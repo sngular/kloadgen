@@ -8,7 +8,7 @@ KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO sc
 ## Getting Started
 ___
 
-Que Avrocado includes four main components
+KLoadGen includes four main components
 
 * **KLoadGen Kafka Sampler** : This is jmeter java sampler sends messages to kafka.
 * **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
