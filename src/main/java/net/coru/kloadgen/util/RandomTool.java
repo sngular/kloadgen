@@ -36,6 +36,9 @@ public final class RandomTool {
       case "short":
         value = RandomUtils.nextInt(0, 32767);
         break;
+      case "double":
+        value = RandomUtils.nextDouble();
+        break;
       case "uuid":
         value = UUID.randomUUID().toString();
         break;
@@ -56,6 +59,9 @@ public final class RandomTool {
       switch (field.schema().getType().getName().toUpperCase()) {
         case "INT":
           value = Integer.valueOf(valueExpression);
+          break;
+        case "DOUBLE":
+          value = Double.valueOf(valueExpression);
           break;
         case "LONG":
         case "UNION":
