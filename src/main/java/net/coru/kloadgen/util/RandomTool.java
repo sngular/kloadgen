@@ -3,16 +3,23 @@ package net.coru.kloadgen.util;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 public final class RandomTool {
 
+  public static final Set<String> VALID_TYPES = SetUtils.hashSet("string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid");
+
+  private RandomTool() {
+  }
+
   public static Object generateRandom(String valueExpression) {
-    Object value = valueExpression;
+    Object value;
     switch (valueExpression) {
       case "string":
         value = RandomStringUtils.randomAlphabetic(20);
@@ -21,7 +28,6 @@ public final class RandomTool {
         value = RandomUtils.nextInt();
         break;
       case "long":
-      case "union":
         value = RandomUtils.nextLong();
         break;
       case "timestamp":
@@ -41,6 +47,9 @@ public final class RandomTool {
         break;
       case "uuid":
         value = UUID.randomUUID().toString();
+        break;
+      default:
+        value = valueExpression;
         break;
     }
     return value;
@@ -64,11 +73,13 @@ public final class RandomTool {
           value = Double.valueOf(valueExpression);
           break;
         case "LONG":
-        case "UNION":
           value = Long.valueOf(valueExpression);
           break;
         case "SHORT":
           value = Short.valueOf(valueExpression);
+          break;
+        case "UNION":
+          value = ("null".equalsIgnoreCase(value.toString())) ? null : valueExpression;
           break;
         default:
           value = valueExpression;

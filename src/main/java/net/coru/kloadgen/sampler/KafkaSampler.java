@@ -91,6 +91,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(ProducerKeys.SASL_MECHANISM, context.getParameter(ProducerKeys.SASL_MECHANISM));
         props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty("schemaUrl"));
+        props.put(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
 
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {

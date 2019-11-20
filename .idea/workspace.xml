@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f1f4f215-a6cc-466a-93ac-a5bf487580e1" name="Default Changelist" comment="" />
+    <list default="true" id="f1f4f215-a6cc-466a-93ac-a5bf487580e1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.apt.core.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.m2e.core.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dependency-reduced-pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/dependency-reduced-pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/input/AvroSchemaProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/input/AvroSchemaProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/input/avro/SchemaExtractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/input/avro/SchemaExtractor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/sampler/KafkaSampler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/sampler/KafkaSampler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/util/ProducerKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/util/ProducerKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/util/RandomTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/coru/kloadgen/util/RandomTool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/net/coru/kloadgen/config/avroserialized/AvroSerializedConfigElementTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/net/coru/kloadgen/config/avroserialized/AvroSerializedConfigElementTest.java" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,10 +26,26 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenRunner">
+    <option name="skipTests" value="true" />
+  </component>
   <component name="ProjectId" id="1TmxWEgkhH7WkOQk7g0qXGAzciJ" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="true" />
+    <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -28,6 +59,46 @@
       </list>
     </option>
   </component>
+  <component name="RunManager" selected="JUnit.AvroSerializedConfigElementTest.avroSerializedConfigTest">
+    <configuration name="AvroSerializedConfigElementTest.avroSerializedConfigTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="kloadgen" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="net.coru.kloadgen.config.avroserialized.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="net.coru.kloadgen.config.avroserialized" />
+      <option name="MAIN_CLASS_NAME" value="net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElementTest" />
+      <option name="METHOD_NAME" value="avroSerializedConfigTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AvroSubjectPropertyEditorTest.iterationStart" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="kloadgen" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="net.coru.kloadgen.input.avro.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="net.coru.kloadgen.input.avro" />
+      <option name="MAIN_CLASS_NAME" value="net.coru.kloadgen.input.avro.AvroSubjectPropertyEditorTest" />
+      <option name="METHOD_NAME" value="iterationStart" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.AvroSerializedConfigElementTest.avroSerializedConfigTest" />
+        <item itemvalue="JUnit.AvroSubjectPropertyEditorTest.iterationStart" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -39,6 +110,21 @@
       <option name="presentableId" value="Default" />
       <updated>1574079101375</updated>
     </task>
+    <task id="LOCAL-00001" summary="Clean up">
+      <created>1574080252136</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1574080252136</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Adding support for array avro type">
+      <created>1574202459390</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1574202459390</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -46,10 +132,62 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/.." />
+    </ignored-roots>
+    <MESSAGE value="Clean up" />
+    <MESSAGE value="Adding support for array avro type" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding support for array avro type" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/net/coru/kloadgen/input/avro/AvroSubjectPropertyEditorTest.java</url>
+          <line>30</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/net/coru/kloadgen/input/AvroSchemaProcessor.java</url>
+          <line>39</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/net/coru/kloadgen/config/avroserialized/AvroSerializedConfigElementTest.java</url>
+          <line>35</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/net/coru/kloadgen/input/avro/SchemaExtractor.java</url>
+          <line>61</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/net/coru/kloadgen/sampler/KafkaSampler.java</url>
+          <line>159</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/net/coru/kloadgen/sampler/KafkaSampler.java</url>
+          <line>165</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$MAVEN_REPOSITORY$/io/confluent/kafka-avro-serializer/5.3.1/kafka-avro-serializer-5.3.1.jar!/io/confluent/kafka/serializers/AbstractKafkaAvroSerializer.class</url>
+          <line>47</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

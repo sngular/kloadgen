@@ -86,10 +86,11 @@ public class AvroSchemaProcessor implements Iterator {
 
   private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     List<GenericRecord> objectArray = new ArrayList<>(arraySize);
-    for(int i=0; i<arraySize; i++) {
+    for(int i=0; i<arraySize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
       objectArray.add(createObject(subSchema, fieldName, temporalQueue));
     }
+    objectArray.add(createObject(subSchema, fieldName, fieldExpMappingsQueue));
     return objectArray;
   }
 
