@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -21,6 +22,7 @@ public class AvroSchemaProcessor implements Iterator {
 
   private SchemaRegistryClient schemaRegistryClient;
   private Schema schema;
+  private SchemaMetadata metadata;
   private List<FieldValueMapping> fieldExprMappings;
 
   public AvroSchemaProcessor(String schemaRegistruUrl, String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
@@ -55,7 +57,7 @@ public class AvroSchemaProcessor implements Iterator {
         fieldValueMapping = fieldExpMappingsQueue.peek();
       }
     }
-    return entity;
+    return new EnrichedRecord(metadata, entity);
   }
 
   private GenericRecord createObject(Schema subSchema, String fieldName, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
@@ -128,7 +130,7 @@ public class AvroSchemaProcessor implements Iterator {
   }
 
   private Schema getSchemaBySubject(String avroSubjectName) throws IOException, RestClientException {
-    SchemaMetadata metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSubjectName);
+    metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSubjectName);
     return schemaRegistryClient.getById(metadata.getId());
   }
 
