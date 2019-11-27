@@ -193,6 +193,12 @@
             <version>4.1.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <artifactId>jaxb-api</artifactId>
+            <groupId>javax.xml.bind</groupId>
+            <scope>compile</scope>
+            <version>2.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
