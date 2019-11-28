@@ -56,7 +56,7 @@ public class ProducerKeys {
     public static final String KAFKA_HEADERS = "kafka.headers";
 
     public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
+    public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT = "true";
 
     public static final String SAMPLE_ENTITY = "SampleEntity";
-
 }

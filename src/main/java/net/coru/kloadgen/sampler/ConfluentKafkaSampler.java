@@ -32,7 +32,7 @@ import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 @Slf4j
-public class KafkaSampler extends AbstractJavaSamplerClient implements Serializable {
+public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
 
     private KafkaProducer<String, Object> producer;
     private String topic;
@@ -44,6 +44,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
         Arguments defaultParameters = new Arguments();
         defaultParameters.addArgument(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, ProducerKeys.BOOTSTRAP_SERVERS_CONFIG_DEFAULT);
+        defaultParameters.addArgument(ProducerKeys.ZOOKEEPER_SERVERS, ProducerKeys.ZOOKEEPER_SERVERS_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.KAFKA_TOPIC_CONFIG, ProducerKeys.KAFKA_TOPIC_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerConfig.COMPRESSION_TYPE_CONFIG, ProducerKeys.COMPRESSION_TYPE_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerConfig.BATCH_SIZE_CONFIG, ProducerKeys.BATCH_SIZE_CONFIG_DEFAULT);
@@ -53,11 +54,15 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         defaultParameters.addArgument(ProducerConfig.SEND_BUFFER_CONFIG, ProducerKeys.SEND_BUFFER_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerConfig.RECEIVE_BUFFER_CONFIG, ProducerKeys.RECEIVE_BUFFER_CONFIG_DEFAULT);
         defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
+        defaultParameters.addArgument(PropsKeys.KEYED_MESSAGE_KEY, PropsKeys.KEYED_MESSAGE_DEFAULT);
+        defaultParameters.addArgument(PropsKeys.MESSAGE_KEY_PLACEHOLDER_KEY, PropsKeys.MSG_KEY_PLACEHOLDER);
+        defaultParameters.addArgument(PropsKeys.MESSAGE_VAL_PLACEHOLDER_KEY, PropsKeys.MSG_PLACEHOLDER);
         defaultParameters.addArgument(ProducerKeys.KERBEROS_ENABLED, ProducerKeys.FLAG_NO);
         defaultParameters.addArgument(ProducerKeys.JAVA_SEC_AUTH_LOGIN_CONFIG, ProducerKeys.JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.JAVA_SEC_KRB5_CONFIG, ProducerKeys.JAVA_SEC_KRB5_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.SASL_KERBEROS_SERVICE_NAME, ProducerKeys.SASL_KERBEROS_SERVICE_NAME_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.SASL_MECHANISM, ProducerKeys.SASL_MECHANISM_DEFAULT);
+        defaultParameters.addArgument(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
 
         defaultParameters.addArgument(ProducerKeys.SSL_ENABLED, ProducerKeys.FLAG_NO);
         defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
@@ -75,8 +80,8 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         Properties props = new Properties();
 
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put(ProducerConfig.ACKS_CONFIG, context.getParameter(ProducerConfig.ACKS_CONFIG));
         props.put(ProducerConfig.SEND_BUFFER_CONFIG, context.getParameter(ProducerConfig.SEND_BUFFER_CONFIG));
         props.put(ProducerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ProducerConfig.RECEIVE_BUFFER_CONFIG));
@@ -87,6 +92,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(ProducerKeys.SASL_MECHANISM, context.getParameter(ProducerKeys.SASL_MECHANISM));
         props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty("schemaUrl"));
+        props.put(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
 
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {
@@ -134,9 +140,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         ProducerRecord<String, Object> producerRecord;
         try {
             if (key_message_flag) {
-                producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal);
+                producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal.getGenericRecord());
             } else {
-                producerRecord = new ProducerRecord<>(topic, messageVal);
+                producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
             }
 
             for (FieldValueMapping kafkaHeader : kafkaHeaders) {
