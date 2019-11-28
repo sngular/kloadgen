@@ -1,6 +1,8 @@
 
 package net.coru.kloadgen.sampler;
 
+import static net.coru.kloadgen.util.ProducerKeys.SAMPLE_ENTITY;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -134,7 +136,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
-        Object messageVal = jMeterContext.getVariables().getObject(msg_val_placeHolder);
+        Object messageVal = jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
         List<FieldValueMapping> kafkaHeaders = (List<FieldValueMapping>) jMeterContext.getSamplerContext().get(
             ProducerKeys.KAFKA_HEADERS);
 

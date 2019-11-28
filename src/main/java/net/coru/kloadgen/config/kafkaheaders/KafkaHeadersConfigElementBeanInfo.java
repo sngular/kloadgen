@@ -8,6 +8,7 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class KafkaHeadersConfigElementBeanInfo extends BeanInfoSupport {
+
     private static final String KAFKA_HEADERS = "kafkaHeaders";
 
     public KafkaHeadersConfigElementBeanInfo() {

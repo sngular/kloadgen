@@ -57,4 +57,6 @@ public class ProducerKeys {
 
     public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
 
+    public static final String SAMPLE_ENTITY = "SampleEntity";
+
 }

@@ -19,8 +19,6 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
     private static final String SCHEMA_PROPERTIES = "schemaProperties";
 
-    private static final String PLACE_HOLDER = "placeHolder";
-
     /**
      * Constructor which creates property group and creates UI for SerializedConfigElement.
      */
@@ -30,13 +28,8 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
         //Create Property group
         createPropertyGroup("avro_serialized_load_generator", new String[] {
-                PLACE_HOLDER, SCHEMA_REGISTRY_URL, AVRO_SUBJECT, SCHEMA_PROPERTIES
+            SCHEMA_REGISTRY_URL, AVRO_SUBJECT, SCHEMA_PROPERTIES
         });
-
-        PropertyDescriptor placeHolderProps = property(PLACE_HOLDER);
-        placeHolderProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-        placeHolderProps.setValue(DEFAULT, PropsKeys.MSG_PLACEHOLDER);
-        placeHolderProps.setValue(NOT_EXPRESSION, Boolean.TRUE);
 
         //Create table editor component of jmeter for class field and expression mapping
         TypeEditor tableEditor = TypeEditor.TableEditor;
