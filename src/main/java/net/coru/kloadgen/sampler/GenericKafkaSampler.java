@@ -3,14 +3,11 @@ package net.coru.kloadgen.sampler;
 
 import static net.coru.kloadgen.util.ProducerKeys.SAMPLE_ENTITY;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -31,19 +28,16 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 @Slf4j
-public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
+public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
 
     private KafkaProducer<String, Object> producer;
     private String topic;
     private String msg_key_placeHolder;
     private boolean key_message_flag = false;
-
-    ObjectMapper objectMapperJson = new ObjectMapper();
 
     @Override
     public Arguments getDefaultParameters() {
@@ -52,6 +46,8 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         defaultParameters.addArgument(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, ProducerKeys.BOOTSTRAP_SERVERS_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.ZOOKEEPER_SERVERS, ProducerKeys.ZOOKEEPER_SERVERS_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.KAFKA_TOPIC_CONFIG, ProducerKeys.KAFKA_TOPIC_CONFIG_DEFAULT);
+        defaultParameters.addArgument(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeys.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
+        defaultParameters.addArgument(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProducerKeys.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerConfig.COMPRESSION_TYPE_CONFIG, ProducerKeys.COMPRESSION_TYPE_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerConfig.BATCH_SIZE_CONFIG, ProducerKeys.BATCH_SIZE_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerConfig.LINGER_MS_CONFIG, ProducerKeys.LINGER_MS_CONFIG_DEFAULT);
@@ -68,7 +64,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         defaultParameters.addArgument(ProducerKeys.JAVA_SEC_KRB5_CONFIG, ProducerKeys.JAVA_SEC_KRB5_CONFIG_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.SASL_KERBEROS_SERVICE_NAME, ProducerKeys.SASL_KERBEROS_SERVICE_NAME_DEFAULT);
         defaultParameters.addArgument(ProducerKeys.SASL_MECHANISM, ProducerKeys.SASL_MECHANISM_DEFAULT);
-        defaultParameters.addArgument(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
 
         defaultParameters.addArgument(ProducerKeys.SSL_ENABLED, ProducerKeys.FLAG_NO);
         defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
@@ -86,8 +81,8 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         Properties props = new Properties();
 
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
         props.put(ProducerConfig.ACKS_CONFIG, context.getParameter(ProducerConfig.ACKS_CONFIG));
         props.put(ProducerConfig.SEND_BUFFER_CONFIG, context.getParameter(ProducerConfig.SEND_BUFFER_CONFIG));
         props.put(ProducerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ProducerConfig.RECEIVE_BUFFER_CONFIG));
@@ -98,7 +93,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(ProducerKeys.SASL_MECHANISM, context.getParameter(ProducerKeys.SASL_MECHANISM));
         props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty("schemaUrl"));
-        props.put(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+        props.put(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
 
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {
@@ -125,7 +120,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             props.put(ProducerKeys.SASL_KERBEROS_SERVICE_NAME, context.getParameter(ProducerKeys.SASL_KERBEROS_SERVICE_NAME));
         }
 
-        if ("YES".equals(context.getParameter(PropsKeys.KEYED_MESSAGE_KEY))) {
+        if (context.getParameter(PropsKeys.KEYED_MESSAGE_KEY).equals("YES")) {
             key_message_flag= true;
             msg_key_placeHolder = UUID.randomUUID().toString();
         }
@@ -150,18 +145,14 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             } else {
                 producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
             }
-            Map<String, String> jsonTypes = new HashMap<>();
-            jsonTypes.put("itx_deprecation_date", "java.lang.String");
-            jsonTypes.put("contentType", "java.lang.String");
-            producerRecord.headers()
-                .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
+
             for (FieldValueMapping kafkaHeader : kafkaHeaders) {
                 producerRecord.headers().add(kafkaHeader.getFieldName(),
-                    objectMapperJson.writeValueAsBytes(RandomTool.generateRandom(kafkaHeader.getValueExpression())));
+                    RandomTool.generateRandom(kafkaHeader.getValueExpression()).toString().getBytes());
             }
 
             log.info("Send message {}", producerRecord.value());
-            Future<RecordMetadata> messageSent = producer.send(producerRecord);
+            Future messageSent = producer.send(producerRecord);
             producer.flush();
             if (!messageSent.isDone()) {
                 throw new IOException("Message not sent");
@@ -175,8 +166,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
-        } finally {
-            producer.close();
         }
 
         return sampleResult;

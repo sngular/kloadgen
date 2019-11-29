@@ -113,7 +113,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
             props.put(ProducerKeys.SASL_KERBEROS_SERVICE_NAME, context.getParameter(ProducerKeys.SASL_KERBEROS_SERVICE_NAME));
         }
 
-        if (context.getParameter(PropsKeys.KEYED_MESSAGE_KEY).equals("YES")) {
+        if ("YES".equals(context.getParameter(PropsKeys.KEYED_MESSAGE_KEY))) {
             key_message_flag= true;
             msg_key_placeHolder = UUID.randomUUID().toString();
         }
