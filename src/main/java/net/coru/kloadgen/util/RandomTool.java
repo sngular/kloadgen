@@ -2,6 +2,7 @@ package net.coru.kloadgen.util;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -13,7 +14,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 public final class RandomTool {
 
-  public static final Set<String> VALID_TYPES = SetUtils.hashSet("string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid");
+  public static final Set<String> VALID_TYPES = SetUtils.hashSet("string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array");
 
   private RandomTool() {
   }
@@ -48,6 +49,12 @@ public final class RandomTool {
       case "uuid":
         value = UUID.randomUUID().toString();
         break;
+      case "boolean":
+        value = RandomUtils.nextBoolean();
+        break;
+      case "int-array":
+        value = generateIntArray();
+        break;
       default:
         value = valueExpression;
         break;
@@ -60,7 +67,7 @@ public final class RandomTool {
     if ("ENUM".equalsIgnoreCase(field.schema().getType().getName())) {
        if ("ENUM".equalsIgnoreCase(valueExpression)) {
          List<String> enumValueList= field.schema().getEnumSymbols();
-         value = enumValueList.get(RandomUtils.nextInt(0, enumValueList.size()));
+         value = new GenericData.EnumSymbol(field.schema(), enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
        } else {
          value = new GenericData.EnumSymbol(field.schema(), valueExpression);
        }
@@ -87,5 +94,14 @@ public final class RandomTool {
       }
     }
     return value;
+  }
+
+  private static List<Integer> generateIntArray() {
+    int size = RandomUtils.nextInt(1,5);
+    List<Integer> intArray = new ArrayList<>();
+    for (int i=0; i<size; i++) {
+      intArray.add(RandomUtils.nextInt());
+    }
+    return intArray;
   }
 }

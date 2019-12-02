@@ -175,10 +175,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
-        } finally {
-            producer.close();
         }
-
         return sampleResult;
     }
 

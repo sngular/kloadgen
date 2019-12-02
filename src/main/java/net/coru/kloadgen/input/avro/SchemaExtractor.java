@@ -39,8 +39,15 @@ public class SchemaExtractor {
 
   private List<FieldValueMapping> extractArrayInternalFields(Field innerField) {
     List<FieldValueMapping> completeFieldList = new ArrayList<>();
-    for (Field arrayElementField : innerField.schema().getElementType().getFields()) {
-      processField(arrayElementField, completeFieldList);
+    if ("RECORD".equalsIgnoreCase(innerField.schema().getElementType().getName())) {
+      for (Field arrayElementField : innerField.schema().getElementType().getFields()) {
+        processField(arrayElementField, completeFieldList);
+      }
+    } else if ("INT".equalsIgnoreCase(innerField.schema().getElementType().getName())) {
+      FieldValueMapping internalField = new FieldValueMapping();
+      internalField.setFieldName(innerField.name());
+      internalField.setValueExpression(innerField.schema().getElementType().getName()+"-array");
+      completeFieldList.add(internalField);
     }
     return completeFieldList;
   }
@@ -54,10 +61,15 @@ public class SchemaExtractor {
       });
     } else if (Type.ARRAY == innerField.schema().getType()) {
       List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField);
-      internalFields.forEach(internalField -> {
-        internalField.setFieldName(innerField.name() + "[]." + internalField.getFieldName());
-        completeFieldList.add(internalField);
-      });
+      if (internalFields.size() >1) {
+        internalFields.forEach(internalField -> {
+          internalField.setFieldName(innerField.name() + "[]." + internalField.getFieldName());
+          completeFieldList.add(internalField);
+        });
+      } else {
+        internalFields.get(0).setFieldName(innerField.name());
+        completeFieldList.add(internalFields.get(0));
+      }
     } else if (Type.UNION == innerField.schema().getType()) {
       FieldValueMapping internalField = new FieldValueMapping();
       internalField.setFieldName(innerField.name());
@@ -73,8 +85,12 @@ public class SchemaExtractor {
 
   private String getNotNullType(List<Schema> types) {
     String choosenType = types.get(0).getName().equalsIgnoreCase("null") ? types.get(1).getName() : types.get(0).getName();
+    choosenType = types.get(1).getName().equalsIgnoreCase("array") ? types.get(1).getName() : types.get(0).getName();
+
     if (!RandomTool.VALID_TYPES.contains(choosenType)) {
       choosenType = "null";
+    } else if ("array".equalsIgnoreCase(choosenType)) {
+      choosenType = "int-array";
     }
     return choosenType;
   }
