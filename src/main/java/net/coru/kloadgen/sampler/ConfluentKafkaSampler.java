@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -157,7 +158,8 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
             for (FieldValueMapping kafkaHeader : kafkaHeaders) {
                 producerRecord.headers().add(kafkaHeader.getFieldName(),
-                    objectMapperJson.writeValueAsBytes(RandomTool.generateRandom(kafkaHeader.getValueExpression())));
+                    objectMapperJson.writeValueAsBytes(RandomTool.generateRandom(kafkaHeader.getValueExpression(),
+                        10, Collections.emptyList())));
             }
 
             log.info("Send message {}", producerRecord.value());

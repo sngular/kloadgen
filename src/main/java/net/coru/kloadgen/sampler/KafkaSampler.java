@@ -6,6 +6,7 @@ import static net.coru.kloadgen.util.ProducerKeys.SAMPLE_ENTITY;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -141,7 +142,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
             for (FieldValueMapping kafkaHeader : kafkaHeaders) {
                 producerRecord.headers().add(kafkaHeader.getFieldName(),
-                    RandomTool.generateRandom(kafkaHeader.getValueExpression()).toString().getBytes());
+                    RandomTool.generateRandom(kafkaHeader.getValueExpression(),
+                        10,
+                        Collections.emptyList()).toString().getBytes());
             }
 
             log.info("Send message {}", producerRecord.value());

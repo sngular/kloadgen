@@ -26,7 +26,8 @@ public class JsonSchemaProcessor implements Iterator {
   public Object next() {
     DocumentContext json = JsonPath.parse(jsonDocument);
     for (FieldValueMapping fieldValueMapping: schemaProperties) {
-      json.set("$." + fieldValueMapping.getFieldName(),  RandomTool.generateRandom(fieldValueMapping.getValueExpression()));
+      json.set("$." + fieldValueMapping.getFieldName(),  RandomTool.generateRandom(fieldValueMapping.getValueExpression(),
+          fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList()));
     }
     return json.jsonString();
   }
