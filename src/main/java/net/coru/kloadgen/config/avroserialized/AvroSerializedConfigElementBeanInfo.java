@@ -36,8 +36,8 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         PropertyDescriptor tableProperties = property(SCHEMA_PROPERTIES, tableEditor);
         tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
         tableProperties.setValue(TableEditor.HEADERS, new String[]{ "Field Name",
-            "Field Expression",
-            "Field length",
+            "Field Type",
+            "Field Length",
             "Field Values List"} );
         tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
             new String[]{

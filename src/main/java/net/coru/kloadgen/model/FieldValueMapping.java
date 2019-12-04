@@ -51,6 +51,6 @@ public class FieldValueMapping extends AbstractTestElement {
     }
 
     public void setFieldValuesList(String fieldValuesList) {
-        setProperty(FIELD_VALUES_LIST, fieldValuesList);
+        setProperty(FIELD_VALUES_LIST, fieldValuesList.replace("[","").replace("]",""));
     }
 }

@@ -16,11 +16,11 @@ import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.threads.JMeterContext;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
 public class KafkaHeadersConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private List<FieldValueMapping> kafkaHeaders;

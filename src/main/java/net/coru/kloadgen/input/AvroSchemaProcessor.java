@@ -58,7 +58,6 @@ public class AvroSchemaProcessor implements Iterator {
         entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
         fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       } else {
-        assert fieldValueMapping != null;
         entity.put(fieldValueMapping.getFieldName(),
             RandomTool.generateRandom(fieldValueMapping.getValueExpression(),
                 fieldValueMapping.getValueLength(),
@@ -86,7 +85,7 @@ public class AvroSchemaProcessor implements Iterator {
         String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
         subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
             fieldNameSubEntity,
-            calculateArraySize(fieldName),
+            calculateArraySize(cleanFieldName),
             fieldExpMappingsQueue));
       } else if (cleanFieldName.contains(".")) {
         String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
@@ -139,7 +138,7 @@ public class AvroSchemaProcessor implements Iterator {
   private Integer calculateArraySize(String fieldName) {
     Integer arrayLength = RandomUtils.nextInt(1,10);
     String arrayLengthStr = StringUtils.substringBetween(fieldName,"[", "]");
-    if (StringUtils.isEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
+    if (StringUtils.isNotEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
       arrayLength = Integer.valueOf(arrayLengthStr);
     }
     return arrayLength;

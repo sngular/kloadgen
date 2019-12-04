@@ -10,7 +10,10 @@ ___
 
 KLoadGen includes four main components
 
-* **KLoadGen Kafka Sampler** : This is jmeter java sampler sends messages to kafka.
+* **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class used:
+   * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer
+   * **Kafka Sampler** : Our own and simple Kafka Sampler
+   * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configure by properties.
 * **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
 * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
 
@@ -23,12 +26,12 @@ KLoadGen uses Java, hence on JMeter machine JRE 8 or superior:
 
 Install openjdk on Debian, Ubuntu, etc.,
 ```
-sudo apt-get install openjdk-8-jdk
+ sudo apt-get install openjdk-8-jdk
 ``` 
 
 Install openjdk on Fedora, Oracle Linux, Red Hat Enterprise Linux, etc.,
 ```
-su -c "yum install java-1.8.0-openjdk-devel"
+ su -c "yum install java-1.8.0-openjdk-devel"
 ```
 For windows and mac and you can:
  * download oracle JDK 8 setup from [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 
@@ -36,22 +39,22 @@ For windows and mac and you can:
         https://chocolatey.org/packages?q=java
    brew (mac):
 ```
-    brew tap adoptopenjdk/openjdk 
-    brew cask install adoptopenjdk8 
+ brew tap adoptopenjdk/openjdk 
+ brew cask install adoptopenjdk8 
 ```
 
 
 #### Build Project
 ```
-mvn clean install
+ mvn clean install
 ```
-Once build is completed, copy jar file to JMETER_HOME/lib/ext directory.
+Once build is completed, copy target/kloadgen-<version>.jar file to JMETER_HOME/lib/ext directory.
 
 ### KLoadGenSampler
 ___
 
 * **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
-* **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. **Note** : Any one of bootstrap or zookeeper server detail is enough. if zookeeper servers are given then bootstrap.servers are retrieved dynamically from zookeeper servers.
+* **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
 * **kafka.topic.name** : Topic on which messages will be sent
 * **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
 * **value.serializer** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
@@ -68,6 +71,7 @@ ___
 * **java.security.auth.login.config** : jaas.conf of kafka Kerberos
 * **java.security.krb5.conf** : Kerberos server krb5.conf file
 * **sasl.kerberos.service.name** : Kafka Kerberos service name
+* **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing.
 
 Above properties are added by default in sampler as those are more significant in terms of performance in most of the cases. But you can add other non listed kafka properties with prefix "_".
 
@@ -82,6 +86,21 @@ _ssl.truststore.password
 
 ```
 
+![Kafka Producer Configuration](/Kafka_producer_properties.png)
+
+
+### Load Generator Configuration
+---
+This screen will allow JMeter connect to a Schema Registry and download the specified subject. AVRO sctructure will be flattened and show in the lower table. 
+On that Table we will see 4 columns where we will configure the Random Generator system.
+
+* **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
+* **Field Type** : Field type, like String, Int, Double, Array **Note** : if the field is an array of basic types it will be show as string-array, int-array,...
+* **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
+* **Field Values List** : Field possibles values which will be used by the Random Tool to generate values.
+
+![Load Generator Table](/Kafka_load_generator_config.png)
+
 ### Schema Template Functions
 ___
 
@@ -94,11 +113,21 @@ KLoadGen provides an easy way for random data generation base on the field type.
 | short | Field of short type | Random Short |
 | long | Field of long type | Random Long |
 | enum | Field of enum type | Random enum value bases on the AVRO enum type definition |
-| union | Field of type UNION | Random long* (in the future we will generate base on the union types) |
 | stringTimestmap | Field of type String but coding a Timestmap | Localdatetime.now formatted as string |
 | longTimestmap | Field of type Long but coding a Timestmap | Localdatetime.now formatted as long |
+| string-array | Field of type Array of String | Random size array of random generated String |
+| int-array | Field of type Array of String | Random size array of random generated Integers |
+| short-array | Field of type Array of Short | Random size array of Random generated Shorts |
+| double-array | Field of type Array of Double | Random size array of Random generated Double |
 
 Other values will be considered Constants for this field and will be converted to the Field Type. Keep that in mind to avoid Cast Exceptions
+
+### Kafka Headers Configuration
+---
+This configuration component allow to specify a list of header which will be included in the producer. Headers specified here will be included in every message after be serialized.
+Values will follow the same rules and the message body, if specify a type (basic type) it will generate a random value. If a value is set will be treated as String and serialize in the same way.
+
+[Kafka Header Config](/Kafka_header_config_element.png)
 
 ## Special Thanks!
 

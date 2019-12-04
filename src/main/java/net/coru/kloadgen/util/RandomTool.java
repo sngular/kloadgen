@@ -153,7 +153,7 @@ public final class RandomTool {
   private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     int value;
     if (fieldValuesList.size() >0 ) {
-      value = Integer.parseInt(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())));
+      value = Integer.parseInt(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -163,7 +163,7 @@ public final class RandomTool {
   private static Long getLongValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     long value;
     if (fieldValuesList.size() > 0) {
-      value = Long.parseLong(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())));
+      value = Long.parseLong(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextLong(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -173,7 +173,7 @@ public final class RandomTool {
   private static Double getDoubleValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     double value;
     if (fieldValuesList.size() > 0) {
-      value = Double.parseDouble(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())));
+      value = Double.parseDouble(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextDouble(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -183,7 +183,7 @@ public final class RandomTool {
   private static String getStringValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     String value;
     if (fieldValuesList.size() > 0) {
-      value = fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size()));
+      value = fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim();
     } else {
       value = RandomStringUtils.randomAlphabetic(valueLength);
     }
@@ -193,7 +193,7 @@ public final class RandomTool {
   private static Short getShortValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     short value;
     if (fieldValuesList.size() > 0) {
-      value = Short.parseShort(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())));
+      value = Short.parseShort(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       if (valueLength < 5 ) {
         value = (short) RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
@@ -211,7 +211,7 @@ public final class RandomTool {
   private static Object getTimestampValueOrRandom(String type, List<String> fieldValuesList) {
     LocalDateTime value;
     if (fieldValuesList.size() > 0) {
-      value = LocalDateTime.parse(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())));
+      value = LocalDateTime.parse(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       value = LocalDateTime.now();
     }
