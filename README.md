@@ -129,6 +129,10 @@ Values will follow the same rules and the message body, if specify a type (basic
 
 [Kafka Header Config](/Kafka_header_config_element.png)
 
+### Example Test Plan
+
+[Here](/Example-Test-Plan.jmx) you can find an example of a JMeter Test Plan using the elements defined in this plugin. This test plan will only inject messages in a Kafka Cluster. **Before** execute it you should add your Schema Registry to retrieve the Schema in order to extract the Entity structure. In a future we will include support to read AVRO files.
+
 ## Special Thanks!
 
 * We would like to special thanks to [pepper-box
