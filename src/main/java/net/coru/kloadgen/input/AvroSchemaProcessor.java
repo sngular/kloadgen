@@ -81,7 +81,7 @@ public class AvroSchemaProcessor implements Iterator {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     while(!fieldExpMappingsQueue.isEmpty() && fieldValueMapping.getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
-      if (cleanFieldName.contains("[")) {
+      if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
         String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
         subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
             fieldNameSubEntity,
@@ -109,7 +109,11 @@ public class AvroSchemaProcessor implements Iterator {
     if (ARRAY == field.schema().getType()) {
       return field.schema().getElementType();
     } else if (UNION == field.schema().getType()) {
-      return field.schema().getTypes().get(1).getElementType();
+      if (ARRAY == field.schema().getTypes().get(1).getType()) {
+        return field.schema().getTypes().get(1).getElementType();
+      } else {
+        return field.schema().getTypes().get(1);
+      }
     } else return null;
   }
 

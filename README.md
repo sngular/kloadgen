@@ -112,11 +112,13 @@ KLoadGen provides an easy way for random data generation base on the field type.
 | int | Field of Int type | Random Integer |
 | short | Field of short type | Random Short |
 | long | Field of long type | Random Long |
+| double | Field of double type | Random Double |
 | enum | Field of enum type | Random enum value bases on the AVRO enum type definition |
 | stringTimestmap | Field of type String but coding a Timestmap | Localdatetime.now formatted as string |
 | longTimestmap | Field of type Long but coding a Timestmap | Localdatetime.now formatted as long |
 | string-array | Field of type Array of String | Random size array of random generated String |
 | int-array | Field of type Array of String | Random size array of random generated Integers |
+| long-array | Field of type Array of Long | Random size array of Random generated Longs |
 | short-array | Field of type Array of Short | Random size array of Random generated Shorts |
 | double-array | Field of type Array of Double | Random size array of Random generated Double |
 

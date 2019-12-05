@@ -1,12 +1,14 @@
 package net.coru.kloadgen.util;
 
+import static org.apache.avro.Schema.Type.UNION;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.SetUtils;
@@ -81,27 +83,33 @@ public final class RandomTool {
          value = new GenericData.EnumSymbol(field.schema(), valueExpression);
        }
     } else if (valueExpression.equalsIgnoreCase(value.toString())) {
-      switch (field.schema().getType().getName().toUpperCase()) {
-        case "INT":
-          value = Integer.valueOf(valueExpression);
-          break;
-        case "DOUBLE":
-          value = Double.valueOf(valueExpression);
-          break;
-        case "LONG":
-          value = Long.valueOf(valueExpression);
-          break;
-        case "SHORT":
-          value = Short.valueOf(valueExpression);
-          break;
-        case "UNION":
-          value = ("null".equalsIgnoreCase(value.toString())) ? null : valueExpression;
-          break;
-        default:
-          value = valueExpression;
-          break;
-      }
+     if (UNION == field.schema().getType()) {
+       value = ("null".equalsIgnoreCase(value.toString())) ? null : castValue(valueExpression, field.schema().getTypes().get(1).getType());
+     } else {
+       value = castValue(valueExpression, field.schema().getType());
+     }
     }
+    return value;
+  }
+
+  private static Object castValue(String valueExpression, Schema.Type type) {
+    Object value = valueExpression;
+    switch(type) {
+      case INT:
+        value = Integer.valueOf(valueExpression);
+        break;
+      case DOUBLE:
+        value = Double.valueOf(valueExpression);
+        break;
+      case LONG:
+        value = Long.valueOf(valueExpression);
+        break;
+      case BOOLEAN:
+        value = Boolean.valueOf(valueExpression);
+        break;
+
+    }
+
     return value;
   }
 
