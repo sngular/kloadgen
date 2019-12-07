@@ -6,7 +6,6 @@ import net.coru.kloadgen.input.avro.AvroSchemaPropertyEditor;
 import net.coru.kloadgen.input.avro.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.ProducerKeys;
-import net.coru.kloadgen.util.PropsKeys;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
@@ -35,17 +34,20 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         TypeEditor tableEditor = TypeEditor.TableEditor;
         PropertyDescriptor tableProperties = property(SCHEMA_PROPERTIES, tableEditor);
         tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
-        tableProperties.setValue(TableEditor.HEADERS, new String[]{ "Field Name",
-            "Field Type",
-            "Field Length",
-            "Field Values List"} );
+        tableProperties.setValue(TableEditor.HEADERS,
+            new String[]{
+                "Field Name",
+                "Field Type",
+                "Field Length",
+                "Field Values List"
+            });
         tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
             new String[]{
                 FieldValueMapping.FIELD_NAME,
                 FieldValueMapping.VALUE_EXPRESSION,
                 FieldValueMapping.VALUE_LENGTH,
                 FieldValueMapping.FIELD_VALUES_LIST
-        });
+            });
         tableProperties.setValue(DEFAULT, new ArrayList<>());
         tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
 

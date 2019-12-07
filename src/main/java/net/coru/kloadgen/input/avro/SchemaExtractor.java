@@ -1,6 +1,5 @@
 package net.coru.kloadgen.input.avro;
 
-import static org.apache.avro.Schema.Type.INT;
 import static org.apache.avro.Schema.Type.RECORD;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
@@ -58,10 +57,7 @@ public class SchemaExtractor {
         processField(arrayElementField, completeFieldList);
       }
     } else if (typesSet.contains(innerField.getElementType().getType())) {
-      FieldValueMapping internalField = new FieldValueMapping();
-      internalField.setFieldName(fieldName);
-      internalField.setValueExpression(innerField.getElementType().getName()+"-array");
-      completeFieldList.add(internalField);
+      completeFieldList.add( new FieldValueMapping(fieldName,innerField.getElementType().getName()+"-array"));
     }
     return completeFieldList;
   }
@@ -92,16 +88,10 @@ public class SchemaExtractor {
           }
         }
       } else {
-        FieldValueMapping internalField = new FieldValueMapping();
-        internalField.setFieldName(innerField.name());
-        internalField.setValueExpression(getNotNullType(innerField.schema().getTypes()));
-        completeFieldList.add(internalField);
+        completeFieldList.add( new FieldValueMapping(innerField.name(), getNotNullType(innerField.schema().getTypes())));
       }
     } else {
-      FieldValueMapping internalField = new FieldValueMapping();
-      internalField.setFieldName(innerField.name());
-      internalField.setValueExpression(innerField.schema().getType().getName());
-      completeFieldList.add(internalField);
+      completeFieldList.add( new FieldValueMapping(innerField.name(),innerField.schema().getType().getName()));
     }
   }
 

@@ -1,19 +1,92 @@
 {
-  "priority":10,
-  "request": {
-    "method": "GET",
-    "urlPattern": ".*"
-  },
-  "response": {
-    "status": 404,
-    "jsonBody": {
-      "subject": "AvroSubject",
-      "version": 1,
-      "id": 71,
-      "schema":"{\"type\" : \"object\",\"required\" : [ \"Name\", \"Age\" ],\"additionalProperties\" : false,\"properties\" : {\"Name\" : {\"type\" : \"string\"},\"Age\" : {\"type\" : \"integer\",\"minimum\" : -2147483648,\"maximum\" : 2147483647}}}}"
+  "mappings" : [
+    {
+      "priority":10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/subjects/users/versions/latest"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "subject": "AvroSubject",
+          "version": 1,
+          "id": 72,
+          "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\": \"long\"}]}}}]}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
     },
-    "headers": {
-      "Content-Type": "application/vnd.schemaregistry.v1+json"
+    {
+      "priority":10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/subjects/avrosubject/versions/latest"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "subject": "AvroSubject",
+          "version": 1,
+          "id": 71,
+          "schema":"{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority":10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/schemas/ids/71"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody":
+        {
+          "schema":"{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority":10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/schemas/ids/72"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody":
+        {
+          "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\": \"long\"}]}}}]}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority":10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/subjects"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody":
+         ["avrosubject","users"]
+        ,
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
     }
-  }
+  ]
 }

@@ -13,7 +13,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.ProducerKeys;
 import net.coru.kloadgen.util.PropsKeys;
@@ -93,7 +93,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(ProducerKeys.SASL_MECHANISM, context.getParameter(ProducerKeys.SASL_MECHANISM));
-        props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty("schemaUrl"));
+        props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty(ProducerKeys.SCHEMA_REGISTRY_URL));
         props.put(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
 
         Iterator<String> parameters = context.getParameterNamesIterator();
@@ -135,9 +135,9 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
-        JMeterContext jMeterContext = JMeterContextService.getContext();
-        EnrichedRecord messageVal = (EnrichedRecord)jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
-        List<FieldValueMapping> kafkaHeaders = (List<FieldValueMapping>) jMeterContext.getSamplerContext().get(ProducerKeys.KAFKA_HEADERS);
+        JMeterContext samplerContext = JMeterContextService.getContext();
+        EnrichedRecord messageVal = (EnrichedRecord)samplerContext.getVariables().getObject(SAMPLE_ENTITY);
+        List<HeaderMapping> kafkaHeaders = (List<HeaderMapping>) samplerContext.getSamplerContext().get(ProducerKeys.KAFKA_HEADERS);
 
         ProducerRecord<String, Object> producerRecord;
         try {
@@ -147,9 +147,9 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
                 producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
             }
 
-            for (FieldValueMapping kafkaHeader : kafkaHeaders) {
-                producerRecord.headers().add(kafkaHeader.getFieldName(),
-                    RandomTool.generateRandom(kafkaHeader.getValueExpression(),
+            for (HeaderMapping kafkaHeader : kafkaHeaders) {
+                producerRecord.headers().add(kafkaHeader.getHeaderName(),
+                    RandomTool.generateRandom(kafkaHeader.getHeaderValue(),
                         10,
                         Collections.emptyList()).toString().getBytes());
             }

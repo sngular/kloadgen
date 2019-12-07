@@ -35,7 +35,6 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
     }
 
     private void init() {
-
         panel.setLayout(new BorderLayout());
         panel.add(schemaUrlTextField);
         panel.add(testSchemaRepoBtn, BorderLayout.AFTER_LINE_ENDS);
@@ -46,12 +45,11 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
         super(source);
         this.init();
         this.setValue(source);
-
     }
 
     public AvroSchemaPropertyEditor(PropertyDescriptor descriptor) {
         super(descriptor);
-        this.propertyDescriptor =descriptor;
+        this.propertyDescriptor = descriptor;
         this.init();
     }
 
@@ -69,6 +67,9 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
     public void setAsText(String text) throws IllegalArgumentException {
         this.schemaUrlTextField.setText(text);
         this.schemaUrlTextField.setCaretPosition(0);
+        if (text != null) {
+            storeInVariables(text);
+        }
     }
 
     @Override
@@ -76,7 +77,7 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
         if (value != null) {
             this.schemaUrlTextField.setText(value.toString());
             this.schemaUrlTextField.setCaretPosition(0);
-            JMeterUtils.setProperty("schemaUrl", value.toString());
+            storeInVariables(value.toString());
         } else {
             this.schemaUrlTextField.setText("");
         }
@@ -99,8 +100,7 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
         SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(getAsText(), 1000);
         try {
             schemaRegistryClient.getAllSubjects();
-            JMeterUtils.setProperty("schemaUrl", getAsText());
-            JMeterUtils.setProperty(ProducerKeys.SCHEMA_REGISTRY_URL, getAsText());
+            storeInVariables(getAsText());
 
         } catch (IOException | RestClientException e) {
            log.error(e.getMessage(), e);
@@ -115,5 +115,9 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
     @Override
     public void clearGui() {
         this.schemaUrlTextField.setText("");
+    }
+
+    private void storeInVariables(String value) {
+        JMeterUtils.setProperty(ProducerKeys.SCHEMA_REGISTRY_URL, value);
     }
 }

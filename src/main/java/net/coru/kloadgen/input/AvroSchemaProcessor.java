@@ -43,28 +43,27 @@ public class AvroSchemaProcessor implements Iterator {
   @Override
   public Object next() {
     GenericRecord entity = new GenericData.Record(schema);
-    ArrayDeque<FieldValueMapping> fieldExpMappingsQueue =  new ArrayDeque<>(fieldExprMappings);
-    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    while(!fieldExpMappingsQueue.isEmpty()) {
-      if (cleanUpPath(fieldValueMapping, "").contains("[")) {
-        String fieldName = getCleanMethodName(fieldValueMapping, "");
-        entity.put(fieldName, createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(),
-            fieldName,
-            calculateArraySize(fieldName),
-            fieldExpMappingsQueue));
-        fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-      } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
-        String fieldName = getCleanMethodName(fieldValueMapping, "");
-        entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
-        fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-      } else {
-        entity.put(fieldValueMapping.getFieldName(),
-            RandomTool.generateRandom(fieldValueMapping.getValueExpression(),
-                fieldValueMapping.getValueLength(),
-                fieldValueMapping.getFieldValuesList(),
-                schema.getField(fieldValueMapping.getFieldName())));
-        fieldExpMappingsQueue.remove();
-        fieldValueMapping = fieldExpMappingsQueue.peek();
+    if (!fieldExprMappings.isEmpty()) {
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
+      FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+      while (!fieldExpMappingsQueue.isEmpty()) {
+        if (cleanUpPath(fieldValueMapping, "").contains("[")) {
+          String fieldName = getCleanMethodName(fieldValueMapping, "");
+          entity.put(fieldName,
+              createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateArraySize(fieldName),
+                  fieldExpMappingsQueue));
+          fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+        } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
+          String fieldName = getCleanMethodName(fieldValueMapping, "");
+          entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
+          fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+        } else {
+          entity.put(fieldValueMapping.getFieldName(), RandomTool
+              .generateRandom(fieldValueMapping.getValueExpression(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
+                  schema.getField(fieldValueMapping.getFieldName())));
+          fieldExpMappingsQueue.remove();
+          fieldValueMapping = fieldExpMappingsQueue.peek();
+        }
       }
     }
     return new EnrichedRecord(metadata, entity);

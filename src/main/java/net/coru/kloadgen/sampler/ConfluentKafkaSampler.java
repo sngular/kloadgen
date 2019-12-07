@@ -16,7 +16,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.ProducerKeys;
 import net.coru.kloadgen.util.PropsKeys;
@@ -85,7 +85,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
     public void setupTest(JavaSamplerContext context) {
 
         Properties props = new Properties();
-
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
@@ -98,7 +97,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(ProducerKeys.SASL_MECHANISM, context.getParameter(ProducerKeys.SASL_MECHANISM));
-        props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty("schemaUrl"));
+        props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty(ProducerKeys.SCHEMA_REGISTRY_URL));
         props.put(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
 
         Iterator<String> parameters = context.getParameterNamesIterator();
@@ -142,7 +141,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
         EnrichedRecord messageVal = (EnrichedRecord)jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
-        List<FieldValueMapping> kafkaHeaders = (List<FieldValueMapping>) jMeterContext.getSamplerContext().get(ProducerKeys.KAFKA_HEADERS);
+        List<HeaderMapping> kafkaHeaders = (List<HeaderMapping>) jMeterContext.getSamplerContext().get(ProducerKeys.KAFKA_HEADERS);
 
         ProducerRecord<String, Object> producerRecord;
         try {
@@ -156,9 +155,9 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             jsonTypes.put("contentType", "java.lang.String");
             producerRecord.headers()
                 .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
-            for (FieldValueMapping kafkaHeader : kafkaHeaders) {
-                producerRecord.headers().add(kafkaHeader.getFieldName(),
-                    objectMapperJson.writeValueAsBytes(RandomTool.generateRandom(kafkaHeader.getValueExpression(),
+            for (HeaderMapping kafkaHeader : kafkaHeaders) {
+                producerRecord.headers().add(kafkaHeader.getHeaderName(),
+                    objectMapperJson.writeValueAsBytes(RandomTool.generateRandom(kafkaHeader.getHeaderValue(),
                         10, Collections.emptyList())));
             }
 

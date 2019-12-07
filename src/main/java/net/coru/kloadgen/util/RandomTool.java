@@ -1,5 +1,6 @@
 package net.coru.kloadgen.util;
 
+import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.UNION;
 
 import java.time.LocalDateTime;
@@ -46,10 +47,10 @@ public final class RandomTool {
         value = getTimestampValueOrRandom(valueExpression, fieldValuesList);
         break;
       case "uuid":
-        value = UUID.randomUUID().toString();
+        value = getUUIDValueOrRandom(fieldValuesList);
         break;
       case "boolean":
-        value = RandomUtils.nextBoolean();
+        value = getBooleanValueOrRandom(fieldValuesList);
         break;
       case "int-array":
         value = generateIntArray(valueLength, fieldValuesList);
@@ -66,16 +67,23 @@ public final class RandomTool {
       case "string-array":
         value = generateStringArray(valueLength, fieldValuesList);
         break;
+      case "uuid-array":
+        value = generateUuidArray(fieldValuesList);
+        break;
+      case "boolean-array":
+        value = generateBooleanArray(fieldValuesList);
+        break;
       default:
         value = valueExpression;
         break;
     }
     return value;
   }
+
   public static Object generateRandom(String valueExpression, Integer valueLength, List<String> fieldValuesList, Field field) {
 
     Object value = generateRandom(valueExpression, valueLength, fieldValuesList);
-    if ("ENUM".equalsIgnoreCase(field.schema().getType().getName())) {
+    if (ENUM == field.schema().getType()) {
        if ("ENUM".equalsIgnoreCase(valueExpression)) {
          List<String> enumValueList= field.schema().getEnumSymbols();
          value = new GenericData.EnumSymbol(field.schema(), enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
@@ -158,6 +166,24 @@ public final class RandomTool {
     return stringArray;
   }
 
+  private static List<UUID> generateUuidArray(List<String> fieldValueList) {
+    int size = RandomUtils.nextInt(1,5);
+    List<UUID> uuidArray = new ArrayList<>();
+    for (int i=0; i<size; i++) {
+      uuidArray.add(getUUIDValueOrRandom(fieldValueList));
+    }
+    return uuidArray;
+  }
+
+  private static List<Boolean> generateBooleanArray(List<String> fieldValueList) {
+    int size = RandomUtils.nextInt(1,5);
+    List<Boolean> booleanArray = new ArrayList<>();
+    for (int i=0; i<size; i++) {
+      booleanArray.add(getBooleanValueOrRandom(fieldValueList));
+    }
+    return booleanArray;
+  }
+
   private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     int value;
     if (fieldValuesList.size() >0 ) {
@@ -227,6 +253,22 @@ public final class RandomTool {
       return value.toInstant(ZoneOffset.UTC).toEpochMilli();
     } else if ("stringTimestamp".equalsIgnoreCase(type)) {
       return value.toString();
+    }
+    return value;
+  }
+
+  private static UUID getUUIDValueOrRandom(List<String> fieldValuesList) {
+    UUID value = UUID.randomUUID();
+    if (fieldValuesList.size() > 0) {
+      value = UUID.fromString(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+    }
+    return value;
+  }
+
+  private static Boolean getBooleanValueOrRandom(List<String> fieldValuesList) {
+    Boolean value = RandomUtils.nextBoolean();
+    if (fieldValuesList.size() > 0) {
+      value = Boolean.valueOf(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     }
     return value;
   }

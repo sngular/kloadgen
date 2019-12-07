@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.ProducerKeys;
 import net.coru.kloadgen.util.PropsKeys;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
@@ -24,7 +25,7 @@ import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
 public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -55,9 +56,16 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
     this.init();
   }
 
+  private void init() {
+    panel.setLayout(new BorderLayout());
+    panel.add(subjectNameTextField);
+    panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
+    this.loadClassBtn.addActionListener(this);
+  }
+
   @Override
   public void actionPerformed(ActionEvent event) {
-    String schemaUrl = JMeterUtils.getProperty("schemaUrl");
+    String schemaUrl = (String) JMeterContextService.getContext().getSamplerContext().get(ProducerKeys.SCHEMA_REGISTRY_URL);
     String subjectName = this.subjectNameTextField.getText();
 
     try {
@@ -134,13 +142,5 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
   @Override
   public boolean supportsCustomEditor() {
     return true;
-  }
-
-  private void init() {
-
-    panel.setLayout(new BorderLayout());
-    panel.add(subjectNameTextField);
-    panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
-    this.loadClassBtn.addActionListener(this);
   }
 }
