@@ -25,7 +25,7 @@ import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
 public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -65,7 +65,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    String schemaUrl = (String) JMeterContextService.getContext().getSamplerContext().get(ProducerKeys.SCHEMA_REGISTRY_URL);
+    String schemaUrl = JMeterUtils.getProperty(ProducerKeys.SCHEMA_REGISTRY_URL);
     String subjectName = this.subjectNameTextField.getText();
 
     try {
