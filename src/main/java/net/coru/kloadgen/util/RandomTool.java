@@ -219,7 +219,7 @@ public final class RandomTool {
     if (fieldValuesList.size() > 0) {
       value = fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim();
     } else {
-      value = RandomStringUtils.randomAlphabetic(valueLength);
+      value = RandomStringUtils.randomAlphabetic(valueLength == 0? RandomUtils.nextInt(): valueLength);
     }
     return value;
   }
