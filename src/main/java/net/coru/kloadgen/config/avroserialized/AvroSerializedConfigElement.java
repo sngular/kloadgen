@@ -1,12 +1,12 @@
 package net.coru.kloadgen.config.avroserialized;
 
 import static net.coru.kloadgen.util.ProducerKeys.SAMPLE_ENTITY;
+import static net.coru.kloadgen.util.ProducerKeys.SCHEMA_REGISTRY_URL;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
@@ -43,6 +43,7 @@ public class AvroSerializedConfigElement extends ConfigTestElement implements Te
       }
 
       JMeterVariables variables = JMeterContextService.getContext().getVariables();
+      variables.put(SCHEMA_REGISTRY_URL, schemaRegistryUrl);
       variables.putObject(SAMPLE_ENTITY, generator.nextMessage());
     } catch (Exception e) {
       log.error("Failed to create AvroLoadGenerator instance", e);

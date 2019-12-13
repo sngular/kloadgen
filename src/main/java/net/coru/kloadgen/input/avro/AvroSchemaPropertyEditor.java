@@ -14,10 +14,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.util.ProducerKeys;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
 public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -67,9 +65,6 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
     public void setAsText(String text) throws IllegalArgumentException {
         this.schemaUrlTextField.setText(text);
         this.schemaUrlTextField.setCaretPosition(0);
-        if (text != null) {
-            storeInVariables(text);
-        }
     }
 
     @Override
@@ -77,11 +72,9 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
         if (value != null) {
             this.schemaUrlTextField.setText(value.toString());
             this.schemaUrlTextField.setCaretPosition(0);
-            storeInVariables(value.toString());
         } else {
             this.schemaUrlTextField.setText("");
         }
-
     }
 
     @Override
@@ -100,8 +93,6 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
         SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(getAsText(), 1000);
         try {
             schemaRegistryClient.getAllSubjects();
-            storeInVariables(getAsText());
-
         } catch (IOException | RestClientException e) {
            log.error(e.getMessage(), e);
         }
@@ -115,9 +106,5 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
     @Override
     public void clearGui() {
         this.schemaUrlTextField.setText("");
-    }
-
-    private void storeInVariables(String value) {
-        JMeterUtils.setProperty(ProducerKeys.SCHEMA_REGISTRY_URL, value);
     }
 }

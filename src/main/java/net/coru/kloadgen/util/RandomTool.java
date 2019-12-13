@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.avro.Schema;
@@ -23,9 +24,9 @@ public final class RandomTool {
   private RandomTool() {
   }
 
-  public static Object generateRandom(String valueExpression, Integer valueLength, List<String> fieldValuesList) {
+  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
     Object value;
-    switch (valueExpression) {
+    switch (fieldType) {
       case "string":
         value = getStringValueOrRandom(valueLength, fieldValuesList);
         break;
@@ -44,7 +45,7 @@ public final class RandomTool {
       case "timestamp":
       case "longTimestamp":
       case "stringTimestamp":
-        value = getTimestampValueOrRandom(valueExpression, fieldValuesList);
+        value = getTimestampValueOrRandom(fieldType, fieldValuesList);
         break;
       case "uuid":
         value = getUUIDValueOrRandom(fieldValuesList);
@@ -74,46 +75,49 @@ public final class RandomTool {
         value = generateBooleanArray(fieldValuesList);
         break;
       default:
-        value = valueExpression;
+        value = fieldType;
         break;
     }
     return value;
   }
 
-  public static Object generateRandom(String valueExpression, Integer valueLength, List<String> fieldValuesList, Field field) {
+  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
+      Map<String, Object> context) {
 
-    Object value = generateRandom(valueExpression, valueLength, fieldValuesList);
+    Object value = generateRandom(fieldType, valueLength, fieldValuesList);
     if (ENUM == field.schema().getType()) {
-       if ("ENUM".equalsIgnoreCase(valueExpression)) {
+       if ("ENUM".equalsIgnoreCase(fieldType)) {
          List<String> enumValueList= field.schema().getEnumSymbols();
          value = new GenericData.EnumSymbol(field.schema(), enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
        } else {
-         value = new GenericData.EnumSymbol(field.schema(), valueExpression);
+         value = new GenericData.EnumSymbol(field.schema(), fieldType);
        }
-    } else if (valueExpression.equalsIgnoreCase(value.toString())) {
+    } else if (fieldType.equalsIgnoreCase(value.toString())) {
      if (UNION == field.schema().getType()) {
-       value = ("null".equalsIgnoreCase(value.toString())) ? null : castValue(valueExpression, field.schema().getTypes().get(1).getType());
+       value = ("null".equalsIgnoreCase(value.toString())) ? null : castValue(fieldType, field.schema().getTypes().get(1).getType());
+     } else if ("SEQ".equalsIgnoreCase(fieldType)) {
+       value = context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? 1L : ((Long)seqObject) + 1);
      } else {
-       value = castValue(valueExpression, field.schema().getType());
+       value = castValue(fieldType, field.schema().getType());
      }
     }
     return value;
   }
 
-  private static Object castValue(String valueExpression, Schema.Type type) {
-    Object value = valueExpression;
+  private static Object castValue(String fieldType, Schema.Type type) {
+    Object value = fieldType;
     switch(type) {
       case INT:
-        value = Integer.valueOf(valueExpression);
+        value = Integer.valueOf(fieldType);
         break;
       case DOUBLE:
-        value = Double.valueOf(valueExpression);
+        value = Double.valueOf(fieldType);
         break;
       case LONG:
-        value = Long.valueOf(valueExpression);
+        value = Long.valueOf(fieldType);
         break;
       case BOOLEAN:
-        value = Boolean.valueOf(valueExpression);
+        value = Boolean.valueOf(fieldType);
         break;
 
     }

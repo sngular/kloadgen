@@ -16,25 +16,25 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 public class FieldValueMapping extends AbstractTestElement {
 
     public static final String FIELD_NAME = "fieldName";
-    public static final String VALUE_EXPRESSION = "valueExpression";
+    public static final String FIELD_TYPE = "fieldType";
     public static final String VALUE_LENGTH = "valueLength";
     public static final String FIELD_VALUES_LIST = "fieldValuesList";
 
     private String fieldName;
-    private String valueExpression;
+    private String fieldType;
     private Integer valueLength;
     private String fieldValueList;
 
-    public FieldValueMapping(String fieldName, String valueExpression) {
+    public FieldValueMapping(String fieldName, String fieldType) {
         this.setFieldName(fieldName);
         this.setValueLength(0);
-        this.setValueExpression(valueExpression);
+        this.setfieldType(fieldType);
     }
 
-    public FieldValueMapping(String fieldName, String valueExpression,  Integer valueLength, String valueList) {
+    public FieldValueMapping(String fieldName, String fieldType,  Integer valueLength, String valueList) {
         this.setFieldName(fieldName);
         this.setValueLength(valueLength);
-        this.setValueExpression(valueExpression);
+        this.setfieldType(fieldType);
         this.setFieldValuesList(valueList);
     }
 
@@ -56,13 +56,13 @@ public class FieldValueMapping extends AbstractTestElement {
         setProperty(VALUE_LENGTH, valueLength);
     }
 
-    public String getValueExpression() {
-        return getPropertyAsString(VALUE_EXPRESSION);
+    public String getfieldType() {
+        return getPropertyAsString(FIELD_TYPE);
     }
 
-    public void setValueExpression(String propertyValue) {
-        this.valueExpression = valueExpression;
-        setProperty(VALUE_EXPRESSION, propertyValue);
+    public void setfieldType(String propertyValue) {
+        this.fieldType = fieldType;
+        setProperty(FIELD_TYPE, propertyValue);
     }
 
     public List<String> getFieldValuesList() {

@@ -2,6 +2,7 @@
 package net.coru.kloadgen.sampler;
 
 import static net.coru.kloadgen.util.ProducerKeys.SAMPLE_ENTITY;
+import static net.coru.kloadgen.util.ProducerKeys.SCHEMA_REGISTRY_URL;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -27,7 +28,6 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.util.JMeterUtils;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -97,7 +97,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(ProducerKeys.SASL_MECHANISM, context.getParameter(ProducerKeys.SASL_MECHANISM));
-        props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterUtils.getProperty(ProducerKeys.SCHEMA_REGISTRY_URL));
+        props.put(ProducerKeys.SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
         props.put(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ProducerKeys.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
 
         Iterator<String> parameters = context.getParameterNamesIterator();

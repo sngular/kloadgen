@@ -44,7 +44,7 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
             new String[]{
                 FieldValueMapping.FIELD_NAME,
-                FieldValueMapping.VALUE_EXPRESSION,
+                FieldValueMapping.FIELD_TYPE,
                 FieldValueMapping.VALUE_LENGTH,
                 FieldValueMapping.FIELD_VALUES_LIST
             });

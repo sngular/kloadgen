@@ -61,132 +61,132 @@
           <collectionProp name="schemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.name</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">7</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.domain</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">7</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.version</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.id</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">5</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.timestamp</stringProp>
-              <stringProp name="valueExpression">stringTimestamp</stringProp>
+              <stringProp name="fieldType">stringTimestamp</stringProp>
               <intProp name="valueLength">0</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.action</stringProp>
-              <stringProp name="valueExpression">created</stringProp>
+              <stringProp name="fieldType">created</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.name</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.version</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.classifiers[1].name</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.classifiers[].values</stringProp>
-              <stringProp name="valueExpression">string-array</stringProp>
+              <stringProp name="fieldType">string-array</stringProp>
               <intProp name="valueLength">4</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.context</stringProp>
-              <stringProp name="valueExpression">null</stringProp>
+              <stringProp name="fieldType">null</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.id</stringProp>
-              <stringProp name="valueExpression">int</stringProp>
+              <stringProp name="fieldType">int</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.code</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
               <stringProp name="fieldValuesList">COD1,COD2,COD3</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.type</stringProp>
-              <stringProp name="valueExpression">enum</stringProp>
+              <stringProp name="fieldType">enum</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.brand_id</stringProp>
-              <stringProp name="valueExpression">int</stringProp>
+              <stringProp name="fieldType">int</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.address</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">20</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.city</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">10</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.zip_code</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.state</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.latitude</stringProp>
-              <stringProp name="valueExpression">0</stringProp>
+              <stringProp name="fieldType">0</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.longitude</stringProp>
-              <stringProp name="valueExpression">0</stringProp>
+              <stringProp name="fieldType">0</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.time_zone_id</stringProp>
-              <stringProp name="valueExpression">int</stringProp>
+              <stringProp name="fieldType">int</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.country_iso</stringProp>
-              <stringProp name="valueExpression">string</stringProp>
+              <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.location_ids</stringProp>
-              <stringProp name="valueExpression">int-array</stringProp>
+              <stringProp name="fieldType">int-array</stringProp>
               <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.entity_version</stringProp>
-              <stringProp name="valueExpression">int</stringProp>
+              <stringProp name="fieldType">int</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.last_updated_date_time</stringProp>
-              <stringProp name="valueExpression">longTimestamp</stringProp>
+              <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.status</stringProp>
-              <stringProp name="valueExpression">enum</stringProp>
+              <stringProp name="fieldType">enum</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.timestamp</stringProp>
-              <stringProp name="valueExpression">longTimestamp</stringProp>
+              <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
           </collectionProp>
           <stringProp name="schemaRegistryUrl">http://localhost:8082</stringProp>

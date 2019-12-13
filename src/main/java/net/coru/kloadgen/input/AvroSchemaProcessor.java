@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.rmi.UnexpectedException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -25,12 +27,13 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class AvroSchemaProcessor implements Iterator {
+public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
   private SchemaRegistryClient schemaRegistryClient;
   private Schema schema;
   private SchemaMetadata metadata;
   private List<FieldValueMapping> fieldExprMappings;
+  private Map<String, Object> context = new HashMap<>();
 
   public AvroSchemaProcessor(String schemaRegistruUrl, String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
       throws IOException, RestClientException {
@@ -41,7 +44,7 @@ public class AvroSchemaProcessor implements Iterator {
 
   @SneakyThrows
   @Override
-  public Object next() {
+  public EnrichedRecord next() {
     GenericRecord entity = new GenericData.Record(schema);
     if (!fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
@@ -59,8 +62,8 @@ public class AvroSchemaProcessor implements Iterator {
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
           entity.put(fieldValueMapping.getFieldName(), RandomTool
-              .generateRandom(fieldValueMapping.getValueExpression(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
-                  schema.getField(fieldValueMapping.getFieldName())));
+              .generateRandom(fieldValueMapping.getfieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
+                  schema.getField(fieldValueMapping.getFieldName()), context));
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
         }
@@ -94,10 +97,10 @@ public class AvroSchemaProcessor implements Iterator {
       } else {
         fieldExpMappingsQueue.poll();
         subEntity.put(cleanFieldName, RandomTool.generateRandom(
-            fieldValueMapping.getValueExpression(),
+            fieldValueMapping.getfieldType(),
             fieldValueMapping.getValueLength(),
             fieldValueMapping.getFieldValuesList(),
-            subSchema.getField(cleanFieldName)));
+            subSchema.getField(cleanFieldName), context));
       }
       fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
     }

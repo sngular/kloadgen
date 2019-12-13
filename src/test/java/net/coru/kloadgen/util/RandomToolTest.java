@@ -5,11 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.apache.groovy.util.Maps;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -35,8 +38,8 @@ class RandomToolTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSingleRandomValue")
-  void generateSingleRandomValue(String valueExpression, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat(RandomTool.generateRandom(valueExpression, valueLength, fieldValuesList)).isEqualTo(expected);
+  void generateSingleRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
+    assertThat(RandomTool.generateRandom(fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateArrayRandomValue() {
@@ -52,8 +55,8 @@ class RandomToolTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateArrayRandomValue")
-  void generateArrayRandomValue(String valueExpression, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat((List<Object>)RandomTool.generateRandom(valueExpression, valueLength, fieldValuesList))
+  void generateArrayRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
+    assertThat((List<Object>)RandomTool.generateRandom(fieldType, valueLength, fieldValuesList))
         .allMatch(value -> value.equals(expected));
   }
 
@@ -74,7 +77,21 @@ class RandomToolTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
-  void testGenerateRandomValueForField(String valueExpression, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(RandomTool.generateRandom(valueExpression, valueLength, fieldValuesList, field)).isEqualTo(expected);
+  void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
+    assertThat(RandomTool.generateRandom(fieldType, valueLength, fieldValuesList, field, Collections.emptyMap())).isEqualTo(expected);
+  }
+
+  private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
+    return Stream.of(
+        Arguments.of("seq", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), 1L),
+        Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), new HashMap<>(Maps.of("name", 15L)), 16L)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateSequenceValueForField")
+  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Map<String, Object> context, Object expected) {
+    assertThat(RandomTool.generateRandom(fieldType, valueLength, fieldValuesList, field, context)).isEqualTo(expected);
+    assertThat(context.get(field.name())).isEqualTo(expected);
   }
 }
