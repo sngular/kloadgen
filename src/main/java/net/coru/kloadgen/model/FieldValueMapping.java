@@ -28,13 +28,13 @@ public class FieldValueMapping extends AbstractTestElement {
     public FieldValueMapping(String fieldName, String fieldType) {
         this.setFieldName(fieldName);
         this.setValueLength(0);
-        this.setfieldType(fieldType);
+        this.setFieldType(fieldType);
     }
 
     public FieldValueMapping(String fieldName, String fieldType,  Integer valueLength, String valueList) {
         this.setFieldName(fieldName);
         this.setValueLength(valueLength);
-        this.setfieldType(fieldType);
+        this.setFieldType(fieldType);
         this.setFieldValuesList(valueList);
     }
 
@@ -56,11 +56,11 @@ public class FieldValueMapping extends AbstractTestElement {
         setProperty(VALUE_LENGTH, valueLength);
     }
 
-    public String getfieldType() {
+    public String getFieldType() {
         return getPropertyAsString(FIELD_TYPE);
     }
 
-    public void setfieldType(String propertyValue) {
+    public void setFieldType(String propertyValue) {
         this.fieldType = fieldType;
         setProperty(FIELD_TYPE, propertyValue);
     }

@@ -106,6 +106,7 @@ ___
 
 KLoadGen provides an easy way for random data generation base on the field type.
 
+#### Data Types
 | Type | Details |  Returns |
 |----------|:-------:|:--------:|
 | string | Field of String type| Random string with a longitude of 20 characters |
@@ -116,11 +117,20 @@ KLoadGen provides an easy way for random data generation base on the field type.
 | enum | Field of enum type | Random enum value bases on the AVRO enum type definition |
 | stringTimestmap | Field of type String but coding a Timestmap | Localdatetime.now formatted as string |
 | longTimestmap | Field of type Long but coding a Timestmap | Localdatetime.now formatted as long |
+
+#### Special Data Types
+| Type | Details |  Returns |
+|----------|:-------:|:--------:|
 | string-array | Field of type Array of String | Random size array of random generated String |
 | int-array | Field of type Array of String | Random size array of random generated Integers |
 | long-array | Field of type Array of Long | Random size array of Random generated Longs |
 | short-array | Field of type Array of Short | Random size array of Random generated Shorts |
 | double-array | Field of type Array of Double | Random size array of Random generated Double |
+
+#### Special functions
+| Type | Details |  Returns |
+|----------|:-------:|:--------:|
+| seq | Generate a Numeric sequence starting in 1. Will cast to the AVRO Field Type | Returns a sequence starting in 1 |
 
 Other values will be considered Constants for this field and will be converted to the Field Type. Keep that in mind to avoid Cast Exceptions
 

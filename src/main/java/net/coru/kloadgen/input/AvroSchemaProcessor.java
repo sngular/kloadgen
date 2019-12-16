@@ -62,7 +62,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
           entity.put(fieldValueMapping.getFieldName(), RandomTool
-              .generateRandom(fieldValueMapping.getfieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
+              .generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
                   schema.getField(fieldValueMapping.getFieldName()), context));
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
@@ -97,7 +97,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       } else {
         fieldExpMappingsQueue.poll();
         subEntity.put(cleanFieldName, RandomTool.generateRandom(
-            fieldValueMapping.getfieldType(),
+            fieldValueMapping.getFieldType(),
             fieldValueMapping.getValueLength(),
             fieldValueMapping.getFieldValuesList(),
             subSchema.getField(cleanFieldName), context));

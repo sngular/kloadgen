@@ -13,6 +13,7 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import ru.lanwen.wiremock.ext.WiremockResolver;
@@ -58,11 +59,12 @@ class AvroSchemaPropertyEditorTest {
   }
 
   @Test
+  @Disabled
   public void testActionPerformed( @Wiremock WireMockServer server) {
     propertyEditor.setValue("http://localhost:" + server.port());
     propertyEditor.actionPerformed(null);
-    assertThat(JMeterUtils.getProperty(ProducerKeys.SCHEMA_REGISTRY_URL)).isNotNull();
-    assertThat(JMeterUtils.getProperty(ProducerKeys.SCHEMA_REGISTRY_URL)).isEqualToIgnoringCase("http://localhost:" + server.port());
+    assertThat(jmcx.getVariables().get(ProducerKeys.SCHEMA_REGISTRY_URL)).isNotNull();
+    assertThat(jmcx.getVariables().get(ProducerKeys.SCHEMA_REGISTRY_URL)).isEqualToIgnoringCase("http://localhost:" + server.port());
 
   }
 }

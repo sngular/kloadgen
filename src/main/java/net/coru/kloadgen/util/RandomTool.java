@@ -96,7 +96,7 @@ public final class RandomTool {
      if (UNION == field.schema().getType()) {
        value = ("null".equalsIgnoreCase(value.toString())) ? null : castValue(fieldType, field.schema().getTypes().get(1).getType());
      } else if ("SEQ".equalsIgnoreCase(fieldType)) {
-       value = context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? 1L : ((Long)seqObject) + 1);
+       value = castValue(context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? 1L : ((Long)seqObject) + 1), field.schema().getType());
      } else {
        value = castValue(fieldType, field.schema().getType());
      }
@@ -119,9 +119,27 @@ public final class RandomTool {
       case BOOLEAN:
         value = Boolean.valueOf(fieldType);
         break;
-
     }
 
+    return value;
+  }
+
+  private static Object castValue(Object fieldType, Schema.Type type) {
+    Object value = fieldType.toString();
+    switch(type) {
+      case INT:
+        value = Integer.valueOf(fieldType.toString());
+        break;
+      case DOUBLE:
+        value = Double.valueOf(fieldType.toString());
+        break;
+      case LONG:
+        value = Long.valueOf(fieldType.toString());
+        break;
+      case BOOLEAN:
+        value = Boolean.valueOf(fieldType.toString());
+        break;
+    }
     return value;
   }
 
@@ -223,7 +241,7 @@ public final class RandomTool {
     if (fieldValuesList.size() > 0) {
       value = fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim();
     } else {
-      value = RandomStringUtils.randomAlphabetic(valueLength == 0? RandomUtils.nextInt(): valueLength);
+      value = RandomStringUtils.randomAlphabetic(valueLength == 0? RandomUtils.nextInt(1,20): valueLength);
     }
     return value;
   }

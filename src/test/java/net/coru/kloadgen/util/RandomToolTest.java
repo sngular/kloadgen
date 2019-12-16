@@ -83,15 +83,15 @@ class RandomToolTest {
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
     return Stream.of(
-        Arguments.of("seq", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), 1L),
-        Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), new HashMap<>(Maps.of("name", 15L)), 16L)
+        Arguments.of("seq", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), "1", 1L),
+        Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), new HashMap<>(Maps.of("name", 15L)), 16, 16L)
     );
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Map<String, Object> context, Object expected) {
-    assertThat(RandomTool.generateRandom(fieldType, valueLength, fieldValuesList, field, context)).isEqualTo(expected);
-    assertThat(context.get(field.name())).isEqualTo(expected);
+  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Map<String, Object> context, Object expectedTyped, Object expectedStored) {
+    assertThat(RandomTool.generateRandom(fieldType, valueLength, fieldValuesList, field, context)).isEqualTo(expectedTyped);
+    assertThat(context.get(field.name())).isEqualTo(expectedStored);
   }
 }
