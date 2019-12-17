@@ -1,5 +1,7 @@
 package net.coru.kloadgen.input.avro;
 
+import static net.coru.kloadgen.util.ProducerKeys.SCHEMA_REGISTRY_URL;
+
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -17,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.ProducerKeys;
 import net.coru.kloadgen.util.PropsKeys;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
@@ -25,7 +26,7 @@ import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
 public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -65,7 +66,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    String schemaUrl = JMeterUtils.getProperty(ProducerKeys.SCHEMA_REGISTRY_URL);
+    String schemaUrl = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL);
     String subjectName = this.subjectNameTextField.getText();
 
     try {

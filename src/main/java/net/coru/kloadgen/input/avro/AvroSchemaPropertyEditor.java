@@ -1,5 +1,7 @@
 package net.coru.kloadgen.input.avro;
 
+import static net.coru.kloadgen.util.ProducerKeys.SCHEMA_REGISTRY_URL;
+
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
@@ -16,6 +18,7 @@ import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
 public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -72,6 +75,7 @@ public class AvroSchemaPropertyEditor extends PropertyEditorSupport implements A
         if (value != null) {
             this.schemaUrlTextField.setText(value.toString());
             this.schemaUrlTextField.setCaretPosition(0);
+            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, value.toString());
         } else {
             this.schemaUrlTextField.setText("");
         }
