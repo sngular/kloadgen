@@ -94,7 +94,7 @@ public final class RandomTool {
        }
     } else if (fieldType.equalsIgnoreCase(value.toString())) {
      if (UNION == field.schema().getType()) {
-       value = ("null".equalsIgnoreCase(value.toString())) ? null : castValue(fieldType, field.schema().getTypes().get(1).getType());
+       value = ("null".equalsIgnoreCase(value.toString())) ? null : castValue(fieldType, field.schema().getTypes().get(1));
      } else if ("SEQ".equalsIgnoreCase(fieldType)) {
        value = castValue(context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? 1L : ((Long)seqObject) + 1), field.schema().getType());
      } else {
@@ -141,6 +141,10 @@ public final class RandomTool {
         break;
     }
     return value;
+  }
+
+  private static Object castValue(String fieldValue, Schema schema) {
+    return new GenericData.EnumSymbol(schema, fieldValue);
   }
 
   private static List<Integer> generateIntArray(Integer valueLength, List<String> fieldValueList) {

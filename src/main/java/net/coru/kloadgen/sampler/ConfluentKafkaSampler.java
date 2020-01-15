@@ -151,7 +151,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
             }
             Map<String, String> jsonTypes = new HashMap<>();
-            jsonTypes.put("itx_deprecation_date", "java.lang.String");
             jsonTypes.put("contentType", "java.lang.String");
             producerRecord.headers()
                 .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
