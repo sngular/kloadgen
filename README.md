@@ -122,10 +122,19 @@ KLoadGen provides an easy way for random data generation base on the field type.
 | Type | Details |  Returns |
 |----------|:-------:|:--------:|
 | string-array | Field of type Array of String | Random size array of random generated String |
-| int-array | Field of type Array of String | Random size array of random generated Integers |
+| int-array | Field of type Array of Int | Random size array of random generated Integers |
 | long-array | Field of type Array of Long | Random size array of Random generated Longs |
 | short-array | Field of type Array of Short | Random size array of Random generated Shorts |
 | double-array | Field of type Array of Double | Random size array of Random generated Double |
+| uuid-array | Field of type Array of UUIDs | Random size array of Random generated Uuid |
+| boolean-array | Field of type Array of Boolean | Random size array of Random generated Boolean |
+| string-map | Field of type Map of String, String | Random size map of random generated String, String |
+| int-map | Field of type Map of String,  inter | Random size map of random generated String, Integers |
+| long-map | Field of type Map of String, Long | Random size map of Random generated String, Longs |
+| short-map | Field of type Map of String, Short | Random size map of Random generated String, Shorts |
+| double-map | Field of type Map of String, Double | Random size map of Random generated String, Double |
+| uuid-map | Field of type Map of String, UUIDs | Random size map of Random generated String, Uuid |
+| boolean-map | Field of type Map of String, Boolean | Random size map of Random generated String, Boolean |
 
 #### Special functions
 | Type | Details |  Returns |

@@ -96,15 +96,18 @@ public class SchemaExtractor {
   }
 
   private String getNotNullType(List<Schema> types) {
-    String choosenType = types.get(0).getName().equalsIgnoreCase("null") ? types.get(1).getName() : types.get(0).getName();
-    choosenType = types.get(1).getName().equalsIgnoreCase("array") ? types.get(1).getName() : choosenType;
+    Schema chosenType = extractTypeName(types.get(0)).equalsIgnoreCase("null") ? types.get(1) : types.get(0);
+    chosenType = extractTypeName(types.get(1)).equalsIgnoreCase("array") ? types.get(1) : chosenType;
+    String chosenTypeName = extractTypeName(chosenType);
 
-    if (!RandomTool.VALID_TYPES.contains(choosenType)) {
-      choosenType = "null";
-    } else if ("array".equalsIgnoreCase(choosenType)) {
-      choosenType = "int-array";
+    if (!RandomTool.VALID_TYPES.contains(chosenTypeName)) {
+      chosenTypeName = "null";
+    } else if ("array".equalsIgnoreCase(chosenTypeName)) {
+      chosenTypeName = "int-array";
+    } else if ("map".equalsIgnoreCase(chosenTypeName)) {
+      chosenTypeName = chosenType.getValueType().getName() + "-map";
     }
-    return choosenType;
+    return chosenTypeName;
   }
 
   private Schema getRecordUnion(List<Schema> types) {
@@ -122,5 +125,9 @@ public class SchemaExtractor {
       internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
       completeFieldList.add(internalField);
     });
+  }
+
+  private String extractTypeName(Schema schema) {
+    return schema.getType().getName();
   }
 }
