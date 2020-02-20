@@ -21,15 +21,13 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 })
 class AvroSchemaProcessorTest {
 
-  private AvroSchemaProcessor avroSchemaProcessor;
-
   @Test
   public void textAvroSchemaProcessor(@Wiremock WireMockServer server) throws IOException, RestClientException {
     List<FieldValueMapping> fieldValueMappingList = asList(
         new FieldValueMapping("Name", "string", 0, "Jose"),
         new FieldValueMapping("Age", "int", 0, "43"));
 
-    avroSchemaProcessor = new AvroSchemaProcessor("http://localhost:" + server.port(), "avrosubject", fieldValueMappingList);
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor("http://localhost:" + server.port(), "avrosubject", fieldValueMappingList);
 
     Object message = avroSchemaProcessor.next();
     assertThat(message).isNotNull();

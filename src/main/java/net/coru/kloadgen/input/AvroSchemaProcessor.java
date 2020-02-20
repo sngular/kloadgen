@@ -9,7 +9,6 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.IOException;
-import java.rmi.UnexpectedException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.RandomTool;
@@ -73,11 +73,11 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   }
 
   private GenericRecord createObject(final Schema subSchema, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
-      throws UnexpectedException {
+      throws KLoadGenException {
     Schema schema = subSchema;
     GenericRecord subEntity = createRecord(schema);
     if (null == subEntity) {
-      throw new UnexpectedException("Something Odd just happened", new NullPointerException());
+      throw new KLoadGenException("Something Odd just happened");
     } else {
       schema = subEntity.getSchema();
     }
@@ -121,7 +121,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   }
 
   private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
-      throws UnexpectedException {
+      throws KLoadGenException {
     List<GenericRecord> objectArray = new ArrayList<>(arraySize);
     for(int i=0; i<arraySize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();

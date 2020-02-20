@@ -10,11 +10,9 @@ import org.junit.jupiter.api.Test;
 
 class KafkaHeadersConfigElementTest {
 
-  private KafkaHeadersConfigElement kafkaHeadersConfigElement;
-
   @Test
   public void testIterateStart() {
-    kafkaHeadersConfigElement = new KafkaHeadersConfigElement();
+    KafkaHeadersConfigElement kafkaHeadersConfigElement = new KafkaHeadersConfigElement();
     kafkaHeadersConfigElement.setKafkaHeaders(Collections.emptyList());
     kafkaHeadersConfigElement.iterationStart(null);
 

@@ -19,13 +19,11 @@ import org.apache.avro.Schema.Type;
 
 public class SchemaExtractor {
 
-  private SchemaRegistryClient schemaRegistryClient;
-
   private Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
 
   public List<FieldValueMapping> flatPropertiesList(String schemaUrl, String subjectName) throws IOException, RestClientException {
     List<FieldValueMapping> attributeList = new ArrayList<>();
-    schemaRegistryClient = new CachedSchemaRegistryClient(schemaUrl, 1000);
+    SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaUrl, 1000);
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     Schema schema = schemaRegistryClient.getById(schemaMetadata.getId());

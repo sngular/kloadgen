@@ -25,8 +25,6 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 })
 class AvroSubjectPropertyEditorTest {
 
-  private AvroSerializedConfigElement  avroSerializedConfigElement;
-
   @BeforeEach
   public void setUp() {
     JMeterContext jmcx = JMeterContextService.getContext();
@@ -36,7 +34,7 @@ class AvroSubjectPropertyEditorTest {
 
   @Test
   public void iterationStart(@Wiremock WireMockServer server) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    avroSerializedConfigElement = new AvroSerializedConfigElement("AvroSubject",
+    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("AvroSubject",
         "http://localhost:" + server.port(), Collections.emptyList(), null);
     PropertyUtils.setSimpleProperty(avroSerializedConfigElement, "schemaRegistryUrl", "http://localhost:" + server.port());
     JMeterVariables variables = JMeterContextService.getContext().getVariables();

@@ -20,8 +20,6 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 })
 class AvroLoadGeneratorTest {
 
-  private AvroLoadGenerator avroLoadGenerator;
-
   @Test
   public void testAvroLoadGenerator(@Wiremock WireMockServer server) throws KLoadGenException {
 
@@ -29,7 +27,7 @@ class AvroLoadGeneratorTest {
         new FieldValueMapping("Name", "string", 0, "Jose"),
         new FieldValueMapping("Age", "int", 0, "43"));
 
-    avroLoadGenerator = new AvroLoadGenerator("http://localhost:" + server.port(), "avrosubject", fieldValueMappingList);
+    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator("http://localhost:" + server.port(), "avrosubject", fieldValueMappingList);
 
     Object message = avroLoadGenerator.nextMessage();
     assertThat(message).isNotNull();
