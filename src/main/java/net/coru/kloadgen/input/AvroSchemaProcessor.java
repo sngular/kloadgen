@@ -72,13 +72,14 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return new EnrichedRecord(metadata, entity);
   }
 
-  private GenericRecord createObject(Schema subSchema, String fieldName, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
+  private GenericRecord createObject(final Schema subSchema, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
       throws UnexpectedException {
-    GenericRecord subEntity = createRecord(subSchema);
+    Schema schema = subSchema;
+    GenericRecord subEntity = createRecord(schema);
     if (null == subEntity) {
       throw new UnexpectedException("Something Odd just happened", new NullPointerException());
     } else {
-      subSchema = subEntity.getSchema();
+      schema = subEntity.getSchema();
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     while(!fieldExpMappingsQueue.isEmpty() && fieldValueMapping.getFieldName().contains(fieldName)) {
@@ -100,7 +101,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
             fieldValueMapping.getFieldType(),
             fieldValueMapping.getValueLength(),
             fieldValueMapping.getFieldValuesList(),
-            subSchema.getField(cleanFieldName), context));
+          schema.getField(cleanFieldName), context));
       }
       fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
     }

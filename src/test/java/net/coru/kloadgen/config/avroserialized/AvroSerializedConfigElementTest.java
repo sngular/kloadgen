@@ -1,6 +1,6 @@
 package net.coru.kloadgen.config.avroserialized;
 
-import static net.coru.kloadgen.util.ProducerKeys.SAMPLE_ENTITY;
+import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;

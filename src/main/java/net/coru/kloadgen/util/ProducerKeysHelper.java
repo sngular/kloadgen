@@ -2,7 +2,7 @@ package net.coru.kloadgen.util;
 
 import org.apache.kafka.common.serialization.StringSerializer;
 
-public class ProducerKeys {
+public class ProducerKeysHelper {
 
     public static final String KAFKA_TOPIC_CONFIG = "kafka.topic.name";
 

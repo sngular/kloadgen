@@ -134,7 +134,7 @@ public final class RandomTool {
   }
 
   private static Object castValue(String fieldType, Schema.Type type) {
-    Object value = fieldType;
+    Object value;
     switch(type) {
       case INT:
         value = Integer.valueOf(fieldType);
@@ -148,13 +148,16 @@ public final class RandomTool {
       case BOOLEAN:
         value = Boolean.valueOf(fieldType);
         break;
+      default:
+        value = fieldType;
+        break;
     }
 
     return value;
   }
 
   private static Object castValue(Object fieldType, Schema.Type type) {
-    Object value = fieldType.toString();
+    Object value;
     switch(type) {
       case INT:
         value = Integer.valueOf(fieldType.toString());
@@ -167,6 +170,9 @@ public final class RandomTool {
         break;
       case BOOLEAN:
         value = Boolean.valueOf(fieldType.toString());
+        break;
+      default:
+        value = fieldType.toString();
         break;
     }
     return value;

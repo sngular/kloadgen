@@ -18,8 +18,8 @@ import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.input.avro.SchemaExtractor;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.ProducerKeys;
-import net.coru.kloadgen.util.PropsKeys;
+import net.coru.kloadgen.util.ProducerKeysHelper;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -70,7 +70,7 @@ public class JsonDocumentPropertyEditor extends PropertyEditorSupport implements
   }
   @Override
   public void actionPerformed(ActionEvent event) {
-    String schemaUrl = variables.get(ProducerKeys.SCHEMA_REGISTRY_URL);
+    String schemaUrl = variables.get(ProducerKeysHelper.SCHEMA_REGISTRY_URL);
     String subjectName = this.subjectNameTextField.getText();
 
     try {
@@ -78,13 +78,13 @@ public class JsonDocumentPropertyEditor extends PropertyEditorSupport implements
 
       //Get current test GUI component
       TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
-      Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeys.CUSTOMIZER);
+      Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
       customizer.setAccessible(true);
 
 
       //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
       GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
-      Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeys.EDITORS);
+      Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
       editors.setAccessible(true);
 
       //Retrieve TableEditor and set all fields with default values to it

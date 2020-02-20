@@ -1,6 +1,6 @@
 package net.coru.kloadgen.input.avro;
 
-import static net.coru.kloadgen.util.ProducerKeys.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;

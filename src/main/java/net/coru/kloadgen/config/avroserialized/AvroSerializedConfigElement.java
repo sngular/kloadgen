@@ -1,7 +1,7 @@
 package net.coru.kloadgen.config.avroserialized;
 
-import static net.coru.kloadgen.util.ProducerKeys.SAMPLE_ENTITY;
-import static net.coru.kloadgen.util.ProducerKeys.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
+import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

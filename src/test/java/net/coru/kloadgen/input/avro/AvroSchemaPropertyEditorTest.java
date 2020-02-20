@@ -7,7 +7,7 @@ import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import net.coru.kloadgen.util.ProducerKeys;
+import net.coru.kloadgen.util.ProducerKeysHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -63,8 +63,8 @@ class AvroSchemaPropertyEditorTest {
   public void testActionPerformed( @Wiremock WireMockServer server) {
     propertyEditor.setValue("http://localhost:" + server.port());
     propertyEditor.actionPerformed(null);
-    assertThat(jmcx.getVariables().get(ProducerKeys.SCHEMA_REGISTRY_URL)).isNotNull();
-    assertThat(jmcx.getVariables().get(ProducerKeys.SCHEMA_REGISTRY_URL)).isEqualToIgnoringCase("http://localhost:" + server.port());
+    assertThat(jmcx.getVariables().get(ProducerKeysHelper.SCHEMA_REGISTRY_URL)).isNotNull();
+    assertThat(jmcx.getVariables().get(ProducerKeysHelper.SCHEMA_REGISTRY_URL)).isEqualToIgnoringCase("http://localhost:" + server.port());
 
   }
 }

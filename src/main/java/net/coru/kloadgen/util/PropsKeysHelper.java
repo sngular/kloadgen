@@ -1,6 +1,6 @@
 package net.coru.kloadgen.util;
 
-public class PropsKeys {
+public class PropsKeysHelper {
 
     public static final String MSG_KEY_PLACEHOLDER = "KEY";
     public static final String MSG_PLACEHOLDER = "MESSAGE";

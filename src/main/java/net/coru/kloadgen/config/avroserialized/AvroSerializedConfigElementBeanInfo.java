@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import net.coru.kloadgen.input.avro.AvroSchemaPropertyEditor;
 import net.coru.kloadgen.input.avro.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.ProducerKeys;
+import net.coru.kloadgen.util.ProducerKeysHelper;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
@@ -61,7 +61,7 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_URL);
         schemaRegistryUrl.setPropertyEditorClass(AvroSchemaPropertyEditor.class);
         schemaRegistryUrl.setValue(NOT_UNDEFINED, Boolean.TRUE);
-        schemaRegistryUrl.setValue(DEFAULT, ProducerKeys.SCHEMA_REGISTRY_URL_DEFAULT);
+        schemaRegistryUrl.setValue(DEFAULT, ProducerKeysHelper.SCHEMA_REGISTRY_URL_DEFAULT);
         schemaRegistryUrl.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     }

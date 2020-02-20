@@ -1,6 +1,6 @@
 package net.coru.kloadgen.config.kafkaheaders;
 
-import static net.coru.kloadgen.util.ProducerKeys.KAFKA_HEADERS;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
 
 import java.util.List;
 import java.util.Map;

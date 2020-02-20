@@ -10,7 +10,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 @Slf4j
 public class AvroLoadGenerator implements BaseLoadGenerator {
 
-  AvroSchemaProcessor avroSchemaProcessor;
+  private AvroSchemaProcessor avroSchemaProcessor;
 
   public AvroLoadGenerator(String schemaRegistryUrl, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) throws
       KLoadGenException {
