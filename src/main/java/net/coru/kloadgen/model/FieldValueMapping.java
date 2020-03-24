@@ -1,14 +1,15 @@
 package net.coru.kloadgen.model;
 
-import static java.util.Arrays.asList;
-
-import java.util.Collections;
-import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.testelement.AbstractTestElement;
+
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @EqualsAndHashCode
 @NoArgsConstructor

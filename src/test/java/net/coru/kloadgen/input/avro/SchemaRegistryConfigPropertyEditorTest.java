@@ -7,7 +7,8 @@ import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import net.coru.kloadgen.util.ProducerKeysHelper;
+
+import net.coru.kloadgen.util.SchemaRegistryKeys;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -24,9 +25,9 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
     WiremockResolver.class,
     WiremockUriResolver.class
 })
-class AvroSchemaPropertyEditorTest {
+class SchemaRegistryConfigPropertyEditorTest {
 
-  private AvroSchemaPropertyEditor propertyEditor;
+  private SchemaRegistryConfigPropertyEditor propertyEditor;
 
   private JMeterContext jmcx;
 
@@ -34,7 +35,7 @@ class AvroSchemaPropertyEditorTest {
   public void setUp() {
     jmcx = JMeterContextService.getContext();
     jmcx.setVariables(new JMeterVariables());
-    propertyEditor = new AvroSchemaPropertyEditor();
+    propertyEditor = new SchemaRegistryConfigPropertyEditor();
     JMeterUtils.setLocale(Locale.ENGLISH);
     JMeterUtils.getProperties("jmeter.properties");
   }
@@ -45,17 +46,14 @@ class AvroSchemaPropertyEditorTest {
 
     JPanel panel = (JPanel) propertyEditor.getCustomEditor();
 
-    assertThat(panel.getComponent(0)).isInstanceOfAny(JTextField.class);
+    assertThat(panel.getComponent(0)).isInstanceOfAny(JPanel.class);
     assertThat(panel.getComponent(1)).isInstanceOfAny(JButton.class);
   }
 
   @Test
   public void testPropertyEditorSetValue() {
-    propertyEditor.setAsText("Testing String");
-    assertThat(propertyEditor.getValue()).isEqualTo("Testing String");
-
-    propertyEditor.setValue("Testing String");
-    assertThat(propertyEditor.getValue()).isEqualTo("Testing String");
+    propertyEditor.setValue("{\"schemaRegistryUrl\":\"http://localhost:8081\",\"username\":\"username\",\"password\":\"password\"}");
+    assertThat(propertyEditor.getValue()).isEqualTo("{\"schemaRegistryUrl\":\"http://localhost:8081\",\"username\":\"username\",\"password\":\"password\"}");
   }
 
   @Test
@@ -63,8 +61,8 @@ class AvroSchemaPropertyEditorTest {
   public void testActionPerformed( @Wiremock WireMockServer server) {
     propertyEditor.setValue("http://localhost:" + server.port());
     propertyEditor.actionPerformed(null);
-    assertThat(jmcx.getVariables().get(ProducerKeysHelper.SCHEMA_REGISTRY_URL)).isNotNull();
-    assertThat(jmcx.getVariables().get(ProducerKeysHelper.SCHEMA_REGISTRY_URL)).isEqualToIgnoringCase("http://localhost:" + server.port());
+    assertThat(jmcx.getVariables().get(SchemaRegistryKeys.SCHEMA_REGISTRY_URL)).isNotNull();
+    assertThat(jmcx.getVariables().get(SchemaRegistryKeys.SCHEMA_REGISTRY_URL)).isEqualToIgnoringCase("http://localhost:" + server.port());
 
   }
 }

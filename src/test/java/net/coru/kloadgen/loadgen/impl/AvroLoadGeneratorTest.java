@@ -1,6 +1,7 @@
 package net.coru.kloadgen.loadgen.impl;
 
 import static java.util.Arrays.asList;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -8,6 +9,7 @@ import java.util.List;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import ru.lanwen.wiremock.ext.WiremockResolver;
@@ -27,7 +29,11 @@ class AvroLoadGeneratorTest {
         new FieldValueMapping("Name", "string", 0, "Jose"),
         new FieldValueMapping("Age", "int", 0, "43"));
 
-    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator("http://localhost:" + server.port(), "avrosubject", fieldValueMappingList);
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+
+    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator( "avrosubject", fieldValueMappingList);
 
     Object message = avroLoadGenerator.nextMessage();
     assertThat(message).isNotNull();

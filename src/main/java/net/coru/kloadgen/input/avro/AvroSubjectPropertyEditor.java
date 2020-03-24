@@ -1,22 +1,6 @@
 package net.coru.kloadgen.input.avro;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
-
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyDescriptor;
-import java.beans.PropertyEditor;
-import java.beans.PropertyEditorSupport;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.PropsKeysHelper;
@@ -27,6 +11,19 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyDescriptor;
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorSupport;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.List;
+
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
 
 @Slf4j
 public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -66,11 +63,10 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    String schemaUrl = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL);
     String subjectName = this.subjectNameTextField.getText();
 
     try {
-      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(schemaUrl, subjectName);
+      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(subjectName);
 
       //Get current test GUI component
       TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();

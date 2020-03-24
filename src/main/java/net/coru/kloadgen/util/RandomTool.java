@@ -1,23 +1,18 @@
 package net.coru.kloadgen.util;
 
-import static org.apache.avro.Schema.Type.ENUM;
-import static org.apache.avro.Schema.Type.UNION;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+
+import static org.apache.avro.Schema.Type.ENUM;
+import static org.apache.avro.Schema.Type.UNION;
 
 public final class RandomTool {
 

@@ -1,29 +1,41 @@
 package net.coru.kloadgen.input.avro;
 
-import static org.apache.avro.Schema.Type.RECORD;
-
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
+import org.apache.jmeter.threads.JMeterContextService;
+
+import java.io.IOException;
+import java.util.*;
+
+import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
+import static org.apache.avro.Schema.Type.RECORD;
 
 public class SchemaExtractor {
 
   private Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
 
-  public List<FieldValueMapping> flatPropertiesList(String schemaUrl, String subjectName) throws IOException, RestClientException {
+  public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
+    Map<String, String> originals = new HashMap<>();
+
+    String schemaUrl = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL);
+
+    String username = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_USERNAME_KEY);
+    String password = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_PASSWORD_KEY);
+
+    if (!SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(username)) {
+      originals.put("basic.auth.credentials.source", "USER_INFO");
+      originals.put("schema.registry.basic.auth.user.info", username + ":" + password);
+    }
+
     List<FieldValueMapping> attributeList = new ArrayList<>();
-    SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaUrl, 1000);
+    SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaUrl, 1000, originals);
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     Schema schema = schemaRegistryClient.getById(schemaMetadata.getId());

@@ -27,7 +27,7 @@ class AvroSchemaProcessorTest {
         new FieldValueMapping("Name", "string", 0, "Jose"),
         new FieldValueMapping("Age", "int", 0, "43"));
 
-    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor("http://localhost:" + server.port(), "avrosubject", fieldValueMappingList);
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor("http://localhost:" + server.port(), "avrosubject", fieldValueMappingList, "foo", "foo");
 
     Object message = avroSchemaProcessor.next();
     assertThat(message).isNotNull();

@@ -28,9 +28,8 @@ class AvroSerializedConfigElementBeanInfoTest {
   @Test
   public void shouldGenerateElements() {
     PropertyDescriptor[] propertyDescriptors = avroSerializedConfigElementBeanInfo.getPropertyDescriptors();
-    assertThat(propertyDescriptors).hasSize(4);
+    assertThat(propertyDescriptors).hasSize(3);
     assertThat(propertyDescriptors[0].getName()).isEqualTo(AVRO_SUBJECT);
     assertThat(propertyDescriptors[2].getName()).isEqualTo(SCHEMA_PROPERTIES);
-    assertThat(propertyDescriptors[3].getName()).isEqualTo(SCHEMA_REGISTRY_URL);
   }
 }

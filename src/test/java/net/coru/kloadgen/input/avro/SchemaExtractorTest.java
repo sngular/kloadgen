@@ -1,5 +1,6 @@
 package net.coru.kloadgen.input.avro;
 
+import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -7,6 +8,7 @@ import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientExcept
 import java.io.IOException;
 import java.util.List;
 import net.coru.kloadgen.model.FieldValueMapping;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import ru.lanwen.wiremock.ext.WiremockResolver;
@@ -23,8 +25,11 @@ class SchemaExtractorTest {
 
   @Test
   public void testFlatPropertiesListSimpleRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(
-        "http://localhost:" + server.port(),
         "avrosubject"
     );
 
@@ -37,8 +42,11 @@ class SchemaExtractorTest {
 
   @Test
   public void testFlatPropertiesListArrayRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(
-        "http://localhost:" + server.port(),
         "users"
     );
 

@@ -1,11 +1,12 @@
 package net.coru.kloadgen.config.kafkaheaders;
 
-import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
 import net.coru.kloadgen.model.HeaderMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
+
+import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 
 public class KafkaHeadersConfigElementBeanInfo extends BeanInfoSupport {
 
@@ -15,11 +16,9 @@ public class KafkaHeadersConfigElementBeanInfo extends BeanInfoSupport {
 
         super(KafkaHeadersConfigElement.class);
 
-        //Create Property group
         createPropertyGroup("kafka_headers", new String[] { KAFKA_HEADERS
         });
 
-        //Create table editor component of jmeter for class field and expression mapping
         TypeEditor tableEditor = TypeEditor.TableEditor;
         PropertyDescriptor tableProperties = property(KAFKA_HEADERS, tableEditor);
         tableProperties.setValue(TableEditor.CLASSNAME, HeaderMapping.class.getName());

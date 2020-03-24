@@ -1,25 +1,13 @@
 
 package net.coru.kloadgen.sampler;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import net.coru.kloadgen.util.RandomTool;
+import net.coru.kloadgen.util.SchemaRegistryKeys;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -32,6 +20,16 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.Future;
+
+import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
+import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
 
 @Slf4j
 public class KafkaSampler extends AbstractJavaSamplerClient implements Serializable {
@@ -87,7 +85,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+	    props.put(SchemaRegistryKeys.SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
 
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {

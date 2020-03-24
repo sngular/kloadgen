@@ -1,61 +1,12 @@
 
 package net.coru.kloadgen.sampler;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.ACKS_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.BATCH_SIZE_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.BOOTSTRAP_SERVERS_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.BUFFER_MEMORY_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.COMPRESSION_TYPE_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_NO;
-import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
-import static net.coru.kloadgen.util.ProducerKeysHelper.JAAS_ENABLED;
-import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KERBEROS_ENABLED;
-import static net.coru.kloadgen.util.ProducerKeysHelper.LINGER_MS_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.RECEIVE_BUFFER_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SEND_BUFFER_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SSL_ENABLED;
-import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
-import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_PLACEHOLDER_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_VAL_PLACEHOLDER_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
-import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.RandomTool;
+import net.coru.kloadgen.util.SchemaRegistryKeys;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -70,6 +21,18 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.Future;
+
+import static net.coru.kloadgen.util.ProducerKeysHelper.*;
+import static net.coru.kloadgen.util.PropsKeysHelper.*;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
+import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
 @Slf4j
 public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
@@ -133,7 +96,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+        props.put(SchemaRegistryKeys.SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
         props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
 
         Iterator<String> parameters = context.getParameterNamesIterator();

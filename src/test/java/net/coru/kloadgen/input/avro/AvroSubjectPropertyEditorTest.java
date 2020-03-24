@@ -1,5 +1,6 @@
 package net.coru.kloadgen.input.avro;
 
+import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -34,9 +35,11 @@ class AvroSubjectPropertyEditorTest {
 
   @Test
   public void iterationStart(@Wiremock WireMockServer server) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("AvroSubject",
-        "http://localhost:" + server.port(), Collections.emptyList(), null);
-    PropertyUtils.setSimpleProperty(avroSerializedConfigElement, "schemaRegistryUrl", "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+
+    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("AvroSubject", Collections.emptyList(), null);
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     avroSerializedConfigElement.iterationStart(null);
     assertThat(variables).isNotNull();

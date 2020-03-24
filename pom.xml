@@ -117,12 +117,12 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
-            <version>5.3.1</version>
+            <version>5.3.0</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>5.3.1</version>
+            <version>5.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
