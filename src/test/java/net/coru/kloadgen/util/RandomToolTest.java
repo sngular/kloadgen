@@ -83,7 +83,7 @@ class RandomToolTest {
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
     return Stream.of(
-        Arguments.of("seq", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), "1", 1L),
+        Arguments.of("seq", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), "testString", "testString"),
         Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), new HashMap<>(Maps.of("name", 15L)), 16, 16L)
     );
   }
