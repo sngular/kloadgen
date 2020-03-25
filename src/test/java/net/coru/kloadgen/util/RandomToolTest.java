@@ -72,7 +72,7 @@ class RandomToolTest {
         Arguments.of("stringTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), new Field("name", SchemaBuilder.builder().stringType()), "2019-12-06T12:00"),
         Arguments.of("uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"), new Field("name", SchemaBuilder.builder().stringType()), UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
         Arguments.of("boolean", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE)
-      );
+    );
   }
 
   @ParameterizedTest
@@ -83,7 +83,7 @@ class RandomToolTest {
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
     return Stream.of(
-        Arguments.of("seq", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), "1", 1L),
+        Arguments.of("seq", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), "testString", "testString"),
         Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), new HashMap<>(Maps.of("name", 15L)), 16, 16L)
     );
   }

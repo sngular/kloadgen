@@ -111,13 +111,13 @@ public final class RandomTool {
     if (ENUM == field.schema().getType()) {
       value = getEnumOrGenerate(fieldType, field.schema());
     } else if (fieldType.equalsIgnoreCase(value.toString())) {
-     if (UNION == field.schema().getType()) {
-       value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
-     } else if ("SEQ".equalsIgnoreCase(fieldType)) {
-       value = castValue(context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? 1L : ((Long)seqObject) + 1), field.schema().getType());
-     } else {
-       value = castValue(fieldType, field.schema().getType());
-     }
+      if (UNION == field.schema().getType()) {
+        value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
+      } else if ("SEQ".equalsIgnoreCase(fieldType)) {
+        value = castValue(context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? (fieldValuesList.isEmpty()? 1L : fieldValuesList.get(0)) : ((Long)seqObject) + 1), field.schema().getType());
+      } else {
+        value = castValue(fieldType, field.schema().getType());
+      }
     }
     return value;
   }
