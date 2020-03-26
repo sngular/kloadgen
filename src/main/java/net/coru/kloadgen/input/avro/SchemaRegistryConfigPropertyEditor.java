@@ -1,20 +1,20 @@
 package net.coru.kloadgen.input.avro;
 
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
+import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_PASSWORD_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_DEFAULT;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_KEY;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfig;
-import net.coru.kloadgen.util.SpringUtilities;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jmeter.gui.ClearGui;
-import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.apache.jmeter.threads.JMeterContextService;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
@@ -22,8 +22,18 @@ import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfig;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jmeter.gui.ClearGui;
+import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
 public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -149,8 +159,9 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     public void actionPerformed(ActionEvent actionEvent) {
         Map<String, String> originals = new HashMap<>();
         if (!SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(userName.toString())) {
-            originals.put("basic.auth.credentials.source", "USER_INFO");
-            originals.put("schema.registry.basic.auth.user.info", userName.getText() + ":" + password.getText());
+            originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl.getText());
+            originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+            originals.put(USER_INFO_CONFIG, userName.getText() + ":" + password.getText());
         }
         SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(getAsText(), 1000, originals);
         try {

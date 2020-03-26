@@ -1,21 +1,31 @@
 package net.coru.kloadgen.input.avro;
 
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
+import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_PASSWORD_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_DEFAULT;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_KEY;
+import static org.apache.avro.Schema.Type.RECORD;
+
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.jmeter.threads.JMeterContextService;
-
-import java.io.IOException;
-import java.util.*;
-
-import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
-import static org.apache.avro.Schema.Type.RECORD;
 
 public class SchemaExtractor {
 
@@ -30,8 +40,9 @@ public class SchemaExtractor {
     String password = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_PASSWORD_KEY);
 
     if (!SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(username)) {
-      originals.put("basic.auth.credentials.source", "USER_INFO");
-      originals.put("schema.registry.basic.auth.user.info", username + ":" + password);
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaUrl);
+      originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+      originals.put(USER_INFO_CONFIG, username + ":" + password);
     }
 
     List<FieldValueMapping> attributeList = new ArrayList<>();

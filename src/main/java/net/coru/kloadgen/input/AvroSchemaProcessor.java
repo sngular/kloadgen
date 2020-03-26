@@ -1,9 +1,24 @@
 package net.coru.kloadgen.input;
 
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
+import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_DEFAULT;
+import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.UNION;
+
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -16,12 +31,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
-import java.util.*;
-
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_DEFAULT;
-import static org.apache.avro.Schema.Type.*;
-
 public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
 	private SchemaRegistryClient schemaRegistryClient;
@@ -30,14 +39,15 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 	private List<FieldValueMapping> fieldExprMappings;
 	private Map<String, Object> context = new HashMap<>();
 
-	public AvroSchemaProcessor(String schemaRegistruUrl, String avroSchemaName, List<FieldValueMapping> fieldExprMappings, String username, String password)
+	public AvroSchemaProcessor(String schemaRegistryUrl, String avroSchemaName, List<FieldValueMapping> fieldExprMappings, String username, String password)
 					throws IOException, RestClientException {
 	  Map<String, String> originals = new HashMap<>();
     if (!SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(username)) {
-      originals.put("basic.auth.credentials.source", "USER_INFO");
-      originals.put("schema.registry.basic.auth.user.info", username + ":" + password);
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
+      originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+      originals.put(USER_INFO_CONFIG, username + ":" + password);
     }
-		schemaRegistryClient = new CachedSchemaRegistryClient(schemaRegistruUrl, 1000, originals);
+		schemaRegistryClient = new CachedSchemaRegistryClient(schemaRegistryUrl, 1000, originals);
 		schema = getSchemaBySubject(avroSchemaName);
 		this.fieldExprMappings = fieldExprMappings;
 	}
