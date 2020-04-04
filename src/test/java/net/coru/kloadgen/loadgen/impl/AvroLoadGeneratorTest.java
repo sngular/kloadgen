@@ -1,15 +1,23 @@
 package net.coru.kloadgen.loadgen.impl;
 
 import static java.util.Arrays.asList;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_PASSWORD_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterVariables;
+import org.apache.jmeter.util.JMeterUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import ru.lanwen.wiremock.ext.WiremockResolver;
@@ -22,6 +30,16 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 })
 class AvroLoadGeneratorTest {
 
+  @BeforeEach
+  public void setUp() {
+    File file = new File("src/test/resources");
+    String absolutePath = file.getAbsolutePath();
+    JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
+    JMeterContext jmcx = JMeterContextService.getContext();
+    jmcx.setVariables(new JMeterVariables());
+    JMeterUtils.setLocale(Locale.ENGLISH);
+  }
+
   @Test
   public void testAvroLoadGenerator(@Wiremock WireMockServer server) throws KLoadGenException {
 
@@ -33,7 +51,7 @@ class AvroLoadGeneratorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator( "avrosubject", fieldValueMappingList);
+    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator("avroSubject", fieldValueMappingList);
 
     Object message = avroLoadGenerator.nextMessage();
     assertThat(message).isNotNull();

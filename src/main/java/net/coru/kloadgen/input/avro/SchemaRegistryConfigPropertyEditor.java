@@ -1,51 +1,59 @@
 package net.coru.kloadgen.input.avro;
 
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
 import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_BEARER_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_BEARER_TYPE;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_FLAG;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_PASSWORD_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_SUBJECTS;
 import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_DEFAULT;
 import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_KEY;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
+import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfig;
+import net.coru.kloadgen.model.PropertyMapping;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.gui.ClearGui;
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
+import org.apache.jmeter.testbeans.gui.TableEditor;
+import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
+
 
 @Slf4j
 public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-    private final JLabel schemaUrlLabel = new JLabel("Schema Url");
-    private final JTextField schemaRegistryUrl = new JTextField(5);
-
-    private final JLabel userNameLabel = new JLabel("Username");
-    private final JTextField userName = new JTextField(2);
-
-    private final JLabel passwordLabel = new JLabel("Password");
-    private final JTextField password = new JPasswordField(2);
+    private final JTextField schemaRegistryUrl = new JTextField();
 
     private final JButton testSchemaRepoBtn = new JButton("Test Registry");
 
@@ -53,32 +61,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
     private PropertyDescriptor propertyDescriptor;
 
-    ObjectMapper mapper = new ObjectMapper();
-
     public SchemaRegistryConfigPropertyEditor() {
         this.init();
-    }
-
-    private void init() {
-        panel.setLayout(new BorderLayout());
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new GridLayout(3,1));
-
-        formPanel.add(schemaUrlLabel);
-        schemaUrlLabel.setLabelFor(schemaRegistryUrl);
-        formPanel.add(schemaRegistryUrl);
-
-        formPanel.add(userNameLabel);
-        userNameLabel.setLabelFor(userName);
-        formPanel.add(userName);
-
-        formPanel.add(passwordLabel);
-        passwordLabel.setLabelFor(password);
-        formPanel.add(password);
-
-        panel.add(formPanel, BorderLayout.NORTH);
-        panel.add(testSchemaRepoBtn, BorderLayout.CENTER);
-        this.testSchemaRepoBtn.addActionListener(this);
     }
 
     public SchemaRegistryConfigPropertyEditor(Object source) {
@@ -91,6 +75,15 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
         super(descriptor);
         this.propertyDescriptor = descriptor;
         this.init();
+    }
+
+    private void init() {
+        panel.setLayout(new BorderLayout());
+
+        panel.add(schemaRegistryUrl);
+
+        panel.add(testSchemaRepoBtn, BorderLayout.AFTER_LINE_ENDS);
+        this.testSchemaRepoBtn.addActionListener(this);
     }
 
     @Override
@@ -111,43 +104,17 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     @SneakyThrows
     @Override
     public void setValue(Object value) {
-        String schemaConfig = (String) value;
-        if (StringUtils.isNotEmpty(schemaConfig)) {
-            if (schemaConfig.startsWith("{")) {
-                SchemaRegistryConfig schemaRegistryConfig = mapper.readerFor(SchemaRegistryConfig.class).readValue((String) value);
-                this.schemaRegistryUrl.setText(schemaRegistryConfig.getSchemaRegistryUrl());
-                this.schemaRegistryUrl.setCaretPosition(0);
-                this.userName.setText(schemaRegistryConfig.getUsername());
-                this.password.setText(schemaRegistryConfig.getPassword());
-                JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, schemaRegistryConfig.getSchemaRegistryUrl());
-                if (! SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(userName.toString())) {
-                    JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_USERNAME_KEY, schemaRegistryConfig.getUsername());
-                    JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_PASSWORD_KEY, schemaRegistryConfig.getPassword());
-                }
-            }
-        }
+        this.schemaRegistryUrl.setText(value.toString());
     }
 
     public void setSchemaRegistryUrl(String schemaUrl) {
         this.schemaRegistryUrl.setText(schemaUrl);
     }
 
-    public void setUserName(String userName) {
-        this.userName.setText(userName);
-    }
-
-    public void setPassword(String password) {
-        this.password.setText(password);
-    }
     @SneakyThrows
     @Override
     public Object getValue() {
-
-        return mapper.writeValueAsString(SchemaRegistryConfig.builder()
-                .schemaRegistryUrl(schemaRegistryUrl.getText())
-                .username(userName.getText())
-                .password(password.getText())
-                .build());
+        return schemaRegistryUrl.getText();
     }
 
     @Override
@@ -157,22 +124,71 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        Map<String, String> originals = new HashMap<>();
-        if (!SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(userName.toString())) {
-            originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl.getText());
-            originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-            originals.put(USER_INFO_CONFIG, userName.getText() + ":" + password.getText());
-        }
-        SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(getAsText(), 1000, originals);
-        try {
-            schemaRegistryClient.getAllSubjects();
-            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, schemaRegistryUrl.getText());
-            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_USERNAME_KEY, userName.getText());
-            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_PASSWORD_KEY, password.getText());
 
-        } catch (IOException | RestClientException e) {
-           log.error(e.getMessage(), e);
+        try {
+            //Get current test GUI component
+            TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
+            Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
+            customizer.setAccessible(true);
+
+            //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
+            GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
+            Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
+            editors.setAccessible(true);
+
+            //Retrieve TableEditor and set all fields with default values to it
+            PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
+            Map<String, String> schemaProperties = new HashMap<>();
+            for (PropertyEditor propertyEditor : propertyEditors) {
+                if (propertyEditor instanceof TableEditor) {
+                    //noinspection unchecked
+                    schemaProperties = fromListToPropertiesMap((List<PropertyMapping>) propertyEditor.getValue());
+                }
+            }
+            Map<String, String> originals = new HashMap<>();
+            originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl.getText());
+            if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
+                JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
+                if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+                    JMeterContextService.getContext().getProperties()
+                        .setProperty(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
+
+                    originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+                    originals.put(USER_INFO_CONFIG,
+                        schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
+                }
+            }
+            SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(getAsText(), 1000, originals);
+
+            List<String> subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());
+            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, schemaRegistryUrl.getText());
+            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
+            if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
+                JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
+                if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+                    JMeterContextService.getContext().getProperties()
+                        .setProperty(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
+                    JMeterContextService.getContext().getProperties().setProperty(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+                    JMeterContextService.getContext().getProperties().setProperty(USER_INFO_CONFIG,
+                        schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
+                } else if (SCHEMA_REGISTRY_AUTH_BEARER_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+                    JMeterContextService.getContext().getProperties()
+                        .setProperty(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BEARER_TYPE);
+                    JMeterContextService.getContext().getProperties().setProperty(BEARER_AUTH_CREDENTIALS_SOURCE, "STATIC_TOKEN");
+                    JMeterContextService.getContext().getProperties()
+                        .setProperty(BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SCHEMA_REGISTRY_AUTH_BEARER_KEY));
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + schemaRegistryUrl.getText() +
+                    "\n Number of subjects in the Registry : " + subjects.size(), "Successful connection to Schema Registry",
+                JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
+            JOptionPane
+                .showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+                    JOptionPane.ERROR_MESSAGE);
+            log.error(e.getMessage(), e);
         }
+
     }
 
     @Override
@@ -183,5 +199,13 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     @Override
     public void clearGui() {
         this.schemaRegistryUrl.setText("");
+    }
+
+    private Map<String, String> fromListToPropertiesMap(List<PropertyMapping> schemaProperties) {
+        Map<String, String> propertiesMap = new HashMap<>();
+        for (PropertyMapping property : schemaProperties) {
+            propertiesMap.put(property.getPropertyName(), property.getPropertyValue());
+        }
+        return propertiesMap;
     }
 }

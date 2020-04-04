@@ -48,7 +48,7 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(
-        "avrosubject"
+        "avroSubject"
     );
 
     assertThat(fieldValueMappingList).hasSize(2);

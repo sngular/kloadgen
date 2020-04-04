@@ -3,7 +3,11 @@ package net.coru.kloadgen.input;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
 import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_DEFAULT;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_FLAG;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
 import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
@@ -19,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -30,27 +35,39 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
-	private SchemaRegistryClient schemaRegistryClient;
-	private Schema schema;
-	private SchemaMetadata metadata;
-	private List<FieldValueMapping> fieldExprMappings;
-	private Map<String, Object> context = new HashMap<>();
+  private SchemaRegistryClient schemaRegistryClient;
 
-	public AvroSchemaProcessor(String schemaRegistryUrl, String avroSchemaName, List<FieldValueMapping> fieldExprMappings, String username, String password)
-					throws IOException, RestClientException {
-	  Map<String, String> originals = new HashMap<>();
-    if (!SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(username)) {
-      originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
-      originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-      originals.put(USER_INFO_CONFIG, username + ":" + password);
+  private Schema schema;
+
+  private SchemaMetadata metadata;
+
+  private List<FieldValueMapping> fieldExprMappings;
+
+  private Map<String, Object> context = new HashMap<>();
+
+  public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
+      throws IOException, RestClientException {
+    Map<String, String> originals = new HashMap<>();
+    if (Objects.nonNull(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL))) {
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL));
+
+      if (FLAG_YES.equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
+            .equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
+          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
+              JMeterContextService.getContext().getProperties().getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
+          originals.put(USER_INFO_CONFIG, JMeterContextService.getContext().getProperties().getProperty(USER_INFO_CONFIG));
+        }
+      }
     }
-		schemaRegistryClient = new CachedSchemaRegistryClient(schemaRegistryUrl, 1000, originals);
-		schema = getSchemaBySubject(avroSchemaName);
-		this.fieldExprMappings = fieldExprMappings;
-	}
+    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
+    schema = getSchemaBySubject(avroSchemaName);
+    this.fieldExprMappings = fieldExprMappings;
+  }
 
   @SneakyThrows
   @Override
@@ -172,7 +189,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       startPosition = fieldValueMapping.getFieldName().indexOf(fieldName) + fieldName.length() + 1;
     }
     cleanPath = fieldValueMapping.getFieldName().substring(startPosition);
-    if (cleanPath.matches("^(\\d*\\]).*$")) {
+    if (cleanPath.matches("^(\\d*]).*$")) {
       cleanPath = cleanPath.substring(cleanPath.indexOf(".") + 1);
     }
     return cleanPath;
@@ -182,7 +199,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
     int endOfField = pathToClean.contains(".")?
         pathToClean.indexOf(".") : 0;
-    return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*\\]", "");
+    return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
   }
 
   private Schema getSchemaBySubject(String avroSubjectName) throws IOException, RestClientException {

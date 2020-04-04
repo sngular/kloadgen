@@ -1,5 +1,9 @@
 package net.coru.kloadgen.serializer;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
@@ -9,11 +13,6 @@ import org.apache.avro.io.EncoderFactory;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
-
-import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 
 @Slf4j
 public class AvroSerializer<T extends EnrichedRecord>  implements Serializer<T> {
@@ -31,8 +30,7 @@ public class AvroSerializer<T extends EnrichedRecord>  implements Serializer<T> 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
         byteArrayOutputStream.write(ByteBuffer.allocate(idSize).putInt(data.getSchemaMetadata().getId()).array());
-        BinaryEncoder binaryEncoder =
-            EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
+        BinaryEncoder binaryEncoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(data.getGenericRecord().getSchema());
         datumWriter.write(data.getGenericRecord(), binaryEncoder);
 

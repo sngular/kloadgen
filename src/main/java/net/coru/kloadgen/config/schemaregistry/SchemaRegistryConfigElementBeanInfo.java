@@ -1,29 +1,44 @@
 package net.coru.kloadgen.config.schemaregistry;
 
-import net.coru.kloadgen.input.avro.SchemaRegistryConfigPropertyEditor;
-import org.apache.jmeter.testbeans.BeanInfoSupport;
+import static net.coru.kloadgen.config.schemaregistry.DefaultProperties.DEFAULTS;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL_DEFAULT;
 
 import java.beans.PropertyDescriptor;
-
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_CONFIG_DEFAULT;
+import net.coru.kloadgen.input.avro.SchemaRegistryConfigPropertyEditor;
+import net.coru.kloadgen.model.PropertyMapping;
+import org.apache.jmeter.testbeans.BeanInfoSupport;
+import org.apache.jmeter.testbeans.gui.TableEditor;
+import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
 
-    private static final String SCHEMA_REGISTRY_CONFIG = "schemaRegistryConfig";
+    private static final String SCHEMA_REGISTRY_URL = "schemaRegistryUrl";
+
+    private static final String SCHEMA_REGISTRY_PROPERTIES = "schemaRegistryProperties";
 
     public SchemaRegistryConfigElementBeanInfo() {
 
         super(SchemaRegistryConfigElement.class);
 
-        createPropertyGroup("schema_registry_config", new String[] {
-                SCHEMA_REGISTRY_CONFIG
+        createPropertyGroup("schema_registry_config", new String[]{
+            SCHEMA_REGISTRY_URL, SCHEMA_REGISTRY_PROPERTIES
         });
 
-        PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_CONFIG);
+        PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_URL);
         schemaRegistryUrl.setPropertyEditorClass(SchemaRegistryConfigPropertyEditor.class);
         schemaRegistryUrl.setValue(NOT_UNDEFINED, Boolean.TRUE);
-        schemaRegistryUrl.setValue(DEFAULT, SCHEMA_REGISTRY_CONFIG_DEFAULT);
+        schemaRegistryUrl.setValue(DEFAULT, SCHEMA_REGISTRY_URL_DEFAULT);
         schemaRegistryUrl.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+        TypeEditor tableEditor = TypeEditor.TableEditor;
+        PropertyDescriptor tableProperties = property(SCHEMA_REGISTRY_PROPERTIES, tableEditor);
+        tableProperties.setValue(TableEditor.CLASSNAME, PropertyMapping.class.getName());
+        tableProperties.setValue(TableEditor.HEADERS, new String[]{"Property Name", "Property Value"});
+        tableProperties
+            .setValue(TableEditor.OBJECT_PROPERTIES, new String[]{PropertyMapping.PROPERTY_NAME, PropertyMapping.PROPERTY_VALUE});
+        tableProperties.setValue(DEFAULT, DEFAULTS);
+        tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        tableProperties.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     }
 }

@@ -3,10 +3,11 @@ package net.coru.kloadgen.input.avro;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
 import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_PASSWORD_KEY;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_FLAG;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_DEFAULT;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_USERNAME_KEY;
 import static org.apache.avro.Schema.Type.RECORD;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
@@ -19,6 +20,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.RandomTool;
@@ -34,19 +36,21 @@ public class SchemaExtractor {
   public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
     Map<String, String> originals = new HashMap<>();
 
-    String schemaUrl = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL);
+    if (Objects.nonNull(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL))) {
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL));
 
-    String username = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_USERNAME_KEY);
-    String password = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_PASSWORD_KEY);
-
-    if (!SCHEMA_REGISTRY_USERNAME_DEFAULT.equalsIgnoreCase(username)) {
-      originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaUrl);
-      originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-      originals.put(USER_INFO_CONFIG, username + ":" + password);
+      if (FLAG_YES.equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
+            .equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
+          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
+              JMeterContextService.getContext().getProperties().getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
+          originals.put(USER_INFO_CONFIG, JMeterContextService.getContext().getProperties().getProperty(USER_INFO_CONFIG));
+        }
+      }
     }
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
-    SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(schemaUrl, 1000, originals);
+    SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     Schema schema = schemaRegistryClient.getById(schemaMetadata.getId());

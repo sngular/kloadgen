@@ -56,7 +56,7 @@
         </net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
         <net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement" testname="Kafka Load Generator Config" enabled="true">
-          <stringProp name="avroSubject">testing-subject</stringProp>
+          <stringProp name="avroSubject">&lt;avro subject&gt;</stringProp>
           <stringProp name="placeHolder">MESSAGE</stringProp>
           <collectionProp name="schemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
@@ -270,6 +270,11 @@
                 <stringProp name="Argument.value">NO</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="jaas.enabled" elementType="Argument">
+                <stringProp name="Argument.name">jaas.enabled</stringProp>
+                <stringProp name="Argument.value">NO</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="java.security.auth.login.config" elementType="Argument">
                 <stringProp name="Argument.name">java.security.auth.login.config</stringProp>
                 <stringProp name="Argument.value">&lt;JAAS File Location&gt;</stringProp>
@@ -329,6 +334,32 @@
           </elementProp>
           <stringProp name="classname">net.coru.kloadgen.sampler.ConfluentKafkaSampler</stringProp>
         </JavaSampler>
+        <hashTree/>
+        <net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
+          <stringProp name="schemaRegistryUrl">http://localhost:8081</stringProp>
+          <collectionProp name="schemaRegistryProperties">
+            <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>
+              <stringProp name="propertyValue">NO</stringProp>
+            </elementProp>
+            <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.auth.method</stringProp>
+              <stringProp name="propertyValue">BASIC</stringProp>
+            </elementProp>
+            <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.username</stringProp>
+              <stringProp name="propertyValue">&lt;username&gt;</stringProp>
+            </elementProp>
+            <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.password</stringProp>
+              <stringProp name="propertyValue">&lt;password&gt;</stringProp>
+            </elementProp>
+            <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.bearer</stringProp>
+              <stringProp name="propertyValue">&lt;bearer&gt;</stringProp>
+            </elementProp>
+          </collectionProp>
+        </net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
         <hashTree/>
       </hashTree>
     </hashTree>

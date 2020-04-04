@@ -1,24 +1,29 @@
 package net.coru.kloadgen.model;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.jmeter.testelement.AbstractTestElement;
 
+@Builder
+@ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-@ToString
 public class HeaderMapping extends AbstractTestElement {
 
     public static final String HEADER_NAME = "headerName";
+
     public static final String HEADER_VALUE = "headerValue";
 
     private String headerName;
+
     private String headerValue;
 
     public HeaderMapping(String headerName, String headerValue) {
         this.setHeaderName(headerName);
         this.setHeaderValue(headerValue);
+        init();
     }
 
     public String getHeaderName() {

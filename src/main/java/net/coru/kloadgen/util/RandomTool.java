@@ -1,18 +1,23 @@
 package net.coru.kloadgen.util;
 
+import static org.apache.avro.Schema.Type.ENUM;
+import static org.apache.avro.Schema.Type.UNION;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.*;
-
-import static org.apache.avro.Schema.Type.ENUM;
-import static org.apache.avro.Schema.Type.UNION;
 
 public final class RandomTool {
 
@@ -301,8 +306,8 @@ public final class RandomTool {
 
   private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     int value;
-    if (fieldValuesList.size() >0 ) {
-      value = Integer.parseInt(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())).trim());
+    if (fieldValuesList.size() > 0) {
+      value = Integer.parseInt(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -381,9 +386,9 @@ public final class RandomTool {
   }
 
   private static Boolean getBooleanValueOrRandom(List<String> fieldValuesList) {
-    Boolean value = RandomUtils.nextBoolean();
+    boolean value = RandomUtils.nextBoolean();
     if (fieldValuesList.size() > 0) {
-      value = Boolean.valueOf(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = Boolean.parseBoolean(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     }
     return value;
   }

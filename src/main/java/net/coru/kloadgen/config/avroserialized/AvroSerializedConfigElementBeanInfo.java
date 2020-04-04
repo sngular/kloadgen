@@ -1,13 +1,12 @@
 package net.coru.kloadgen.config.avroserialized;
 
+import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import net.coru.kloadgen.input.avro.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
-
-import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
 
 public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
@@ -48,6 +47,5 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
         subjectNameProps.setValue(DEFAULT, "<avro subject>");
         subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
-
     }
 }
