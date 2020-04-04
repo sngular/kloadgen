@@ -1,6 +1,6 @@
 package net.coru.kloadgen.config.schemaregistry;
 
-import static net.coru.kloadgen.config.schemaregistry.DefaultProperties.DEFAULTS;
+import static net.coru.kloadgen.config.schemaregistry.DefaultPropertiesHelper.DEFAULTS;
 import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL_DEFAULT;
 
 import java.beans.PropertyDescriptor;

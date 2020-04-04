@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import net.coru.kloadgen.model.PropertyMapping;
 
-public class DefaultProperties {
+class DefaultPropertiesHelper {
 
   static final List<PropertyMapping> DEFAULTS = ImmutableList.of(
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_AUTH_FLAG).propertyValue(FLAG_NO).build(),

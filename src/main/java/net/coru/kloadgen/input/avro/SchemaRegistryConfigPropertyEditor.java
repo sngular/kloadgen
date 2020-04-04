@@ -105,10 +105,12 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     @Override
     public void setValue(Object value) {
         this.schemaRegistryUrl.setText(value.toString());
+        propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
     }
 
     public void setSchemaRegistryUrl(String schemaUrl) {
         this.schemaRegistryUrl.setText(schemaUrl);
+        propertyDescriptor.setValue("schemaRegistryUrl", schemaUrl);
     }
 
     @SneakyThrows

@@ -1,13 +1,12 @@
 package net.coru.kloadgen.input;
 
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
 import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_FLAG;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_KEY;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeys.*;
 import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
@@ -17,13 +16,8 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -52,15 +46,21 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
       throws IOException, RestClientException {
     Map<String, String> originals = new HashMap<>();
-    if (Objects.nonNull(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL))) {
-      originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL));
+    Properties ctxProperties = JMeterContextService.getContext().getProperties();
 
-      if (FLAG_YES.equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
+    if (Objects.nonNull(ctxProperties.getProperty(SCHEMA_REGISTRY_URL))) {
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, ctxProperties.getProperty(SCHEMA_REGISTRY_URL));
+
+      if (FLAG_YES.equals(ctxProperties.getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
         if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-            .equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
+            .equals(ctxProperties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
           originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
-              JMeterContextService.getContext().getProperties().getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
-          originals.put(USER_INFO_CONFIG, JMeterContextService.getContext().getProperties().getProperty(USER_INFO_CONFIG));
+              ctxProperties.getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
+          originals.put(USER_INFO_CONFIG, ctxProperties.getProperty(USER_INFO_CONFIG));
+        } else {
+          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
+                  ctxProperties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
+          originals.put(BEARER_AUTH_TOKEN_CONFIG, ctxProperties.getProperty(BEARER_AUTH_TOKEN_CONFIG));
         }
       }
     }

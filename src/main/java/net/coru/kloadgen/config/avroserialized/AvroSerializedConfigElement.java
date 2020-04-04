@@ -18,7 +18,6 @@ import org.apache.jmeter.threads.JMeterVariables;
 import java.util.List;
 
 import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
 
 @Getter
 @Setter
