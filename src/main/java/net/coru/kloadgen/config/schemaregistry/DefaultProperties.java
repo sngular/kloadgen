@@ -17,7 +17,7 @@ import net.coru.kloadgen.model.PropertyMapping;
 
 public class DefaultProperties {
 
-  public static final List<PropertyMapping> DEFAULTS = ImmutableList.of(
+  static final List<PropertyMapping> DEFAULTS = ImmutableList.of(
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_AUTH_FLAG).propertyValue(FLAG_NO).build(),
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_AUTH_KEY).propertyValue(SCHEMA_REGISTRY_AUTH_BASIC_TYPE).build(),
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_USERNAME_KEY).propertyValue(SCHEMA_REGISTRY_USERNAME_DEFAULT).build(),
