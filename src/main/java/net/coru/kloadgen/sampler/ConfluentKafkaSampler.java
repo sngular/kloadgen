@@ -29,6 +29,8 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SEND_BUFFER_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SSL_ENABLED;
+import static net.coru.kloadgen.util.ProducerKeysHelper.TOPIC_NAME_STRATEGY;
+import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_DEFAULT;
@@ -106,7 +108,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         defaultParameters.addArgument(SASL_KERBEROS_SERVICE_NAME, SASL_KERBEROS_SERVICE_NAME_DEFAULT);
         defaultParameters.addArgument(SASL_MECHANISM, SASL_MECHANISM_DEFAULT);
         defaultParameters.addArgument(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
-
+        defaultParameters.addArgument(VALUE_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
         defaultParameters.addArgument(SSL_ENABLED, FLAG_NO);
         defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
         defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "<Keystore Location>");
@@ -135,6 +137,10 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
         props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
         props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+
+        if (null != context.getParameter(VALUE_NAME_STRATEGY)) {
+            props.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
+        }
 
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {

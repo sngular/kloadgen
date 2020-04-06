@@ -77,7 +77,6 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
       customizer.setAccessible(true);
 
-
       //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
       GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
       Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
@@ -85,8 +84,8 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
       //Retrieve TableEditor and set all fields with default values to it
       PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
-      for (PropertyEditor propertyEditor : propertyEditors){
-        if (propertyEditor instanceof TableEditor){
+      for (PropertyEditor propertyEditor : propertyEditors) {
+        if (propertyEditor instanceof TableEditor) {
           propertyEditor.setValue(attributeList);
         }
       }
