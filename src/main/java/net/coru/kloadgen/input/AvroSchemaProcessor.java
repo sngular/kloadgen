@@ -22,6 +22,7 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
@@ -112,11 +113,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     if (ARRAY == field.schema().getType()) {
       return field.schema().getElementType();
     } else if (UNION == field.schema().getType()) {
-      if (ARRAY == field.schema().getTypes().get(1).getType()) {
-        return field.schema().getTypes().get(1).getElementType();
-      } else {
-        return field.schema().getTypes().get(1);
-      }
+      return getRecordUnion(field.schema().getTypes());
     } else return null;
   }
 
@@ -135,16 +132,27 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     if (RECORD == schema.getType()) {
       return new GenericData.Record(schema);
     } else if (UNION == schema.getType()) {
-      return createRecord(schema.getTypes().get(1));
+      return createRecord(getRecordUnion(schema.getTypes()));
     } else if (ARRAY == schema.getType()) {
       return createRecord(schema.getElementType());
     } else {
       return null;
     }
   }
+
+  private Schema getRecordUnion(List<Schema> types) {
+    Schema isRecord = null;
+    for (Schema schema : types) {
+      if (RECORD == schema.getType() || Type.ARRAY == schema.getType()) {
+        isRecord = schema;
+      }
+    }
+    return isRecord;
+  }
+
   private Integer calculateArraySize(String fieldName) {
-    Integer arrayLength = RandomUtils.nextInt(1,10);
-    String arrayLengthStr = StringUtils.substringBetween(fieldName,"[", "]");
+    Integer arrayLength = RandomUtils.nextInt(1, 10);
+    String arrayLengthStr = StringUtils.substringBetween(fieldName, "[", "]");
     if (StringUtils.isNotEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
       arrayLength = Integer.valueOf(arrayLengthStr);
     }
