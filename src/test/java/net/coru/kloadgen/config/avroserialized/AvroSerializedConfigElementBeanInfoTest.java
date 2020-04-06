@@ -13,8 +13,6 @@ class AvroSerializedConfigElementBeanInfoTest {
 
   private static final String AVRO_SUBJECT = "avroSubject";
 
-  private static final String SCHEMA_REGISTRY_URL = "schemaRegistryUrl";
-
   private static final String SCHEMA_PROPERTIES = "schemaProperties";
 
   private AvroSerializedConfigElementBeanInfo avroSerializedConfigElementBeanInfo;

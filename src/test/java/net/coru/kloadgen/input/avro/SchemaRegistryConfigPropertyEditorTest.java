@@ -2,10 +2,13 @@ package net.coru.kloadgen.input.avro;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -24,13 +27,12 @@ class SchemaRegistryConfigPropertyEditorTest {
 
   private SchemaRegistryConfigPropertyEditor propertyEditor;
 
-  private JMeterContext jmcx;
-
   @BeforeEach
-  public void setUp() {
-    jmcx = JMeterContextService.getContext();
+  public void setUp() throws IntrospectionException {
+    JMeterContext jmcx = JMeterContextService.getContext();
     jmcx.setVariables(new JMeterVariables());
-    propertyEditor = new SchemaRegistryConfigPropertyEditor();
+    PropertyDescriptor propertyDescriptor = new PropertyDescriptor("schemaRegistryUrl", SchemaRegistryConfigElement.class);
+    propertyEditor = new SchemaRegistryConfigPropertyEditor(propertyDescriptor);
     JMeterUtils.setLocale(Locale.ENGLISH);
     JMeterUtils.getProperties("jmeter.properties");
   }

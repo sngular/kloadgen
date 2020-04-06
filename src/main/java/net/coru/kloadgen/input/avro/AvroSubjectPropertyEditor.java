@@ -1,6 +1,6 @@
 package net.coru.kloadgen.input.avro;
 
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_SUBJECTS;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
@@ -156,6 +156,9 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
     }
 
+    /**
+     * Override but not used. Implementation not needed.
+     */
     @Override
     public void focusLost(FocusEvent e) {
 

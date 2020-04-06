@@ -1,6 +1,6 @@
 package net.coru.kloadgen.util;
 
-public class SchemaRegistryKeys {
+public class SchemaRegistryKeyHelper {
 
 	public static final String SCHEMA_REGISTRY_USERNAME_KEY = "schema.registry.username";
 

@@ -2,6 +2,8 @@
 package net.coru.kloadgen.sampler;
 
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ACKS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BATCH_SIZE_CONFIG_DEFAULT;
@@ -38,10 +40,11 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_PLACEHOLDER_KEY
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_VAL_PLACEHOLDER_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_FLAG;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_AUTH_KEY;
-import static net.coru.kloadgen.util.SchemaRegistryKeys.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,7 +65,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.RandomTool;
-import net.coru.kloadgen.util.SchemaRegistryKeys;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -140,16 +142,21 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        if (Objects.nonNull(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL))) {
-            props.put(SchemaRegistryKeys.SCHEMA_REGISTRY_URL,
-                JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL));
+        Properties properties = JMeterContextService.getContext().getProperties();
+        if (Objects.nonNull(properties.getProperty(SCHEMA_REGISTRY_URL))) {
+            props.put(SCHEMA_REGISTRY_URL,
+                properties.getProperty(SCHEMA_REGISTRY_URL));
 
-            if (FLAG_YES.equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
+            if (FLAG_YES.equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-                    .equals(JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
+                    .equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
                     props.put(BASIC_AUTH_CREDENTIALS_SOURCE,
-                        JMeterContextService.getContext().getProperties().getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
-                    props.put(USER_INFO_CONFIG, JMeterContextService.getContext().getProperties().getProperty(USER_INFO_CONFIG));
+                        properties.getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
+                    props.put(USER_INFO_CONFIG, properties.getProperty(USER_INFO_CONFIG));
+                } else if (SCHEMA_REGISTRY_AUTH_BEARER_KEY.equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
+                    props.put(BEARER_AUTH_CREDENTIALS_SOURCE,
+                        properties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
+                    props.put(BEARER_AUTH_TOKEN_CONFIG, properties.getProperty(BEARER_AUTH_TOKEN_CONFIG));
                 }
             }
             props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));

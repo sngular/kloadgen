@@ -18,7 +18,7 @@
         <jmeter.lib.scope>provided</jmeter.lib.scope>
         <avro.version>1.9.1</avro.version>
         <lombok.version>1.18.10</lombok.version>
-        <kafka-schema-registry-client.version>5.4.1</kafka-schema-registry-client.version>
+        <kafka-schema-registry-client.version>5.3.1</kafka-schema-registry-client.version>
         <slf4j-api.version>1.7.25</slf4j-api.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
