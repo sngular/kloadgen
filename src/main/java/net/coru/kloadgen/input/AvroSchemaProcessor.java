@@ -22,7 +22,6 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
-import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
@@ -143,7 +142,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || Type.ARRAY == schema.getType()) {
+      if (RECORD == schema.getType() || ARRAY == schema.getType()) {
         isRecord = schema;
       }
     }
@@ -151,10 +150,10 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   }
 
   private Integer calculateArraySize(String fieldName) {
-    Integer arrayLength = RandomUtils.nextInt(1, 10);
+    int arrayLength = RandomUtils.nextInt(1, 10);
     String arrayLengthStr = StringUtils.substringBetween(fieldName, "[", "]");
     if (StringUtils.isNotEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
-      arrayLength = Integer.valueOf(arrayLengthStr);
+      arrayLength = Integer.parseInt(arrayLengthStr);
     }
     return arrayLength;
   }
