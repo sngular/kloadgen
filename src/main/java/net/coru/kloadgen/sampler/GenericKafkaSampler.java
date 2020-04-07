@@ -127,7 +127,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
         Optional<String> schemaRegistryContext = Optional.of(JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
-        schemaRegistryContext.ifPresent( cont->props.put(SCHEMA_REGISTRY_URL, cont));
+        schemaRegistryContext.ifPresent( cont-> props.put(SCHEMA_REGISTRY_URL, cont));
         props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
 
         Iterator<String> parameters = context.getParameterNamesIterator();
