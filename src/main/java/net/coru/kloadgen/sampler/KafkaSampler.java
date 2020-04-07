@@ -113,8 +113,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
-
+        if( null != JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL)){
+            props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+        }
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {
             if (parameter.startsWith("_")) {
@@ -185,13 +186,13 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
             if (!messageSent.isDone()) {
                 throw new IOException("Message not sent");
             }
-            sampleResult.setResponseData(messageVal.toString(), StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(messageVal != null?messageVal.toString():"", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(true);
             sampleResult.sampleEnd();
 
         } catch (Exception e) {
             log.error("Failed to send message", e);
-            sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(e.getMessage() != null?e.getMessage():"", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
         }

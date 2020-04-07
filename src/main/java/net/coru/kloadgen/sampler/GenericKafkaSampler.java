@@ -27,6 +27,7 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NA
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM_DEFAULT;
+import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SEND_BUFFER_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SSL_ENABLED;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
@@ -129,6 +130,9 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
+        if( null != JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL)){
+            props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+        }
         props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
 
         Iterator<String> parameters = context.getParameterNamesIterator();
@@ -201,13 +205,13 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
             if (!messageSent.isDone()) {
                 throw new IOException("Message not sent");
             }
-            sampleResult.setResponseData(messageVal.toString(), StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(messageVal != null?messageVal.toString():"", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(true);
             sampleResult.sampleEnd();
 
         } catch (Exception e) {
             log.error("Failed to send message", e);
-            sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(e.getMessage() != null?e.getMessage():"", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
         }
