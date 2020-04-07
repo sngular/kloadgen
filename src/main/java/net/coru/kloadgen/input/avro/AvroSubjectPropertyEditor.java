@@ -156,12 +156,9 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
     }
 
-    /**
-     * Override but not used. Implementation not needed.
-     */
     @Override
     public void focusLost(FocusEvent e) {
-
+       // Override but not used. Implementation not needed.
     }
   }
 }

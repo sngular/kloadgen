@@ -41,6 +41,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -174,6 +175,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
     }
 
+    @SuppressFBWarnings({"DM_DEFAULT_ENCODING", "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
     @Override
     public SampleResult runTest(JavaSamplerContext context) {
 
