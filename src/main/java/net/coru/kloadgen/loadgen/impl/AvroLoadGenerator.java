@@ -12,10 +12,10 @@ public class AvroLoadGenerator implements BaseLoadGenerator {
 
   private AvroSchemaProcessor avroSchemaProcessor;
 
-  public AvroLoadGenerator(String schemaRegistryUrl, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) throws
+  public AvroLoadGenerator(String avroSchemaName, List<FieldValueMapping> fieldExprMappings) throws
       KLoadGenException {
     try {
-      this.avroSchemaProcessor = new AvroSchemaProcessor(schemaRegistryUrl, avroSchemaName, fieldExprMappings);
+      this.avroSchemaProcessor = new AvroSchemaProcessor(avroSchemaName, fieldExprMappings);
     } catch (Exception exc){
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);

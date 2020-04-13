@@ -1,9 +1,5 @@
 package net.coru.kloadgen.config.avroserialized;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
-
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +15,10 @@ import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
+import java.util.List;
+
+import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
+
 @Getter
 @Setter
 @Slf4j
@@ -27,8 +27,6 @@ import org.apache.jmeter.threads.JMeterVariables;
 public class AvroSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String avroSubject;
-
-  private String schemaRegistryUrl;
 
   private List<FieldValueMapping> schemaProperties;
 
@@ -39,11 +37,10 @@ public class AvroSerializedConfigElement extends ConfigTestElement implements Te
 
     try {
       if (generator ==  null) {
-        generator = new AvroLoadGenerator(schemaRegistryUrl, avroSubject, schemaProperties);
+        generator = new AvroLoadGenerator(avroSubject, schemaProperties);
       }
 
       JMeterVariables variables = JMeterContextService.getContext().getVariables();
-      variables.put(SCHEMA_REGISTRY_URL, schemaRegistryUrl);
       variables.putObject(SAMPLE_ENTITY, generator.nextMessage());
     } catch (Exception e) {
       log.error("Failed to create AvroLoadGenerator instance", e);

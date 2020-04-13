@@ -1,22 +1,26 @@
 package net.coru.kloadgen.input.avro;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.PropsKeysHelper;
@@ -31,11 +35,11 @@ import org.apache.jmeter.threads.JMeterContextService;
 @Slf4j
 public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private final JTextField subjectNameTextField = new JTextField();
+  private JComboBox<String> subjectNameComboBox;
 
-  private final JButton loadClassBtn = new JButton("Load Subject");
+  private JButton loadClassBtn = new JButton("Load Subject");
 
-  private final JPanel panel = new JPanel();
+  private JPanel panel = new JPanel();
 
   private PropertyDescriptor propertyDescriptor;
 
@@ -58,19 +62,20 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   private void init() {
+    subjectNameComboBox = new JComboBox<>();
+    subjectNameComboBox.addFocusListener(new ComboFiller());
     panel.setLayout(new BorderLayout());
-    panel.add(subjectNameTextField);
+    panel.add(subjectNameComboBox);
     panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
     this.loadClassBtn.addActionListener(this);
   }
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    String schemaUrl = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_URL);
-    String subjectName = this.subjectNameTextField.getText();
+    String subjectName = Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
 
     try {
-      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(schemaUrl, subjectName);
+      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(subjectName);
 
       //Get current test GUI component
       TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
@@ -89,13 +94,14 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
           propertyEditor.setValue(attributeList);
         }
       }
-    }catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
-      JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!" , JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
+          JOptionPane.INFORMATION_MESSAGE);
+    } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
+      JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+          JOptionPane.ERROR_MESSAGE);
       log.error(e.getMessage(), e);
     }
   }
-
-
 
   @Override
   public void clearGui() {
@@ -104,12 +110,12 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
-
+    propertyDescriptor = descriptor;
   }
 
   @Override
   public String getAsText() {
-    return this.subjectNameTextField.getText();
+    return Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
   }
 
   @Override
@@ -119,28 +125,40 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void setAsText(String text) throws IllegalArgumentException {
-    this.subjectNameTextField.setText(text);
-    this.subjectNameTextField.setCaretPosition(0);
+    this.subjectNameComboBox.setSelectedItem(text);
   }
 
   @Override
   public void setValue(Object value) {
     if (value != null) {
-      this.subjectNameTextField.setText(value.toString());
-      this.subjectNameTextField.setCaretPosition(0);
+      this.subjectNameComboBox.setSelectedItem(value);
     } else {
-      this.subjectNameTextField.setText("");
+      this.subjectNameComboBox.setSelectedItem("");
     }
 
   }
 
   @Override
   public Object getValue() {
-    return this.subjectNameTextField.getText();
+    return this.subjectNameComboBox.getSelectedItem();
   }
 
   @Override
   public boolean supportsCustomEditor() {
     return true;
+  }
+
+  class ComboFiller implements FocusListener {
+
+    @Override
+    public void focusGained(FocusEvent e) {
+      String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
+      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+       // Override but not used. Implementation not needed.
+    }
   }
 }

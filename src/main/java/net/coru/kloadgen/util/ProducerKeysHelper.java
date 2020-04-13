@@ -33,14 +33,21 @@ public class ProducerKeysHelper {
     public static final String BOOTSTRAP_SERVERS_CONFIG_DEFAULT = "<Broker List>";
 
     public static final String JAVA_SEC_AUTH_LOGIN_CONFIG = "java.security.auth.login.config";
+
     public static final String JAVA_SEC_KRB5_CONFIG = "java.security.krb5.conf";
+
     public static final String SASL_KERBEROS_SERVICE_NAME = "sasl.kerberos.service.name";
+
     public static final String SASL_MECHANISM = "sasl.mechanism";
+
     public static final String SASL_MECHANISM_DEFAULT = "GSSAPI";
+
     public static final String JAAS_ENABLED = "jaas.enabled";
 
     public static final String JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT = "<JAAS File Location>";
+
     public static final String JAVA_SEC_KRB5_CONFIG_DEFAULT = "<krb5.conf location>";
+
     public static final String SASL_KERBEROS_SERVICE_NAME_DEFAULT = "kafka";
 
     public static final String KERBEROS_ENABLED = "kerberos.auth.enabled";

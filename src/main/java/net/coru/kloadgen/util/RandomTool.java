@@ -306,8 +306,8 @@ public final class RandomTool {
 
   private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     int value;
-    if (fieldValuesList.size() >0 ) {
-      value = Integer.parseInt(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())).trim());
+    if (fieldValuesList.size() > 0) {
+      value = Integer.parseInt(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -386,9 +386,9 @@ public final class RandomTool {
   }
 
   private static Boolean getBooleanValueOrRandom(List<String> fieldValuesList) {
-    Boolean value = RandomUtils.nextBoolean();
+    boolean value = RandomUtils.nextBoolean();
     if (fieldValuesList.size() > 0) {
-      value = Boolean.valueOf(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = Boolean.parseBoolean(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     }
     return value;
   }
