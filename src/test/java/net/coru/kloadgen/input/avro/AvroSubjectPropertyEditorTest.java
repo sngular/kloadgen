@@ -82,8 +82,7 @@ class AvroSubjectPropertyEditorTest {
 
   @ParameterizedTest
   @MethodSource("parametersForMergeValue")
-  public void mergeValueTestSchemaRegistryEmptyReturnEmpty(Object atributeListTable, List<FieldValueMapping> attributeList,
-      Object expected) {
+  public void mergeValueTest(Object atributeListTable, List<FieldValueMapping> attributeList, List<FieldValueMapping> expected) {
 
     List<FieldValueMapping> result = new AvroSubjectPropertyEditor().mergeValue(atributeListTable, attributeList);
 

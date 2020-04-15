@@ -106,7 +106,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   @SuppressWarnings("unchecked")
-  public List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
+  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
     
 
     if (!(tableEditorValue instanceof ArrayList<?>)) {
