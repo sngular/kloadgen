@@ -92,11 +92,8 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
-
           TableEditor tableEditor = (TableEditor) propertyEditor;
-          Object tableEditorValue = tableEditor.getValue();
-
-          propertyEditor.setValue(mergeValue(tableEditorValue, attributeList));
+          propertyEditor.setValue(mergeValue(tableEditor.getValue(), attributeList));
         }
       }
       JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
