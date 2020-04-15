@@ -5,15 +5,14 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -21,6 +20,9 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -50,128 +52,45 @@ class AvroSubjectPropertyEditorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("AvroSubject", Collections.emptyList(), null);
+    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList(), null);
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     avroSerializedConfigElement.iterationStart(null);
     assertThat(variables).isNotNull();
+    assertThat(variables.get("SampleEntity")).isNotNull();
   }
 
-  @Test
-  public void mergeValueTest_schemaRegistryEmpty_returnEmpty() {
 
-    FieldValueMapping fieldValue = new FieldValueMapping("field1", "string");
-
-    List<FieldValueMapping> atributeListTable = new ArrayList<FieldValueMapping>();
-    atributeListTable.add(fieldValue);
-
-    List<FieldValueMapping> attributeList = new ArrayList<FieldValueMapping>();
-
-    AvroSubjectPropertyEditor avroSubjectPropertyEditor = new AvroSubjectPropertyEditor();
-    List<FieldValueMapping> result = avroSubjectPropertyEditor.mergeValue(atributeListTable, attributeList);
-
-    assertNotNull(result);
-    assertTrue(result.isEmpty());
-
+  private static Stream<Arguments> parametersForMergeValue() {
+    return Stream.of(Arguments.of(new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>()),
+        Arguments.of(new ArrayList<FieldValueMapping>(Arrays.asList(new FieldValueMapping("fieldName", "fieldType"))),
+            new ArrayList<FieldValueMapping>(),
+            new ArrayList<FieldValueMapping>()),
+        Arguments.of(new ArrayList<FieldValueMapping>(Arrays.asList(new FieldValueMapping("fieldName", "fieldType"))),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string")),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string"))),
+        Arguments.of(new ArrayList<FieldValueMapping>(Arrays.asList(new FieldValueMapping("fieldSchema1", "int"))),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string")),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string"))),
+        Arguments.of(new ArrayList<FieldValueMapping>(Arrays.asList(new FieldValueMapping("fieldSchema1", "string"))),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string")),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string"))),
+        Arguments.of(new ArrayList<FieldValueMapping>(Arrays.asList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"))),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string"), new FieldValueMapping("field2", "string")),
+            Arrays.asList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"), new FieldValueMapping("field2", "string"))),
+        Arguments.of("value", Arrays.asList(new FieldValueMapping("field2", "string")), Arrays.asList(new FieldValueMapping("field2", "string"))));
   }
 
-  @Test
-  public void mergeValueTest_schemaRegistryWithDistinctName_returnResultOneItem() {
+  @ParameterizedTest
+  @MethodSource("parametersForMergeValue")
+  public void mergeValueTestSchemaRegistryEmptyReturnEmpty(Object atributeListTable, List<FieldValueMapping> attributeList,
+      Object expected) {
 
-    FieldValueMapping fieldValue = new FieldValueMapping("field1", "string");
+    List<FieldValueMapping> result = new AvroSubjectPropertyEditor().mergeValue(atributeListTable, attributeList);
 
-    List<FieldValueMapping> atributeListTable = new ArrayList<FieldValueMapping>();
-    atributeListTable.add(fieldValue);
-
-    FieldValueMapping fieldValueSchema = new FieldValueMapping("fieldSchema1", "string");
-    List<FieldValueMapping> attributeList = new ArrayList<FieldValueMapping>();
-    attributeList.add(fieldValueSchema);
-
-    AvroSubjectPropertyEditor avroSubjectPropertyEditor = new AvroSubjectPropertyEditor();
-    List<FieldValueMapping> result = avroSubjectPropertyEditor.mergeValue(atributeListTable, attributeList);
-
-    assertNotNull(result);
-    assertFalse(result.isEmpty());
-    assertEquals(1, result.size());
-    assertEquals(result.get(0).getFieldName(), fieldValueSchema.getFieldName());
+    assertEquals(expected, result);
 
   }
 
-  @Test
-  public void mergeValueTest_schemaRegistryWithDistinctType_returnResultOneItem() {
 
-    FieldValueMapping fieldValue = new FieldValueMapping("field1", "string");
-
-    List<FieldValueMapping> atributeListTable = new ArrayList<FieldValueMapping>();
-    atributeListTable.add(fieldValue);
-
-    FieldValueMapping fieldValueSchema = new FieldValueMapping("field1", "int");
-    List<FieldValueMapping> attributeList = new ArrayList<FieldValueMapping>();
-    attributeList.add(fieldValueSchema);
-
-    AvroSubjectPropertyEditor avroSubjectPropertyEditor = new AvroSubjectPropertyEditor();
-    List<FieldValueMapping> result = avroSubjectPropertyEditor.mergeValue(atributeListTable, attributeList);
-
-    assertNotNull(result);
-    assertFalse(result.isEmpty());
-    assertEquals(1, result.size());
-    assertEquals(result.get(0).getFieldName(), fieldValueSchema.getFieldName());
-    assertEquals(result.get(0).getFieldType(), fieldValueSchema.getFieldType());
-
-  }
-
-  @Test
-  public void mergeValueTest_schemaRegistryWithSameValue_returnResultOneItem() {
-
-    FieldValueMapping fieldValue = new FieldValueMapping("field1", "string");
-
-    List<FieldValueMapping> atributeListTable = new ArrayList<FieldValueMapping>();
-    atributeListTable.add(fieldValue);
-
-    FieldValueMapping fieldValueSchema = new FieldValueMapping("field1", "string");
-    List<FieldValueMapping> attributeList = new ArrayList<FieldValueMapping>();
-    attributeList.add(fieldValueSchema);
-
-    AvroSubjectPropertyEditor avroSubjectPropertyEditor = new AvroSubjectPropertyEditor();
-    List<FieldValueMapping> result = avroSubjectPropertyEditor.mergeValue(atributeListTable, attributeList);
-
-    assertNotNull(result);
-    assertFalse(result.isEmpty());
-    assertEquals(1, result.size());
-    assertEquals(result.get(0).getFieldName(), fieldValueSchema.getFieldName());
-    assertEquals(result.get(0).getFieldType(), fieldValueSchema.getFieldType());
-    assertEquals(result.get(0).getFieldName(), fieldValue.getFieldName());
-    assertEquals(result.get(0).getFieldType(), fieldValue.getFieldType());
-
-  }
-
-  @Test
-  public void mergeValueTest_schemaRegistryWithTwoValues_returnResultOneItem() {
-
-    FieldValueMapping fieldValue = new FieldValueMapping("field1", "string", 0, "[\"value1\"]");
-
-    List<FieldValueMapping> atributeListTable = new ArrayList<FieldValueMapping>();
-    atributeListTable.add(fieldValue);
-
-    FieldValueMapping fieldValueSchema = new FieldValueMapping("field1", "string");
-    FieldValueMapping fieldValueSchema2 = new FieldValueMapping("field2", "string");
-    List<FieldValueMapping> attributeList = new ArrayList<FieldValueMapping>();
-    attributeList.add(fieldValueSchema);
-    attributeList.add(fieldValueSchema2);
-
-    AvroSubjectPropertyEditor avroSubjectPropertyEditor = new AvroSubjectPropertyEditor();
-    List<FieldValueMapping> result = avroSubjectPropertyEditor.mergeValue(atributeListTable, attributeList);
-
-    assertNotNull(result);
-    assertFalse(result.isEmpty());
-    assertEquals(2, result.size());
-    assertEquals(result.get(0).getFieldName(), fieldValueSchema.getFieldName());
-    assertEquals(result.get(0).getFieldType(), fieldValueSchema.getFieldType());
-    assertEquals(result.get(0).getFieldName(), fieldValue.getFieldName());
-    assertEquals(result.get(0).getFieldType(), fieldValue.getFieldType());
-    assertEquals(result.get(0).getFieldValuesList(), fieldValue.getFieldValuesList());
-    assertEquals(result.get(1).getFieldName(), fieldValueSchema2.getFieldName());
-    assertEquals(result.get(1).getFieldType(), fieldValueSchema2.getFieldType());
-
-  }
 
 }

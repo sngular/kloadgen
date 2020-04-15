@@ -15,12 +15,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -108,37 +108,37 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
+  @SuppressWarnings("unchecked")
   public List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
     
+
     if (!(tableEditorValue instanceof ArrayList<?>)) {
       log.error("Table Editor is not array list");
       return attributeList;
     }
 
-    List<FieldValueMapping> result = new ArrayList<>();
-    ArrayList<?> arrayListObjects = (ArrayList<?>) tableEditorValue;
-    for (Object object : arrayListObjects) {
-      if (object instanceof FieldValueMapping) {
-        FieldValueMapping fieldValue = (FieldValueMapping) object;
-        Optional<FieldValueMapping> existsField = attributeList.stream()
-            .filter(a -> fieldValue.getFieldName().equals(a.getFieldName()) && fieldValue.getFieldType().equals(a.getFieldType())).findAny();
-        if (existsField.isPresent()) {
-          result.add(fieldValue);
-        }
-      }
-    }
-    
-    if (result.isEmpty()) {
+    List<FieldValueMapping> fileValueList;
+    try {
+      fileValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
+    }catch(Exception e) {
+      log.error("Table Editor is not FieldValueMapping list", e);
       return attributeList;
     }
+    
+    List<FieldValueMapping> result = new ArrayList<>();
+    for(FieldValueMapping fieldValue: attributeList) {
 
-    for (FieldValueMapping fieldValue : attributeList) {
-      Optional<FieldValueMapping> existsField = result.stream().filter(a -> fieldValue.getFieldName().equals(a.getFieldName())).findAny();
-      if (!existsField.isPresent()) {
+      FieldValueMapping existsValue = IterableUtils.find(fileValueList,
+          v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
+      
+      if (existsValue != null) {
+        result.add(existsValue);
+      } else {
         result.add(fieldValue);
       }
-    }
 
+    }
+    
     return result;
   }
 
