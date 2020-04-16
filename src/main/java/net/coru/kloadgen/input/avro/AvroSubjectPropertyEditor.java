@@ -1,8 +1,6 @@
 package net.coru.kloadgen.input.avro;
 
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
-
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -14,6 +12,7 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.DefaultComboBoxModel;
@@ -21,9 +20,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.PropsKeysHelper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -31,6 +29,10 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.PropsKeysHelper;
 
 @Slf4j
 public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -91,7 +93,8 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
-          propertyEditor.setValue(attributeList);
+          TableEditor tableEditor = (TableEditor) propertyEditor;
+          propertyEditor.setValue(mergeValue(tableEditor.getValue(), attributeList));
         }
       }
       JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
@@ -102,6 +105,50 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       log.error(e.getMessage(), e);
     }
   }
+
+  @SuppressWarnings("unchecked")
+  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
+    
+
+    if (!(tableEditorValue instanceof ArrayList<?>)) {
+      log.error("Table Editor is not array list");
+      return attributeList;
+    }
+
+    List<FieldValueMapping> fieldValueList;
+    try {
+      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
+    }catch(Exception e) {
+      log.error("Table Editor is not FieldValueMapping list", e);
+      return attributeList;
+    }
+    
+    if (CollectionUtils.isEmpty(fieldValueList)) {
+      return attributeList;
+    }
+    
+    List<FieldValueMapping> result = new ArrayList<>();
+    for(FieldValueMapping fieldValue: attributeList) {
+
+      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
+      
+      if (existsValue != null) {
+        result.add(existsValue);
+      } else {
+        result.add(fieldValue);
+      }
+
+    }
+    
+    return result;
+  }
+
+  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
+
+    return IterableUtils.find(fieldValueList,
+        v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
+  }
+
 
   @Override
   public void clearGui() {
