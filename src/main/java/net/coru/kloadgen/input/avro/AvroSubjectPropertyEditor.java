@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
@@ -114,19 +115,22 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       return attributeList;
     }
 
-    List<FieldValueMapping> fileValueList;
+    List<FieldValueMapping> fieldValueList;
     try {
-      fileValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
+      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
     }catch(Exception e) {
       log.error("Table Editor is not FieldValueMapping list", e);
+      return attributeList;
+    }
+    
+    if (CollectionUtils.isEmpty(fieldValueList)) {
       return attributeList;
     }
     
     List<FieldValueMapping> result = new ArrayList<>();
     for(FieldValueMapping fieldValue: attributeList) {
 
-      FieldValueMapping existsValue = IterableUtils.find(fileValueList,
-          v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
+      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
       
       if (existsValue != null) {
         result.add(existsValue);
@@ -137,6 +141,12 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
     
     return result;
+  }
+
+  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
+
+    return IterableUtils.find(fieldValueList,
+        v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
   }
 
 

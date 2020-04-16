@@ -1,10 +1,10 @@
 package net.coru.kloadgen.input.avro;
 
+import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -55,8 +55,10 @@ class AvroSubjectPropertyEditorTest {
     AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList(), null);
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     avroSerializedConfigElement.iterationStart(null);
+
     assertThat(variables).isNotNull();
-    assertThat(variables.get("SampleEntity")).isNotNull();
+    assertThat(variables.getObject(SAMPLE_ENTITY)).isNotNull();
+
   }
 
 
@@ -86,7 +88,7 @@ class AvroSubjectPropertyEditorTest {
 
     List<FieldValueMapping> result = new AvroSubjectPropertyEditor().mergeValue(atributeListTable, attributeList);
 
-    assertEquals(expected, result);
+    assertThat(result).isEqualTo(expected);
 
   }
 
