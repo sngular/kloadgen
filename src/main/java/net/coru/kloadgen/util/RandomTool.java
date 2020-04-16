@@ -1,8 +1,5 @@
 package net.coru.kloadgen.util;
 
-import static org.apache.avro.Schema.Type.ENUM;
-import static org.apache.avro.Schema.Type.UNION;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -12,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -104,78 +98,50 @@ public final class RandomTool {
     return value;
   }
 
-  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
-      Map<String, Object> context) {
 
-    Object value = generateRandom(fieldType, valueLength, fieldValuesList);
-    if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(fieldType, field.schema());
-    } else if (fieldType.equalsIgnoreCase(value.toString())) {
-      if (UNION == field.schema().getType()) {
-        value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
-      } else if ("SEQ".equalsIgnoreCase(fieldType)) {
-        value = castValue(context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? (fieldValuesList.isEmpty()? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long)seqObject) + 1), field.schema().getType());
-      } else {
-        value = castValue(fieldType, field.schema().getType());
-      }
-    }
-    return value;
-  }
-
-  private static Object getEnumOrGenerate(String fieldType, Schema schema) {
-    Object value;
-    if ("ENUM".equalsIgnoreCase(fieldType)) {
-      List<String> enumValueList= schema.getEnumSymbols();
-      value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
-    } else {
-      value = new GenericData.EnumSymbol(schema, fieldType);
-    }
-    return value;
-  }
-
-  private static Object castValue(String fieldType, Schema.Type type) {
-    Object value;
+  public static Object castValue(String value, String type) {
+    Object castValue;
     switch(type) {
-      case INT:
-        value = Integer.valueOf(fieldType);
+      case "int":
+        castValue = Integer.valueOf(value);
         break;
-      case DOUBLE:
-        value = Double.valueOf(fieldType);
+      case "double":
+        castValue = Double.valueOf(value);
         break;
-      case LONG:
-        value = Long.valueOf(fieldType);
+      case "long":
+        castValue = Long.valueOf(value);
         break;
-      case BOOLEAN:
-        value = Boolean.valueOf(fieldType);
+      case "boolean":
+        castValue = Boolean.valueOf(value);
         break;
       default:
-        value = fieldType;
+        castValue = value;
         break;
     }
 
-    return value;
+    return castValue;
   }
 
-  private static Object castValue(Object fieldType, Schema.Type type) {
-    Object value;
+  public static Object castValue(Object value, String type) {
+    Object castValue;
     switch(type) {
-      case INT:
-        value = Integer.valueOf(fieldType.toString());
+      case "int":
+        castValue = Integer.valueOf(value.toString());
         break;
-      case DOUBLE:
-        value = Double.valueOf(fieldType.toString());
+      case "double":
+        castValue = Double.valueOf(value.toString());
         break;
-      case LONG:
-        value = Long.valueOf(fieldType.toString());
+      case "long":
+        castValue = Long.valueOf(value.toString());
         break;
-      case BOOLEAN:
-        value = Boolean.valueOf(fieldType.toString());
+      case "boolean":
+        castValue = Boolean.valueOf(value.toString());
         break;
       default:
-        value = fieldType.toString();
+        castValue = value.toString();
         break;
     }
-    return value;
+    return castValue;
   }
 
   private static List<Integer> generateIntArray(Integer valueLength, List<String> fieldValueList) {
