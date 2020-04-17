@@ -49,7 +49,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
   private List<FieldValueMapping> fieldExprMappings;
 
-  private Map<String, Object> context = new HashMap<>();
+  private RandomToolAvro randomToolAvro;
 
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
       throws IOException, RestClientException {
@@ -74,6 +74,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     }
     schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
     schema = getSchemaBySubject(avroSchemaName);
+    randomToolAvro = new RandomToolAvro();
     this.fieldExprMappings = fieldExprMappings;
   }
 
@@ -97,9 +98,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
           entity.put(fieldValueMapping.getFieldName(),
-              RandomToolAvro.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
+              randomToolAvro.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
                   fieldValueMapping.getFieldValuesList(),
-                  schema.getField(fieldValueMapping.getFieldName()), context));
+                  schema.getField(fieldValueMapping.getFieldName())));
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
         }
@@ -133,11 +134,11 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
             fieldExpMappingsQueue));
       } else {
         fieldExpMappingsQueue.poll();
-        subEntity.put(cleanFieldName, RandomToolAvro.generateRandom(
+        subEntity.put(cleanFieldName, randomToolAvro.generateRandom(
             fieldValueMapping.getFieldType(),
             fieldValueMapping.getValueLength(),
             fieldValueMapping.getFieldValuesList(),
-          schema.getField(cleanFieldName), context));
+            schema.getField(cleanFieldName)));
       }
       fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
     }

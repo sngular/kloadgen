@@ -2,6 +2,7 @@ package net.coru.kloadgen.util;
 
 import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.UNION;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.avro.Schema;
@@ -12,38 +13,24 @@ import org.apache.commons.lang3.RandomUtils;
 
 public class RandomToolAvro {
 
-  private RandomToolAvro() {}
+  private Map<String, Object> context = new HashMap<>();
 
-
-  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Map<String, Object> context) {
+  public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
 
     Object value = RandomTool.generateRandom(fieldType, valueLength, fieldValuesList);
 
     if (ENUM == field.schema().getType()) {
       value = getEnumOrGenerate(fieldType, field.schema());
-    } else if (fieldType.equalsIgnoreCase(value.toString())) {
-      value = notGenerateRandomValue(fieldType, fieldValuesList, field, context, value);
+    } else if (UNION == field.schema().getType()) {
+      value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
+    } else if ("seq".equals(value)) {
+      value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), fieldValuesList, context);
     } else if (diferentTypesNeedCast(fieldType, field.schema().getType())) {
       value = RandomTool.castValue(value, field.schema().getType().getName());
     }
     return value;
   }
 
-  private static Object notGenerateRandomValue(String fieldType, List<String> fieldValuesList, Field field, Map<String, Object> context,
-      Object value) {
-
-    if (UNION == field.schema().getType()) {
-      value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
-    } else if ("SEQ".equalsIgnoreCase(fieldType)) {
-      value = RandomTool.castValue(
-          context.compute(field.name(), (fieldName,
-              seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long) seqObject) + 1),
-          field.schema().getType().getName());
-    } else {
-      value = RandomTool.castValue(fieldType, field.schema().getType().getName());
-    }
-    return value;
-  }
 
 
   private static boolean diferentTypesNeedCast(String fieldType, Type fieldTypeSchema) {

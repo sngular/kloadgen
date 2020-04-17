@@ -48,8 +48,6 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -63,10 +61,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.model.HeaderMapping;
-import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.RandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -81,6 +75,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.model.HeaderMapping;
+import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.StatelessRandomTool;
 
 @Slf4j
 public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
@@ -91,6 +90,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
     private boolean key_message_flag = false;
 
     private ObjectMapper objectMapperJson = new ObjectMapper();
+    private StatelessRandomTool statelessRandomTool;
 
     @Override
     public Arguments getDefaultParameters() {
@@ -204,6 +204,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
         producer = new KafkaProducer<>(props);
+        statelessRandomTool = new StatelessRandomTool();
 
     }
 
@@ -230,8 +231,8 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
             for (HeaderMapping kafkaHeader : kafkaHeaders) {
                 producerRecord.headers().add(kafkaHeader.getHeaderName(),
-                    objectMapperJson.writeValueAsBytes(RandomTool.generateRandom(kafkaHeader.getHeaderValue(),
-                        10, Collections.emptyList())));
+            objectMapperJson.writeValueAsBytes(
+                statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList())));
             }
 
             log.info("Send message {}", producerRecord.value());

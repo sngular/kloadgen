@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.apache.groovy.util.Maps;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -52,6 +55,22 @@ class RandomToolTest {
   void generateArrayRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
     assertThat((List<Object>)RandomTool.generateRandom(fieldType, valueLength, fieldValuesList))
         .allMatch(value -> value.equals(expected));
+  }
+
+
+  private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
+    return Stream.of(
+        Arguments.of("name", "seq", Collections.singletonList("0"), new HashMap<>(), "0", 0L),
+        Arguments.of("name", "seq", Collections.singletonList("1"), new HashMap<>(Maps.of("name", 15L)), "16", 16L));
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateSequenceValueForField")
+  void testGenerateSequenceValueForField(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context,
+      Object expectedTyped, Object expectedStored) {
+
+    assertThat(RandomTool.generateSeq(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedTyped);
+    assertThat(context.get(fieldName)).isEqualTo(expectedStored);
   }
 
 }

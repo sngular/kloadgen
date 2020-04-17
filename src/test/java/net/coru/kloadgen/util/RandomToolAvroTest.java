@@ -4,14 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
-import org.apache.groovy.util.Maps;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,22 +44,20 @@ class RandomToolAvroTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(RandomToolAvro.generateRandom(fieldType, valueLength, fieldValuesList, field, Collections.emptyMap())).isEqualTo(expected);
+    assertThat(new RandomToolAvro().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
     return Stream.of(
-        Arguments.of("seq", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), new HashMap<>(), "0", 0L),
-        Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()),
-            new HashMap<>(Maps.of("name", 15L)), 16, 16L));
+        Arguments.of("seq", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), "0"),
+        Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
+        Arguments.of("seq", 1, Collections.singletonList("2"), new Field("name", SchemaBuilder.builder().intType()), 2));
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
-      Map<String, Object> context, Object expectedTyped, Object expectedStored) {
-    assertThat(RandomToolAvro.generateRandom(fieldType, valueLength, fieldValuesList, field, context)).isEqualTo(expectedTyped);
-    assertThat(context.get(field.name())).isEqualTo(expectedStored);
+  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expectedTyped) {
+    assertThat(new RandomToolAvro().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expectedTyped);
   }
 
 }

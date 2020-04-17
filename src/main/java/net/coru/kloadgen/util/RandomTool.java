@@ -17,8 +17,7 @@ public final class RandomTool {
 
   public static final Set<String> VALID_TYPES = SetUtils.hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array");
 
-  private RandomTool() {
-  }
+  private RandomTool() {}
 
   public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
     Object value;
@@ -357,5 +356,13 @@ public final class RandomTool {
       value = Boolean.parseBoolean(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     }
     return value;
+  }
+
+  public static Object generateSeq(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context) {
+
+    return RandomTool.castValue(
+        context.compute(fieldName, (fieldNameMap,
+            seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long) seqObject) + 1),
+        fieldType);
   }
 }
