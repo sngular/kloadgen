@@ -13,7 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class RandomToolAvroTest {
+class AvroRandomToolTest {
 
   private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 06, 12, 00, 00);
 
@@ -44,7 +44,7 @@ class RandomToolAvroTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(new RandomToolAvro().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expected);
+    assertThat(new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
@@ -57,7 +57,7 @@ class RandomToolAvroTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expectedTyped) {
-    assertThat(new RandomToolAvro().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expectedTyped);
+    assertThat(new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expectedTyped);
   }
 
 }

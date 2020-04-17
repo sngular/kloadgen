@@ -11,7 +11,7 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang3.RandomUtils;
 
-public class RandomToolAvro {
+public class AvroRandomTool {
 
   private Map<String, Object> context = new HashMap<>();
 

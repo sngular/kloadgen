@@ -37,7 +37,7 @@ import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.RandomToolAvro;
+import net.coru.kloadgen.util.AvroRandomTool;
 
 public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
@@ -49,7 +49,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
   private List<FieldValueMapping> fieldExprMappings;
 
-  private RandomToolAvro randomToolAvro;
+  private AvroRandomTool randomToolAvro;
 
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
       throws IOException, RestClientException {
@@ -74,7 +74,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     }
     schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
     schema = getSchemaBySubject(avroSchemaName);
-    randomToolAvro = new RandomToolAvro();
+    randomToolAvro = new AvroRandomTool();
     this.fieldExprMappings = fieldExprMappings;
   }
 
