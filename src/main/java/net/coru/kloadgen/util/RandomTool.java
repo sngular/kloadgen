@@ -19,7 +19,7 @@ public final class RandomTool {
 
   private RandomTool() {}
 
-  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
+  protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
     Object value;
     switch (fieldType) {
       case "string":
@@ -98,30 +98,7 @@ public final class RandomTool {
   }
 
 
-  public static Object castValue(String value, String type) {
-    Object castValue;
-    switch(type) {
-      case "int":
-        castValue = Integer.valueOf(value);
-        break;
-      case "double":
-        castValue = Double.valueOf(value);
-        break;
-      case "long":
-        castValue = Long.valueOf(value);
-        break;
-      case "boolean":
-        castValue = Boolean.valueOf(value);
-        break;
-      default:
-        castValue = value;
-        break;
-    }
-
-    return castValue;
-  }
-
-  public static Object castValue(Object value, String type) {
+  protected static Object castValue(Object value, String type) {
     Object castValue;
     switch(type) {
       case "int":
