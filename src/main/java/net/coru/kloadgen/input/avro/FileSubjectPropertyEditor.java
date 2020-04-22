@@ -12,6 +12,7 @@ import java.awt.event.FocusListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -29,6 +30,7 @@ import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.PropsKeysHelper;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -36,6 +38,7 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
+import sun.net.www.content.text.Generic;
 
 @Slf4j
 public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -79,15 +82,15 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    String content = null;
-    try {
-      content = new String(Files.readAllBytes(Paths.get(this.fileChooser.getSelectedFile().getPath())));
-    } catch (IOException e){
-      JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-          JOptionPane.ERROR_MESSAGE);
-      log.error(e.getMessage(), e);
-    }
-    String subjectName = Objects.requireNonNull(content);
+//    File content = null;
+//    try {
+//      this.fileChooser.getSelectedFile();
+//    } catch (IOException e){
+//      JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+//          JOptionPane.ERROR_MESSAGE);
+//      log.error(e.getMessage(), e);
+//    }
+    File subjectName = Objects.requireNonNull(this.fileChooser.getSelectedFile());
 
     try {
       List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(subjectName);

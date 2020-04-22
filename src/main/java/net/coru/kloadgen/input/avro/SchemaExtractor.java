@@ -1,5 +1,11 @@
 package net.coru.kloadgen.input.avro;
 
+import com.sun.org.apache.xpath.internal.operations.And;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+import org.apache.avro.file.DataFileReader;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
@@ -17,6 +23,7 @@ import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -31,6 +38,9 @@ import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumReader;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractor {
@@ -64,6 +74,35 @@ public class SchemaExtractor {
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     Schema schema = schemaRegistryClient.getById(schemaMetadata.getId());
+    schema.getFields().forEach(field -> processField(field, attributeList));
+    return attributeList;
+  }
+
+  public List<FieldValueMapping> flatPropertiesList(File schemaFile) throws IOException, RestClientException {
+
+    Schema.Parser parser = new Schema.Parser();
+    return processSchem(parser.parse(readLineByLineJava8(schemaFile.getPath())));
+  }
+
+  private static String readLineByLineJava8(String filePath)
+  {
+    StringBuilder contentBuilder = new StringBuilder();
+
+    try (Stream<String> stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8))
+    {
+      stream.forEach(s -> contentBuilder.append(s).append("\n"));
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+
+    return contentBuilder.toString();
+  }
+
+  public List<FieldValueMapping> processSchem(Schema schema) {
+    List<FieldValueMapping> attributeList = new ArrayList<>();
+
     schema.getFields().forEach(field -> processField(field, attributeList));
     return attributeList;
   }
