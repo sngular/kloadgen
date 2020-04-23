@@ -105,19 +105,9 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
       Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
       editors.setAccessible(true);
 
-
       //Retrieve TableEditor and set all fields with default values to it
       PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
       for (PropertyEditor propertyEditor : propertyEditors) {
-        if(propertyEditor instanceof JFileChooser){
-          String filePath = ((JFileChooser) propertyEditor).getSelectedFile().getPath();
-          try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-            stream.forEach(System.out::println);
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-
-        }
         if (propertyEditor instanceof TableEditor) {
           propertyEditor.setValue(attributeList);
         }

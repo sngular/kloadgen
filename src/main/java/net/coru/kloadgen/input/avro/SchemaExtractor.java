@@ -81,7 +81,9 @@ public class SchemaExtractor {
   public List<FieldValueMapping> flatPropertiesList(File schemaFile) throws IOException, RestClientException {
 
     Schema.Parser parser = new Schema.Parser();
-    return processSchem(parser.parse(readLineByLineJava8(schemaFile.getPath())));
+    String readLine = readLineByLineJava8(schemaFile.getPath());
+    Schema parserSchema = parser.parse(readLine);
+    return processSchem(parserSchema);
   }
 
   private static String readLineByLineJava8(String filePath)
