@@ -1,6 +1,7 @@
 package net.coru.kloadgen.input.avro;
 
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
+import static org.apache.avro.Schema.Type.RECORD;
 
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -24,6 +26,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
@@ -31,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Type;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -45,7 +50,7 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
   private JComboBox<String> subjectNameComboBox;
 
-  private JButton loadClassBtn = new JButton("Loadinin Subject");
+  private JButton loadClassBtn = new JButton("Load Subject");
 
   private JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
@@ -54,6 +59,8 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
   private PropertyDescriptor propertyDescriptor;
 
   private SchemaExtractor schemaExtractor = new SchemaExtractor();
+
+  private static Schema parserSchema;
 
   public FileSubjectPropertyEditor() {
     this.init();
@@ -74,27 +81,58 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
   private void init() {
     subjectNameComboBox = new JComboBox<>();
     panel.setLayout(new BorderLayout());
-    panel.add(subjectNameComboBox);
     panel.add(fileChooser);
+    panel.add(subjectNameComboBox, BorderLayout.AFTER_LAST_LINE);
+    this.fileChooser.addActionListener(this::actionFileChooser);
     panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
     this.loadClassBtn.addActionListener(this);
   }
 
-  @Override
-  public void actionPerformed(ActionEvent event) {
-//    File content = null;
-//    try {
-//      this.fileChooser.getSelectedFile();
-//    } catch (IOException e){
-//      JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-//          JOptionPane.ERROR_MESSAGE);
-//      log.error(e.getMessage(), e);
-//    }
+  public String [] getStringTypesList() {
+    List<String> listTypes = new ArrayList<String>();
+    parserSchema.getTypes().stream()
+        .filter(t -> t.getType() == RECORD).forEach( types ->
+            listTypes.add(types.getName())
+    );
+    String [] arrayResult = new String[listTypes.size()];
+    return listTypes.toArray(arrayResult);
+  }
+
+  public void actionFileChooser(ActionEvent event) {
+
     File subjectName = Objects.requireNonNull(this.fileChooser.getSelectedFile());
 
     try {
-      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(subjectName);
+      parserSchema = schemaExtractor.schemaTypesList(subjectName);
+      if(Type.UNION == parserSchema.getType()) {
+        String[] values = getStringTypesList();
+        for (String value : values) {
+          subjectNameComboBox.addItem(value);
+        }
+      }
+    } catch (IOException | RestClientException e) {
+    JOptionPane.showMessageDialog(null, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+        JOptionPane.ERROR_MESSAGE);
+    log.error(e.getMessage(), e);
+  }
+  }
 
+  public org.apache.avro.Schema getSelectedSchema(String name) {
+    return parserSchema.getTypes().stream()
+        .filter(t -> t.getName().equals(name))
+        .findFirst().get();
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent event) {
+
+    String selectedItem = subjectNameComboBox.getSelectedItem().toString();
+    Schema selectedSchema = getSelectedSchema(selectedItem);
+    System.out.println(selectedItem);
+    File subjectName = Objects.requireNonNull(this.fileChooser.getSelectedFile());
+
+    try {
+      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(selectedSchema);
       //Get current test GUI component
       TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
       Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);

@@ -78,15 +78,18 @@ public class SchemaExtractor {
     return attributeList;
   }
 
-  public List<FieldValueMapping> flatPropertiesList(File schemaFile) throws IOException, RestClientException {
-
-    Schema.Parser parser = new Schema.Parser();
-    String readLine = readLineByLineJava8(schemaFile.getPath());
-    Schema parserSchema = parser.parse(readLine);
+  public List<FieldValueMapping> flatPropertiesList(Schema parserSchema) throws IOException, RestClientException {
     return processSchem(parserSchema);
   }
 
-  private static String readLineByLineJava8(String filePath)
+  public Schema schemaTypesList(File schemaFile)throws IOException, RestClientException {
+    Schema.Parser parser = new Schema.Parser();
+    String readLine = readLineByLine(schemaFile.getPath());
+    Schema parserSchema = parser.parse(readLine);
+    return parserSchema;
+  }
+
+  private static String readLineByLine(String filePath)
   {
     StringBuilder contentBuilder = new StringBuilder();
 
