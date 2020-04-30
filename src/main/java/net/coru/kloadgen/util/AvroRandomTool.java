@@ -2,6 +2,7 @@ package net.coru.kloadgen.util;
 
 import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.UNION;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 public class AvroRandomTool {
 
-  private Map<String, Object> context = new HashMap<>();
+  private final Map<String, Object> context = new HashMap<>();
 
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
 
@@ -23,7 +24,7 @@ public class AvroRandomTool {
       value = getEnumOrGenerate(fieldType, field.schema());
     } else if (UNION == field.schema().getType()) {
       value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
-    } else if ("seq".equals(value)) {
+    } else if ("seq".equalsIgnoreCase(value.toString())) {
       value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), fieldValuesList, context);
     } else if (diferentTypesNeedCast(fieldType, field.schema().getType())) {
       value = RandomTool.castValue(value, field.schema().getType().getName());
@@ -72,7 +73,7 @@ public class AvroRandomTool {
 
 
   private static boolean needCastForString(String fieldType) {
-    
+
     switch (fieldType) {
       case "timestamp":
       case "uuid":

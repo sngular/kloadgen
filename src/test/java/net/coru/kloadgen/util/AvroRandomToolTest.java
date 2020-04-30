@@ -1,6 +1,7 @@
 package net.coru.kloadgen.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -16,8 +17,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 class AvroRandomToolTest {
 
   private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 06, 12, 00, 00);
-
-  
 
   private static Stream<Arguments> parametersForGenerateRandomValueForField() {
     return Stream.of(
