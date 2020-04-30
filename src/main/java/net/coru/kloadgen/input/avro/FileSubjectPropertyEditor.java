@@ -50,8 +50,6 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
   private JComboBox<String> subjectNameComboBox;
 
-  private JButton loadClassBtn = new JButton("Load Subject");
-
   private JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
   private JPanel panel = new JPanel();
@@ -84,8 +82,7 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
     panel.add(fileChooser);
     panel.add(subjectNameComboBox, BorderLayout.AFTER_LAST_LINE);
     this.fileChooser.addActionListener(this::actionFileChooser);
-    panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
-    this.loadClassBtn.addActionListener(this);
+    this.subjectNameComboBox.addActionListener(this);
   }
 
   public String [] getStringTypesList() {
@@ -128,7 +125,6 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
     String selectedItem = subjectNameComboBox.getSelectedItem().toString();
     Schema selectedSchema = getSelectedSchema(selectedItem);
-    System.out.println(selectedItem);
     File subjectName = Objects.requireNonNull(this.fileChooser.getSelectedFile());
 
     try {
@@ -150,13 +146,12 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
           propertyEditor.setValue(attributeList);
         }
       }
-      JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
-          JOptionPane.INFORMATION_MESSAGE);
     } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
       JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
           JOptionPane.ERROR_MESSAGE);
       log.error(e.getMessage(), e);
     }
+
   }
 
   @Override
