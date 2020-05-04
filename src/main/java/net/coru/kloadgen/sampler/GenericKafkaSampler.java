@@ -40,8 +40,6 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_VAL_PLACEHOLDER_KEY
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -51,10 +49,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.model.HeaderMapping;
-import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.RandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -69,6 +63,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.model.HeaderMapping;
+import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.StatelessRandomTool;
 
 @Slf4j
 public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
@@ -77,6 +76,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
     private String topic;
     private String msg_key_placeHolder;
     private boolean key_message_flag = false;
+    private StatelessRandomTool statelessRandomTool;
 
     @Override
     public Arguments getDefaultParameters() {
@@ -172,6 +172,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
         }
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
         producer = new KafkaProducer<>(props);
+        statelessRandomTool = new StatelessRandomTool();
 
     }
 
@@ -196,7 +197,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
             for (HeaderMapping kafkaHeader : kafkaHeaders) {
                 producerRecord.headers().add(kafkaHeader.getHeaderName(),
-                    RandomTool.generateRandom(kafkaHeader.getHeaderValue(),
+                    statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
                         10,
                         emptyList()).toString().getBytes());
             }
