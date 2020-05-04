@@ -1,8 +1,5 @@
 package net.coru.kloadgen.util;
 
-import static org.apache.avro.Schema.Type.ENUM;
-import static org.apache.avro.Schema.Type.UNION;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -12,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -23,10 +17,9 @@ public final class RandomTool {
 
   public static final Set<String> VALID_TYPES = SetUtils.hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array");
 
-  private RandomTool() {
-  }
+  private RandomTool() {}
 
-  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
+  protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
     Object value;
     switch (fieldType) {
       case "string":
@@ -104,78 +97,27 @@ public final class RandomTool {
     return value;
   }
 
-  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
-      Map<String, Object> context) {
 
-    Object value = generateRandom(fieldType, valueLength, fieldValuesList);
-    if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(fieldType, field.schema());
-    } else if (fieldType.equalsIgnoreCase(value.toString())) {
-      if (UNION == field.schema().getType()) {
-        value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
-      } else if ("SEQ".equalsIgnoreCase(fieldType)) {
-        value = castValue(context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? (fieldValuesList.isEmpty()? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long)seqObject) + 1), field.schema().getType());
-      } else {
-        value = castValue(fieldType, field.schema().getType());
-      }
-    }
-    return value;
-  }
-
-  private static Object getEnumOrGenerate(String fieldType, Schema schema) {
-    Object value;
-    if ("ENUM".equalsIgnoreCase(fieldType)) {
-      List<String> enumValueList= schema.getEnumSymbols();
-      value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
-    } else {
-      value = new GenericData.EnumSymbol(schema, fieldType);
-    }
-    return value;
-  }
-
-  private static Object castValue(String fieldType, Schema.Type type) {
-    Object value;
+  protected static Object castValue(Object value, String type) {
+    Object castValue;
     switch(type) {
-      case INT:
-        value = Integer.valueOf(fieldType);
+      case "int":
+        castValue = Integer.valueOf(value.toString());
         break;
-      case DOUBLE:
-        value = Double.valueOf(fieldType);
+      case "double":
+        castValue = Double.valueOf(value.toString());
         break;
-      case LONG:
-        value = Long.valueOf(fieldType);
+      case "long":
+        castValue = Long.valueOf(value.toString());
         break;
-      case BOOLEAN:
-        value = Boolean.valueOf(fieldType);
+      case "boolean":
+        castValue = Boolean.valueOf(value.toString());
         break;
       default:
-        value = fieldType;
+        castValue = value.toString();
         break;
     }
-
-    return value;
-  }
-
-  private static Object castValue(Object fieldType, Schema.Type type) {
-    Object value;
-    switch(type) {
-      case INT:
-        value = Integer.valueOf(fieldType.toString());
-        break;
-      case DOUBLE:
-        value = Double.valueOf(fieldType.toString());
-        break;
-      case LONG:
-        value = Long.valueOf(fieldType.toString());
-        break;
-      case BOOLEAN:
-        value = Boolean.valueOf(fieldType.toString());
-        break;
-      default:
-        value = fieldType.toString();
-        break;
-    }
-    return value;
+    return castValue;
   }
 
   private static List<Integer> generateIntArray(Integer valueLength, List<String> fieldValueList) {
@@ -391,5 +333,13 @@ public final class RandomTool {
       value = Boolean.parseBoolean(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     }
     return value;
+  }
+
+  public static Object generateSeq(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context) {
+
+    return RandomTool.castValue(
+        context.compute(fieldName, (fieldNameMap,
+            seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long) seqObject) + 1),
+        fieldType);
   }
 }
