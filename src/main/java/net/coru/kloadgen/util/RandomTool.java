@@ -5,7 +5,6 @@ import static org.apache.avro.Schema.Type.UNION;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;

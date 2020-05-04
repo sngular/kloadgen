@@ -4,12 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.apache.avro.Schema.Field;
@@ -21,7 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class RandomToolTest {
 
-  private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019,12,06,12,00,00);
+  private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 6, 12, 0, 0);
 
   private static Stream<Arguments> parametersForGenerateSingleRandomValue() {
     return Stream.of(

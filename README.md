@@ -111,7 +111,7 @@ Server URL will be introduced and properties will be set in the table below. Onl
 |----------|--------|-------------|
 | schema.registry.auth.enabled | YES/NO | Enable/Disable security configuration |
 | schema.registry.auth.method | BASIC/BEARER | Authentication method type |
-| schema.registry.username | String | The username |  
+| schema.registry.username | String | The username |
 | schema.registry.password | String | The password |
 | schema.registry.bearer | String | The bearer for Token authentication |
 
@@ -126,14 +126,14 @@ A confirmation message will be show with the number of subjects retrieved from t
 
 ### Load Generator Configuration
 
-This screen will allow to choose a subject and download it schema. 
-AVRO structure will be flattened and show in the table. 
+This screen will allow to choose a subject and download it schema.
+AVRO structure will be flattened and show in the table.
 We will see 4 columns where we will configure the Random Generator system.
 
-* **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
-* **Field Type** : Field type, like String, Int, Double, Array **Note** : if the field is an array of basic types it will be show as string-array, int-array,...
-* **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
-* **Field Values List** : Field possibles values which will be used by the Random Tool to generate values.
+  * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
+  * **Field Type** : Field type, like String, Int, Double, Array **Note** : if the field is an array of basic types it will be show as string-array, int-array,...
+  * **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
+  * **Field Values List** : Field possibles values which will be used by the Random Tool to generate values.
 
 ![Load Generator Table](/Kafka_load_generator_Success.png)
 
