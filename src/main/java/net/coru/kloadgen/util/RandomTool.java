@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 public final class RandomTool {
 
@@ -249,7 +250,7 @@ public final class RandomTool {
   private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     int value;
     if (fieldValuesList.size() > 0) {
-      value = Integer.parseInt(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = Integer.parseInt(checkIfVariableOrGenerate(fieldValuesList));
     } else {
       value = RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -259,7 +260,7 @@ public final class RandomTool {
   private static Long getLongValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     long value;
     if (fieldValuesList.size() > 0) {
-      value = Long.parseLong(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())).trim());
+      value = Long.parseLong(checkIfVariableOrGenerate(fieldValuesList));
     } else {
       value = RandomUtils.nextLong(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -269,7 +270,7 @@ public final class RandomTool {
   private static Double getDoubleValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     double value;
     if (fieldValuesList.size() > 0) {
-      value = Double.parseDouble(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = Double.parseDouble(checkIfVariableOrGenerate(fieldValuesList));
     } else {
       value = RandomUtils.nextDouble(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -279,7 +280,7 @@ public final class RandomTool {
   private static String getStringValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     String value;
     if (fieldValuesList.size() > 0) {
-      value = fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim();
+      value = checkIfVariableOrGenerate(fieldValuesList);
     } else {
       value = RandomStringUtils.randomAlphabetic(valueLength == 0? RandomUtils.nextInt(1,20): valueLength);
     }
@@ -289,7 +290,7 @@ public final class RandomTool {
   private static Short getShortValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     short value;
     if (fieldValuesList.size() > 0) {
-      value = Short.parseShort(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = Short.parseShort(checkIfVariableOrGenerate(fieldValuesList));
     } else {
       if (valueLength < 5 ) {
         value = (short) RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
@@ -307,7 +308,7 @@ public final class RandomTool {
   private static Object getTimestampValueOrRandom(String type, List<String> fieldValuesList) {
     LocalDateTime value;
     if (fieldValuesList.size() > 0) {
-      value = LocalDateTime.parse(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = LocalDateTime.parse(checkIfVariableOrGenerate(fieldValuesList));
     } else {
       value = LocalDateTime.now();
     }
@@ -322,7 +323,7 @@ public final class RandomTool {
   private static UUID getUUIDValueOrRandom(List<String> fieldValuesList) {
     UUID value = UUID.randomUUID();
     if (fieldValuesList.size() > 0) {
-      value = UUID.fromString(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = UUID.fromString(checkIfVariableOrGenerate(fieldValuesList));
     }
     return value;
   }
@@ -330,7 +331,7 @@ public final class RandomTool {
   private static Boolean getBooleanValueOrRandom(List<String> fieldValuesList) {
     boolean value = RandomUtils.nextBoolean();
     if (fieldValuesList.size() > 0) {
-      value = Boolean.parseBoolean(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+      value = Boolean.parseBoolean(checkIfVariableOrGenerate(fieldValuesList));
     }
     return value;
   }
@@ -339,7 +340,24 @@ public final class RandomTool {
 
     return RandomTool.castValue(
         context.compute(fieldName, (fieldNameMap,
-            seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long) seqObject) + 1),
+            seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0)))
+            : ((Long) seqObject) + 1),
         fieldType);
   }
+
+  private static String checkIfVariableOrGenerate(List<String> fieldValuesList) {
+    String chosen;
+    if (fieldValuesList.size() > 1) {
+      chosen = fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size()));
+    } else {
+      String fieldValue = fieldValuesList.get(0);
+      if (fieldValue.matches("\\$\\{\\w*}")) {
+        chosen = JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1));
+      } else {
+        chosen = fieldValue;
+      }
+    }
+    return chosen.trim();
+  }
+
 }
