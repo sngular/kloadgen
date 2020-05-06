@@ -45,7 +45,6 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         PropertyDescriptor subjectNameProps = property(AVRO_SUBJECT);
         subjectNameProps.setPropertyEditorClass(AvroSubjectPropertyEditor.class);
         subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-        subjectNameProps.setValue(DEFAULT, "<avro subject>");
         subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
     }
 }
