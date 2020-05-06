@@ -26,15 +26,13 @@ public class AvroRandomTool {
       value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
     } else if ("seq".equalsIgnoreCase(value.toString())) {
       value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), fieldValuesList, context);
-    } else if (diferentTypesNeedCast(fieldType, field.schema().getType())) {
+    } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
       value = RandomTool.castValue(value, field.schema().getType().getName());
     }
     return value;
   }
 
-
-
-  private static boolean diferentTypesNeedCast(String fieldType, Type fieldTypeSchema) {
+  private static boolean differentTypesNeedCast(String fieldType, Type fieldTypeSchema) {
 
     switch (fieldTypeSchema) {
       case RECORD:
@@ -57,7 +55,6 @@ public class AvroRandomTool {
       default:
         return !fieldTypeSchema.getName().equals(fieldType);
     }
-
   }
 
   private static boolean needCastForInt(String fieldType) {
@@ -70,7 +67,6 @@ public class AvroRandomTool {
         return !Type.INT.getName().equals(fieldType);
     }
   }
-
 
   private static boolean needCastForString(String fieldType) {
 
