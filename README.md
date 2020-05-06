@@ -6,24 +6,27 @@
 ___
 
 KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO schema Registries. It allows to send kafka messages with a structure defined as an AVRO Subject. It connects to the Scheme Registry Server, retrieve the subject to send and generate a random messages every time.
+
 ## Getting Started
+
 ___
 
 KLoadGen includes four main components
 
- * **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class used:
+* **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class used:
 
-   * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer
+  * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer
 
-   * **Kafka Sampler** : Our own and simple Kafka Sampler
+  * **Kafka Sampler** : Our own and simple Kafka Sampler
 
-   * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configure by properties.
+  * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configure by properties.
 
- * **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
+  * **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
 
- * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
+* **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
 
 ### Setup
+
 ___
 
 #### Requirement
@@ -31,76 +34,64 @@ ___
 KLoadGen uses Java, hence on JMeter machine JRE 8 or superior:
 
 Install openjdk on Debian, Ubuntu, etc.,
-```
+
+```bash
  sudo apt-get install openjdk-8-jdk
-``` 
+```
 
 Install openjdk on Fedora, Oracle Linux, Red Hat Enterprise Linux, etc.,
-```
+
+```bash
  su -c "yum install java-1.8.0-openjdk-devel"
 ```
+
 For windows and mac and you can:
-* download oracle JDK 8 setup from [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 
+
+* download oracle JDK 8 setup from [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * using chocolatey (windows):
         <https://chocolatey.org/packages?q=java>
    brew (mac):
-```
- brew tap adoptopenjdk/openjdk 
- brew cask install adoptopenjdk8 
-```
 
+```bash
+ brew tap adoptopenjdk/openjdk
+ brew cask install adoptopenjdk8
+```
 
 #### Build Project
-```
+
+```bash
  mvn clean install
 ```
-Once build is completed, copy target/kloadgen-<version>.jar file to JMETER_HOME/lib/ext directory.
+
+Once build is completed, copy target/kloadgen-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
 
 ### KLoadGenSampler
 
- * **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
- 
- * **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
- 
- * **kafka.topic.name** : Topic on which messages will be sent
- 
- * **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
- 
- * **value.serializer** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
- 
- * **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
-
- * **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
-
- * **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
-
- * **buffer.memory** : Total buffer memory for producer.
-
- * **acks** : Message sent acknowledgement, value can be (0/1/-1).
-
- * **send.buffer.bytes** : The size of the TCP send buffer (SO_SNDBUF) to use when sending data. If the value is -1, the OS default will be used.
-
- * **receive.buffer.bytes** : The size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is -1, the OS default will be used.
-
- * **security.protocol** : kafka producer protocol. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
-
- * **message.placeholder.key** : Config element message variable name. This name should be same as message placeholder key in serialized/plaintext config element.
-
- * **kerberos.auth.enabled** : YES/NO if it is disabled all below properties will be ignored
-
- * **java.security.auth.login.config** : jaas.conf of kafka Kerberos
-
- * **java.security.krb5.conf** : Kerberos server krb5.conf file
-
- * **sasl.kerberos.service.name** : Kafka Kerberos service name
-
- * **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing.
+* **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
+* **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
+* **kafka.topic.name** : Topic on which messages will be sent
+* **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
+* **value.serializer** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
+* **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
+* **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
+* **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
+* **buffer.memory** : Total buffer memory for producer.
+* **acks** : Message sent acknowledgement, value can be (0/1/-1).
+* **send.buffer.bytes** : The size of the TCP send buffer (SO_SNDBUF) to use when sending data. If the value is -1, the OS default will be used.
+* **receive.buffer.bytes** : The size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is -1, the OS default will be used.
+* **security.protocol** : kafka producer protocol. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+* **message.placeholder.key** : Config element message variable name. This name should be same as message placeholder key in serialized/plaintext config element.
+* **kerberos.auth.enabled** : YES/NO if it is disabled all below properties will be ignored
+* **java.security.auth.login.config** : jaas.conf of kafka Kerberos
+* **java.security.krb5.conf** : Kerberos server krb5.conf file
+* **sasl.kerberos.service.name** : Kafka Kerberos service name
+* **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing.
 
 Above properties are added by default in sampler as those are more significant in terms of performance in most of the cases. But you can add other non listed kafka properties with prefix "_".
 
 For example to enable SSL properties you can add below properties
 
-```
+```bash
 _ssl.key.password
 _ssl.keystore.location
 _ssl.keystore.password
@@ -112,6 +103,7 @@ _ssl.truststore.password
 ![Kafka Producer Configuration](/Kafka_producer_properties.png)
 
 ### Schema Registry Configuration
+
 This screen will allow to configure the connection to the Schema Registry and retrieve the list of subjects hold there.
 Server URL will be introduced and properties will be set in the table below. Only he actual set of properties are supported.
 
@@ -119,7 +111,7 @@ Server URL will be introduced and properties will be set in the table below. Onl
 |----------|--------|-------------|
 | schema.registry.auth.enabled | YES/NO | Enable/Disable security configuration |
 | schema.registry.auth.method | BASIC/BEARER | Authentication method type |
-| schema.registry.username | String | The username |  
+| schema.registry.username | String | The username |
 | schema.registry.password | String | The password |
 | schema.registry.bearer | String | The bearer for Token authentication |
 
@@ -131,10 +123,11 @@ Subject list will be used when configure the AVRO schema to download.
 ![Schema Registy Config Success](/Schema_Registry_Success.png)
 
 A confirmation message will be show with the number of subjects retrieved from the Registry.
+
 ### Load Generator Configuration
 
-This screen will allow to choose a subject and download it schema. 
-AVRO structure will be flattened and show in the table. 
+This screen will allow to choose a subject and download it schema.
+AVRO structure will be flattened and show in the table.
 We will see 4 columns where we will configure the Random Generator system.
 
   * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
@@ -180,6 +173,14 @@ KLoadGen provides an easy way for random data generation base on the field type.
 | uuid-map | Field of type Map of String, UUIDs | Random size map of Random generated String, Uuid |
 | boolean-map | Field of type Map of String, Boolean | Random size map of Random generated String, Boolean |
 
+In case of (*)-array the data introduced in "Field Values List" will be used to generate example data. Format will be comma separated value list.
+In case of (*)-map the data introduces in "Field Values List" will be used to generate example data. Format will be comma separated value list. Those values can be a set of pairs Key:value or a list of Keys.
+Example:
+
+* key1:value, key2:value, key3:value -- Will generate a map with data in between (key1:value, key2:value, key3:value)
+
+* key1,key2,key3 -- Will generate a map with keys in between (key1,key2,key3) and value random generated
+
 #### Special functions
 
 | Type | Details |  Returns |
@@ -201,6 +202,6 @@ Values will follow the same rules and the message body, if specify a type (basic
 
 [Here](/Example-Test-Plan.jmx) you can find an example of a JMeter Test Plan using the elements defined in this plugin. This test plan will only inject messages in a Kafka Cluster. **Before** execute it you should add your Schema Registry to retrieve the Schema in order to extract the Entity structure. In a future we will include support to read AVRO files.
 
-## Special Thanks!
+## Special Thanks
 
 * We would like to special thanks to [pepper-box](https://github.com/GSLabDev/pepper-box) for give us the base to create this plugin and the main ideas about how to face it.

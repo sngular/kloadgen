@@ -1,6 +1,8 @@
 package net.coru.kloadgen.input.avro;
 
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
+
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -20,6 +22,9 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.jmeter.gui.ClearGui;
@@ -29,23 +34,19 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.PropsKeysHelper;
 
 @Slf4j
 public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
   private JComboBox<String> subjectNameComboBox;
 
-  private JButton loadClassBtn = new JButton("Load Subject");
+  private final JButton loadClassBtn = new JButton("Load Subject");
 
-  private JPanel panel = new JPanel();
+  private final JPanel panel = new JPanel();
 
   private PropertyDescriptor propertyDescriptor;
 
-  private SchemaExtractor schemaExtractor = new SchemaExtractor();
+  private final SchemaExtractor schemaExtractor = new SchemaExtractor();
 
   public AvroSubjectPropertyEditor() {
     this.init();
@@ -108,7 +109,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @SuppressWarnings("unchecked")
   protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
-    
+
 
     if (!(tableEditorValue instanceof ArrayList<?>)) {
       log.error("Table Editor is not array list");
@@ -122,16 +123,16 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       log.error("Table Editor is not FieldValueMapping list", e);
       return attributeList;
     }
-    
+
     if (CollectionUtils.isEmpty(fieldValueList)) {
       return attributeList;
     }
-    
+
     List<FieldValueMapping> result = new ArrayList<>();
     for(FieldValueMapping fieldValue: attributeList) {
 
       FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
-      
+
       if (existsValue != null) {
         result.add(existsValue);
       } else {
@@ -139,7 +140,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       }
 
     }
-    
+
     return result;
   }
 
@@ -172,12 +173,18 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void setAsText(String text) throws IllegalArgumentException {
+    if (this.subjectNameComboBox.getModel().getSize() == 0) {
+      this.subjectNameComboBox.addItem(text);
+    }
     this.subjectNameComboBox.setSelectedItem(text);
   }
 
   @Override
   public void setValue(Object value) {
     if (value != null) {
+      if (this.subjectNameComboBox.getModel().getSize() == 0) {
+        this.subjectNameComboBox.addItem((String) value);
+      }
       this.subjectNameComboBox.setSelectedItem(value);
     } else {
       this.subjectNameComboBox.setSelectedItem("");
