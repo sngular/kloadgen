@@ -33,6 +33,7 @@ import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.PropsKeysHelper;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
@@ -85,39 +86,34 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
     this.subjectNameComboBox.addActionListener(this);
   }
 
-  public String [] getStringTypesList() {
-    List<String> listTypes = new ArrayList<String>();
-    parserSchema.getTypes().stream()
-        .filter(t -> t.getType() == RECORD).forEach( types ->
-            listTypes.add(types.getName())
-    );
-    String [] arrayResult = new String[listTypes.size()];
-    return listTypes.toArray(arrayResult);
-  }
-
   public void actionFileChooser(ActionEvent event) {
-
     File subjectName = Objects.requireNonNull(this.fileChooser.getSelectedFile());
-
     try {
-      parserSchema = schemaExtractor.schemaTypesList(subjectName);
+      parserSchema = schemaExtractor.schemaTypesList(subjectName);//Devolver lista de Strings
+      subjectNameComboBox.removeAllItems();
       if(Type.UNION == parserSchema.getType()) {
-        String[] values = getStringTypesList();
-        for (String value : values) {
-          subjectNameComboBox.addItem(value);
+        Iterable<Schema> schemaList = IterableUtils.filteredIterable(parserSchema.getTypes(), t -> t.getType() == RECORD);
+        for (Schema types : schemaList) {
+          subjectNameComboBox.addItem(types.getName());
         }
+      }else {
+        subjectNameComboBox.addItem(parserSchema.getName());
       }
     } catch (IOException | RestClientException e) {
-    JOptionPane.showMessageDialog(null, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-        JOptionPane.ERROR_MESSAGE);
-    log.error(e.getMessage(), e);
-  }
+      JOptionPane.showMessageDialog(null, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+          JOptionPane.ERROR_MESSAGE);
+      log.error(e.getMessage(), e);
+    }
   }
 
   public org.apache.avro.Schema getSelectedSchema(String name) {
-    return parserSchema.getTypes().stream()
-        .filter(t -> t.getName().equals(name))
-        .findFirst().get();
+    if(Type.UNION == parserSchema.getType()) {
+      return parserSchema.getTypes().stream()
+          .filter(t -> t.getName().equals(name))
+          .findFirst().get();
+    } else {
+      return parserSchema;
+    }
   }
 
   @Override
@@ -156,7 +152,6 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
   @Override
   public void clearGui() {
-
   }
 
   @Override
@@ -181,12 +176,11 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
   @Override
   public void setValue(Object value) {
-    if (value != null) {
-      this.subjectNameComboBox.setSelectedItem(value);
-    } else {
-      this.subjectNameComboBox.setSelectedItem("");
-    }
-
+      if (value != null) {
+        this.subjectNameComboBox.setSelectedItem(value);
+      } else {
+        this.subjectNameComboBox.setSelectedItem("");
+      }
   }
 
   @Override
