@@ -1,6 +1,7 @@
 package net.coru.kloadgen.util;
 
 import static org.apache.avro.Schema.Type.ENUM;
+import static org.apache.avro.Schema.Type.NULL;
 import static org.apache.avro.Schema.Type.UNION;
 
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 public class AvroRandomTool {
@@ -23,7 +25,14 @@ public class AvroRandomTool {
     if (ENUM == field.schema().getType()) {
       value = getEnumOrGenerate(fieldType, field.schema());
     } else if (UNION == field.schema().getType()) {
-      value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
+      Schema safeSchema = getRecordUnion(field.schema().getTypes());
+      if ("null".equalsIgnoreCase(value.toString())) {
+        value = null;
+      } else if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
+        value = RandomTool.castValue(value, field.schema().getType().getName());
+      } else if (ENUM == safeSchema.getType()) {
+        value = getEnumOrGenerate(fieldType, safeSchema);
+      }
     } else if ("seq".equalsIgnoreCase(value.toString())) {
       value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), fieldValuesList, context);
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
@@ -35,8 +44,8 @@ public class AvroRandomTool {
   private static boolean differentTypesNeedCast(String fieldType, Type fieldTypeSchema) {
 
     switch (fieldTypeSchema) {
-      case RECORD:
       case ENUM:
+      case RECORD:
       case ARRAY:
       case MAP:
       case UNION:
@@ -90,4 +99,7 @@ public class AvroRandomTool {
     return value;
   }
 
+  private Schema getRecordUnion(List<Schema> types) {
+    return IterableUtils.find(types, schema -> !schema.getType().equals(NULL));
+  }
 }
