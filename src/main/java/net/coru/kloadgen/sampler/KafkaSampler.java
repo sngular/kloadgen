@@ -183,7 +183,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
                 producerRecord.headers().add(kafkaHeader.getHeaderName(),
                     statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
                         10,
-                        emptyList()).toString().getBytes());
+                        emptyList()).toString().getBytes(StandardCharsets.UTF_8));
             }
 
             log.info("Send message {}", producerRecord.value());
