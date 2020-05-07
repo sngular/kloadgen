@@ -4,15 +4,17 @@ import static java.util.Arrays.asList;
 
 import java.util.Collections;
 import java.util.List;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.testelement.AbstractTestElement;
 
+@Builder
+@ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-@ToString
 public class FieldValueMapping extends AbstractTestElement {
 
     public static final String FIELD_NAME = "fieldName";
@@ -61,7 +63,7 @@ public class FieldValueMapping extends AbstractTestElement {
     }
 
     public void setFieldType(String propertyValue) {
-        this.fieldType = fieldType;
+        this.fieldType = propertyValue;
         setProperty(FIELD_TYPE, propertyValue);
     }
 

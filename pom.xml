@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.coru</groupId>
     <artifactId>kloadgen</artifactId>
-    <version>1.0</version>
+    <version>1.2.0</version>
     <properties>
         <jmeter.version>5.2</jmeter.version>
         <kafka.version>2.3.0</kafka.version>
@@ -18,6 +18,20 @@
         <jmeter.lib.scope>provided</jmeter.lib.scope>
         <avro.version>1.9.1</avro.version>
         <lombok.version>1.18.10</lombok.version>
+        <kafka-schema-registry-client.version>5.3.1</kafka-schema-registry-client.version>
+        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
+        <assertj-core.version>3.11.1</assertj-core.version>
+        <assertj-json.version>1.2.0</assertj-json.version>
+        <json-path.version>2.4.0</json-path.version>
+        <mockito-core.version>3.0.0</mockito-core.version>
+        <commons-beanutils.version>1.9.3</commons-beanutils.version>
+        <wiremock.version>2.25.1</wiremock.version>
+        <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
+        <rest-assured.version>4.1.1</rest-assured.version>
+        <jaxb-api.version>2.3.0</jaxb-api.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
     </properties>
     <dependencies>
         <dependency>
@@ -112,108 +126,108 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
+            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
-            <version>5.3.1</version>
+            <version>${kafka-schema-registry-client.version}</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>5.3.1</version>
+            <version>${kafka-schema-registry-client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.4</version>
+            <version>${commons-collections4.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.5.2</version>
+            <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.11.1</version>
+            <version>${assertj-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.revinate</groupId>
             <artifactId>assertj-json</artifactId>
-            <version>1.2.0</version>
+            <version>${assertj-json.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>2.4.0</version>
+            <version>${json-path.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.0.0</version>
+            <version>${mockito-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>3.0.0</version>
+            <version>${mockito-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <artifactId>commons-beanutils</artifactId>
             <groupId>commons-beanutils</groupId>
-            <version>1.9.3</version>
+            <version>${commons-beanutils.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
-            <version>2.25.1</version>
+            <version>${wiremock.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ru.lanwen.wiremock</groupId>
             <artifactId>wiremock-junit5</artifactId>
-            <version>1.3.1</version>
+            <version>${wiremock-junit5.version}</version>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>4.1.1</version>
+            <version>${rest-assured.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <artifactId>jaxb-api</artifactId>
             <groupId>javax.xml.bind</groupId>
             <scope>compile</scope>
-            <version>2.3.0</version>
+            <version>${jaxb-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.5.2</version>
+            <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.5.2</version>
+            <version>${junit-jupiter-api.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -290,4 +304,10 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>confluent</id>
+            <url>http://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
 </project>

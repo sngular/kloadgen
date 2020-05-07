@@ -1,9 +1,5 @@
 package net.coru.kloadgen.config.kafkaheaders;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-
-import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +11,11 @@ import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.threads.JMeterContext;
+
+import java.util.List;
+import java.util.Map;
+
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
 
 @Getter
 @Setter

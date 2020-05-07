@@ -23,7 +23,7 @@
       "priority":10,
       "request": {
         "method": "GET",
-        "urlPattern": "/subjects/avrosubject/versions/latest"
+        "urlPattern": "/subjects/avroSubject/versions/latest"
       },
       "response": {
         "status": 200,

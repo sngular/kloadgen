@@ -1,6 +1,7 @@
 
 package net.coru.kloadgen.sampler;
 
+import static java.util.Collections.emptyList;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ACKS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BATCH_SIZE_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BOOTSTRAP_SERVERS_CONFIG_DEFAULT;
@@ -9,6 +10,7 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.COMPRESSION_TYPE_CONFIG_
 import static net.coru.kloadgen.util.ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_NO;
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.ProducerKeysHelper.JAAS_ENABLED;
 import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG;
@@ -37,11 +39,13 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_PLACEHOLDER_KEY
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_VAL_PLACEHOLDER_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
+import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -50,7 +54,8 @@ import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.RandomTool;
+import net.coru.kloadgen.util.StatelessRandomTool;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -61,16 +66,24 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 @Slf4j
 public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private KafkaProducer<String, Object> producer;
+
     private String topic;
+
     private String msg_key_placeHolder;
+
     private boolean key_message_flag = false;
+
+    private transient StatelessRandomTool statelessRandomTool;
 
     @Override
     public Arguments getDefaultParameters() {
@@ -125,7 +138,9 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+        if( null != JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL)){
+            props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+        }
         props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
 
         Iterator<String> parameters = context.getParameterNamesIterator();
@@ -135,9 +150,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
             }
         });
 
-        String sslEnabled = context.getParameter(SSL_ENABLED);
-
-        if (sslEnabled != null && sslEnabled.equals(FLAG_YES)) {
+        if (FLAG_YES.equalsIgnoreCase(context.getParameter(SSL_ENABLED))) {
 
             props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_KEY_PASSWORD_CONFIG));
             props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
@@ -146,30 +159,40 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
             props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
         }
 
-        String kerberosEnabled = context.getParameter(KERBEROS_ENABLED);
-        if (kerberosEnabled != null && kerberosEnabled.equals(FLAG_YES)) {
+        if (FLAG_YES.equalsIgnoreCase(context.getParameter(KERBEROS_ENABLED))) {
             System.setProperty(JAVA_SEC_AUTH_LOGIN_CONFIG, context.getParameter(JAVA_SEC_AUTH_LOGIN_CONFIG));
             System.setProperty(JAVA_SEC_KRB5_CONFIG, context.getParameter(JAVA_SEC_KRB5_CONFIG));
             props.put(SASL_KERBEROS_SERVICE_NAME, context.getParameter(SASL_KERBEROS_SERVICE_NAME));
         }
 
-        if (context.getParameter(KEYED_MESSAGE_KEY).equals("YES")) {
-            key_message_flag= true;
+        if (FLAG_YES.equalsIgnoreCase(context.getParameter(JAAS_ENABLED))) {
+            if (StringUtils.contains(context.getParameter(JAVA_SEC_AUTH_LOGIN_CONFIG), File.separatorChar)) {
+                System.setProperty(JAVA_SEC_AUTH_LOGIN_CONFIG, context.getParameter(JAVA_SEC_AUTH_LOGIN_CONFIG));
+            } else {
+                props.put(SASL_JAAS_CONFIG, context.getParameter(JAVA_SEC_AUTH_LOGIN_CONFIG));
+            }
+        }
+
+        if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
+            key_message_flag = true;
             msg_key_placeHolder = UUID.randomUUID().toString();
         }
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
         producer = new KafkaProducer<>(props);
+        statelessRandomTool = new StatelessRandomTool();
 
     }
 
+    @SuppressFBWarnings({"DM_DEFAULT_ENCODING", "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"})
     @Override
     public SampleResult runTest(JavaSamplerContext context) {
 
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
-        JMeterContext samplerContext = JMeterContextService.getContext();
-        EnrichedRecord messageVal = (EnrichedRecord)samplerContext.getVariables().getObject(SAMPLE_ENTITY);
-        List<HeaderMapping> kafkaHeaders = (List<HeaderMapping>) samplerContext.getSamplerContext().get(KAFKA_HEADERS);
+        JMeterContext jMeterContext = JMeterContextService.getContext();
+        EnrichedRecord messageVal = (EnrichedRecord) jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
+        //noinspection unchecked
+        List<HeaderMapping> kafkaHeaders = (List<HeaderMapping>) jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
 
         ProducerRecord<String, Object> producerRecord;
         try {
@@ -181,24 +204,24 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
             for (HeaderMapping kafkaHeader : kafkaHeaders) {
                 producerRecord.headers().add(kafkaHeader.getHeaderName(),
-                    RandomTool.generateRandom(kafkaHeader.getHeaderValue(),
+                    statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
                         10,
-                        Collections.emptyList()).toString().getBytes());
+                        emptyList()).toString().getBytes(StandardCharsets.UTF_8));
             }
 
             log.info("Send message {}", producerRecord.value());
-            Future messageSent = producer.send(producerRecord);
+            Future<RecordMetadata> messageSent = producer.send(producerRecord);
             producer.flush();
             if (!messageSent.isDone()) {
                 throw new IOException("Message not sent");
             }
-            sampleResult.setResponseData(messageVal.toString(), StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(messageVal != null?messageVal.toString():"", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(true);
             sampleResult.sampleEnd();
 
         } catch (Exception e) {
             log.error("Failed to send message", e);
-            sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(e.getMessage() != null?e.getMessage():"", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
         }

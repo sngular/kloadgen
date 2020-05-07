@@ -33,14 +33,21 @@ public class ProducerKeysHelper {
     public static final String BOOTSTRAP_SERVERS_CONFIG_DEFAULT = "<Broker List>";
 
     public static final String JAVA_SEC_AUTH_LOGIN_CONFIG = "java.security.auth.login.config";
+
     public static final String JAVA_SEC_KRB5_CONFIG = "java.security.krb5.conf";
+
     public static final String SASL_KERBEROS_SERVICE_NAME = "sasl.kerberos.service.name";
+
     public static final String SASL_MECHANISM = "sasl.mechanism";
+
     public static final String SASL_MECHANISM_DEFAULT = "GSSAPI";
+
     public static final String JAAS_ENABLED = "jaas.enabled";
 
     public static final String JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT = "<JAAS File Location>";
+
     public static final String JAVA_SEC_KRB5_CONFIG_DEFAULT = "<krb5.conf location>";
+
     public static final String SASL_KERBEROS_SERVICE_NAME_DEFAULT = "kafka";
 
     public static final String KERBEROS_ENABLED = "kerberos.auth.enabled";
@@ -52,12 +59,20 @@ public class ProducerKeysHelper {
     public static final String FLAG_YES = "YES";
 
     public static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
+
     public static final String SCHEMA_REGISTRY_URL_DEFAULT = "http://localhost:8081";
 
     public static final String KAFKA_HEADERS = "kafka.headers";
 
     public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
+
     public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT = "true";
 
     public static final String SAMPLE_ENTITY = "SampleEntity";
+
+    public static final String VALUE_NAME_STRATEGY = "value.subject.name.strategy";
+
+    public static final String RECORD_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.RecordNameStrategy";
+
+    public static final String TOPIC_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.TopicRecordNameStrategy";
 }
