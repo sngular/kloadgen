@@ -30,6 +30,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_KERBEROS_SERVICE_NAME;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -39,6 +40,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.model.HeaderMapping;
+import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -53,19 +58,19 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.model.HeaderMapping;
-import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.StatelessRandomTool;
 
 @Slf4j
 public class KafkaSampler extends AbstractJavaSamplerClient implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private KafkaProducer<String, Object> producer;
     private String topic;
     private String msg_key_placeHolder;
+
     private boolean key_message_flag = false;
-    private StatelessRandomTool statelessRandomTool;
+
+    private transient StatelessRandomTool statelessRandomTool;
 
     @Override
     public Arguments getDefaultParameters() {
@@ -169,16 +174,16 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         ProducerRecord<String, Object> producerRecord;
         try {
             if (key_message_flag) {
-                producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal.getGenericRecord());
+                producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal);
             } else {
-                producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
+                producerRecord = new ProducerRecord<>(topic, messageVal);
             }
 
             for (HeaderMapping kafkaHeader : kafkaHeaders) {
                 producerRecord.headers().add(kafkaHeader.getHeaderName(),
                     statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
                         10,
-                        emptyList()).toString().getBytes());
+                        emptyList()).toString().getBytes(StandardCharsets.UTF_8));
             }
 
             log.info("Send message {}", producerRecord.value());
@@ -187,13 +192,13 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
             if (!messageSent.isDone()) {
                 throw new IOException("Message not sent");
             }
-            sampleResult.setResponseData(messageVal != null?messageVal.toString():"", StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(messageVal != null ? messageVal.toString() : "", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(true);
             sampleResult.sampleEnd();
 
         } catch (Exception e) {
             log.error("Failed to send message", e);
-            sampleResult.setResponseData(e.getMessage() != null?e.getMessage():"", StandardCharsets.UTF_8.name());
+            sampleResult.setResponseData(e.getMessage() != null ? e.getMessage() : "", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
         }
