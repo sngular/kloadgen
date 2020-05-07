@@ -6,6 +6,7 @@ import static org.apache.avro.Schema.Type.RECORD;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -118,35 +119,39 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
   @Override
   public void actionPerformed(ActionEvent event) {
+    if(subjectNameComboBox.getItemCount() != 0) {
 
-    String selectedItem = subjectNameComboBox.getSelectedItem().toString();
-    Schema selectedSchema = getSelectedSchema(selectedItem);
-    File subjectName = Objects.requireNonNull(this.fileChooser.getSelectedFile());
+      String selectedItem = subjectNameComboBox.getSelectedItem().toString();
+      Schema selectedSchema = getSelectedSchema(selectedItem);
+      File subjectName = Objects.requireNonNull(this.fileChooser.getSelectedFile());
 
-    try {
-      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(selectedSchema);
-      //Get current test GUI component
-      TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
-      Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
-      customizer.setAccessible(true);
+      try {
+        List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(selectedSchema);
+        //Get current test GUI component
+        TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
+        Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
+        customizer.setAccessible(true);
 
-      //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
-      GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
-      Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
-      editors.setAccessible(true);
+        //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
+        GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
+        Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
+        editors.setAccessible(true);
 
-      //Retrieve TableEditor and set all fields with default values to it
-      PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
-      for (PropertyEditor propertyEditor : propertyEditors) {
-        if (propertyEditor instanceof TableEditor) {
-          propertyEditor.setValue(attributeList);
+        //Retrieve TableEditor and set all fields with default values to it
+        PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
+        for (PropertyEditor propertyEditor : propertyEditors) {
+          if (propertyEditor instanceof TableEditor) {
+            propertyEditor.setValue(attributeList);
+          }
         }
+      } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
+        JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+            JOptionPane.ERROR_MESSAGE);
+        log.error(e.getMessage(), e);
       }
-    } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
-      JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-          JOptionPane.ERROR_MESSAGE);
-      log.error(e.getMessage(), e);
+
     }
+
 
   }
 
