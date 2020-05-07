@@ -108,6 +108,14 @@ public class SchemaExtractor {
         internalFields.get(0).setFieldName(innerField.name());
         completeFieldList.add(internalFields.get(0));
       }
+    } else if (Type.MAP == innerField.schema().getType()) {
+      List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField);
+      if (internalFields.size() >1) {
+        processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
+      } else {
+        internalFields.get(0).setFieldName(innerField.name());
+        completeFieldList.add(internalFields.get(0));
+      }
     } else if (Type.UNION == innerField.schema().getType()) {
       Schema recordUnion = getRecordUnion(innerField.schema().getTypes());
       if (null != recordUnion) {
