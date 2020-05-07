@@ -10,6 +10,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
+import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -55,8 +57,35 @@ class AvroRandomToolTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expectedTyped) {
+  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
+      Object expectedTyped) {
     assertThat(new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expectedTyped);
   }
 
+  private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
+    return Stream.of(
+        Arguments.of("string", 1, "testString", new Field("name", SchemaBuilder.builder().stringType()), "testString"),
+        Arguments.of("int", 1, "1", new Field("name", SchemaBuilder.builder().intType()), 1),
+        Arguments.of("long", 1, "1", new Field("name", SchemaBuilder.builder().longType()), 1L),
+        Arguments.of("short", 1, "1", new Field("name", SchemaBuilder.builder().intType()), (short) 1),
+        Arguments.of("double", 1, "1.0", new Field("name", SchemaBuilder.builder().doubleType()), 1.0),
+        Arguments.of("timestamp", 1, "2019-12-06T12:00:00", new Field("name", SchemaBuilder.builder().stringType()), FIXED_DATE),
+        Arguments.of("longTimestamp", 1, "2019-12-06T12:00:00", new Field("name", SchemaBuilder.builder().longType()),
+            FIXED_DATE.toInstant(ZoneOffset.UTC).toEpochMilli()),
+        Arguments.of("stringTimestamp", 1, "2019-12-06T12:00", new Field("name", SchemaBuilder.builder().stringType()), "2019-12-06T12:00"),
+        Arguments.of("uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name", SchemaBuilder.builder().stringType()),
+            UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
+        Arguments.of("boolean", 1, "true", new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForShouldRecoverVariableFromContext")
+  void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field, Object expected) {
+    JMeterVariables variables = new JMeterVariables();
+    variables.put("VARIABLE", value);
+    JMeterContextService.getContext().setVariables(variables);
+    assertThat(new AvroRandomTool().generateRandom(fieldType, valueLength, Collections.singletonList("${VARIABLE}"), field))
+        .isEqualTo(expected);
+  }
 }

@@ -348,7 +348,7 @@ public final class RandomTool {
   private static Long getLongValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     long value;
     if (fieldValuesList.size() > 0) {
-      value = Long.parseLong(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())).trim());
+      value = Long.parseLong(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextLong(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -428,7 +428,8 @@ public final class RandomTool {
 
     return RandomTool.castValue(
         context.compute(fieldName, (fieldNameMap,
-            seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long) seqObject) + 1),
+            seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0)))
+            : ((Long) seqObject) + 1),
         fieldType);
   }
 }

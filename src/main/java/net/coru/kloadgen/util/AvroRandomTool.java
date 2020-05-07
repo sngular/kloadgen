@@ -4,6 +4,7 @@ import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.NULL;
 import static org.apache.avro.Schema.Type.UNION;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 public class AvroRandomTool {
 
@@ -20,7 +22,14 @@ public class AvroRandomTool {
 
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
 
-    Object value = RandomTool.generateRandom(fieldType, valueLength, fieldValuesList);
+    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    parameterList.replaceAll(fieldValue ->
+        fieldValue.matches("\\$\\{\\w*}") ?
+            JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
+            fieldValue
+    );
+
+    Object value = RandomTool.generateRandom(fieldType, valueLength, parameterList);
 
     if (ENUM == field.schema().getType()) {
       value = getEnumOrGenerate(fieldType, field.schema());
@@ -34,7 +43,7 @@ public class AvroRandomTool {
         value = getEnumOrGenerate(fieldType, safeSchema);
       }
     } else if ("seq".equalsIgnoreCase(value.toString())) {
-      value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), fieldValuesList, context);
+      value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
       value = RandomTool.castValue(value, field.schema().getType().getName());
     }
@@ -44,8 +53,8 @@ public class AvroRandomTool {
   private static boolean differentTypesNeedCast(String fieldType, Type fieldTypeSchema) {
 
     switch (fieldTypeSchema) {
-      case ENUM:
       case RECORD:
+      case ENUM:
       case ARRAY:
       case MAP:
       case UNION:
