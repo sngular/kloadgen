@@ -3,6 +3,7 @@ package net.coru.kloadgen.util;
 import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.UNION;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 public class AvroRandomTool {
 
@@ -18,23 +20,28 @@ public class AvroRandomTool {
 
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
 
-    Object value = RandomTool.generateRandom(fieldType, valueLength, fieldValuesList);
+    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    parameterList.replaceAll(fieldValue ->
+        fieldValue.matches("\\$\\{\\w*}") ?
+            JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
+            fieldValue
+    );
+
+    Object value = RandomTool.generateRandom(fieldType, valueLength, parameterList);
 
     if (ENUM == field.schema().getType()) {
       value = getEnumOrGenerate(fieldType, field.schema());
     } else if (UNION == field.schema().getType()) {
       value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
     } else if ("seq".equalsIgnoreCase(value.toString())) {
-      value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), fieldValuesList, context);
-    } else if (diferentTypesNeedCast(fieldType, field.schema().getType())) {
+      value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
+    } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
       value = RandomTool.castValue(value, field.schema().getType().getName());
     }
     return value;
   }
 
-
-
-  private static boolean diferentTypesNeedCast(String fieldType, Type fieldTypeSchema) {
+  private static boolean differentTypesNeedCast(String fieldType, Type fieldTypeSchema) {
 
     switch (fieldTypeSchema) {
       case RECORD:
