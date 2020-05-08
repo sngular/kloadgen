@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -169,7 +170,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         JMeterContext jMeterContext = JMeterContextService.getContext();
         EnrichedRecord messageVal = (EnrichedRecord) jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
         //noinspection unchecked
-        List<HeaderMapping> kafkaHeaders = (List<HeaderMapping>) jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
+        List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
         ProducerRecord<String, Object> producerRecord;
         try {
@@ -209,5 +210,14 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
     @Override
     public void teardownTest(JavaSamplerContext context) {
         producer.close();
+    }
+
+    private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
+        List<HeaderMapping> headerMappingList = new ArrayList<>();
+        Object headers = jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
+        if (null != headers) {
+            headerMappingList.addAll((List) headers);
+        }
+        return headerMappingList;
     }
 }

@@ -54,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -223,7 +224,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         JMeterContext jMeterContext = JMeterContextService.getContext();
         EnrichedRecord messageVal = (EnrichedRecord)jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
         //noinspection unchecked
-        List<HeaderMapping> kafkaHeaders = (List<HeaderMapping>) jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
+        List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
         ProducerRecord<String, Object> producerRecord;
         try {
@@ -259,6 +260,15 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             sampleResult.sampleEnd();
         }
         return sampleResult;
+    }
+
+    private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
+        List<HeaderMapping> headerMappingList = new ArrayList<>();
+        Object headers = jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
+        if (null != headers) {
+            headerMappingList.addAll((List) headers);
+        }
+        return headerMappingList;
     }
 
     @Override
