@@ -12,7 +12,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.avro.Schema.Type.RECORD;
-
+import static org.apache.avro.Schema.Type.MAP;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
@@ -108,20 +108,23 @@ public class SchemaExtractor {
         internalFields.get(0).setFieldName(innerField.name());
         completeFieldList.add(internalFields.get(0));
       }
-    } else if (Type.MAP == innerField.schema().getType()) {
-      List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField);
-      if (internalFields.size() >1) {
-        processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
-      } else {
-        internalFields.get(0).setFieldName(innerField.name());
-        completeFieldList.add(internalFields.get(0));
-      }
+    }else if (Type.MAP == innerField.schema().getType()) {
+      System.out.println("Mapa");
     } else if (Type.UNION == innerField.schema().getType()) {
       Schema recordUnion = getRecordUnion(innerField.schema().getTypes());
       if (null != recordUnion) {
         if (recordUnion.getType() == RECORD) {
             processRecordFieldList(innerField.name(), ".", processFieldList(recordUnion.getFields()), completeFieldList);
-        } else {
+        } else if(recordUnion.getType() == Type.ARRAY){
+          List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField.name(), recordUnion);
+          if (internalFields.size() >1) {
+            processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
+          } else {
+            internalFields.get(0).setFieldName(innerField.name());
+            completeFieldList.add(internalFields.get(0));
+          }
+        }else if(recordUnion.getType() == Type.MAP){
+          System.out.println("Hola map");
           List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField.name(), recordUnion);
           if (internalFields.size() >1) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
@@ -156,7 +159,7 @@ public class SchemaExtractor {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || Type.ARRAY == schema.getType()) {
+      if (RECORD == schema.getType() || Type.ARRAY == schema.getType() || Type.MAP == schema.getType()) {
         isRecord = schema;
       }
     }

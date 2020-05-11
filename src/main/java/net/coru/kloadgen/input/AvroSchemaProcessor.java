@@ -11,6 +11,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
 import java.io.IOException;
@@ -148,12 +149,25 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   private Schema extractRecordSchema(Field field) {
     if (ARRAY == field.schema().getType()) {
       return field.schema().getElementType();
-    } else if (UNION == field.schema().getType()) {
+    } else if (MAP == field.schema().getType()) {
+      return getRecordUnion(field.schema().getTypes());
+    }else if (UNION == field.schema().getType()) {
       return getRecordUnion(field.schema().getTypes());
     } else return null;
   }
 
   private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
+      throws KLoadGenException {
+    List<GenericRecord> objectArray = new ArrayList<>(arraySize);
+    for(int i=0; i<arraySize-1; i++) {
+      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
+      objectArray.add(createObject(subSchema, fieldName, temporalQueue));
+    }
+    objectArray.add(createObject(subSchema, fieldName, fieldExpMappingsQueue));
+    return objectArray;
+  }
+
+  private List<GenericRecord> createObjectMap(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
       throws KLoadGenException {
     List<GenericRecord> objectArray = new ArrayList<>(arraySize);
     for(int i=0; i<arraySize-1; i++) {
@@ -171,7 +185,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       return createRecord(getRecordUnion(schema.getTypes()));
     } else if (ARRAY == schema.getType()) {
       return createRecord(schema.getElementType());
-    } else {
+    } else if (MAP == schema.getType()) {
+      return createRecord(schema.getElementType());
+    }else {
       return null;
     }
   }
@@ -179,7 +195,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || ARRAY == schema.getType()) {
+      if (RECORD == schema.getType() || ARRAY == schema.getType() || MAP == schema.getType()) {
         isRecord = schema;
       }
     }
