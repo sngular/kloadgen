@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericFixed;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -49,7 +51,7 @@ public class AvroRandomTool {
       value = RandomTool.castValue(value, field.schema().getType().getName());
     }
 	if(FIXED == field.schema().getType()) {
-		value = getFixedOrGenerate(fieldType, field.schema());
+		value = getFixedOrGenerate(field.schema());
 	}
     return value;
   }
@@ -79,12 +81,11 @@ public class AvroRandomTool {
     }
   }
   
-  private static Object getFixedOrGenerate(String fieldType, Schema schema) {
-		Object value;
+  private static GenericFixed getFixedOrGenerate( Schema schema) {
+	
 		byte[] bytes = new byte[schema.getFixedSize()];
 
-		value = new GenericData.Fixed(schema, bytes);
-		return value;
+		return new GenericData.Fixed(schema, bytes);
 	}
 
   private static boolean needCastForInt(String fieldType) {

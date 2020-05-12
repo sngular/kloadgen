@@ -369,10 +369,10 @@ public final class RandomTool {
     return value;
   }
   
-  private static Object getByteRandom(Integer valueLength) {
-	    Object value;
+  private static ByteBuffer getByteRandom(Integer valueLength) {
+	  	ByteBuffer value;
 	    if (valueLength == 0) {
-	      value =  ByteBuffer.wrap(RandomUtils.nextBytes(4));
+	    	 value =  ByteBuffer.wrap(RandomUtils.nextBytes(4));
 	    } else {
 	      value =  ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
 	    }
