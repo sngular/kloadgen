@@ -1,6 +1,7 @@
 package net.coru.kloadgen.util;
 
 import static org.apache.avro.Schema.Type.ENUM;
+import static org.apache.avro.Schema.Type.FIXED;
 import static org.apache.avro.Schema.Type.NULL;
 import static org.apache.avro.Schema.Type.UNION;
 
@@ -47,6 +48,9 @@ public class AvroRandomTool {
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
       value = RandomTool.castValue(value, field.schema().getType().getName());
     }
+	if(FIXED == field.schema().getType()) {
+		value = getFixedOrGenerate(fieldType, field.schema());
+	}
     return value;
   }
 
@@ -74,6 +78,14 @@ public class AvroRandomTool {
         return !fieldTypeSchema.getName().equals(fieldType);
     }
   }
+  
+  private static Object getFixedOrGenerate(String fieldType, Schema schema) {
+		Object value;
+		byte[] bytes = new byte[schema.getFixedSize()];
+
+		value = new GenericData.Fixed(schema, bytes);
+		return value;
+	}
 
   private static boolean needCastForInt(String fieldType) {
 
@@ -111,4 +123,6 @@ public class AvroRandomTool {
   private Schema getRecordUnion(List<Schema> types) {
     return IterableUtils.find(types, schema -> !schema.getType().equals(NULL));
   }
+  
+	
 }
