@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -172,38 +173,45 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
-        ProducerRecord<String, Object> producerRecord;
-        try {
-            if (key_message_flag) {
-                producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal);
-            } else {
-                producerRecord = new ProducerRecord<>(topic, messageVal);
-            }
+        if (Objects.nonNull(messageVal)) {
 
-            for (HeaderMapping kafkaHeader : kafkaHeaders) {
-                producerRecord.headers().add(kafkaHeader.getHeaderName(),
-                    statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
-                        10,
-                        emptyList()).toString().getBytes(StandardCharsets.UTF_8));
-            }
+            ProducerRecord<String, Object> producerRecord;
+            try {
+                if (key_message_flag) {
+                    producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal);
+                } else {
+                    producerRecord = new ProducerRecord<>(topic, messageVal);
+                }
 
-            log.info("Send message {}", producerRecord.value());
-            Future<RecordMetadata> messageSent = producer.send(producerRecord);
-            producer.flush();
-            if (!messageSent.isDone()) {
-                throw new IOException("Message not sent");
-            }
-            sampleResult.setResponseData(messageVal != null ? messageVal.toString() : "", StandardCharsets.UTF_8.name());
-            sampleResult.setSuccessful(true);
-            sampleResult.sampleEnd();
+                for (HeaderMapping kafkaHeader : kafkaHeaders) {
+                    producerRecord.headers().add(kafkaHeader.getHeaderName(),
+                        statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
+                            10,
+                            emptyList()).toString().getBytes(StandardCharsets.UTF_8));
+                }
 
-        } catch (Exception e) {
-            log.error("Failed to send message", e);
-            sampleResult.setResponseData(e.getMessage() != null ? e.getMessage() : "", StandardCharsets.UTF_8.name());
+                log.info("Send message {}", producerRecord.value());
+                Future<RecordMetadata> messageSent = producer.send(producerRecord);
+                producer.flush();
+                if (!messageSent.isDone()) {
+                    throw new IOException("Message not sent");
+                }
+                sampleResult.setResponseData(messageVal != null ? messageVal.toString() : "", StandardCharsets.UTF_8.name());
+                sampleResult.setSuccessful(true);
+                sampleResult.sampleEnd();
+
+            } catch (Exception e) {
+                log.error("Failed to send message", e);
+                sampleResult.setResponseData(e.getMessage() != null ? e.getMessage() : "", StandardCharsets.UTF_8.name());
+                sampleResult.setSuccessful(false);
+                sampleResult.sampleEnd();
+            }
+        } else {
+            log.error("Failed to Generate message");
+            sampleResult.setResponseData("Failed to Generate message", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
         }
-
         return sampleResult;
     }
 

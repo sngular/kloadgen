@@ -222,40 +222,48 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
-        EnrichedRecord messageVal = (EnrichedRecord)jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
+        EnrichedRecord messageVal = (EnrichedRecord) jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
         //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
-        ProducerRecord<String, Object> producerRecord;
-        try {
-            if (key_message_flag) {
-                producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal.getGenericRecord());
-            } else {
-                producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
-            }
-            Map<String, String> jsonTypes = new HashMap<>();
-            jsonTypes.put("contentType", "java.lang.String");
-            producerRecord.headers()
-                .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
-            for (HeaderMapping kafkaHeader : kafkaHeaders) {
-                producerRecord.headers().add(kafkaHeader.getHeaderName(),
-            objectMapperJson.writeValueAsBytes(
-                statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList())));
-            }
+        if (Objects.nonNull(messageVal)) {
+            ProducerRecord<String, Object> producerRecord;
+            try {
+                if (key_message_flag) {
+                    producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal.getGenericRecord());
+                } else {
+                    producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
+                }
+                Map<String, String> jsonTypes = new HashMap<>();
+                jsonTypes.put("contentType", "java.lang.String");
+                producerRecord.headers()
+                    .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
+                for (HeaderMapping kafkaHeader : kafkaHeaders) {
+                    producerRecord.headers().add(kafkaHeader.getHeaderName(),
+                        objectMapperJson.writeValueAsBytes(
+                            statelessRandomTool
+                                .generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList())));
+                }
 
-            log.info("Send message {}", producerRecord.value());
-            Future<RecordMetadata> messageSent = producer.send(producerRecord);
-            producer.flush();
-            if (!messageSent.isDone()) {
-                throw new IOException("Message not sent");
-            }
-            sampleResult.setResponseData(messageVal.toString(), StandardCharsets.UTF_8.name());
-            sampleResult.setSuccessful(true);
-            sampleResult.sampleEnd();
+                log.info("Send message {}", producerRecord.value());
+                Future<RecordMetadata> messageSent = producer.send(producerRecord);
+                producer.flush();
+                if (!messageSent.isDone()) {
+                    throw new IOException("Message not sent");
+                }
+                sampleResult.setResponseData(messageVal.toString(), StandardCharsets.UTF_8.name());
+                sampleResult.setSuccessful(true);
+                sampleResult.sampleEnd();
 
-        } catch (Exception e) {
-            log.error("Failed to send message", e);
-            sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
+            } catch (Exception e) {
+                log.error("Failed to send message", e);
+                sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
+                sampleResult.setSuccessful(false);
+                sampleResult.sampleEnd();
+            }
+        } else {
+            log.error("Failed to Generate message");
+            sampleResult.setResponseData("Failed to Generate message", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();
         }
