@@ -83,20 +83,20 @@ class RandomToolTest {
 
   private static Stream<Arguments> parametersForGenerateMapFixedKeyRandomValue() {
     return Stream.of(
-        Arguments.of("string-map", 1, Collections.singletonList("testString")),
-        Arguments.of("int-map", 1, Collections.singletonList("testString")),
-        Arguments.of("long-map", 1, Collections.singletonList("testString")),
-        Arguments.of("short-map", 1, Collections.singletonList("testString")),
-        Arguments.of("double-map", 1, Collections.singletonList("testString")),
-        Arguments.of("uuid-map", 1, Collections.singletonList("testString"))
+        Arguments.of("string-map", 1, Collections.singletonList("testString"),1),
+        Arguments.of("int-map", 1, Collections.singletonList("testString"),1),
+        Arguments.of("long-map", 1, Collections.singletonList("testString"),1),
+        Arguments.of("short-map", 1, Collections.singletonList("testString"),1),
+        Arguments.of("double-map", 1, Collections.singletonList("testString"),1),
+        Arguments.of("uuid-map", 1, Collections.singletonList("testString"),1)
     );
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapFixedKeyRandomValue")
-  void generateMapFixedKeyRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList) {
+  void generateMapFixedKeyRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
     String[] expectedKeys = fieldValuesList.toArray(new String[1]);
-    Map<String, Object> result = (Map<String, Object>)RandomTool.generateRandom(fieldType, valueLength, fieldValuesList);
+    Map<String, Object> result = (Map<String, Object>)RandomTool.generateRandomMap(fieldType, valueLength, fieldValuesList,size);
     assertThat(result).containsKeys(expectedKeys);
     assertThat(result).doesNotContainValue(null);
   }
