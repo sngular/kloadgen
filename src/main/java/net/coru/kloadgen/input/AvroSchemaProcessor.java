@@ -130,7 +130,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
         if (fieldValueMapping.getFieldType().contains("map")){
-          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
               calculateArraySize(cleanFieldName),
               fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName)));
@@ -180,9 +180,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
-  private Map<String, Object> createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappingsQueue, Field field)
+  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappingsQueue, Field field)
       throws KLoadGenException {
-    return (Map<String, Object>)randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappingsQueue, field, arraySize);
+    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappingsQueue, field, arraySize);
   }
 
   private GenericRecord createRecord(Schema schema) {
@@ -239,6 +239,13 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
     int endOfField = pathToClean.contains(".")?
         pathToClean.indexOf(".") : 0;
+    return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
+  }
+
+  private String getCleanMethodNameMap(FieldValueMapping fieldValueMapping, String fieldName) {
+    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
+    int endOfField = pathToClean.contains("[]")?
+        pathToClean.indexOf("[]") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
   }
 
