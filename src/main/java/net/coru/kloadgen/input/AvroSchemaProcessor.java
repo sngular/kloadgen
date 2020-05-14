@@ -13,6 +13,11 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL
 import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
+
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -22,6 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import lombok.SneakyThrows;
+import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.AvroRandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
@@ -29,30 +39,21 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import lombok.SneakyThrows;
-import net.coru.kloadgen.exception.KLoadGenException;
-import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.AvroRandomTool;
 
 public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
-  private SchemaRegistryClient schemaRegistryClient;
+  private final SchemaRegistryClient schemaRegistryClient;
 
-  private Schema schema;
+  private final Schema schema;
 
   private SchemaMetadata metadata;
 
-  private List<FieldValueMapping> fieldExprMappings;
+  private final List<FieldValueMapping> fieldExprMappings;
 
-  private AvroRandomTool randomToolAvro;
+  private final AvroRandomTool randomToolAvro;
 
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
-      throws IOException, RestClientException {
+      throws IOException, RestClientException, KLoadGenException {
     Map<String, String> originals = new HashMap<>();
     Properties ctxProperties = JMeterContextService.getContext().getProperties();
 
@@ -67,12 +68,14 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           originals.put(USER_INFO_CONFIG, ctxProperties.getProperty(USER_INFO_CONFIG));
         } else {
           originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
-                  ctxProperties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
+              ctxProperties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
           originals.put(BEARER_AUTH_TOKEN_CONFIG, ctxProperties.getProperty(BEARER_AUTH_TOKEN_CONFIG));
         }
       }
+      schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
+    } else {
+      throw new KLoadGenException("No Schema Registry URL in System");
     }
-    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
     schema = getSchemaBySubject(avroSchemaName);
     randomToolAvro = new AvroRandomTool();
     this.fieldExprMappings = fieldExprMappings;

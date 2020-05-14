@@ -51,7 +51,6 @@ import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -63,8 +62,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.StatelessRandomTool;
@@ -79,7 +78,6 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 
@@ -245,12 +243,15 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                                 .generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList())));
                 }
 
-                log.info("Send message {}", producerRecord.value());
-                Future<RecordMetadata> messageSent = producer.send(producerRecord);
-                producer.flush();
-                if (!messageSent.isDone()) {
-                    throw new IOException("Message not sent");
-                }
+                producer.send(producerRecord, (metadata, e) -> {
+                    if (e != null) {
+                        log.error("Send failed for record {}", producerRecord, e);
+                        throw new KLoadGenException("Failed to sent message due ", e);
+                    }
+                });
+
+                log.info("Send message to body: {}", producerRecord.value());
+
                 sampleResult.setResponseData(messageVal.toString(), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(true);
                 sampleResult.sampleEnd();
