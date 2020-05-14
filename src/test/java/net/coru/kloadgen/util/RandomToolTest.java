@@ -64,20 +64,20 @@ class RandomToolTest {
 
   private static Stream<Arguments> parametersForGenerateMapRandomValueFromList() {
     return Stream.of(
-        Arguments.of("string-map", 1, Collections.singletonList("testString:testString"), Maps.of("testString", "testString")),
-        Arguments.of("int-map", 1, Collections.singletonList("testString:1"),  Maps.of("testString",1)),
-        Arguments.of("long-map", 1, Collections.singletonList("testString:1"),  Maps.of("testString",1L)),
-        Arguments.of("short-map", 1, Collections.singletonList("testString:1"),  Maps.of("testString",(short)1)),
-        Arguments.of("double-map", 1, Collections.singletonList("testString:1.0"),  Maps.of("testString",1.0)),
-        Arguments.of("uuid-map", 1, Collections.singletonList("testString:0177f035-e51c-4a46-8b82-5b157371c2a5"),  Maps.of("testString", UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")))
+        Arguments.of("string-map", 1, Collections.singletonList("testString:testString"), Maps.of("testString", "testString"),1),
+        Arguments.of("int-map", 1, Collections.singletonList("testString:1"),  Maps.of("testString",1),1),
+        Arguments.of("long-map", 1, Collections.singletonList("testString:1"),  Maps.of("testString",1L),1),
+        Arguments.of("short-map", 1, Collections.singletonList("testString:1"),  Maps.of("testString",(short)1),1),
+        Arguments.of("double-map", 1, Collections.singletonList("testString:1.0"),  Maps.of("testString",1.0),1),
+        Arguments.of("uuid-map", 1, Collections.singletonList("testString:0177f035-e51c-4a46-8b82-5b157371c2a5"),  Maps.of("testString", UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),1)
     );
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapRandomValueFromList")
-  void generateMapRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected) {
+  void generateMapRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected,Integer size) {
     Map.Entry<String, Object>[] expectedMap = expected.entrySet().toArray(new Map.Entry[1]);
-    assertThat((Map<String, Object>)RandomTool.generateRandom(fieldType, valueLength, fieldValuesList))
+    assertThat((Map<String, Object>)RandomTool.generateRandomMap(fieldType, valueLength, fieldValuesList,size))
         .containsExactly(expectedMap);
   }
 

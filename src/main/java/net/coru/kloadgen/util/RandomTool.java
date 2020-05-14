@@ -26,6 +26,37 @@ public final class RandomTool {
 
   private RandomTool() {}
 
+  protected static Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer mapSize) {
+    Object value;
+    switch (fieldType) {
+      case "int-map":
+        value = generateIntMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "long-map":
+        value = generateLongMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "double-map":
+        value = generateDoubleMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "short-map":
+        value = generateShortMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "string-map":
+        value = generateStringMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "uuid-map":
+        value = generateUuidMap(fieldValuesList,mapSize);
+        break;
+      case "boolean-map":
+        value = generateBooleanMap(fieldValuesList,mapSize);
+        break;
+      default:
+        value = fieldType;
+        break;
+    }
+    return value;
+  }
+
   protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
     Object value;
     switch (fieldType) {
@@ -54,27 +85,6 @@ public final class RandomTool {
         break;
       case "boolean":
         value = getBooleanValueOrRandom(fieldValuesList);
-        break;
-      case "int-map":
-        value = generateIntMap(valueLength, fieldValuesList);
-        break;
-      case "long-map":
-        value = generateLongMap(valueLength, fieldValuesList);
-        break;
-      case "double-map":
-        value = generateDoubleMap(valueLength, fieldValuesList);
-        break;
-      case "short-map":
-        value = generateShortMap(valueLength, fieldValuesList);
-        break;
-      case "string-map":
-        value = generateStringMap(valueLength, fieldValuesList);
-        break;
-      case "uuid-map":
-        value = generateUuidMap(fieldValuesList);
-        break;
-      case "boolean-map":
-        value = generateBooleanMap(fieldValuesList);
         break;
       case "int-array":
         value = generateIntArray(valueLength, fieldValuesList);
@@ -190,8 +200,8 @@ public final class RandomTool {
     return booleanArray;
   }
 
-  private static Map<String, Integer> generateIntMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Integer> generateIntMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Integer> intMap = new HashMap<>();
     for (int i=0; i<size; i++) {
       Map.Entry<String, Integer> mapValue;
@@ -211,8 +221,8 @@ public final class RandomTool {
     return intMap;
   }
 
-  private static Map<String, Long> generateLongMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Long> generateLongMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Long> longMap = new HashMap<>();
     for (int i=0; i<size; i++) {
       Map.Entry<String, Long> mapValue;
@@ -232,8 +242,8 @@ public final class RandomTool {
     return longMap;
   }
 
-  private static Map<String, Double> generateDoubleMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Double> generateDoubleMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Double> doubleMap = new HashMap<>();
     for (int i=0; i<size; i++) {
       Map.Entry<String, Double> mapValue;
@@ -253,8 +263,8 @@ public final class RandomTool {
     return doubleMap;
   }
 
-  private static Map<String, Short> generateShortMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Short> generateShortMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Short> shortMap = new HashMap<>();
     for (int i=0; i<size; i++) {
       Map.Entry<String, Short> mapValue;
@@ -274,8 +284,8 @@ public final class RandomTool {
     return shortMap;
   }
 
-  private static Map<String, String> generateStringMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, String> generateStringMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, String> stringMap = new HashMap<>();
     for (int i=0; i<size; i++) {
       Map.Entry<String, String> mapValue;
@@ -295,8 +305,8 @@ public final class RandomTool {
     return stringMap;
   }
 
-  private static Map<String, UUID> generateUuidMap(List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, UUID> generateUuidMap(List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, UUID> uuidMap = new HashMap<>();
     for (int i=0; i<size; i++) {
       Map.Entry<String, UUID> mapValue;
@@ -316,8 +326,8 @@ public final class RandomTool {
     return uuidMap;
   }
 
-  private static Map<String, Boolean> generateBooleanMap(List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Boolean> generateBooleanMap(List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Boolean> booleanMap = new HashMap<>();
     for (int i=0; i<size; i++) {
       Map.Entry<String, Boolean> mapValue;

@@ -97,6 +97,16 @@ public class SchemaExtractor {
     return completeFieldList;
   }
 
+  private List<FieldValueMapping> extractMapInternalFields(Field innerField) {
+    return extractArrayInternalFields(innerField.name(), innerField.schema());
+  }
+
+  private List<FieldValueMapping> extractMapInternalFields(String fieldName, Schema innerField) {
+    List<FieldValueMapping> completeFieldList = new ArrayList<>();
+    completeFieldList.add( new FieldValueMapping(fieldName,innerField.getValueType().getName()+"-map"));
+    return completeFieldList;
+  }
+
   private void processField(Field innerField, List<FieldValueMapping> completeFieldList) {
     if (RECORD == innerField.schema().getType()) {
       processRecordFieldList(innerField.name(), ".", extractInternalFields(innerField), completeFieldList);
@@ -109,7 +119,13 @@ public class SchemaExtractor {
         completeFieldList.add(internalFields.get(0));
       }
     }else if (Type.MAP == innerField.schema().getType()) {
-      System.out.println("Mapa");
+      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField);
+      if (internalFields.size() >1) {
+        processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
+      } else {
+        internalFields.get(0).setFieldName(innerField.name() + "[]");
+        completeFieldList.add(internalFields.get(0));
+      }
     } else if (Type.UNION == innerField.schema().getType()) {
       Schema recordUnion = getRecordUnion(innerField.schema().getTypes());
       if (null != recordUnion) {
@@ -124,12 +140,11 @@ public class SchemaExtractor {
             completeFieldList.add(internalFields.get(0));
           }
         }else if(recordUnion.getType() == Type.MAP){
-          System.out.println("Hola map");
-          List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField.name(), recordUnion);
+          List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name(), recordUnion);
           if (internalFields.size() >1) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
           } else {
-            internalFields.get(0).setFieldName(innerField.name());
+            internalFields.get(0).setFieldName(innerField.name()+"[]");
             completeFieldList.add(internalFields.get(0));
           }
         }

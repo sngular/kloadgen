@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
@@ -89,6 +90,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       while (!fieldExpMappingsQueue.isEmpty()) {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
+          if(fieldValueMapping.getFieldType().contains("map")) { System.out.println("Map");}
           entity.put(fieldName,
               createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateArraySize(fieldName),
                   fieldExpMappingsQueue));
@@ -123,12 +125,20 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     while(!fieldExpMappingsQueue.isEmpty() && fieldValueMapping.getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
-        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-        subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
-            fieldNameSubEntity,
-            calculateArraySize(cleanFieldName),
-            fieldExpMappingsQueue));
-      } else if (cleanFieldName.contains(".")) {
+        if (fieldValueMapping.getFieldType().contains("map")){
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          subEntity.put(fieldNameSubEntity, createObjectMap(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
+              fieldNameSubEntity,
+              calculateArraySize(cleanFieldName),
+              fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName),calculateArraySize(fieldName)));
+        } else {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
+              fieldNameSubEntity,
+              calculateArraySize(cleanFieldName),
+              fieldExpMappingsQueue));
+        }
+      }else if (cleanFieldName.contains(".")) {
         String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
         subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
             fieldNameSubEntity,
@@ -150,7 +160,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     if (ARRAY == field.schema().getType()) {
       return field.schema().getElementType();
     } else if (MAP == field.schema().getType()) {
-      return getRecordUnion(field.schema().getTypes());
+      return field.schema().getElementType();
     }else if (UNION == field.schema().getType()) {
       return getRecordUnion(field.schema().getTypes());
     } else return null;
@@ -167,15 +177,10 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
-  private List<GenericRecord> createObjectMap(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
+  private Object createObjectMap(Schema subSchema, String fieldName, Integer arraySize, List<String> fieldExpMappingsQueue, Field field, Integer size)
       throws KLoadGenException {
-    List<GenericRecord> objectArray = new ArrayList<>(arraySize);
-    for(int i=0; i<arraySize-1; i++) {
-      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.add(createObject(subSchema, fieldName, temporalQueue));
-    }
-    objectArray.add(createObject(subSchema, fieldName, fieldExpMappingsQueue));
-    return objectArray;
+    Object objectMap = randomToolAvro.generateRandomMap("string-map", arraySize, fieldExpMappingsQueue, field, size);
+    return objectMap;
   }
 
   private GenericRecord createRecord(Schema schema) {
