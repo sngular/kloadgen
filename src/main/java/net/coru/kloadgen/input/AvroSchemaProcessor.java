@@ -130,6 +130,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
         if (fieldValueMapping.getFieldType().contains("map")){
+          fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
               calculateArraySize(cleanFieldName),
@@ -180,9 +181,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
-  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappingsQueue, Field field)
+  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings, Field field)
       throws KLoadGenException {
-    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappingsQueue, field, arraySize);
+    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, field, arraySize);
   }
 
   private GenericRecord createRecord(Schema schema) {
