@@ -1,6 +1,6 @@
 package net.coru.kloadgen.exception;
 
-public class KLoadGenException extends Exception {
+public class KLoadGenException extends RuntimeException {
 
     public KLoadGenException(String message) {
         super(message);
@@ -10,4 +10,7 @@ public class KLoadGenException extends Exception {
         super(exc);
     }
 
+    public KLoadGenException(String message, Exception exc) {
+        super(message, exc);
+    }
 }
