@@ -90,7 +90,11 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       while (!fieldExpMappingsQueue.isEmpty()) {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
-          if(fieldValueMapping.getFieldType().contains("map")) { System.out.println("Map");}
+          if(fieldValueMapping.getFieldType().contains("map")) {
+            entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
+                calculateArraySize(fieldName),
+                fieldValueMapping.getFieldValuesList(),schema.getField(fieldValueMapping.getFieldName())));
+          }
           entity.put(fieldName,
               createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateArraySize(fieldName),
                   fieldExpMappingsQueue));
@@ -127,10 +131,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
         if (fieldValueMapping.getFieldType().contains("map")){
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-          subEntity.put(fieldNameSubEntity, createObjectMap(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
-              fieldNameSubEntity,
+          subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
               calculateArraySize(cleanFieldName),
-              fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName),calculateArraySize(fieldName)));
+              fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName)));
         } else {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
@@ -177,9 +180,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
-  private Map<String, Object> createObjectMap(Schema subSchema, String fieldName, Integer arraySize, List<String> fieldExpMappingsQueue, Field field, Integer size)
+  private Map<String, Object> createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappingsQueue, Field field)
       throws KLoadGenException {
-    return (Map<String, Object>)randomToolAvro.generateRandomMap("string-map", arraySize, fieldExpMappingsQueue, field, size);
+    return (Map<String, Object>)randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappingsQueue, field, arraySize);
   }
 
   private GenericRecord createRecord(Schema schema) {
