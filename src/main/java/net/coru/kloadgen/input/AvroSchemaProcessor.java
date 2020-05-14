@@ -14,6 +14,11 @@ import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
+
+import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -43,18 +48,18 @@ import net.coru.kloadgen.util.AvroRandomTool;
 
 public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
-  private SchemaRegistryClient schemaRegistryClient;
+  private final SchemaRegistryClient schemaRegistryClient;
 
-  private Schema schema;
+  private final Schema schema;
 
   private SchemaMetadata metadata;
 
-  private List<FieldValueMapping> fieldExprMappings;
+  private final List<FieldValueMapping> fieldExprMappings;
 
-  private AvroRandomTool randomToolAvro;
+  private final AvroRandomTool randomToolAvro;
 
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
-      throws IOException, RestClientException {
+      throws IOException, RestClientException, KLoadGenException {
     Map<String, String> originals = new HashMap<>();
     Properties ctxProperties = JMeterContextService.getContext().getProperties();
 
@@ -69,12 +74,14 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           originals.put(USER_INFO_CONFIG, ctxProperties.getProperty(USER_INFO_CONFIG));
         } else {
           originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
-                  ctxProperties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
+              ctxProperties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
           originals.put(BEARER_AUTH_TOKEN_CONFIG, ctxProperties.getProperty(BEARER_AUTH_TOKEN_CONFIG));
         }
       }
+      schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
+    } else {
+      throw new KLoadGenException("No Schema Registry URL in System");
     }
-    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
     schema = getSchemaBySubject(avroSchemaName);
     randomToolAvro = new AvroRandomTool();
     this.fieldExprMappings = fieldExprMappings;
@@ -92,11 +99,11 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if(fieldValueMapping.getFieldType().contains("map")) {
             entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
-                calculateArraySize(fieldName),
+                calculateSize(fieldName),
                 fieldValueMapping.getFieldValuesList(),schema.getField(fieldValueMapping.getFieldName())));
           }
           entity.put(fieldName,
-              createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateArraySize(fieldName),
+              createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateSize(fieldName),
                   fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
@@ -133,13 +140,13 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
-              calculateArraySize(cleanFieldName),
+              calculateSize(cleanFieldName),
               fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName)));
         } else {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
               fieldNameSubEntity,
-              calculateArraySize(cleanFieldName),
+              calculateSize(cleanFieldName),
               fieldExpMappingsQueue));
         }
       }else if (cleanFieldName.contains(".")) {
@@ -210,7 +217,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return isRecord;
   }
 
-  private Integer calculateArraySize(String fieldName) {
+  private Integer calculateSize(String fieldName) {
     int arrayLength = RandomUtils.nextInt(1, 10);
     String arrayLengthStr = StringUtils.substringBetween(fieldName, "[", "]");
     if (StringUtils.isNotEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
@@ -245,8 +252,8 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
   private String getCleanMethodNameMap(FieldValueMapping fieldValueMapping, String fieldName) {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
-    int endOfField = pathToClean.contains("[]")?
-        pathToClean.indexOf("[]") : 0;
+    int endOfField = pathToClean.contains("[")?
+        pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
   }
 

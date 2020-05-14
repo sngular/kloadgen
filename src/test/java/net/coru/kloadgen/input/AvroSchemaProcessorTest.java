@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.jmeter.threads.JMeterContext;
@@ -46,7 +47,7 @@ class AvroSchemaProcessorTest {
   }
 
   @Test
-  public void textAvroSchemaProcessor(@Wiremock WireMockServer server) throws IOException, RestClientException {
+  public void textAvroSchemaProcessor(@Wiremock WireMockServer server) throws IOException, RestClientException, KLoadGenException {
     List<FieldValueMapping> fieldValueMappingList = asList(
         new FieldValueMapping("Name", "string", 0, "Jose"),
         new FieldValueMapping("Age", "int", 0, "43"));

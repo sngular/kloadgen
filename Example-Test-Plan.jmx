@@ -189,7 +189,6 @@
               <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
           </collectionProp>
-          <stringProp name="schemaRegistryUrl">http://localhost:8082</stringProp>
         </net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Producer Properties" enabled="true">
@@ -300,6 +299,11 @@
                 <stringProp name="Argument.value">true</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="value.subject.name.strategy" elementType="Argument">
+                <stringProp name="Argument.name">value.subject.name.strategy</stringProp>
+                <stringProp name="Argument.value">io.confluent.kafka.serializers.subject.TopicRecordNameStrategy</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="ssl.enabled" elementType="Argument">
                 <stringProp name="Argument.name">ssl.enabled</stringProp>
                 <stringProp name="Argument.value">NO</stringProp>
@@ -336,7 +340,7 @@
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
-          <stringProp name="schemaRegistryUrl">http://localhost:8081</stringProp>
+          <stringProp name="schemaRegistryUrl">http://localhost:8082</stringProp>
           <collectionProp name="schemaRegistryProperties">
             <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>

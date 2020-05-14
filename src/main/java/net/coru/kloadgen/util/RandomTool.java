@@ -1,5 +1,6 @@
 package net.coru.kloadgen.util;
 
+import java.nio.ByteBuffer;
 import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.UNION;
 
@@ -22,7 +23,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 public final class RandomTool {
 
-  public static final Set<String> VALID_TYPES = SetUtils.hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array");
+  public static final Set<String> VALID_TYPES = SetUtils.hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array", "boolean", "bytes");
 
   private RandomTool() {}
 
@@ -75,6 +76,9 @@ public final class RandomTool {
       case "double":
         value = getDoubleValueOrRandom(valueLength, fieldValuesList);
         break;
+      case "bytes":
+		value = getByteRandom(valueLength);
+		break;
       case "timestamp":
       case "longTimestamp":
       case "stringTimestamp":
@@ -380,6 +384,16 @@ public final class RandomTool {
     }
     return value;
   }
+
+  private static ByteBuffer getByteRandom(Integer valueLength) {
+	  	ByteBuffer value;
+	    if (valueLength == 0) {
+	    	 value =  ByteBuffer.wrap(RandomUtils.nextBytes(4));
+	    } else {
+	      value =  ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
+	    }
+	    return value;
+	  }
 
   private static String getStringValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     String value;
