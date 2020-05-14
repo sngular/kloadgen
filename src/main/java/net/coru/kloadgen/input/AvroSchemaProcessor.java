@@ -177,10 +177,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
-  private Object createObjectMap(Schema subSchema, String fieldName, Integer arraySize, List<String> fieldExpMappingsQueue, Field field, Integer size)
+  private Map<String, Object> createObjectMap(Schema subSchema, String fieldName, Integer arraySize, List<String> fieldExpMappingsQueue, Field field, Integer size)
       throws KLoadGenException {
-    Object objectMap = randomToolAvro.generateRandomMap("string-map", arraySize, fieldExpMappingsQueue, field, size);
-    return objectMap;
+    return (Map<String, Object>)randomToolAvro.generateRandomMap("string-map", arraySize, fieldExpMappingsQueue, field, size);
   }
 
   private GenericRecord createRecord(Schema schema) {
