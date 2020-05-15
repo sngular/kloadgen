@@ -1,8 +1,6 @@
 package net.coru.kloadgen.util;
 
 import java.nio.ByteBuffer;
-import static org.apache.avro.Schema.Type.ENUM;
-import static org.apache.avro.Schema.Type.UNION;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -14,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -77,7 +72,7 @@ public final class RandomTool {
         value = getDoubleValueOrRandom(valueLength, fieldValuesList);
         break;
       case "bytes":
-		value = getByteRandom(valueLength);
+		    value = getByteRandom(valueLength);
 		break;
       case "timestamp":
       case "longTimestamp":
@@ -386,14 +381,14 @@ public final class RandomTool {
   }
 
   private static ByteBuffer getByteRandom(Integer valueLength) {
-	  	ByteBuffer value;
-	    if (valueLength == 0) {
-	    	 value =  ByteBuffer.wrap(RandomUtils.nextBytes(4));
-	    } else {
-	      value =  ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
-	    }
-	    return value;
-	  }
+    ByteBuffer value;
+    if (valueLength == 0) {
+      value =  ByteBuffer.wrap(RandomUtils.nextBytes(4));
+    } else {
+      value =  ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
+    }
+    return value;
+  }
 
   private static String getStringValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     String value;

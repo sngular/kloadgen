@@ -12,7 +12,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.avro.Schema.Type.RECORD;
-import static org.apache.avro.Schema.Type.MAP;
+
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
@@ -80,7 +80,6 @@ public class SchemaExtractor {
     return completeFieldList;
   }
 
-
   private List<FieldValueMapping> extractArrayInternalFields(Field innerField) {
     return extractArrayInternalFields(innerField.name(), innerField.schema());
   }
@@ -116,14 +115,6 @@ public class SchemaExtractor {
         processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
       } else {
         internalFields.get(0).setFieldName(innerField.name());
-        completeFieldList.add(internalFields.get(0));
-      }
-    }else if (Type.MAP == innerField.schema().getType()) {
-      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField);
-      if (internalFields.size() >1) {
-        processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
-      } else {
-        internalFields.get(0).setFieldName(innerField.name() + "[]");
         completeFieldList.add(internalFields.get(0));
       }
     } else if (Type.UNION == innerField.schema().getType()) {

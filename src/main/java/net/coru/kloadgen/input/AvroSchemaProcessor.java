@@ -28,7 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import net.coru.kloadgen.util.RandomTool;
+import lombok.SneakyThrows;
+import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.AvroRandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
@@ -36,15 +40,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import lombok.SneakyThrows;
-import net.coru.kloadgen.exception.KLoadGenException;
-import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.AvroRandomTool;
 
 public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 

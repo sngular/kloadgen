@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.SchemaBuilder;
 import org.apache.groovy.util.Maps;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
