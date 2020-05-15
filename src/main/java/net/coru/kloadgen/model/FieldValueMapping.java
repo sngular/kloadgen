@@ -13,8 +13,8 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 
 @Builder
 @ToString
-@EqualsAndHashCode
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class FieldValueMapping extends AbstractTestElement {
 
     public static final String FIELD_NAME = "fieldName";
