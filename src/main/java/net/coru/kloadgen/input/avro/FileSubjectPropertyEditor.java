@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -80,6 +81,7 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
 
   private void init() {
     subjectNameComboBox = new JComboBox<>();
+    subjectNameComboBox.setEditable(true);
     panel.setLayout(new BorderLayout());
     panel.add(fileChooser);
     panel.add(subjectNameComboBox, BorderLayout.AFTER_LAST_LINE);
@@ -105,6 +107,7 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
           JOptionPane.ERROR_MESSAGE);
       log.error(e.getMessage(), e);
     }
+     subjectNameComboBox.addFocusListener(new ComboFiller());
   }
 
   public org.apache.avro.Schema getSelectedSchema(String name) {
