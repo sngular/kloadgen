@@ -1,10 +1,10 @@
 package net.coru.kloadgen.util;
 
-import static org.apache.avro.Schema.Type.ENUM;
-import static org.apache.avro.Schema.Type.UNION;
+import java.nio.ByteBuffer;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,21 +12,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
-import org.apache.avro.generic.GenericData;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 public final class RandomTool {
 
-  public static final Set<String> VALID_TYPES = SetUtils.hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array");
+  public static final Set<String> VALID_TYPES = SetUtils.hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array", "boolean", "bytes");
 
-  private RandomTool() {
+  private RandomTool() {}
+
+  protected static Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer mapSize) {
+    Object value;
+    switch (fieldType) {
+      case "int-map":
+        value = generateIntMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "long-map":
+        value = generateLongMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "double-map":
+        value = generateDoubleMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "short-map":
+        value = generateShortMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "string-map":
+        value = generateStringMap(valueLength, fieldValuesList,mapSize);
+        break;
+      case "uuid-map":
+        value = generateUuidMap(fieldValuesList,mapSize);
+        break;
+      case "boolean-map":
+        value = generateBooleanMap(fieldValuesList,mapSize);
+        break;
+      default:
+        value = fieldType;
+        break;
+    }
+    return value;
   }
 
-  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
+  protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
     Object value;
     switch (fieldType) {
       case "string":
@@ -44,6 +71,9 @@ public final class RandomTool {
       case "double":
         value = getDoubleValueOrRandom(valueLength, fieldValuesList);
         break;
+      case "bytes":
+		    value = getByteRandom(valueLength);
+		break;
       case "timestamp":
       case "longTimestamp":
       case "stringTimestamp":
@@ -54,27 +84,6 @@ public final class RandomTool {
         break;
       case "boolean":
         value = getBooleanValueOrRandom(fieldValuesList);
-        break;
-      case "int-map":
-        value = generateIntMap(valueLength, fieldValuesList);
-        break;
-      case "long-map":
-        value = generateLongMap(valueLength, fieldValuesList);
-        break;
-      case "double-map":
-        value = generateDoubleMap(valueLength, fieldValuesList);
-        break;
-      case "short-map":
-        value = generateShortMap(valueLength, fieldValuesList);
-        break;
-      case "string-map":
-        value = generateStringMap(valueLength, fieldValuesList);
-        break;
-      case "uuid-map":
-        value = generateUuidMap(fieldValuesList);
-        break;
-      case "boolean-map":
-        value = generateBooleanMap(fieldValuesList);
         break;
       case "int-array":
         value = generateIntArray(valueLength, fieldValuesList);
@@ -104,78 +113,27 @@ public final class RandomTool {
     return value;
   }
 
-  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
-      Map<String, Object> context) {
 
-    Object value = generateRandom(fieldType, valueLength, fieldValuesList);
-    if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(fieldType, field.schema());
-    } else if (fieldType.equalsIgnoreCase(value.toString())) {
-      if (UNION == field.schema().getType()) {
-        value = ("null".equalsIgnoreCase(value.toString())) ? null : getEnumOrGenerate(fieldType, field.schema().getTypes().get(1));
-      } else if ("SEQ".equalsIgnoreCase(fieldType)) {
-        value = castValue(context.compute(field.name(), (fieldName, seqObject) -> seqObject == null ? (fieldValuesList.isEmpty()? 1L : Long.parseLong(fieldValuesList.get(0))) : ((Long)seqObject) + 1), field.schema().getType());
-      } else {
-        value = castValue(fieldType, field.schema().getType());
-      }
-    }
-    return value;
-  }
-
-  private static Object getEnumOrGenerate(String fieldType, Schema schema) {
-    Object value;
-    if ("ENUM".equalsIgnoreCase(fieldType)) {
-      List<String> enumValueList= schema.getEnumSymbols();
-      value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
-    } else {
-      value = new GenericData.EnumSymbol(schema, fieldType);
-    }
-    return value;
-  }
-
-  private static Object castValue(String fieldType, Schema.Type type) {
-    Object value;
+  protected static Object castValue(Object value, String type) {
+    Object castValue;
     switch(type) {
-      case INT:
-        value = Integer.valueOf(fieldType);
+      case "int":
+        castValue = Integer.valueOf(value.toString());
         break;
-      case DOUBLE:
-        value = Double.valueOf(fieldType);
+      case "double":
+        castValue = Double.valueOf(value.toString());
         break;
-      case LONG:
-        value = Long.valueOf(fieldType);
+      case "long":
+        castValue = Long.valueOf(value.toString());
         break;
-      case BOOLEAN:
-        value = Boolean.valueOf(fieldType);
+      case "boolean":
+        castValue = Boolean.valueOf(value.toString());
         break;
       default:
-        value = fieldType;
+        castValue = value.toString();
         break;
     }
-
-    return value;
-  }
-
-  private static Object castValue(Object fieldType, Schema.Type type) {
-    Object value;
-    switch(type) {
-      case INT:
-        value = Integer.valueOf(fieldType.toString());
-        break;
-      case DOUBLE:
-        value = Double.valueOf(fieldType.toString());
-        break;
-      case LONG:
-        value = Long.valueOf(fieldType.toString());
-        break;
-      case BOOLEAN:
-        value = Boolean.valueOf(fieldType.toString());
-        break;
-      default:
-        value = fieldType.toString();
-        break;
-    }
-    return value;
+    return castValue;
   }
 
   private static List<Integer> generateIntArray(Integer valueLength, List<String> fieldValueList) {
@@ -241,67 +199,155 @@ public final class RandomTool {
     return booleanArray;
   }
 
-  private static Map<String, Integer> generateIntMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Integer> generateIntMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Integer> intMap = new HashMap<>();
     for (int i=0; i<size; i++) {
-      intMap.put(getStringValueOrRandom(valueLength, fieldValueList), getIntValueOrRandom(size, Collections.emptyList()));
+      Map.Entry<String, Integer> mapValue;
+      if (fieldValueList.size() > 0) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          mapValue = new SimpleEntry<>(tempValue[0], Integer.parseInt(tempValue[1]));
+        } else {
+          mapValue = new SimpleEntry<>(tempValue[0], getIntValueOrRandom(valueLength, Collections.emptyList()));
+        }
+      } else {
+        mapValue = new SimpleEntry<>(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getIntValueOrRandom(valueLength, Collections.emptyList()));
+      }
+      intMap.put(mapValue.getKey(), mapValue.getValue());
     }
     return intMap;
   }
 
-  private static Map<String, Long> generateLongMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Long> generateLongMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Long> longMap = new HashMap<>();
     for (int i=0; i<size; i++) {
-      longMap.put(getStringValueOrRandom(valueLength, fieldValueList), getLongValueOrRandom(valueLength, fieldValueList));
+      Map.Entry<String, Long> mapValue;
+      if (fieldValueList.size() > 0) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          mapValue = new SimpleEntry<>(tempValue[0], Long.parseLong(tempValue[1]));
+        } else {
+          mapValue = new SimpleEntry<>(tempValue[0], getLongValueOrRandom(valueLength, Collections.emptyList()));
+        }
+      } else {
+        mapValue = new SimpleEntry<>(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getLongValueOrRandom(valueLength, Collections.emptyList()));
+      }
+      longMap.put(mapValue.getKey(), mapValue.getValue());
     }
     return longMap;
   }
 
-  private static Map<String, Double> generateDoubleMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Double> generateDoubleMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Double> doubleMap = new HashMap<>();
     for (int i=0; i<size; i++) {
-      doubleMap.put(getStringValueOrRandom(valueLength, fieldValueList), getDoubleValueOrRandom(valueLength, fieldValueList));
+      Map.Entry<String, Double> mapValue;
+      if (fieldValueList.size() > 0) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          mapValue = new SimpleEntry<>(tempValue[0], Double.parseDouble(tempValue[1]));
+        } else {
+          mapValue = new SimpleEntry<>(tempValue[0], getDoubleValueOrRandom(valueLength, Collections.emptyList()));
+        }
+      } else {
+        mapValue = new SimpleEntry<>(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getDoubleValueOrRandom(valueLength, Collections.emptyList()));
+      }
+      doubleMap.put(mapValue.getKey(), mapValue.getValue());
     }
     return doubleMap;
   }
 
-  private static Map<String, Short> generateShortMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Short> generateShortMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Short> shortMap = new HashMap<>();
     for (int i=0; i<size; i++) {
-      shortMap.put(getStringValueOrRandom(valueLength, fieldValueList), getShortValueOrRandom(valueLength, fieldValueList));
+      Map.Entry<String, Short> mapValue;
+      if (fieldValueList.size() > 0) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          mapValue = new SimpleEntry<>(tempValue[0], Short.parseShort(tempValue[1]));
+        } else {
+          mapValue = new SimpleEntry<>(tempValue[0], getShortValueOrRandom(valueLength, Collections.emptyList()));
+        }
+      } else {
+        mapValue = new SimpleEntry<>(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getShortValueOrRandom(valueLength, Collections.emptyList()));
+      }
+      shortMap.put(mapValue.getKey(), mapValue.getValue());
     }
     return shortMap;
   }
 
-  private static Map<String, String> generateStringMap(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, String> generateStringMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, String> stringMap = new HashMap<>();
     for (int i=0; i<size; i++) {
-      stringMap.put(getStringValueOrRandom(valueLength, fieldValueList), getStringValueOrRandom(valueLength, fieldValueList));
+      Map.Entry<String, String> mapValue;
+      if (fieldValueList.size() > 0) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          mapValue = new SimpleEntry<>(tempValue[0], tempValue[1]);
+        } else {
+          mapValue = new SimpleEntry<>(tempValue[0], getStringValueOrRandom(valueLength, Collections.emptyList()));
+        }
+      } else {
+        mapValue = new SimpleEntry<>(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getStringValueOrRandom(valueLength, Collections.emptyList()));
+      }
+      stringMap.put(mapValue.getKey(), mapValue.getValue());
     }
     return stringMap;
   }
 
-  private static Map<String, UUID> generateUuidMap(List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, UUID> generateUuidMap(List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, UUID> uuidMap = new HashMap<>();
     for (int i=0; i<size; i++) {
-      uuidMap.put(getStringValueOrRandom(size, fieldValueList), getUUIDValueOrRandom(fieldValueList));
+      Map.Entry<String, UUID> mapValue;
+      if (fieldValueList.size() > 0) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          mapValue = new SimpleEntry<>(tempValue[0], UUID.fromString(tempValue[1]));
+        } else {
+          mapValue = new SimpleEntry<>(tempValue[0], getUUIDValueOrRandom(Collections.emptyList()));
+        }
+      } else {
+        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
+            getUUIDValueOrRandom(Collections.emptyList()));
+      }
+      uuidMap.put(mapValue.getKey(), mapValue.getValue());
     }
     return uuidMap;
   }
 
-  private static Map<String, Boolean> generateBooleanMap(List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static Map<String, Boolean> generateBooleanMap(List<String> fieldValueList, Integer mapSize) {
+    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Boolean> booleanMap = new HashMap<>();
     for (int i=0; i<size; i++) {
-      booleanMap.put(getStringValueOrRandom(size, fieldValueList), getBooleanValueOrRandom(fieldValueList));
+      Map.Entry<String, Boolean> mapValue;
+      if (fieldValueList.size() > 0) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          mapValue = new SimpleEntry<>(tempValue[0], Boolean.parseBoolean(tempValue[1]));
+        } else {
+          mapValue = new SimpleEntry<>(tempValue[0], getBooleanValueOrRandom(Collections.emptyList()));
+        }
+      } else {
+        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
+            getBooleanValueOrRandom(Collections.emptyList()));
+      }
+      booleanMap.put(mapValue.getKey(), mapValue.getValue());
     }
     return booleanMap;
+  }
+
+  private static String[] getMapEntryValue(List<String> fieldValueList) {
+    return fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim().split(":");
   }
 
   private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
@@ -317,7 +363,7 @@ public final class RandomTool {
   private static Long getLongValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     long value;
     if (fieldValuesList.size() > 0) {
-      value = Long.parseLong(fieldValuesList.get(RandomUtils.nextInt(0,fieldValuesList.size())).trim());
+      value = Long.parseLong(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextLong(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
@@ -334,12 +380,22 @@ public final class RandomTool {
     return value;
   }
 
+  private static ByteBuffer getByteRandom(Integer valueLength) {
+    ByteBuffer value;
+    if (valueLength == 0) {
+      value =  ByteBuffer.wrap(RandomUtils.nextBytes(4));
+    } else {
+      value =  ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
+    }
+    return value;
+  }
+
   private static String getStringValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
     String value;
     if (fieldValuesList.size() > 0) {
       value = fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim();
     } else {
-      value = RandomStringUtils.randomAlphabetic(valueLength == 0? RandomUtils.nextInt(1,20): valueLength);
+      value = RandomStringUtils.randomAlphabetic(valueLength == 0 ? RandomUtils.nextInt(1,20): valueLength);
     }
     return value;
   }
@@ -391,5 +447,14 @@ public final class RandomTool {
       value = Boolean.parseBoolean(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     }
     return value;
+  }
+
+  public static Object generateSeq(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context) {
+
+    return RandomTool.castValue(
+        context.compute(fieldName, (fieldNameMap,
+            seqObject) -> seqObject == null ? (fieldValuesList.isEmpty() ? 1L : Long.parseLong(fieldValuesList.get(0)))
+            : ((Long) seqObject) + 1),
+        fieldType);
   }
 }

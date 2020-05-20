@@ -11,6 +11,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
 
@@ -31,7 +32,7 @@ import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.RandomTool;
+import net.coru.kloadgen.util.AvroRandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
@@ -42,18 +43,18 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
-  private SchemaRegistryClient schemaRegistryClient;
+  private final SchemaRegistryClient schemaRegistryClient;
 
-  private Schema schema;
+  private final Schema schema;
 
   private SchemaMetadata metadata;
 
-  private List<FieldValueMapping> fieldExprMappings;
+  private final List<FieldValueMapping> fieldExprMappings;
 
-  private Map<String, Object> context = new HashMap<>();
+  private final AvroRandomTool randomToolAvro;
 
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
-      throws IOException, RestClientException {
+      throws IOException, RestClientException, KLoadGenException {
     Map<String, String> originals = new HashMap<>();
     Properties ctxProperties = JMeterContextService.getContext().getProperties();
 
@@ -68,13 +69,16 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           originals.put(USER_INFO_CONFIG, ctxProperties.getProperty(USER_INFO_CONFIG));
         } else {
           originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
-                  ctxProperties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
+              ctxProperties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
           originals.put(BEARER_AUTH_TOKEN_CONFIG, ctxProperties.getProperty(BEARER_AUTH_TOKEN_CONFIG));
         }
       }
+      schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
+    } else {
+      throw new KLoadGenException("No Schema Registry URL in System");
     }
-    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
     schema = getSchemaBySubject(avroSchemaName);
+    randomToolAvro = new AvroRandomTool();
     this.fieldExprMappings = fieldExprMappings;
   }
 
@@ -88,8 +92,13 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       while (!fieldExpMappingsQueue.isEmpty()) {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
+          if(fieldValueMapping.getFieldType().contains("map")) {
+            entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
+                calculateSize(fieldName),
+                fieldValueMapping.getFieldValuesList(),schema.getField(fieldValueMapping.getFieldName())));
+          }
           entity.put(fieldName,
-              createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateArraySize(fieldName),
+              createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateSize(fieldName),
                   fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
@@ -97,9 +106,10 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
-          entity.put(fieldValueMapping.getFieldName(), RandomTool
-              .generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
-                  schema.getField(fieldValueMapping.getFieldName()), context));
+          entity.put(fieldValueMapping.getFieldName(),
+              randomToolAvro.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
+                  fieldValueMapping.getFieldValuesList(),
+                  schema.getField(fieldValueMapping.getFieldName())));
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
         }
@@ -121,23 +131,31 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     while(!fieldExpMappingsQueue.isEmpty() && fieldValueMapping.getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
-        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-        subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
-            fieldNameSubEntity,
-            calculateArraySize(cleanFieldName),
-            fieldExpMappingsQueue));
-      } else if (cleanFieldName.contains(".")) {
+        if (fieldValueMapping.getFieldType().contains("map")){
+          fieldExpMappingsQueue.poll();
+          String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
+          subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
+              calculateSize(cleanFieldName),
+              fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName)));
+        } else {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
+              fieldNameSubEntity,
+              calculateSize(cleanFieldName),
+              fieldExpMappingsQueue));
+        }
+      }else if (cleanFieldName.contains(".")) {
         String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
         subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
             fieldNameSubEntity,
             fieldExpMappingsQueue));
       } else {
         fieldExpMappingsQueue.poll();
-        subEntity.put(cleanFieldName, RandomTool.generateRandom(
+        subEntity.put(cleanFieldName, randomToolAvro.generateRandom(
             fieldValueMapping.getFieldType(),
             fieldValueMapping.getValueLength(),
             fieldValueMapping.getFieldValuesList(),
-          schema.getField(cleanFieldName), context));
+            schema.getField(cleanFieldName)));
       }
       fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
     }
@@ -147,7 +165,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   private Schema extractRecordSchema(Field field) {
     if (ARRAY == field.schema().getType()) {
       return field.schema().getElementType();
-    } else if (UNION == field.schema().getType()) {
+    } else if (MAP == field.schema().getType()) {
+      return field.schema().getElementType();
+    }else if (UNION == field.schema().getType()) {
       return getRecordUnion(field.schema().getTypes());
     } else return null;
   }
@@ -163,6 +183,11 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
+  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings, Field field)
+      throws KLoadGenException {
+    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, field, arraySize);
+  }
+
   private GenericRecord createRecord(Schema schema) {
     if (RECORD == schema.getType()) {
       return new GenericData.Record(schema);
@@ -170,7 +195,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       return createRecord(getRecordUnion(schema.getTypes()));
     } else if (ARRAY == schema.getType()) {
       return createRecord(schema.getElementType());
-    } else {
+    } else if (MAP == schema.getType()) {
+      return createRecord(schema.getElementType());
+    }else {
       return null;
     }
   }
@@ -178,14 +205,14 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || ARRAY == schema.getType()) {
+      if (RECORD == schema.getType() || ARRAY == schema.getType() || MAP == schema.getType()) {
         isRecord = schema;
       }
     }
     return isRecord;
   }
 
-  private Integer calculateArraySize(String fieldName) {
+  private Integer calculateSize(String fieldName) {
     int arrayLength = RandomUtils.nextInt(1, 10);
     String arrayLengthStr = StringUtils.substringBetween(fieldName, "[", "]");
     if (StringUtils.isNotEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
@@ -215,6 +242,13 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
     int endOfField = pathToClean.contains(".")?
         pathToClean.indexOf(".") : 0;
+    return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
+  }
+
+  private String getCleanMethodNameMap(FieldValueMapping fieldValueMapping, String fieldName) {
+    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
+    int endOfField = pathToClean.contains("[")?
+        pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
   }
 

@@ -14,6 +14,7 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.DefaultComboBoxModel;
@@ -24,6 +25,8 @@ import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.PropsKeysHelper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -37,13 +40,13 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private JComboBox<String> subjectNameComboBox;
 
-  private JButton loadClassBtn = new JButton("Load Subject");
+  private final JButton loadClassBtn = new JButton("Load Subject");
 
-  private JPanel panel = new JPanel();
+  private final JPanel panel = new JPanel();
 
   private PropertyDescriptor propertyDescriptor;
 
-  private SchemaExtractor schemaExtractor = new SchemaExtractor();
+  private final SchemaExtractor schemaExtractor = new SchemaExtractor();
 
   public AvroSubjectPropertyEditor() {
     this.init();
@@ -91,7 +94,8 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
-          propertyEditor.setValue(attributeList);
+          TableEditor tableEditor = (TableEditor) propertyEditor;
+          propertyEditor.setValue(mergeValue(tableEditor.getValue(), attributeList));
         }
       }
       JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
@@ -102,6 +106,50 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       log.error(e.getMessage(), e);
     }
   }
+
+  @SuppressWarnings("unchecked")
+  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
+
+
+    if (!(tableEditorValue instanceof ArrayList<?>)) {
+      log.error("Table Editor is not array list");
+      return attributeList;
+    }
+
+    List<FieldValueMapping> fieldValueList;
+    try {
+      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
+    }catch(Exception e) {
+      log.error("Table Editor is not FieldValueMapping list", e);
+      return attributeList;
+    }
+
+    if (CollectionUtils.isEmpty(fieldValueList)) {
+      return attributeList;
+    }
+
+    List<FieldValueMapping> result = new ArrayList<>();
+    for(FieldValueMapping fieldValue: attributeList) {
+
+      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
+
+      if (existsValue != null) {
+        result.add(existsValue);
+      } else {
+        result.add(fieldValue);
+      }
+
+    }
+
+    return result;
+  }
+
+  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
+
+    return IterableUtils.find(fieldValueList,
+        v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
+  }
+
 
   @Override
   public void clearGui() {
@@ -125,12 +173,18 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void setAsText(String text) throws IllegalArgumentException {
+    if (this.subjectNameComboBox.getModel().getSize() == 0) {
+      this.subjectNameComboBox.addItem(text);
+    }
     this.subjectNameComboBox.setSelectedItem(text);
   }
 
   @Override
   public void setValue(Object value) {
     if (value != null) {
+      if (this.subjectNameComboBox.getModel().getSize() == 0) {
+        this.subjectNameComboBox.addItem((String) value);
+      }
       this.subjectNameComboBox.setSelectedItem(value);
     } else {
       this.subjectNameComboBox.setSelectedItem("");
