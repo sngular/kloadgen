@@ -6,7 +6,6 @@ import static org.apache.avro.Schema.Type.RECORD;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -17,28 +16,20 @@ import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.PropsKeysHelper;
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
+import org.apache.commons.collections4.IterableUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -46,20 +37,19 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
-import sun.net.www.content.text.Generic;
 
 @Slf4j
 public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
   private JComboBox<String> subjectNameComboBox;
 
-  private JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+  private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
-  private JPanel panel = new JPanel();
+  private final JPanel panel = new JPanel();
 
   private PropertyDescriptor propertyDescriptor;
 
-  private SchemaExtractor schemaExtractor = new SchemaExtractor();
+  private final SchemaExtractor schemaExtractor = new SchemaExtractor();
 
   private static Schema parserSchema;
 
@@ -111,18 +101,26 @@ public class FileSubjectPropertyEditor  extends PropertyEditorSupport implements
   }
 
   public org.apache.avro.Schema getSelectedSchema(String name) {
-    if(Type.UNION == parserSchema.getType()) {
-      return parserSchema.getTypes().stream()
-          .filter(t -> t.getName().equals(name))
-          .findFirst().get();
+    if (Type.UNION == parserSchema.getType()) {
+      return getRecordUnion(parserSchema.getTypes(), name);
     } else {
       return parserSchema;
     }
   }
 
+  private Schema getRecordUnion(List<Schema> types, String name) {
+    Schema unionSchema = null;
+    for (Schema schema : types) {
+      if (schema.getName().equalsIgnoreCase(name)) {
+        unionSchema = schema;
+      }
+    }
+    return unionSchema;
+  }
+
   @Override
   public void actionPerformed(ActionEvent event) {
-    if(subjectNameComboBox.getItemCount() != 0) {
+    if (subjectNameComboBox.getItemCount() != 0) {
 
       String selectedItem = subjectNameComboBox.getSelectedItem().toString();
       Schema selectedSchema = getSelectedSchema(selectedItem);
