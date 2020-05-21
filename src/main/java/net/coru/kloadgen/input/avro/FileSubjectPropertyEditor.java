@@ -39,6 +39,7 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -55,7 +56,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private static Schema parserSchema;
 
-  private final JButton openFileDialogButton = new JButton("Open");
+  private final JButton openFileDialogButton = new JButton(JMeterUtils.getResString("file_visualizer_open"));
 
   public FileSubjectPropertyEditor() {
     this.init();
@@ -85,7 +86,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
   public void actionFileChooser(ActionEvent event) {
 
-    int returnValue = fileChooser.showDialog(panel, "Open");
+    int returnValue = fileChooser.showDialog(panel, JMeterUtils.getResString("file_visualizer_open"));
 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
       File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
