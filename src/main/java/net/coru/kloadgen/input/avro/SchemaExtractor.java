@@ -1,11 +1,5 @@
 package net.coru.kloadgen.input.avro;
 
-import com.sun.org.apache.xpath.internal.operations.And;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
-import org.apache.avro.file.DataFileReader;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
@@ -25,6 +19,9 @@ import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -33,19 +30,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumReader;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractor {
 
-  private Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
+  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
 
   public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
     Map<String, String> originals = new HashMap<>();
@@ -79,7 +74,7 @@ public class SchemaExtractor {
   }
 
   public List<FieldValueMapping> flatPropertiesList(Schema parserSchema) throws IOException, RestClientException {
-    return processSchem(parserSchema);
+    return processSchema(parserSchema);
   }
 
   public Schema schemaTypesList(File schemaFile)throws IOException, RestClientException {
@@ -105,7 +100,7 @@ public class SchemaExtractor {
     return contentBuilder.toString();
   }
 
-  public List<FieldValueMapping> processSchem(Schema schema) {
+  public List<FieldValueMapping> processSchema(Schema schema) {
     List<FieldValueMapping> attributeList = new ArrayList<>();
 
     schema.getFields().forEach(field -> processField(field, attributeList));
