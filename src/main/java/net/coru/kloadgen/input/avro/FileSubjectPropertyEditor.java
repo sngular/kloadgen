@@ -55,7 +55,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private static Schema parserSchema;
 
-  private final JButton openFileDialogButton = new JButton("The Fecking Button");
+  private final JButton openFileDialogButton = new JButton("Open");
 
   public FileSubjectPropertyEditor() {
     this.init();
@@ -85,12 +85,12 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
   public void actionFileChooser(ActionEvent event) {
 
-    int returnValue = fileChooser.showDialog(panel, "Avre Carallo");
+    int returnValue = fileChooser.showDialog(panel, "Open");
 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
       File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
       try {
-        parserSchema = schemaExtractor.schemaTypesList(subjectName);//Devolver lista de Strings
+        parserSchema = schemaExtractor.schemaTypesList(subjectName);
         subjectNameComboBox.removeAllItems();
         if (Type.UNION == parserSchema.getType()) {
           Iterable<Schema> schemaList = IterableUtils.filteredIterable(parserSchema.getTypes(), t -> t.getType() == RECORD);
