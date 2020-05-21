@@ -82,6 +82,8 @@ public class AutoCompletion extends PlainDocument {
             e.consume();
             comboBox.getToolkit().beep();
             break;
+          default:
+            break;
         }
       }
     };
@@ -132,33 +134,35 @@ public class AutoCompletion extends PlainDocument {
 
   public void remove(int offs, int len) throws BadLocationException {
     // return immediately when selecting an item
+    int editOffs = offs;
     if (selecting) {
       return;
     }
     if (hitBackspace) {
       // user hit backspace => move the selection backwards
       // old item keeps being selected
-      if (offs > 0) {
+      if (editOffs > 0) {
         if (hitBackspaceOnSelection) {
-          offs--;
+          editOffs--;
         }
       } else {
         // User hit backspace with the cursor positioned on the start => beep
         comboBox.getToolkit().beep(); // when available use: UIManager.getLookAndFeel().provideErrorFeedback(comboBox);
       }
-      highlightCompletedText(offs);
+      highlightCompletedText(editOffs);
     } else {
-      super.remove(offs, len);
+      super.remove(editOffs, len);
     }
   }
 
   public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
     // return immediately when selecting an item
+    int editOffs = offs;
     if (selecting) {
       return;
     }
     // insert the string into the document
-    super.insertString(offs, str, a);
+    super.insertString(editOffs, str, a);
     // lookup and select a matching item
     Object item = lookupItem(getText(0, getLength()));
     if (item != null) {
@@ -167,13 +171,13 @@ public class AutoCompletion extends PlainDocument {
       // keep old item selected if there is no match
       item = comboBox.getSelectedItem();
       // imitate no insert (later on offs will be incremented by str.length(): selection won't move forward)
-      offs = offs - str.length();
+      editOffs = editOffs - str.length();
       // provide feedback to the user that his input has been received but can not be accepted
       comboBox.getToolkit().beep(); // when available use: UIManager.getLookAndFeel().provideErrorFeedback(comboBox);
     }
     setText(item.toString());
     // select the completed part
-    highlightCompletedText(offs + str.length());
+    highlightCompletedText(editOffs + str.length());
   }
 
   private void setText(String text) {
