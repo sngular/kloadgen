@@ -135,10 +135,6 @@ public class SchemaExtractor {
     return completeFieldList;
   }
 
-  private List<FieldValueMapping> extractMapInternalFields(Field innerField) {
-    return extractArrayInternalFields(innerField.name(), innerField.schema());
-  }
-
   private List<FieldValueMapping> extractMapInternalFields(String fieldName, Schema innerField) {
     List<FieldValueMapping> completeFieldList = new ArrayList<>();
     completeFieldList.add( new FieldValueMapping(fieldName,innerField.getValueType().getName()+"-map"));
