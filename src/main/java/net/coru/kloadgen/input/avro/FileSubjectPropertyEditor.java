@@ -109,7 +109,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public org.apache.avro.Schema getSelectedSchema(String name) {
+  public Schema getSelectedSchema(String name) {
     if (Type.UNION == parserSchema.getType()) {
       return getRecordUnion(parserSchema.getTypes(), name);
     } else {

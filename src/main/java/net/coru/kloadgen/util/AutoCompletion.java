@@ -25,25 +25,25 @@ import javax.swing.text.PlainDocument;
  */
 public class AutoCompletion extends PlainDocument {
 
-  JComboBox comboBox;
+  private JComboBox comboBox;
 
-  ComboBoxModel model;
+  private ComboBoxModel model;
 
-  JTextComponent editor;
+  private JTextComponent editor;
 
   // flag to indicate if setSelectedItem has been called
   // subsequent calls to remove/insertString should be ignored
-  boolean selecting = false;
+  private boolean selecting = false;
 
-  boolean hidePopupOnFocusLoss;
+  private boolean hidePopupOnFocusLoss;
 
-  boolean hitBackspace = false;
+  private boolean hitBackspace = false;
 
-  boolean hitBackspaceOnSelection;
+  private boolean hitBackspaceOnSelection;
 
-  KeyListener editorKeyListener;
+  private KeyListener editorKeyListener;
 
-  FocusListener editorFocusListener;
+  private FocusListener editorFocusListener;
 
   public AutoCompletion(final JComboBox comboBox) {
     this.comboBox = comboBox;
@@ -116,7 +116,7 @@ public class AutoCompletion extends PlainDocument {
     new AutoCompletion(comboBox);
   }
 
-  void configureEditor(ComboBoxEditor newEditor) {
+  private void configureEditor(ComboBoxEditor newEditor) {
     if (editor != null) {
       editor.removeKeyListener(editorKeyListener);
       editor.removeFocusListener(editorFocusListener);
