@@ -17,7 +17,11 @@ import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -26,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
@@ -35,7 +40,7 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractor {
 
-  private Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
+  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
 
   public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
     Map<String, String> originals = new HashMap<>();
@@ -68,6 +73,40 @@ public class SchemaExtractor {
     return attributeList;
   }
 
+  public List<FieldValueMapping> flatPropertiesList(Schema parserSchema) throws IOException, RestClientException {
+    return processSchema(parserSchema);
+  }
+
+  public Schema schemaTypesList(File schemaFile)throws IOException, RestClientException {
+    Schema.Parser parser = new Schema.Parser();
+    String readLine = readLineByLine(schemaFile.getPath());
+    Schema parserSchema = parser.parse(readLine);
+    return parserSchema;
+  }
+
+  private static String readLineByLine(String filePath)
+  {
+    StringBuilder contentBuilder = new StringBuilder();
+
+    try (Stream<String> stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8))
+    {
+      stream.forEach(s -> contentBuilder.append(s).append("\n"));
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+
+    return contentBuilder.toString();
+  }
+
+  public List<FieldValueMapping> processSchema(Schema schema) {
+    List<FieldValueMapping> attributeList = new ArrayList<>();
+
+    schema.getFields().forEach(field -> processField(field, attributeList));
+    return attributeList;
+  }
+
   private List<FieldValueMapping> extractInternalFields(Field field) {
     return processFieldList(field.schema().getFields());
   }
@@ -94,10 +133,6 @@ public class SchemaExtractor {
       completeFieldList.add( new FieldValueMapping(fieldName,innerField.getElementType().getName()+"-array"));
     }
     return completeFieldList;
-  }
-
-  private List<FieldValueMapping> extractMapInternalFields(Field innerField) {
-    return extractArrayInternalFields(innerField.name(), innerField.schema());
   }
 
   private List<FieldValueMapping> extractMapInternalFields(String fieldName, Schema innerField) {
