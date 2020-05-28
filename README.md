@@ -59,6 +59,20 @@ For windows and mac and you can:
 
 #### Build Project
 
+In order to build the project we have 2 profiles based on how you are gone to use it, as an standalone jar or as a Jmeter library under the lib/ext folder.
+By default the build is go to generate the plugin jar, but to switch for standalone just pass it as parameter
+
+```bash
+ mvn clean install -P standalone
+```
+
+if you want to specify the plugin profile is like
+
+```bash
+ mvn clean install -P plugin
+```
+or just
+
 ```bash
  mvn clean install
 ```
