@@ -200,7 +200,7 @@ public class SchemaExtractor {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || Type.ARRAY == schema.getType() || Type.MAP == schema.getType()) {
+      if (RECORD == schema.getType() || Type.ARRAY == schema.getType() || Type.MAP == schema.getType() || typesSet.contains(schema.getType())) {
         isRecord = schema;
       }
     }
