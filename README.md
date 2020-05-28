@@ -137,6 +137,29 @@ We will see 4 columns where we will configure the Random Generator system.
 
 ![Load Generator Table](/Kafka_load_generator_Success.png)
 
+### File Load Generator Configuration
+
+This screen will allow to choose a schema from file(.avsc or.json).
+
+![File Generator Table](/Kafka_file_load_generator_config_dialog.png)
+
+AVRO or Json structure will be flattened and show in the table.
+
+![File Generator Table](/Kafka_file_load_generator_config_comboBox.png)
+
+We will see 4 columns where we will configure the Random Generator system.
+
+  * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
+  * **Field Type** : Field type, like String, Int, Double, Map,Array **Note** : if the field is an array of basic types it will be show as string-array, int-array,...
+  * **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
+  * **Field Values List** : Field possibles values which will be used by the Random Tool to generate values 
+      
+      **Note**In "Field Type" if the field type is an array or a map you can define a specific number of random values(metadata.extensions.flows[].correlation[2]).
+              In "Field Values List" if the field type is an array or a map you can define a specific list of values([1,2,3,4,5] or [ key1:value1, key2:value2, key3:value3]).
+               
+
+![File Generator Table](/Kafka_file_load_generator_config_success.png)
+
 ### Schema Template Functions
 
 KLoadGen provides an easy way for random data generation base on the field type.
