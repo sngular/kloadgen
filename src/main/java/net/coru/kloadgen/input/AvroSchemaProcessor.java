@@ -56,7 +56,8 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
 
   private final AvroRandomTool randomToolAvro;
 
-  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
+  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING,
+      Type.LONG, Type.BYTES, Type.FIXED);
 
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
       throws IOException, RestClientException, KLoadGenException {

@@ -40,7 +40,8 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractor {
 
-  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
+  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING,
+      Type.LONG, Type.BYTES, Type.FIXED);
 
   public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
     Map<String, String> originals = new HashMap<>();
