@@ -14,6 +14,7 @@ import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
+import org.apache.avro.Schema.Type;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -22,10 +23,12 @@ import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientExcept
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Objects;
 import java.util.Properties;
 import lombok.SneakyThrows;
@@ -52,6 +55,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   private final List<FieldValueMapping> fieldExprMappings;
 
   private final AvroRandomTool randomToolAvro;
+
+  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING,
+      Type.LONG, Type.BYTES, Type.FIXED);
 
   public AvroSchemaProcessor(String avroSchemaName, List<FieldValueMapping> fieldExprMappings)
       throws IOException, RestClientException, KLoadGenException {
@@ -167,9 +173,11 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       return field.schema().getElementType();
     } else if (MAP == field.schema().getType()) {
       return field.schema().getElementType();
-    }else if (UNION == field.schema().getType()) {
+    } else if (UNION == field.schema().getType()) {
       return getRecordUnion(field.schema().getTypes());
-    } else return null;
+    } else if (typesSet.contains(field.schema().getType())){
+      return getRecordUnion(field.schema().getTypes());
+    }else return null;
   }
 
   private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
@@ -197,7 +205,9 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       return createRecord(schema.getElementType());
     } else if (MAP == schema.getType()) {
       return createRecord(schema.getElementType());
-    }else {
+    } else if (typesSet.contains(schema.getType())) {
+      return createRecord(schema.getElementType());
+    } else{
       return null;
     }
   }
@@ -205,7 +215,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || ARRAY == schema.getType() || MAP == schema.getType()) {
+      if (RECORD == schema.getType() || ARRAY == schema.getType() || MAP == schema.getType() || typesSet.contains(schema.getType())) {
         isRecord = schema;
       }
     }
