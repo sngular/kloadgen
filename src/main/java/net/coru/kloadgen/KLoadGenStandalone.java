@@ -28,7 +28,6 @@ public class KLoadGenStandalone {
 
     CommandLineParser parser = new DefaultParser();
     try {
-      StandardJMeterEngine jmeter = new StandardJMeterEngine();
 
       CommandLine line = parser.parse(options, args);
       Path jMeterPropsFile = Paths.get(line.getOptionValue("h"));
@@ -50,6 +49,8 @@ public class KLoadGenStandalone {
       if (!Files.exists(testPlanFile) || !Files.isReadable(testPlanFile) || Files.isDirectory(testPlanFile)) {
         throw new KLoadGenException("Test plan File not Valid");
       }
+
+      StandardJMeterEngine jmeter = new StandardJMeterEngine();
 
       JMeterUtils.initLocale();
 
