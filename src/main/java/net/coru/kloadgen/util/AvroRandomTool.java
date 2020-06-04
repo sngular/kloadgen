@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
@@ -93,10 +92,10 @@ public class AvroRandomTool {
         return !fieldTypeSchema.getName().equals(fieldType);
     }
   }
-  
+
   private static GenericFixed getFixedOrGenerate( Schema schema) {
-	
-		byte[] bytes = new byte[schema.getFixedSize()];
+
+    byte[] bytes = new byte[schema.getFixedSize()];
 
 		return new GenericData.Fixed(schema, bytes);
 	}
@@ -132,7 +131,6 @@ public class AvroRandomTool {
       } else {
         value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
       }
-
     } else {
       value = new GenericData.EnumSymbol(schema, fieldType);
     }
@@ -142,6 +140,6 @@ public class AvroRandomTool {
   private Schema getRecordUnion(List<Schema> types) {
     return IterableUtils.find(types, schema -> !schema.getType().equals(NULL));
   }
-  
-	
+
+
 }
