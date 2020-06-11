@@ -174,6 +174,8 @@ public class SchemaExtractor {
             internalFields.get(0).setFieldName(innerField.name()+"[]");
             completeFieldList.add(internalFields.get(0));
           }
+        } else {
+          completeFieldList.add( new FieldValueMapping(innerField.name(), recordUnion.getType().getName()));
         }
       } else {
         completeFieldList.add( new FieldValueMapping(innerField.name(), getNotNullType(innerField.schema().getTypes())));
