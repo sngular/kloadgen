@@ -12,7 +12,7 @@
           "subject": "AvroSubject",
           "version": 1,
           "id": 72,
-          "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\": \"long\"}]}}}]}"
+          "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\":[\"null\",\"long\"]}]}}}]}"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
