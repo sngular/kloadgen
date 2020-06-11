@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.util.ListenToTest;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -15,6 +16,10 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.jmeter.engine.StandardJMeterEngine;
+import org.apache.jmeter.report.config.ConfigurationException;
+import org.apache.jmeter.report.dashboard.ReportGenerator;
+import org.apache.jmeter.reporters.ResultCollector;
+import org.apache.jmeter.reporters.Summariser;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
@@ -56,6 +61,17 @@ public class KLoadGenStandalone {
 
       HashTree testPlanTree = SaveService.loadTree(testPlanFile.toFile());
 
+      ReportGenerator reportGenerator = null;
+
+      if (line.hasOption("l")) {
+        Path resultsFile = Paths.get(line.getOptionValue("l"));
+        if (Files.isDirectory(resultsFile)) {
+          throw new KLoadGenException("Folders are not allow in this Option");
+        }
+
+         reportGenerator = createCollector(testPlanTree, resultsFile);
+      }
+      testPlanTree.add(testPlanTree.getArray()[0], new ListenToTest(reportGenerator));
       jmeter.configure(testPlanTree);
       jmeter.run();
 
@@ -63,7 +79,7 @@ public class KLoadGenStandalone {
       log.log(Level.SEVERE, "Parsing failed.  Reason: ", ex);
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("kloadgen", options);
-    } catch (KLoadGenException ex) {
+    } catch (KLoadGenException | ConfigurationException ex) {
       log.log(Level.SEVERE, "Wrong parameters.  Reason: ", ex);
       HelpFormatter formatter = new HelpFormatter();
       formatter.printHelp("kloadgen", options);
@@ -73,11 +89,26 @@ public class KLoadGenStandalone {
 
   }
 
+  private static ReportGenerator createCollector(HashTree testPlanTree, Path resultsFile) throws ConfigurationException {
+    Summariser summariser = null;
+    String summariserName = JMeterUtils.getPropDefault("summariser.name", "KLoagGenSummariser");//$NON-NLS-1$
+    if (summariserName.length() > 0) {
+      log.info(String.format("Creating summariser <%s>", summariserName));
+      summariser = new Summariser(summariserName);
+    }
+    ResultCollector resultCollector;
+    resultCollector = new ResultCollector(summariser);
+    resultCollector.setFilename(resultsFile.toAbsolutePath().toString());
+    testPlanTree.add(testPlanTree.getArray()[0], resultCollector);
+    return new ReportGenerator(resultsFile.toAbsolutePath().toString(), resultCollector);
+  }
+
   private static Options createCLIOptions() {
     Options options = new Options();
     options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
     options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
     options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
+    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("File where logs will be dump").required().build());
     return options;
   }
 }
