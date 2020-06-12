@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
@@ -48,7 +47,7 @@ public class AvroRandomTool {
     Object value = RandomTool.generateRandom(fieldType, valueLength, parameterList);
 
     if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(fieldType, field.schema());
+      value = getEnumOrGenerate(fieldType, field.schema(),parameterList);
     } else if (UNION == field.schema().getType()) {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if ("null".equalsIgnoreCase(value.toString())) {
@@ -56,7 +55,7 @@ public class AvroRandomTool {
       } else if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
         value = RandomTool.castValue(value, field.schema().getType().getName());
       } else if (ENUM == safeSchema.getType()) {
-        value = getEnumOrGenerate(fieldType, safeSchema);
+        value = getEnumOrGenerate(fieldType, safeSchema,parameterList);
       }
     } else if ("seq".equalsIgnoreCase(value.toString())) {
       value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
@@ -93,10 +92,10 @@ public class AvroRandomTool {
         return !fieldTypeSchema.getName().equals(fieldType);
     }
   }
-  
+
   private static GenericFixed getFixedOrGenerate( Schema schema) {
-	
-		byte[] bytes = new byte[schema.getFixedSize()];
+
+    byte[] bytes = new byte[schema.getFixedSize()];
 
 		return new GenericData.Fixed(schema, bytes);
 	}
@@ -123,11 +122,15 @@ public class AvroRandomTool {
     }
   }
 
-  private static Object getEnumOrGenerate(String fieldType, Schema schema) {
+  private static Object getEnumOrGenerate(String fieldType, Schema schema,List<String> parameterList) {
     Object value;
     if ("ENUM".equalsIgnoreCase(fieldType)) {
-      List<String> enumValueList = schema.getEnumSymbols();
-      value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
+      if(parameterList.isEmpty()) {
+        List<String> enumValueList = schema.getEnumSymbols();
+        value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
+      } else {
+        value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
+      }
     } else {
       value = new GenericData.EnumSymbol(schema, fieldType);
     }
@@ -137,6 +140,6 @@ public class AvroRandomTool {
   private Schema getRecordUnion(List<Schema> types) {
     return IterableUtils.find(types, schema -> !schema.getType().equals(NULL));
   }
-  
-	
+
+
 }

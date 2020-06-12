@@ -40,7 +40,8 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractor {
 
-  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING);
+  private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING,
+      Type.LONG, Type.BYTES, Type.FIXED);
 
   public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
     Map<String, String> originals = new HashMap<>();
@@ -173,6 +174,8 @@ public class SchemaExtractor {
             internalFields.get(0).setFieldName(innerField.name()+"[]");
             completeFieldList.add(internalFields.get(0));
           }
+        } else {
+          completeFieldList.add( new FieldValueMapping(innerField.name(), recordUnion.getType().getName()));
         }
       } else {
         completeFieldList.add( new FieldValueMapping(innerField.name(), getNotNullType(innerField.schema().getTypes())));
@@ -200,7 +203,7 @@ public class SchemaExtractor {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || Type.ARRAY == schema.getType() || Type.MAP == schema.getType()) {
+      if (RECORD == schema.getType() || Type.ARRAY == schema.getType() || Type.MAP == schema.getType() || typesSet.contains(schema.getType())) {
         isRecord = schema;
       }
     }

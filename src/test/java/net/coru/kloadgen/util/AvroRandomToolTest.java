@@ -39,13 +39,27 @@ class AvroRandomToolTest {
             new Field("name", SchemaBuilder.builder().stringType()), UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
         Arguments.of("boolean", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE),
         Arguments.of("boolean", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().stringType()), "true"),
-        Arguments.of("string", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE));
+        Arguments
+            .of("string", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE));
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
     assertThat(new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expected);
+  }
+
+  private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
+    return Stream.of(
+        Arguments.of("enum", 1, Collections.singletonList("RED"),
+            new Field("name", SchemaBuilder.builder().enumeration("ENUM1").symbols("RED", "BLUE", "GREEN")), "RED"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateRandomValueForEnums")
+  void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
+    assertThat(new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field))
+        .hasFieldOrPropertyWithValue("symbol", expected);
   }
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
