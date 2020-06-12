@@ -250,7 +250,7 @@
           <plugin>
             <artifactId>maven-shade-plugin</artifactId>
             <configuration>
-              <finalName>${project.artifactId}-${lane}</finalName>
+              <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
             </configuration>
             <executions>
               <execution>
@@ -357,11 +357,6 @@
           </exclusions>
           <groupId>org.apache.jmeter</groupId>
           <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-          <artifactId>slf4j-jdk14</artifactId>
-          <groupId>org.slf4j</groupId>
-          <version>${slf4j-api.version}</version>
         </dependency>
       </dependencies>
     </profile>

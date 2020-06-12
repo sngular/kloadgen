@@ -1,5 +1,6 @@
 package net.coru.kloadgen.config.avroserialized;
 
+import java.beans.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
