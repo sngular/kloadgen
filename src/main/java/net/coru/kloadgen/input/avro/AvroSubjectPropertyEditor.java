@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
@@ -70,6 +71,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
     panel.setLayout(new BorderLayout());
     panel.add(subjectNameComboBox);
     panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
+    AutoCompletion.enable(subjectNameComboBox);
     this.loadClassBtn.addActionListener(this);
   }
 
