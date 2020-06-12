@@ -14,19 +14,11 @@ public class ListenToTest implements TestStateListener, Remoteable {
 
   private final ReportGenerator reportGenerator;
 
-  private boolean remoteStop;
-
-  /**
-   * Listener for remote test
-   * @param reportGenerator {@link ReportGenerator}
-   */
   public ListenToTest( ReportGenerator reportGenerator) {
-    this.remoteStop = remoteStop;
     this.reportGenerator = reportGenerator;
   }
 
   @Override
-  // N.B. this is called by a daemon RMI thread from the remote host
   public void testEnded(String host) {
     final long now=System.currentTimeMillis();
     log.info("Finished remote host: {} ({})", host, now);
@@ -47,7 +39,7 @@ public class ListenToTest implements TestStateListener, Remoteable {
   public void testStarted() {
     if (log.isInfoEnabled()) {
       final long now = System.currentTimeMillis();
-      log.info("{} ({})", JMeterUtils.getResString("running_test"), now);//$NON-NLS-1$
+      log.info("{} ({})", JMeterUtils.getResString("running_test"), now);
     }
   }
 
@@ -68,27 +60,19 @@ public class ListenToTest implements TestStateListener, Remoteable {
     log.info("... end of run");
   }
 
-  /**
-   * Runs daemon thread which waits a short while;
-   * if JVM does not exit, lists remaining non-daemon threads on stdout.
-   */
   private void checkForRemainingThreads() {
-    // This cannot be a JMeter class variable, because properties
-    // are not initialised until later.
     final int pauseToCheckForRemainingThreads =
-        JMeterUtils.getPropDefault("jmeter.exit.check.pause", 2000); // $NON-NLS-1$
+        JMeterUtils.getPropDefault("jmeter.exit.check.pause", 2000);
 
     if (pauseToCheckForRemainingThreads > 0) {
       Thread daemon = new Thread(() -> {
         try {
-          TimeUnit.MILLISECONDS.sleep(pauseToCheckForRemainingThreads); // Allow enough time for JVM to exit
+          TimeUnit.MILLISECONDS.sleep(pauseToCheckForRemainingThreads);
         } catch (InterruptedException ignored) {
           Thread.currentThread().interrupt();
         }
-        // This is a daemon thread, which should only reach here if there are other
-        // non-daemon threads still active
-        log.warn("The JVM should have exited but did not.");//NOSONAR
-        log.warn("The following non-daemon threads are still running (DestroyJavaVM is OK):");//NOSONAR
+        log.warn("The JVM should have exited but did not.");
+        log.warn("The following non-daemon threads are still running (DestroyJavaVM is OK):");
         JOrphanUtils.displayThreads(false);
       });
       daemon.setDaemon(true);
