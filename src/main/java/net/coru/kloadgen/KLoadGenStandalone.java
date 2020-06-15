@@ -17,6 +17,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.report.config.ConfigurationException;
+import org.apache.jmeter.report.dashboard.GenerationException;
 import org.apache.jmeter.report.dashboard.ReportGenerator;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.reporters.Summariser;
@@ -25,6 +26,8 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 
 public class KLoadGenStandalone {
+
+  public static final String JMETER_REPORT_OUTPUT_DIR_PROPERTY = "jmeter.reportgenerator.outputdir";
 
   private static final Logger log = Logger.getLogger("KLoadGenStandalone");
 
@@ -53,6 +56,15 @@ public class KLoadGenStandalone {
       Path testPlanFile = Paths.get(line.getOptionValue("t"));
       if (!Files.exists(testPlanFile) || !Files.isReadable(testPlanFile) || Files.isDirectory(testPlanFile)) {
         throw new KLoadGenException("Test plan File not Valid");
+      }
+
+      if (line.hasOption("r")) {
+        Path resultsFile = Paths.get(line.getOptionValue("r"));
+        if (!Files.isDirectory(resultsFile)) {
+          throw new KLoadGenException("Path is required to be a folder");
+        }
+
+        JMeterUtils.setProperty(JMETER_REPORT_OUTPUT_DIR_PROPERTY, resultsFile.toAbsolutePath().toString());
       }
 
       StandardJMeterEngine jmeter = new StandardJMeterEngine();
@@ -108,6 +120,7 @@ public class KLoadGenStandalone {
     options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
     options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
     options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
+    options.addOption(Option.builder("r").longOpt("reportOutput").hasArg().desc("Report Output Folder").build());
     options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("File where logs will be dump").required().build());
     return options;
   }
