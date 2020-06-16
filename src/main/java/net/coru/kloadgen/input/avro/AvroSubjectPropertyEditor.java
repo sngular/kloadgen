@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
@@ -67,7 +69,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private void init() {
     subjectNameComboBox = new JComboBox<>();
-    subjectNameComboBox.addFocusListener(new ComboFiller());
+    panel.setFocusable(true);
     panel.setLayout(new BorderLayout());
     panel.add(subjectNameComboBox);
     panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
@@ -111,7 +113,6 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @SuppressWarnings("unchecked")
   protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
-
 
     if (!(tableEditorValue instanceof ArrayList<?>)) {
       log.error("Table Editor is not array list");
@@ -183,6 +184,13 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void setValue(Object value) {
+    String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
+    if (Objects.nonNull(subjects)) {
+      String[] subjectsList = subjects.split(",");
+      if (subjectNameComboBox.getModel().getSize() != subjectsList.length) {
+        subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjectsList));
+      }
+    }
     if (value != null) {
       if (this.subjectNameComboBox.getModel().getSize() == 0) {
         this.subjectNameComboBox.addItem((String) value);
@@ -204,17 +212,4 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
     return true;
   }
 
-  class ComboFiller implements FocusListener {
-
-    @Override
-    public void focusGained(FocusEvent e) {
-      String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
-      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-       // Override but not used. Implementation not needed.
-    }
-  }
 }
