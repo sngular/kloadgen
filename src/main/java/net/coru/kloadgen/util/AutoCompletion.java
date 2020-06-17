@@ -1,19 +1,16 @@
 package net.coru.kloadgen.util;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -26,9 +23,9 @@ import net.coru.kloadgen.exception.KLoadGenException;
  */
 public class AutoCompletion extends PlainDocument {
 
-  private JComboBox comboBox;
+  private final JComboBox<String> comboBox;
 
-  private ComboBoxModel model;
+  private transient ComboBoxModel<String> model;
 
   private JTextComponent editor;
 
@@ -42,11 +39,11 @@ public class AutoCompletion extends PlainDocument {
 
   private boolean hitBackspaceOnSelection;
 
-  private KeyListener editorKeyListener;
+  private final transient KeyListener editorKeyListener;
 
-  private FocusListener editorFocusListener;
+  private final transient FocusListener editorFocusListener;
 
-  public AutoCompletion(final JComboBox comboBox) {
+  public AutoCompletion(final JComboBox<String> comboBox) {
     this.comboBox = comboBox;
     model = comboBox.getModel();
     comboBox.addActionListener(e -> {
@@ -108,7 +105,7 @@ public class AutoCompletion extends PlainDocument {
     highlightCompletedText(0);
   }
 
-  public static void enable(JComboBox comboBox) {
+  public static void enable(JComboBox<String> comboBox) {
     // has to be editable
     comboBox.setEditable(true);
     // change the editor's document
@@ -224,23 +221,19 @@ public class AutoCompletion extends PlainDocument {
 
   private static void createAndShowGUI() {
     // the combo box (add/modify items if you like to)
-    final JComboBox comboBox = new JComboBox(new Object[]{"Ester", "Jordi", "Jordina", "Jorge", "Sergi"});
+    final JComboBox<String> comboBox = new JComboBox<>(new String[]{"Ester", "Jordi", "Jordina", "Jorge", "Sergi"});
     enable(comboBox);
 
     // create and show a window containing the combo box
     final JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(3);
+    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.getContentPane().add(comboBox);
     frame.pack();
     frame.setVisible(true);
   }
 
   public static void main(String[] args) {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        createAndShowGUI();
-      }
-    });
+    javax.swing.SwingUtilities.invokeLater(() -> createAndShowGUI());
   }
 }
 
