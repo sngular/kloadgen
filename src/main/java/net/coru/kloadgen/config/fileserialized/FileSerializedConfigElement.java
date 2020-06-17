@@ -31,6 +31,8 @@ public class FileSerializedConfigElement  extends ConfigTestElement implements T
 
   private BaseLoadGenerator generator;
 
+  private String avroSchema;
+
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 

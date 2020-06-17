@@ -14,6 +14,8 @@ public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String SCHEMA_PROPERTIES = "schemaProperties";
 
+  private static final String AVRO_SCHEMA = "avroSchema";
+
   public FileSerializedConfigElementBeanInfo() {
 
     super(FileSerializedConfigElement.class);
