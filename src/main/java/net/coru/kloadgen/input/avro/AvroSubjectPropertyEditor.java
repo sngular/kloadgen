@@ -69,7 +69,6 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private void init() {
     subjectNameComboBox = new JComboBox<>();
-    panel.setFocusable(true);
     panel.setLayout(new BorderLayout());
     panel.add(subjectNameComboBox);
     panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
