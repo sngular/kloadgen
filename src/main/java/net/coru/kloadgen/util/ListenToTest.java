@@ -26,7 +26,7 @@ public class ListenToTest implements TestStateListener, Remoteable {
 
   @Override
   public void testEnded() {
-    endTest(false);
+    endTest();
   }
 
   @Override
@@ -43,7 +43,7 @@ public class ListenToTest implements TestStateListener, Remoteable {
     }
   }
 
-  private void endTest(boolean isDistributed) {
+  private void endTest() {
     long now = System.currentTimeMillis();
     log.info("Tidying up ...    @ "+new Date(now)+" ("+now+")");
 
