@@ -4,6 +4,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>kloadgen</artifactId>
 
+  <groupId>net.coru</groupId>
+  <version>1.6.0</version>
+  <modelVersion>4.0.0</modelVersion>
+
   <build>
     <plugins>
       <plugin>
@@ -88,7 +92,6 @@
       <groupId>org.apache.kafka</groupId>
       <version>${kafka.version}</version>
     </dependency>
-
     <dependency>
       <artifactId>guava</artifactId>
       <groupId>com.google.guava</groupId>
@@ -233,8 +236,6 @@
       <version>${junit-jupiter-api.version}</version>
     </dependency>
   </dependencies>
-  <groupId>net.coru</groupId>
-  <modelVersion>4.0.0</modelVersion>
 
   <profiles>
     <profile>
@@ -459,5 +460,4 @@
       <url>http://packages.confluent.io/maven/</url>
     </repository>
   </repositories>
-  <version>1.5.1</version>
 </project>
