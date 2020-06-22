@@ -251,6 +251,13 @@
             <artifactId>maven-shade-plugin</artifactId>
             <configuration>
               <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
+              <filters>
+                <filter>
+                  <excludes>
+                    <exclude>org/apache/jmeter/jmeter.properties</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
             <executions>
               <execution>
@@ -308,6 +315,11 @@
         <lane>standalone</lane>
       </properties>
       <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+          </resource>
+        </resources>
         <plugins>
           <plugin>
             <artifactId>maven-shade-plugin</artifactId>
@@ -351,12 +363,64 @@
               <groupId>org.apache.jmeter</groupId>
             </exclusion>
             <exclusion>
-              <artifactId>jcl-over-slf4j</artifactId>
-              <groupId>org.slf4j</groupId>
+              <artifactId>log4j-slf4j-impl</artifactId>
+              <groupId>org.apache.logging.log4j</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>log4j-api</artifactId>
+              <groupId>org.apache.logging.log4j</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>log4j-core</artifactId>
+              <groupId>org.apache.logging.log4j</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>log4j-1.2-api</artifactId>
+              <groupId>org.apache.logging.log4j</groupId>
             </exclusion>
           </exclusions>
           <groupId>org.apache.jmeter</groupId>
           <version>${jmeter.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jmeter</groupId>
+          <artifactId>ApacheJMeter_components</artifactId>
+          <version>${jmeter.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jmeter</groupId>
+          <artifactId>ApacheJMeter_http</artifactId>
+          <version>${jmeter.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jmeter</groupId>
+          <artifactId>ApacheJMeter_config</artifactId>
+          <version>${jmeter.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jmeter</groupId>
+          <artifactId>ApacheJMeter_functions</artifactId>
+          <version>${jmeter.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jmeter</groupId>
+          <artifactId>ApacheJMeter_mail</artifactId>
+          <version>${jmeter.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jmeter</groupId>
+          <artifactId>ApacheJMeter_jdbc</artifactId>
+          <version>${jmeter.version}</version>
+        </dependency>
+        <dependency>
+          <artifactId>slf4j-jdk14</artifactId>
+          <groupId>org.slf4j</groupId>
+          <version>${slf4j-api.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>${slf4j-api.version}</version>
         </dependency>
       </dependencies>
     </profile>
@@ -374,7 +438,7 @@
     <jaxb-api.version>2.3.0</jaxb-api.version>
     <jdk.version>1.8</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.2</jmeter.version>
+    <jmeter.version>5.2.1</jmeter.version>
     <json-path.version>2.4.0</json-path.version>
     <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>5.3.1</kafka-schema-registry-client.version>

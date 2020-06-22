@@ -43,7 +43,6 @@ public class KLoadGenStandalone {
       }
       JMeterUtils.setJMeterHome(jMeterPropsFile.toAbsolutePath().toString());
       JMeterUtils.loadJMeterProperties(jMeterPropsFile.toAbsolutePath().toString() + "/bin/jmeter.properties");
-
       if (line.hasOption("o")) {
         Path optionalPropsFile = Paths.get(line.getOptionValue("o"));
         if (!Files.exists(optionalPropsFile) || !Files.isReadable(optionalPropsFile) || Files.isDirectory(optionalPropsFile)) {
@@ -116,11 +115,11 @@ public class KLoadGenStandalone {
 
   private static Options createCLIOptions() {
     Options options = new Options();
-    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
+    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").build());
     options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
     options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
     options.addOption(Option.builder("r").longOpt("reportOutput").hasArg().desc("Report Output Folder").build());
-    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("File where logs will be dump").required().build());
+    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("Jtl File where logs will be dump").required().build());
     return options;
   }
 }
