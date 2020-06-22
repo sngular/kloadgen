@@ -166,11 +166,11 @@ We will see 4 columns where we will configure the Random Generator system.
   * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
   * **Field Type** : Field type, like String, Int, Double, Map,Array **Note** : if the field is an array of basic types it will be show as string-array, int-array,...
   * **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
-  * **Field Values List** : Field possibles values which will be used by the Random Tool to generate values 
-      
+  * **Field Values List** : Field possibles values which will be used by the Random Tool to generate values
+
       **Note**In "Field Type" if the field type is an array or a map you can define a specific number of random values(metadata.extensions.flows[].correlation[2]).
               In "Field Values List" if the field type is an array or a map you can define a specific list of values([1,2,3,4,5] or [ key1:value1, key2:value2, key3:value3]).
-               
+
 
 ![File Generator Table](/Kafka_file_load_generator_config_success.png)
 
@@ -241,6 +241,41 @@ Values will follow the same rules and the message body, if specify a type (basic
 ### Example Test Plan
 
 [Here](/Example-Test-Plan.jmx) you can find an example of a JMeter Test Plan using the elements defined in this plugin. This test plan will only inject messages in a Kafka Cluster. **Before** execute it you should add your Schema Registry to retrieve the Schema in order to extract the Entity structure. In a future we will include support to read AVRO files.
+
+## StandAlone execution
+
+This plugin also support an StandAlone execution. Only requires a JMeter installation in order to read some configuration files:
+* jmeter.properties
+* saveservice.properties
+* upgrade.properties
+
+### Building
+
+Build process required specify the standalone profile
+
+```bash
+$ mvn -P standalone clean install
+```
+### Execution
+
+Execution in standalone mode is quite easy :
+
+```bash
+$ java -jar target/kloadgen-standalone-1.5.1.jar  -h ../JMeter/apache-jmeter-5.2\ 2 -l ../logs/results.log -t ../Example-Test-Plan.jmx -r ../logs
+```
+
+### Configuration Options
+
+There are some mandatory configuration options:
+
+- "h" or "jmeterHome" : Folder where reside a JMeter installation
+- "t" or "testPlan" : Test plan file
+
+And some optional ones who will let us configura the JMeter Engine and the test itself
+
+- "o" or "optionalPros" : Optional properties file to pass to JMeter
+- "r" or "reportOutput" : Report Output Folder
+- "l" or "logFileName" : Jtl File where logs will be dump
 
 ## Special Thanks
 

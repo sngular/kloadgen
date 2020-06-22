@@ -79,9 +79,9 @@ public class KLoadGenStandalone {
           throw new KLoadGenException("Folders are not allow in this Option");
         }
 
-         reportGenerator = createCollector(testPlanTree, resultsFile);
+        reportGenerator = createCollector(testPlanTree, resultsFile);
+        testPlanTree.add(testPlanTree.getArray()[0], new ListenToTest(reportGenerator));
       }
-      testPlanTree.add(testPlanTree.getArray()[0], new ListenToTest(reportGenerator));
       jmeter.configure(testPlanTree);
       jmeter.run();
 
@@ -115,11 +115,11 @@ public class KLoadGenStandalone {
 
   private static Options createCLIOptions() {
     Options options = new Options();
-    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").build());
+    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
     options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
     options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
     options.addOption(Option.builder("r").longOpt("reportOutput").hasArg().desc("Report Output Folder").build());
-    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("Jtl File where logs will be dump").required().build());
+    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("Jtl File where logs will be dump").build());
     return options;
   }
 }
