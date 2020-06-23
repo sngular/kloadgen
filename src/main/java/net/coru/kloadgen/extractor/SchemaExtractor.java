@@ -74,11 +74,11 @@ public class SchemaExtractor {
     return attributeList;
   }
 
-  public List<FieldValueMapping> flatPropertiesList(Schema parserSchema) throws IOException, RestClientException {
+  public List<FieldValueMapping> flatPropertiesList(Schema parserSchema) {
     return processSchema(parserSchema);
   }
 
-  public Schema schemaTypesList(File schemaFile)throws IOException, RestClientException {
+  public Schema schemaTypesList(File schemaFile) {
     Schema.Parser parser = new Schema.Parser();
     String readLine = readLineByLine(schemaFile.getPath());
     Schema parserSchema = parser.parse(readLine);

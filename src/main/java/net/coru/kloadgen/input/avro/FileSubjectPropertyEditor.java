@@ -154,6 +154,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
           for (PropertyEditor propertyEditor : propertyEditors) {
             if (propertyEditor instanceof TableEditor) {
               propertyEditor.setValue(attributeList);
+            } else if (propertyEditor instanceof SchemaConverterPropertyEditor) {
+              propertyEditor.setValue(selectedSchema);
             }
           }
         } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
