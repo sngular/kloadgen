@@ -25,7 +25,6 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG_DEFAU
 import static net.coru.kloadgen.util.ProducerKeysHelper.KERBEROS_ENABLED;
 import static net.coru.kloadgen.util.ProducerKeysHelper.LINGER_MS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.RECEIVE_BUFFER_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM;
@@ -165,7 +164,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        if (null != context.getParameter(VALUE_NAME_STRATEGY)) {
+        if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
             props.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
         }
 
@@ -242,7 +241,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
-        EnrichedRecord messageVal = (EnrichedRecord) jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
+        EnrichedRecord messageVal = generator.nextMessage();
         //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
         if (Objects.nonNull(messageVal)) {

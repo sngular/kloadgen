@@ -3,7 +3,6 @@ package net.coru.kloadgen.input.avro;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 import static org.apache.avro.Schema.Type.RECORD;
 
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -102,7 +101,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         } else {
           subjectNameComboBox.addItem(parserSchema.getName());
         }
-      } catch (IOException | RestClientException e) {
+      } catch (IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
             JOptionPane.ERROR_MESSAGE);
         log.error(e.getMessage(), e);
@@ -158,7 +157,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
               propertyEditor.setValue(selectedSchema);
             }
           }
-        } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
           JOptionPane
               .showMessageDialog(panel, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
                   JOptionPane.ERROR_MESSAGE);

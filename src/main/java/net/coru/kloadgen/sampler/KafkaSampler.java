@@ -20,13 +20,15 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG_DEFAU
 import static net.coru.kloadgen.util.ProducerKeysHelper.KERBEROS_ENABLED;
 import static net.coru.kloadgen.util.ProducerKeysHelper.LINGER_MS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.RECEIVE_BUFFER_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SEND_BUFFER_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SSL_ENABLED;
+import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_KERBEROS_SERVICE_NAME;
@@ -43,6 +45,9 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.loadgen.BaseLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
+import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.StatelessRandomTool;
@@ -72,7 +77,14 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
     private boolean key_message_flag = false;
 
-    private transient StatelessRandomTool statelessRandomTool;
+    private final StatelessRandomTool statelessRandomTool;
+
+    private final BaseLoadGenerator generator;
+
+    public KafkaSampler() {
+        generator = new AvroLoadGenerator();
+        statelessRandomTool = new StatelessRandomTool();
+    }
 
     @Override
     public Arguments getDefaultParameters() {
@@ -120,8 +132,15 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        if( null != JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL)){
+        if (Objects.nonNull(JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL))) {
             props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+            generator.setUpGeneratorFromRegistry(
+                JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
+                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+        } else {
+            generator.setUpGenerator(
+                JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
+                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
         }
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {
@@ -159,8 +178,6 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         }
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
         producer = new KafkaProducer<>(props);
-        statelessRandomTool = new StatelessRandomTool();
-
     }
 
     @Override
@@ -169,7 +186,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
-        EnrichedRecord messageVal = (EnrichedRecord) jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
+        EnrichedRecord messageVal = generator.nextMessage();
         //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
@@ -199,7 +216,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
                     }
                 });
 
-                log.info("Send message to body: {}", producerRecord.value());
+                log.info("Send message with body: {}", producerRecord.value());
 
                 sampleResult.setResponseData(result.get().toString(), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(true);

@@ -51,8 +51,8 @@ class AvroLoadGeneratorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator("avroSubject", fieldValueMappingList);
-
+    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator();
+    avroLoadGenerator.setUpGeneratorFromRegistry("avroSubject", fieldValueMappingList);
     Object message = avroLoadGenerator.nextMessage();
     assertThat(message).isNotNull();
     assertThat(message).isInstanceOf(EnrichedRecord.class);

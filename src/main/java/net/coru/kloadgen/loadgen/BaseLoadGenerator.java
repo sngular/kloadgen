@@ -2,6 +2,7 @@ package net.coru.kloadgen.loadgen;
 
 import java.util.List;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.serializer.EnrichedRecord;
 
 public interface BaseLoadGenerator {
 
@@ -9,5 +10,5 @@ public interface BaseLoadGenerator {
 
     void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings);
 
-    Object nextMessage();
+    EnrichedRecord nextMessage();
 }

@@ -11,6 +11,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.AvroSchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.avro.SchemaBuilder;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -50,8 +52,8 @@ class AvroSchemaProcessorTest {
   @Test
   public void textAvroSchemaProcessor(@Wiremock WireMockServer server) throws IOException, RestClientException, KLoadGenException {
     List<FieldValueMapping> fieldValueMappingList = asList(
-        new FieldValueMapping("Name", "string", 0, "Jose"),
-        new FieldValueMapping("Age", "int", 0, "43"));
+        new FieldValueMapping("name", "string", 0, "Jose"),
+        new FieldValueMapping("age", "int", 0, "43"));
 
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
@@ -59,8 +61,9 @@ class AvroSchemaProcessorTest {
     JMeterContextService.getContext().getProperties().put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
     JMeterContextService.getContext().getProperties().put(USER_INFO_CONFIG, "foo:foo");
 
-    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor("avroSubject", fieldValueMappingList);
-
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder.builder().record("testing").fields().requiredString("name").optionalInt("age").endRecord(),
+        new SchemaMetadata(1, 1, ""), fieldValueMappingList);
     EnrichedRecord message = avroSchemaProcessor.next();
     assertThat(message).isNotNull();
     assertThat(message).isInstanceOf(EnrichedRecord.class);

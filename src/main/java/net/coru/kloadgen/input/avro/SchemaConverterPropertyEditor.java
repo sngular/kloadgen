@@ -1,12 +1,13 @@
 package net.coru.kloadgen.input.avro;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.extractor.SchemaExtractor;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 
@@ -15,7 +16,7 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   private PropertyDescriptor propertyDescriptor;
 
-  private final SchemaExtractor schemaExtractor = new SchemaExtractor();
+  private final JPanel panel = new JPanel();
 
   private String schemaAsString;
 
@@ -32,12 +33,19 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
     this.propertyDescriptor = propertyDescriptor;
   }
 
+  private void init() { }
+
   @Override
   public void actionPerformed(ActionEvent event) {
   }
 
   @Override
   public void clearGui() {
+  }
+
+  @Override
+  public Component getCustomEditor() {
+    return this.panel;
   }
 
   @Override

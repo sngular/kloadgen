@@ -78,24 +78,19 @@ public class SchemaExtractor {
     return processSchema(parserSchema);
   }
 
-  public Schema schemaTypesList(File schemaFile) {
+  public Schema schemaTypesList(File schemaFile) throws IOException {
     Schema.Parser parser = new Schema.Parser();
     String readLine = readLineByLine(schemaFile.getPath());
     Schema parserSchema = parser.parse(readLine);
     return parserSchema;
   }
 
-  private static String readLineByLine(String filePath)
-  {
+  private static String readLineByLine(String filePath) throws IOException {
     StringBuilder contentBuilder = new StringBuilder();
 
     try (Stream<String> stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8))
     {
       stream.forEach(s -> contentBuilder.append(s).append("\n"));
-    }
-    catch (IOException e)
-    {
-      e.printStackTrace();
     }
 
     return contentBuilder.toString();
