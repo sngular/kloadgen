@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.HeaderMapping;
@@ -78,6 +79,7 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 
@@ -223,7 +225,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         EnrichedRecord messageVal = (EnrichedRecord) jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
         //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
-
         if (Objects.nonNull(messageVal)) {
             ProducerRecord<String, Object> producerRecord;
             try {
@@ -243,7 +244,9 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                                 .generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList())));
                 }
 
-                producer.send(producerRecord, (metadata, e) -> {
+                sampleResult.setSamplerData(producerRecord.value().toString());
+
+                Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
                     if (e != null) {
                         log.error("Send failed for record {}", producerRecord, e);
                         throw new KLoadGenException("Failed to sent message due ", e);
@@ -251,8 +254,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 });
 
                 log.info("Send message to body: {}", producerRecord.value());
-
-                sampleResult.setResponseData(messageVal.toString(), StandardCharsets.UTF_8.name());
+                sampleResult.setResponseData(result.get().toString(), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(true);
                 sampleResult.sampleEnd();
 

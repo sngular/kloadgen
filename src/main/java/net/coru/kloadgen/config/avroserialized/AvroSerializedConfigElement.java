@@ -1,5 +1,8 @@
 package net.coru.kloadgen.config.avroserialized;
 
+import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +18,6 @@ import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
-import java.util.List;
-
-import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
-
 @Getter
 @Setter
 @Slf4j
@@ -30,7 +29,7 @@ public class AvroSerializedConfigElement extends ConfigTestElement implements Te
 
   private List<FieldValueMapping> schemaProperties;
 
-  private BaseLoadGenerator generator;
+  private transient BaseLoadGenerator generator;
 
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {

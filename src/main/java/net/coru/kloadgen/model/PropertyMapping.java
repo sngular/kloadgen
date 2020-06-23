@@ -8,8 +8,8 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 
 @Builder
 @ToString
-@EqualsAndHashCode
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class PropertyMapping extends AbstractTestElement {
 
   public static final String PROPERTY_NAME = "propertyName";
