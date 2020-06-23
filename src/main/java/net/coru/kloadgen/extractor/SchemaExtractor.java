@@ -1,4 +1,4 @@
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.extractor;
 
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;

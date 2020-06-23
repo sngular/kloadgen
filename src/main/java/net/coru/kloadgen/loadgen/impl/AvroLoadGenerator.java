@@ -3,14 +3,14 @@ package net.coru.kloadgen.loadgen.impl;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
-import net.coru.kloadgen.input.AvroSchemaProcessor;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.processor.AvroSchemaProcessor;
 
 @Slf4j
 public class AvroLoadGenerator implements BaseLoadGenerator {
 
-  private AvroSchemaProcessor avroSchemaProcessor;
+  private final AvroSchemaProcessor avroSchemaProcessor;
 
   public AvroLoadGenerator(String avroSchemaName, List<FieldValueMapping> fieldExprMappings) throws
       KLoadGenException {

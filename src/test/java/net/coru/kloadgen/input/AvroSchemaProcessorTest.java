@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.processor.AvroSchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;

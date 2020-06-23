@@ -3,6 +3,7 @@ package net.coru.kloadgen.config.fileserialized;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.input.avro.FileSubjectPropertyEditor;
+import net.coru.kloadgen.input.avro.SchemaConverterPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
@@ -21,7 +22,7 @@ public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     super(FileSerializedConfigElement.class);
 
     createPropertyGroup("file_serialized_load_generator", new String[]{
-        AVRO_SUBJECT, SCHEMA_PROPERTIES
+        AVRO_SUBJECT, SCHEMA_PROPERTIES, AVRO_SCHEMA
     });
 
     PropertyDescriptor subjectNameProps = property(AVRO_SUBJECT);
@@ -29,6 +30,12 @@ public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "<avro subject>");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+    PropertyDescriptor avroSchemaProps = property(AVRO_SCHEMA);
+    avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
+    avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    avroSchemaProps.setValue(DEFAULT, "");
+    avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     TypeEditor tableEditor = TypeEditor.TableEditor;
     PropertyDescriptor tableProperties = property(SCHEMA_PROPERTIES, tableEditor);
