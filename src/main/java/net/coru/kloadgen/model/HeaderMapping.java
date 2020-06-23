@@ -8,8 +8,8 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 
 @Builder
 @ToString
-@EqualsAndHashCode
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class HeaderMapping extends AbstractTestElement {
 
     public static final String HEADER_NAME = "headerName";
