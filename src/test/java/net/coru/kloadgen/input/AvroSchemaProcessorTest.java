@@ -14,6 +14,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -70,8 +71,8 @@ class AvroSchemaProcessorTest {
 
   @Test
   public void textAvroSchemaProcessorArrayMap(@Wiremock WireMockServer server) throws IOException, RestClientException, KLoadGenException {
-    List<FieldValueMapping> fieldValueMappingList = asList(
-        new FieldValueMapping("Name[2]", "string-map", 0, "n:1"));
+    List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
+        new FieldValueMapping("Name[2]", "string-map-array", 0, "n:1"));
 
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);

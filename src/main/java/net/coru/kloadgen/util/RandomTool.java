@@ -1,7 +1,8 @@
 package net.coru.kloadgen.util;
 
-import java.nio.ByteBuffer;
+import static org.codehaus.groovy.runtime.InvokerHelper.asList;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.AbstractMap.SimpleEntry;
@@ -26,31 +27,38 @@ public final class RandomTool {
     Object value;
     switch (fieldType) {
       case "int-map":
-        value = generateIntMap(valueLength, fieldValuesList,mapSize);
+        value = generateIntMap(valueLength, fieldValuesList, mapSize);
         break;
       case "long-map":
-        value = generateLongMap(valueLength, fieldValuesList,mapSize);
+        value = generateLongMap(valueLength, fieldValuesList, mapSize);
         break;
       case "double-map":
-        value = generateDoubleMap(valueLength, fieldValuesList,mapSize);
+        value = generateDoubleMap(valueLength, fieldValuesList, mapSize);
         break;
       case "short-map":
-        value = generateShortMap(valueLength, fieldValuesList,mapSize);
+        value = generateShortMap(valueLength, fieldValuesList, mapSize);
         break;
       case "string-map":
-        value = generateStringMap(valueLength, fieldValuesList,mapSize);
+        value = generateStringMap(valueLength, fieldValuesList, mapSize);
         break;
       case "uuid-map":
-        value = generateUuidMap(fieldValuesList,mapSize);
+        value = generateUuidMap(fieldValuesList, mapSize);
         break;
       case "boolean-map":
-        value = generateBooleanMap(fieldValuesList,mapSize);
+        value = generateBooleanMap(fieldValuesList, mapSize);
         break;
       default:
         value = fieldType;
         break;
     }
+    if (fieldType.endsWith("array")) {
+      value = generateMapArray(fieldType, valueLength, fieldValuesList, mapSize);
+    }
     return value;
+  }
+
+  protected static Object generateMapArray(String type, Integer valueLength, List<String> fieldValuesList, Integer mapSize) {
+    return asList(generateRandomMap(type.substring(0, type.length() - 6), valueLength, fieldValuesList, mapSize));
   }
 
   protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
