@@ -9,7 +9,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "subject": "AvroSubject",
+          "subject": "users",
           "version": 1,
           "id": 72,
           "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\":[\"null\",\"long\"]}]}}}]}"
@@ -32,6 +32,25 @@
           "version": 1,
           "id": 71,
           "schema":"{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority":10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/subjects/arrayMap/versions/latest"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "subject": "arraymap",
+          "version": 1,
+          "id": 73,
+          "schema":"{\"type\": \"record\",\"name\": \"test\",\"fields\": [  {    \"name\": \"Name\",    \"type\": {      \"type\": \"array\",      \"items\": {        \"type\": \"map\",        \"values\": \"string\"      }    }  }]\n}"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -76,12 +95,29 @@
       "priority":10,
       "request": {
         "method": "GET",
+        "urlPattern": "/schemas/ids/73"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody":
+        {
+          "schema":"{\"type\": \"record\",\"name\": \"test\",\"fields\": [  {    \"name\": \"Name\",    \"type\": {      \"type\": \"array\",      \"items\": {        \"type\": \"map\",        \"values\": \"string\"      }    }  }]\n}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority":10,
+      "request": {
+        "method": "GET",
         "urlPattern": "/subjects"
       },
       "response": {
         "status": 200,
         "jsonBody":
-         ["avrosubject","users"]
+         ["avrosubject","users","arrayMap"]
         ,
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"

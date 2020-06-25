@@ -185,8 +185,8 @@ public class SchemaExtractor {
     }
   }
 
-  private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String s) {
-    internalFields.get(0).setFieldName(s);
+  private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
+    internalFields.get(0).setFieldName(fieldName);
     completeFieldList.add(internalFields.get(0));
   }
 

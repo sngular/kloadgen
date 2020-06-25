@@ -68,4 +68,23 @@ class AvroSchemaProcessorTest {
 
   }
 
+  @Test
+  public void textAvroSchemaProcessorArrayMap(@Wiremock WireMockServer server) throws IOException, RestClientException, KLoadGenException {
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        new FieldValueMapping("Name[2]", "string-map", 0, "n:1"));
+
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+    JMeterContextService.getContext().getProperties().put(USER_INFO_CONFIG, "foo:foo");
+
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor("arrayMap", fieldValueMappingList);
+
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message).isNotNull();
+    assertThat(message).isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+
+  }
 }

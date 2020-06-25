@@ -29,7 +29,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 })
 class SchemaExtractorTest {
 
-  private SchemaExtractor schemaExtractor = new SchemaExtractor();
+  private final SchemaExtractor schemaExtractor = new SchemaExtractor();
 
   @BeforeEach
   public void setUp() {
@@ -72,6 +72,22 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList).containsExactlyInAnyOrder(
         new FieldValueMapping("Users[].id", "long"),
         new FieldValueMapping("Users[].name", "string")
+    );
+  }
+
+  @Test
+  public void testFlatPropertiesListMapArray(@Wiremock WireMockServer server) throws IOException, RestClientException {
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(
+        "arrayMap"
+    );
+
+    assertThat(fieldValueMappingList).hasSize(1);
+    assertThat(fieldValueMappingList).containsExactlyInAnyOrder(
+        new FieldValueMapping("Name[]", "string-map")
     );
   }
 }
