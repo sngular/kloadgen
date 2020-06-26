@@ -99,15 +99,16 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
+            fieldExpMappingsQueue.poll();
             entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getFieldValuesList(), schema.getField(fieldValueMapping.getFieldName())));
+                fieldValueMapping.getFieldValuesList()));
           } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
-            entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
+            fieldExpMappingsQueue.poll();
+            entity.put(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getFieldValuesList(), schema.getField(fieldValueMapping.getFieldName())));
-            fieldExpMappingsQueue.remove();
-            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+                fieldValueMapping.getValueLength(),
+                fieldValueMapping.getFieldValuesList()));
           } else {
             entity.put(fieldName,
                 createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(),
@@ -146,12 +147,19 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
-        if (fieldValueMapping.getFieldType().contains("map")){
+        if (fieldValueMapping.getFieldType().endsWith("map")){
           fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
               calculateSize(fieldValueMapping.getFieldName(), fieldName),
-              fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName)));
+              fieldValueMapping.getFieldValuesList()));
+        } else if (fieldValueMapping.getFieldType().endsWith("map-array")){
+          fieldExpMappingsQueue.poll();
+          String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
+          subEntity.put(fieldNameSubEntity, createObjectMapArray(fieldValueMapping.getFieldType(),
+              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+              fieldValueMapping.getValueLength(),
+              fieldValueMapping.getFieldValuesList()));
         } else {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
@@ -200,9 +208,14 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
-  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings, Field field)
+  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings)
       throws KLoadGenException {
-    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, field, arraySize);
+    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, arraySize);
+  }
+
+  private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings)
+      throws KLoadGenException {
+    return randomToolAvro.generateRandomMap(fieldType, mapSize, fieldExpMappings, arraySize);
   }
 
   private GenericRecord createRecord(Schema schema) {

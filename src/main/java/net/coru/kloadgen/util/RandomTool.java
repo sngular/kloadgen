@@ -1,7 +1,5 @@
 package net.coru.kloadgen.util;
 
-import static org.codehaus.groovy.runtime.InvokerHelper.asList;
-
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -58,7 +56,11 @@ public final class RandomTool {
   }
 
   protected static Object generateMapArray(String type, Integer valueLength, List<String> fieldValuesList, Integer mapSize) {
-    return asList(generateRandomMap(type.substring(0, type.length() - 6), valueLength, fieldValuesList, mapSize));
+    List<Map<String, Object>> generatedMapArray = new ArrayList<>(valueLength);
+    for (int i = 0; i < valueLength; i++) {
+      generatedMapArray.add((Map)generateRandomMap(type.substring(0, type.length() - 6), valueLength, fieldValuesList, mapSize));
+    }
+    return generatedMapArray;
   }
 
   protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList) {
@@ -210,7 +212,7 @@ public final class RandomTool {
   private static Map<String, Integer> generateIntMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Integer> intMap = new HashMap<>();
-    for (int i=0; i<size; i++) {
+    while (intMap.size() < size) {
       Map.Entry<String, Integer> mapValue;
       if (fieldValueList.size() > 0) {
         String[] tempValue = getMapEntryValue(fieldValueList);
@@ -231,7 +233,7 @@ public final class RandomTool {
   private static Map<String, Long> generateLongMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Long> longMap = new HashMap<>();
-    for (int i=0; i<size; i++) {
+    while (longMap.size() < size) {
       Map.Entry<String, Long> mapValue;
       if (fieldValueList.size() > 0) {
         String[] tempValue = getMapEntryValue(fieldValueList);
@@ -252,7 +254,7 @@ public final class RandomTool {
   private static Map<String, Double> generateDoubleMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Double> doubleMap = new HashMap<>();
-    for (int i=0; i<size; i++) {
+    while (doubleMap.size() < size) {
       Map.Entry<String, Double> mapValue;
       if (fieldValueList.size() > 0) {
         String[] tempValue = getMapEntryValue(fieldValueList);
@@ -273,7 +275,7 @@ public final class RandomTool {
   private static Map<String, Short> generateShortMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
     Map<String, Short> shortMap = new HashMap<>();
-    for (int i=0; i<size; i++) {
+    while (shortMap.size() < size) {
       Map.Entry<String, Short> mapValue;
       if (fieldValueList.size() > 0) {
         String[] tempValue = getMapEntryValue(fieldValueList);
@@ -292,9 +294,9 @@ public final class RandomTool {
   }
 
   private static Map<String, String> generateStringMap(Integer valueLength, List<String> fieldValueList, Integer mapSize) {
-    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
+    int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, String> stringMap = new HashMap<>();
-    for (int i=0; i<size; i++) {
+    while (stringMap.size() < size) {
       Map.Entry<String, String> mapValue;
       if (fieldValueList.size() > 0) {
         String[] tempValue = getMapEntryValue(fieldValueList);
@@ -313,9 +315,9 @@ public final class RandomTool {
   }
 
   private static Map<String, UUID> generateUuidMap(List<String> fieldValueList, Integer mapSize) {
-    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
+    int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, UUID> uuidMap = new HashMap<>();
-    for (int i=0; i<size; i++) {
+    while (uuidMap.size() < size) {
       Map.Entry<String, UUID> mapValue;
       if (fieldValueList.size() > 0) {
         String[] tempValue = getMapEntryValue(fieldValueList);
