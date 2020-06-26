@@ -149,7 +149,6 @@ public class SchemaExtractor {
       if (checkIfRecord(innerField)) {
         processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
       } else if (checkIfMap(innerField)) {
-        internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat("-array"));
         createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
       } else {
         createArrayType(completeFieldList, internalFields, innerField.name());
@@ -164,7 +163,6 @@ public class SchemaExtractor {
           if (checkIfRecord(innerField)) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
           } else if (checkIfMap(innerField)) {
-            internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat("-array"));
             createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
           } else {
             createArrayType(completeFieldList, internalFields, innerField.name());
