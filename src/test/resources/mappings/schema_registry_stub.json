@@ -50,7 +50,7 @@
           "subject": "arraymap",
           "version": 1,
           "id": 73,
-          "schema":"{\"type\": \"record\",\"name\": \"test\",\"fields\": [  {    \"name\": \"Name\",    \"type\": {      \"type\": \"array\",      \"items\": {        \"type\": \"map\",        \"values\": \"string\"      }    }  }]\n}"
+          "schema":"{ \"type\" : \"record\", \"name\" : \"Test\", \"fields\" : [ { \"name\" : \"name\", \"type\" : \"string\" }, { \"name\" : \"values\", \"type\" : { \"type\" : \"array\", \"items\" : { \"type\" : \"map\", \"values\" : \"string\" } } } ] } }"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -101,7 +101,7 @@
         "status": 200,
         "jsonBody":
         {
-          "schema":"{\"type\": \"record\",\"name\": \"test\",\"fields\": [  {    \"name\": \"Name\",    \"type\": {      \"type\": \"array\",      \"items\": {        \"type\": \"map\",        \"values\": \"string\"      }    }  }]\n}"
+          "schema":"{ \"type\" : \"record\", \"name\" : \"Test\", \"fields\" : [ { \"name\" : \"name\", \"type\" : \"string\" }, { \"name\" : \"values\", \"type\" : { \"type\" : \"array\", \"items\" : { \"type\" : \"map\", \"values\" : \"string\" } } } ] } }"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"

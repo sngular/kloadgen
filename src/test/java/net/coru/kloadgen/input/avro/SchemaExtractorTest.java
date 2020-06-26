@@ -85,9 +85,10 @@ class SchemaExtractorTest {
         "arrayMap"
     );
 
-    assertThat(fieldValueMappingList).hasSize(1);
+    assertThat(fieldValueMappingList).hasSize(2);
     assertThat(fieldValueMappingList).containsExactlyInAnyOrder(
-        new FieldValueMapping("Name[]", "string-map")
+        new FieldValueMapping("name", "string"),
+        new FieldValueMapping("values[]", "string-map-array")
     );
   }
 }
