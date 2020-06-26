@@ -98,7 +98,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       while (!fieldExpMappingsQueue.isEmpty()) {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
-          if (fieldValueMapping.getFieldType().endsWith("map")) {
+          if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
             entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
                 fieldValueMapping.getFieldValuesList(), schema.getField(fieldValueMapping.getFieldName())));
@@ -106,6 +106,8 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
             entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
                 fieldValueMapping.getFieldValuesList(), schema.getField(fieldValueMapping.getFieldName())));
+            fieldExpMappingsQueue.remove();
+            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           } else {
             entity.put(fieldName,
                 createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(),
@@ -119,7 +121,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
           entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
-          entity.put(fieldValueMapping.getFieldName(),
+          entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
               randomToolAvro.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
                   fieldValueMapping.getFieldValuesList(),
                   schema.getField(fieldValueMapping.getFieldName())));
@@ -141,7 +143,7 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       schema = subEntity.getSchema();
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    while(!fieldExpMappingsQueue.isEmpty() && fieldValueMapping.getFieldName().contains(fieldName)) {
+    while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
         if (fieldValueMapping.getFieldType().contains("map")){
