@@ -8,6 +8,7 @@ import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 
@@ -33,15 +34,13 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
     this.propertyDescriptor = propertyDescriptor;
   }
 
-  private void init() { }
-
   @Override
   public void actionPerformed(ActionEvent event) {
+    throw new NotImplementedException("Not implementation is required");
   }
 
   @Override
-  public void clearGui() {
-  }
+  public void clearGui() { }
 
   @Override
   public Component getCustomEditor() {
@@ -60,13 +59,14 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
+    propertyDescriptor.setValue("schemaAsString", value);
     schemaAsString = value;
   }
 
   @Override
   public void setValue(Object value) {
     if (Objects.nonNull(value)) {
-      schemaAsString = value.toString();
+      setAsText(value.toString());
     }
   }
 

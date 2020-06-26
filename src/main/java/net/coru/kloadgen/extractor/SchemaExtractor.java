@@ -148,6 +148,14 @@ public class SchemaExtractor {
         internalFields.get(0).setFieldName(innerField.name());
         completeFieldList.add(internalFields.get(0));
       }
+    } else if(innerField.schema().getType() == Type.MAP) {
+      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name(), innerField.schema());
+      if (internalFields.size() > 1) {
+        processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
+      } else {
+        internalFields.get(0).setFieldName(innerField.name() + "[]");
+        completeFieldList.add(internalFields.get(0));
+      }
     } else if (Type.UNION == innerField.schema().getType()) {
       Schema recordUnion = getRecordUnion(innerField.schema().getTypes());
       if (null != recordUnion) {
@@ -161,7 +169,7 @@ public class SchemaExtractor {
             internalFields.get(0).setFieldName(innerField.name());
             completeFieldList.add(internalFields.get(0));
           }
-        }else if(recordUnion.getType() == Type.MAP){
+        } else if(recordUnion.getType() == Type.MAP){
           List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name(), recordUnion);
           if (internalFields.size() >1) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
