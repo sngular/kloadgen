@@ -54,13 +54,15 @@ public class AvroSchemaProcessor {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if(fieldValueMapping.getFieldType().contains("map")) {
+            fieldExpMappingsQueue.poll();
             entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
                 calculateSize(fieldName),
                 fieldValueMapping.getFieldValuesList(),schema.getField(fieldValueMapping.getFieldName())));
+          } else {
+            entity.put(fieldName,
+                createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateSize(fieldName),
+                    fieldExpMappingsQueue));
           }
-          entity.put(fieldName,
-              createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateSize(fieldName),
-                  fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
@@ -206,7 +208,7 @@ public class AvroSchemaProcessor {
   private String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
     int endOfField = pathToClean.contains(".")?
-        pathToClean.indexOf(".") : 0;
+        pathToClean.indexOf(".") : pathToClean.contains("[") ? pathToClean.indexOf("[") : pathToClean.length();
     return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
   }
 
