@@ -173,6 +173,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void clearGui() {
+    // Not implementation required
   }
 
   @Override
