@@ -72,7 +72,7 @@ class AvroSchemaProcessorTest {
   @Test
   public void textAvroSchemaProcessorArrayMap(@Wiremock WireMockServer server) throws IOException, RestClientException, KLoadGenException {
     List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
-        new FieldValueMapping("Name[2]", "string-map-array", 0, "n:1"));
+        new FieldValueMapping("values[2]", "string-map-array", 0, "n:1"));
 
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
