@@ -1,4 +1,4 @@
-package net.coru.kloadgen.input;
+package net.coru.kloadgen.processor;
 
 import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.MAP;

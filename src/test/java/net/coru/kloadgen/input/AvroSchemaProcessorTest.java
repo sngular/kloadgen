@@ -86,7 +86,25 @@ class AvroSchemaProcessorTest {
     JMeterContextService.getContext().getProperties().put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
     JMeterContextService.getContext().getProperties().put(USER_INFO_CONFIG, "foo:foo");
 
-    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor("arrayMap", fieldValueMappingList);
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder
+        .builder()
+        .record("arrayMap")
+        .fields()
+        .name("values")
+        .type()
+        .array()
+        .items()
+        .type(SchemaBuilder
+            .builder()
+            .map()
+            .values()
+            .stringType()
+            .getValueType())
+        .noDefault()
+        .endRecord(),
+        new SchemaMetadata(1, 1, ""),
+        fieldValueMappingList);
 
     EnrichedRecord message = avroSchemaProcessor.next();
     assertThat(message).isNotNull();
