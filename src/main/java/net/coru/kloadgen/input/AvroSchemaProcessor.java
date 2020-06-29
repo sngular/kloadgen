@@ -14,7 +14,6 @@ import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
-import org.apache.avro.Schema.Type;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -28,9 +27,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -38,6 +37,7 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.AvroRandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
+import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.lang3.RandomUtils;
@@ -98,21 +98,31 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       while (!fieldExpMappingsQueue.isEmpty()) {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
-          if(fieldValueMapping.getFieldType().contains("map")) {
+          if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
+            fieldExpMappingsQueue.poll();
             entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
-                calculateSize(fieldName),
-                fieldValueMapping.getFieldValuesList(),schema.getField(fieldValueMapping.getFieldName())));
+                calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                fieldValueMapping.getFieldValuesList()));
+          } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
+            fieldExpMappingsQueue.poll();
+            entity.put(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
+                calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                fieldValueMapping.getValueLength(),
+                fieldValueMapping.getFieldValuesList()));
+          } else {
+            entity.put(fieldName,
+                createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(),
+                    fieldName,
+                    calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                    fieldExpMappingsQueue));
+            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           }
-          entity.put(fieldName,
-              createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(), fieldName, calculateSize(fieldName),
-                  fieldExpMappingsQueue));
-          fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
-          entity.put(fieldValueMapping.getFieldName(),
+          entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
               randomToolAvro.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
                   fieldValueMapping.getFieldValuesList(),
                   schema.getField(fieldValueMapping.getFieldName())));
@@ -134,23 +144,30 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
       schema = subEntity.getSchema();
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    while(!fieldExpMappingsQueue.isEmpty() && fieldValueMapping.getFieldName().contains(fieldName)) {
+    while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
-        if (fieldValueMapping.getFieldType().contains("map")){
+        if (fieldValueMapping.getFieldType().endsWith("map")){
           fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
-              calculateSize(cleanFieldName),
-              fieldValueMapping.getFieldValuesList(),schema.getField(cleanFieldName)));
+              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+              fieldValueMapping.getFieldValuesList()));
+        } else if (fieldValueMapping.getFieldType().endsWith("map-array")){
+          fieldExpMappingsQueue.poll();
+          String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
+          subEntity.put(fieldNameSubEntity, createObjectMapArray(fieldValueMapping.getFieldType(),
+              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+              fieldValueMapping.getValueLength(),
+              fieldValueMapping.getFieldValuesList()));
         } else {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
           subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
               fieldNameSubEntity,
-              calculateSize(cleanFieldName),
+              calculateSize(fieldValueMapping.getFieldName(), fieldName),
               fieldExpMappingsQueue));
         }
-      }else if (cleanFieldName.contains(".")) {
+      } else if (cleanFieldName.contains(".")) {
         String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
         subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
             fieldNameSubEntity,
@@ -191,9 +208,14 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return objectArray;
   }
 
-  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings, Field field)
+  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings)
       throws KLoadGenException {
-    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, field, arraySize);
+    return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, arraySize);
+  }
+
+  private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings)
+      throws KLoadGenException {
+    return randomToolAvro.generateRandomMap(fieldType, mapSize, fieldExpMappings, arraySize);
   }
 
   private GenericRecord createRecord(Schema schema) {
@@ -222,9 +244,11 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
     return isRecord;
   }
 
-  private Integer calculateSize(String fieldName) {
+  private Integer calculateSize(String fieldName, String methodName) {
     int arrayLength = RandomUtils.nextInt(1, 10);
-    String arrayLengthStr = StringUtils.substringBetween(fieldName, "[", "]");
+    String tempString = fieldName.substring(
+        fieldName.lastIndexOf(methodName));
+    String arrayLengthStr = StringUtils.substringBetween(tempString, "[", "]");
     if (StringUtils.isNotEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
       arrayLength = Integer.parseInt(arrayLengthStr);
     }
@@ -249,10 +273,14 @@ public class AvroSchemaProcessor implements Iterator<EnrichedRecord> {
   }
 
   private String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
+    String methodName;
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
-    int endOfField = pathToClean.contains(".")?
-        pathToClean.indexOf(".") : 0;
-    return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
+    int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : 0;
+    methodName = pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
+    if ("".equalsIgnoreCase(methodName)) {
+      methodName = pathToClean.replaceAll("\\[[0-9]*]", "");
+    }
+    return methodName;
   }
 
   private String getCleanMethodNameMap(FieldValueMapping fieldValueMapping, String fieldName) {

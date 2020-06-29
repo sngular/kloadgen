@@ -14,11 +14,14 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.groovy.util.Maps;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -68,4 +71,26 @@ class AvroSchemaProcessorTest {
 
   }
 
+  @Test
+  public void textAvroSchemaProcessorArrayMap(@Wiremock WireMockServer server) throws IOException, RestClientException, KLoadGenException {
+    List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
+        new FieldValueMapping("values[4]", "string-map-array", 2, "n:1, t:2"));
+
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+    JMeterContextService.getContext().getProperties().put(USER_INFO_CONFIG, "foo:foo");
+
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor("arrayMap", fieldValueMappingList);
+
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message).isNotNull();
+    assertThat(message).isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord().get("values")).isInstanceOf(List.class);
+    List<Map<String, Object>> result = (List<Map<String, Object>>) message.getGenericRecord().get("values");
+    assertThat(result).hasSize(4);
+    assertThat(result).contains(Maps.of("n","1","t","2"), Maps.of("n","1","t","2"));
+  }
 }

@@ -22,7 +22,7 @@ public class AvroRandomTool {
 
   private final Map<String, Object> context = new HashMap<>();
 
-  public Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Integer size) {
+  public Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
 
     List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(fieldValue ->
