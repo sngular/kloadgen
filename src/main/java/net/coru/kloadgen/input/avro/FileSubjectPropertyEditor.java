@@ -132,7 +132,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   public void actionPerformed(ActionEvent event) {
     if (subjectNameComboBox.getItemCount() != 0) {
 
-      String selectedItem = subjectNameComboBox.getSelectedItem().toString();
+      String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       Schema selectedSchema = getSelectedSchema(selectedItem);
 
       if (Objects.nonNull(selectedSchema)) {

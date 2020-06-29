@@ -79,14 +79,33 @@ class RandomToolTest {
         .containsExactly(expectedMap);
   }
 
+  private static Stream<Arguments> parametersForGenerateMapArrayRandomValueFromList() {
+    return Stream.of(
+        Arguments.of("string-map-array", 1, Collections.singletonList("testString:testString"), Collections.singletonList(Maps.of("testString", "testString")), 1),
+        Arguments.of("int-map-array", 1, Collections.singletonList("testString:1"), Collections.singletonList(Maps.of("testString",1)), 1),
+        Arguments.of("long-map-array", 1, Collections.singletonList("testString:1"), Collections.singletonList(Maps.of("testString",1L)), 1),
+        Arguments.of("short-map-array", 1, Collections.singletonList("testString:1"), Collections.singletonList(Maps.of("testString",(short)1)), 1),
+        Arguments.of("double-map-array", 1, Collections.singletonList("testString:1.0"), Collections.singletonList(Maps.of("testString",1.0)), 1),
+        Arguments.of("uuid-map-array", 1, Collections.singletonList("testString:0177f035-e51c-4a46-8b82-5b157371c2a5"), Collections.singletonList(Maps.of("testString", UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"))), 1)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateMapArrayRandomValueFromList")
+  void generateMapArrayRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, List<Map<String, Object>> expected, Integer size) {
+
+    assertThat((List<Map<String, Object>>)RandomTool.generateRandomMap(fieldType, valueLength, fieldValuesList,size))
+        .containsExactly(expected.get(0));
+  }
+
   private static Stream<Arguments> parametersForGenerateMapFixedKeyRandomValue() {
     return Stream.of(
-        Arguments.of("string-map", 1, Collections.singletonList("testString"),1),
-        Arguments.of("int-map", 1, Collections.singletonList("testString"),1),
-        Arguments.of("long-map", 1, Collections.singletonList("testString"),1),
-        Arguments.of("short-map", 1, Collections.singletonList("testString"),1),
-        Arguments.of("double-map", 1, Collections.singletonList("testString"),1),
-        Arguments.of("uuid-map", 1, Collections.singletonList("testString"),1)
+        Arguments.of("string-map", 1, Collections.singletonList("testString"), 1),
+        Arguments.of("int-map", 1, Collections.singletonList("testString"), 1),
+        Arguments.of("long-map", 1, Collections.singletonList("testString"), 1),
+        Arguments.of("short-map", 1, Collections.singletonList("testString"), 1),
+        Arguments.of("double-map", 1, Collections.singletonList("testString"), 1),
+        Arguments.of("uuid-map", 1, Collections.singletonList("testString"), 1)
     );
   }
 

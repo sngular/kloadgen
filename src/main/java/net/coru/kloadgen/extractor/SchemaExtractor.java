@@ -11,7 +11,10 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
+import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.UNION;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -81,8 +84,7 @@ public class SchemaExtractor {
   public Schema schemaTypesList(File schemaFile) throws IOException {
     Schema.Parser parser = new Schema.Parser();
     String readLine = readLineByLine(schemaFile.getPath());
-    Schema parserSchema = parser.parse(readLine);
-    return parserSchema;
+    return parser.parse(readLine);
   }
 
   private static String readLineByLine(String filePath) throws IOException {
@@ -121,10 +123,12 @@ public class SchemaExtractor {
 
   private List<FieldValueMapping> extractArrayInternalFields(String fieldName, Schema innerField) {
     List<FieldValueMapping> completeFieldList = new ArrayList<>();
-    if (RECORD == innerField.getElementType().getType()) {
+    if (RECORD.equals(innerField.getElementType().getType())) {
       for (Field arrayElementField : innerField.getElementType().getFields()) {
         processField(arrayElementField, completeFieldList);
       }
+    } else if (MAP.equals(innerField.getElementType().getType())) {
+      completeFieldList.addAll(extractMapInternalFields(fieldName, innerField.getElementType()));
     } else if (typesSet.contains(innerField.getElementType().getType())) {
       completeFieldList.add( new FieldValueMapping(fieldName,innerField.getElementType().getName()+"-array"));
     }
@@ -138,54 +142,62 @@ public class SchemaExtractor {
   }
 
   private void processField(Field innerField, List<FieldValueMapping> completeFieldList) {
-    if (RECORD == innerField.schema().getType()) {
+    if (RECORD.equals(innerField.schema().getType())) {
       processRecordFieldList(innerField.name(), ".", extractInternalFields(innerField), completeFieldList);
-    } else if (Type.ARRAY == innerField.schema().getType()) {
+    } else if (ARRAY.equals(innerField.schema().getType())) {
       List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField);
-      if (internalFields.size() >1) {
+      if (checkIfRecord(innerField)) {
         processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
+      } else if (checkIfMap(innerField)) {
+        internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat("-array"));
+        createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
       } else {
-        internalFields.get(0).setFieldName(innerField.name());
-        completeFieldList.add(internalFields.get(0));
+        createArrayType(completeFieldList, internalFields, innerField.name());
       }
-    } else if(innerField.schema().getType() == Type.MAP) {
-      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name(), innerField.schema());
-      if (internalFields.size() > 1) {
-        processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
-      } else {
-        internalFields.get(0).setFieldName(innerField.name() + "[]");
-        completeFieldList.add(internalFields.get(0));
-      }
-    } else if (Type.UNION == innerField.schema().getType()) {
+    } else if (UNION.equals(innerField.schema().getType())) {
       Schema recordUnion = getRecordUnion(innerField.schema().getTypes());
       if (null != recordUnion) {
-        if (recordUnion.getType() == RECORD) {
+        if (RECORD.equals(recordUnion.getType())) {
             processRecordFieldList(innerField.name(), ".", processFieldList(recordUnion.getFields()), completeFieldList);
-        } else if(recordUnion.getType() == Type.ARRAY){
+        } else if (ARRAY.equals(recordUnion.getType())){
           List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField.name(), recordUnion);
-          if (internalFields.size() >1) {
+          if (checkIfRecord(innerField)) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
+          } else if (checkIfMap(innerField)) {
+            internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat("-array"));
+            createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
           } else {
-            internalFields.get(0).setFieldName(innerField.name());
-            completeFieldList.add(internalFields.get(0));
+            createArrayType(completeFieldList, internalFields, innerField.name());
           }
-        } else if(recordUnion.getType() == Type.MAP){
+        } else if (MAP.equals(recordUnion.getType())){
           List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name(), recordUnion);
-          if (internalFields.size() >1) {
+          if (checkIfRecord(innerField)) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
           } else {
-            internalFields.get(0).setFieldName(innerField.name()+"[]");
-            completeFieldList.add(internalFields.get(0));
+            createArrayType(completeFieldList, internalFields, innerField.name()+"[]");
           }
         } else {
-          completeFieldList.add( new FieldValueMapping(innerField.name(), recordUnion.getType().getName()));
+          completeFieldList.add(new FieldValueMapping(innerField.name(), recordUnion.getType().getName()));
         }
       } else {
-        completeFieldList.add( new FieldValueMapping(innerField.name(), getNotNullType(innerField.schema().getTypes())));
+        completeFieldList.add(new FieldValueMapping(innerField.name(), getNotNullType(innerField.schema().getTypes())));
       }
     } else {
-      completeFieldList.add( new FieldValueMapping(innerField.name(),innerField.schema().getType().getName()));
+      completeFieldList.add(new FieldValueMapping(innerField.name(),innerField.schema().getType().getName()));
     }
+  }
+
+  private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
+    internalFields.get(0).setFieldName(fieldName);
+    completeFieldList.add(internalFields.get(0));
+  }
+
+  private boolean checkIfRecord(Field innerField) {
+    return RECORD.equals(innerField.schema().getElementType().getType());
+  }
+
+  private boolean checkIfMap(Field innerField) {
+    return MAP.equals(innerField.schema().getElementType().getType());
   }
 
   private String getNotNullType(List<Schema> types) {
@@ -206,7 +218,7 @@ public class SchemaExtractor {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || Type.ARRAY == schema.getType() || Type.MAP == schema.getType() || typesSet.contains(schema.getType())) {
+      if (RECORD == schema.getType() || ARRAY == schema.getType() || MAP == schema.getType() || typesSet.contains(schema.getType())) {
         isRecord = schema;
       }
     }
