@@ -221,6 +221,11 @@ Example:
 
 * key1,key2,key3 -- Will generate a map with keys in between (key1,key2,key3) and value random generated
 
+#### Special types
+
+There is an special type, mix of map and array, (*)-map-array which will generate an array of maps. This specific type have a way to specify the size of boths collections. First, inline with the property name "[8]" will specify the array size, between brakes, as a normal array. For maps, the size will be specify in the field lenght column as property length as well.
+Values in the "Field Values List" will refer *exclusively* to the map. So a list of "map values" must be there in order to generate a set to use by the random generator to select possible values.
+
 #### Special functions
 
 | Type | Details |  Returns |
