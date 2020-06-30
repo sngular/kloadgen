@@ -25,7 +25,6 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG_DEFAU
 import static net.coru.kloadgen.util.ProducerKeysHelper.KERBEROS_ENABLED;
 import static net.coru.kloadgen.util.ProducerKeysHelper.LINGER_MS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.RECEIVE_BUFFER_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.SAMPLE_ENTITY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_MECHANISM;
@@ -36,12 +35,15 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.TOPIC_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
+import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_DEFAULT;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_PLACEHOLDER_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_VAL_PLACEHOLDER_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
@@ -65,6 +67,9 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.loadgen.BaseLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
+import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.StatelessRandomTool;
@@ -98,7 +103,14 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
     private final ObjectMapper objectMapperJson = new ObjectMapper();
 
-    private transient StatelessRandomTool statelessRandomTool;
+    private final StatelessRandomTool statelessRandomTool;
+
+    private final BaseLoadGenerator generator;
+
+    public ConfluentKafkaSampler() {
+        generator = new AvroLoadGenerator();
+        statelessRandomTool = new StatelessRandomTool();
+    }
 
     @Override
     public Arguments getDefaultParameters() {
@@ -152,7 +164,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        if (null != context.getParameter(VALUE_NAME_STRATEGY)) {
+        if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
             props.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
         }
 
@@ -174,7 +186,16 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 }
             }
             props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+            context.getJMeterVariables().get(AVRO_SUBJECT_NAME);
+            generator.setUpGeneratorFromRegistry(
+                JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
+                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+        } else {
+            generator.setUpGenerator(
+                JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
+                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
         }
+
         Iterator<String> parameters = context.getParameterNamesIterator();
         parameters.forEachRemaining(parameter -> {
             if (parameter.startsWith("_")) {
@@ -212,8 +233,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
         producer = new KafkaProducer<>(props);
-        statelessRandomTool = new StatelessRandomTool();
-
     }
 
     @Override
@@ -222,7 +241,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
-        EnrichedRecord messageVal = (EnrichedRecord) jMeterContext.getVariables().getObject(SAMPLE_ENTITY);
+        EnrichedRecord messageVal = generator.nextMessage();
         //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
         if (Objects.nonNull(messageVal)) {

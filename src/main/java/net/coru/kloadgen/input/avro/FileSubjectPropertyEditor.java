@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
@@ -152,6 +153,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
           for (PropertyEditor propertyEditor : propertyEditors) {
             if (propertyEditor instanceof TableEditor) {
               propertyEditor.setValue(attributeList);
+            } else if (propertyEditor instanceof SchemaConverterPropertyEditor) {
+              propertyEditor.setValue(selectedSchema);
             }
           }
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -170,6 +173,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public void clearGui() {
+    // Not implementation required
   }
 
   @Override
