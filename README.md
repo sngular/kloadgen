@@ -77,7 +77,7 @@ or just
  mvn clean install
 ```
 
-Once build is completed, copy target/kloadgen-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
+Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
 
 ### KLoadGenSampler
 
