@@ -8,8 +8,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -47,12 +49,13 @@ class AvroLoadGeneratorTest {
         new FieldValueMapping("Name", "string", 0, "Jose"),
         new FieldValueMapping("Age", "int", 0, "43"));
 
-    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
-    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
-    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+    Map<String, String> originals = new HashMap<>();
+    originals.put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    originals.put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    originals.put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator();
-    avroLoadGenerator.setUpGeneratorFromRegistry("avroSubject", fieldValueMappingList);
+    avroLoadGenerator.setUpGenerator(originals, "avroSubject", fieldValueMappingList);
     Object message = avroLoadGenerator.nextMessage();
     assertThat(message).isNotNull();
     assertThat(message).isInstanceOf(EnrichedRecord.class);

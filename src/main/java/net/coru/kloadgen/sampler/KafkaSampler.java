@@ -1,6 +1,11 @@
 
 package net.coru.kloadgen.sampler;
 
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
+import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
+import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
 import static java.util.Collections.emptyList;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ACKS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BATCH_SIZE_CONFIG_DEFAULT;
@@ -29,7 +34,9 @@ import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_KERBEROS_SERVICE_NAME;
 
@@ -37,8 +44,10 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
@@ -50,6 +59,7 @@ import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
@@ -58,6 +68,7 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -132,9 +143,26 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
         props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-        if (Objects.nonNull(JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL))) {
-            props.put(SCHEMA_REGISTRY_URL, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
-            generator.setUpGeneratorFromRegistry(
+        JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
+        if (Objects.nonNull(jMeterVariables.get(ProducerKeysHelper.SCHEMA_REGISTRY_URL))) {
+            Map<String, String> originals = new HashMap<>();
+            originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getVariables().get(
+                ProducerKeysHelper.SCHEMA_REGISTRY_URL));
+
+            if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
+                if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
+                    .equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+                    originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
+                        jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
+                    originals.put(USER_INFO_CONFIG, jMeterVariables.get(USER_INFO_CONFIG));
+                } else {
+                    originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
+                        jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
+                    originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
+                }
+            }
+            generator.setUpGenerator(
+                originals,
                 JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
                 (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
         } else {
@@ -199,14 +227,16 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal);
                 }
-
+                List<String> headersSB = new ArrayList<>();
                 for (HeaderMapping kafkaHeader : kafkaHeaders) {
-                    producerRecord.headers().add(kafkaHeader.getHeaderName(),
-                        statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
-                            10,
-                            emptyList()).toString().getBytes(StandardCharsets.UTF_8));
+                    String headerValue = statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
+                        10,
+                        emptyList()).toString();
+                    headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
+                    producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
                 }
 
+                sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
                 sampleResult.setSamplerData(producerRecord.value().toString());
 
                 Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
@@ -218,7 +248,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
                 log.info("Send message with body: {}", producerRecord.value());
 
-                sampleResult.setResponseData(result.get().toString(), StandardCharsets.UTF_8.name());
+                sampleResult.setResponseData(prettyPrint(result.get()), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(true);
                 sampleResult.sampleEnd();
 
@@ -235,6 +265,11 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
             sampleResult.sampleEnd();
         }
         return sampleResult;
+    }
+
+    private String prettyPrint(RecordMetadata recordMetadata) {
+        String template = "Topic: %s, partition: %s, offset: %s";
+        return String.format(template, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
     }
 
     @Override
