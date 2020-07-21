@@ -172,8 +172,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
         if (Objects.nonNull(jMeterVariables.get(ProducerKeysHelper.SCHEMA_REGISTRY_URL))) {
             Map<String, String> originals = new HashMap<>();
-            originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getVariables().get(
-                ProducerKeysHelper.SCHEMA_REGISTRY_URL));
+            originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(ProducerKeysHelper.SCHEMA_REGISTRY_URL));
 
             if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
@@ -188,6 +187,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 }
             }
             props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+            props.putAll(originals);
 
             generator.setUpGenerator(
                 originals,
@@ -245,7 +245,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
         EnrichedRecord messageVal = generator.nextMessage();
-        //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
         if (Objects.nonNull(messageVal)) {
             ProducerRecord<String, Object> producerRecord;

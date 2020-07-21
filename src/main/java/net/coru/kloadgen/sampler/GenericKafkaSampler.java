@@ -180,6 +180,8 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
                     originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
                 }
             }
+            props.putAll(originals);
+
             generator.setUpGenerator(
                 originals,
                 JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
@@ -237,7 +239,6 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
         EnrichedRecord messageVal = generator.nextMessage();
-        //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
         if (Objects.nonNull(messageVal)) {
