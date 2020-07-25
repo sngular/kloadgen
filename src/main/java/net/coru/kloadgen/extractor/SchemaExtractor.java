@@ -146,9 +146,9 @@ public class SchemaExtractor {
       processRecordFieldList(innerField.name(), ".", extractInternalFields(innerField), completeFieldList);
     } else if (ARRAY.equals(innerField.schema().getType())) {
       List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField);
-      if (checkIfRecord(innerField)) {
+      if (checkIfRecord(innerField.schema().getElementType())) {
         processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
-      } else if (checkIfMap(innerField)) {
+      } else if (checkIfMap(innerField.schema().getElementType())) {
         internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat("-array"));
         createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
       } else {
@@ -161,9 +161,9 @@ public class SchemaExtractor {
             processRecordFieldList(innerField.name(), ".", processFieldList(recordUnion.getFields()), completeFieldList);
         } else if (ARRAY.equals(recordUnion.getType())){
           List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField.name(), recordUnion);
-          if (checkIfRecord(innerField)) {
+          if (checkIfRecord(recordUnion.getElementType())) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
-          } else if (checkIfMap(innerField)) {
+          } else if (checkIfMap(recordUnion)) {
             internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat("-array"));
             createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
           } else {
@@ -171,7 +171,7 @@ public class SchemaExtractor {
           }
         } else if (MAP.equals(recordUnion.getType())){
           List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name(), recordUnion);
-          if (checkIfRecord(innerField)) {
+          if (checkIfRecord(recordUnion.getValueType())) {
             processRecordFieldList(innerField.name(), "[].", internalFields, completeFieldList);
           } else {
             createArrayType(completeFieldList, internalFields, innerField.name()+"[]");
@@ -192,12 +192,12 @@ public class SchemaExtractor {
     completeFieldList.add(internalFields.get(0));
   }
 
-  private boolean checkIfRecord(Field innerField) {
-    return RECORD.equals(innerField.schema().getElementType().getType());
+  private boolean checkIfRecord(Schema innerSchema) {
+    return RECORD.equals(innerSchema.getType());
   }
 
-  private boolean checkIfMap(Field innerField) {
-    return MAP.equals(innerField.schema().getElementType().getType());
+  private boolean checkIfMap(Schema innerSchema) {
+    return MAP.equals(innerSchema.getType());
   }
 
   private String getNotNullType(List<Schema> types) {
