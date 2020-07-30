@@ -5,6 +5,8 @@ import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfi
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
+import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static java.util.Collections.emptyList;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ACKS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BATCH_SIZE_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BOOTSTRAP_SERVERS_CONFIG_DEFAULT;
@@ -45,10 +47,8 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +56,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -72,6 +71,7 @@ import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
@@ -80,6 +80,7 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -168,26 +169,28 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             props.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
         }
 
-        Properties properties = JMeterContextService.getContext().getProperties();
-        if (Objects.nonNull(properties.getProperty(SCHEMA_REGISTRY_URL))) {
-            props.put(SCHEMA_REGISTRY_URL,
-                properties.getProperty(SCHEMA_REGISTRY_URL));
+        JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
+        if (Objects.nonNull(jMeterVariables.get(ProducerKeysHelper.SCHEMA_REGISTRY_URL))) {
+            Map<String, String> originals = new HashMap<>();
+            originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(ProducerKeysHelper.SCHEMA_REGISTRY_URL));
 
-            if (FLAG_YES.equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
+            if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-                    .equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
-                    props.put(BASIC_AUTH_CREDENTIALS_SOURCE,
-                        properties.getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
-                    props.put(USER_INFO_CONFIG, properties.getProperty(USER_INFO_CONFIG));
-                } else if (SCHEMA_REGISTRY_AUTH_BEARER_KEY.equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
-                    props.put(BEARER_AUTH_CREDENTIALS_SOURCE,
-                        properties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
-                    props.put(BEARER_AUTH_TOKEN_CONFIG, properties.getProperty(BEARER_AUTH_TOKEN_CONFIG));
+                    .equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+                    originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
+                        jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
+                    originals.put(USER_INFO_CONFIG, jMeterVariables.get(USER_INFO_CONFIG));
+                } else {
+                    originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
+                        jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
+                    originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
                 }
             }
             props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
-            context.getJMeterVariables().get(AVRO_SUBJECT_NAME);
-            generator.setUpGeneratorFromRegistry(
+            props.putAll(originals);
+
+            generator.setUpGenerator(
+                originals,
                 JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
                 (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
         } else {
@@ -242,7 +245,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
         EnrichedRecord messageVal = generator.nextMessage();
-        //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
         if (Objects.nonNull(messageVal)) {
             ProducerRecord<String, Object> producerRecord;
@@ -256,13 +258,17 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 jsonTypes.put("contentType", "java.lang.String");
                 producerRecord.headers()
                     .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
+                List<String> headersSB = new ArrayList<>();
+                headersSB.add("spring_json_header_types".concat(objectMapperJson.writeValueAsString(jsonTypes)));
                 for (HeaderMapping kafkaHeader : kafkaHeaders) {
-                    producerRecord.headers().add(kafkaHeader.getHeaderName(),
-                        objectMapperJson.writeValueAsBytes(
-                            statelessRandomTool
-                                .generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList())));
+                    String headerValue = statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
+                        10,
+                        emptyList()).toString();
+                    headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
+                    producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
                 }
 
+                sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
                 sampleResult.setSamplerData(producerRecord.value().toString());
 
                 Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
@@ -273,7 +279,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 });
 
                 log.info("Send message to body: {}", producerRecord.value());
-                sampleResult.setResponseData(result.get().toString(), StandardCharsets.UTF_8.name());
+                sampleResult.setResponseData(prettyPrint(result.get()), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(true);
                 sampleResult.sampleEnd();
 
@@ -290,6 +296,11 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             sampleResult.sampleEnd();
         }
         return sampleResult;
+    }
+
+    private String prettyPrint(RecordMetadata recordMetadata) {
+        String template = "Topic: %s, partition: %s, offset: %s";
+        return String.format(template, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
     }
 
     private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
