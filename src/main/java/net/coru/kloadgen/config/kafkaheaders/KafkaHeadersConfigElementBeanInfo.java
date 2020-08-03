@@ -1,12 +1,17 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package net.coru.kloadgen.config.kafkaheaders;
 
+import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import net.coru.kloadgen.model.HeaderMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
-
-import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
 
 public class KafkaHeadersConfigElementBeanInfo extends BeanInfoSupport {
 
