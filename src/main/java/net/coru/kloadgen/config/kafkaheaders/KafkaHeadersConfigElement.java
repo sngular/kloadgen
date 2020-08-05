@@ -1,5 +1,15 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package net.coru.kloadgen.config.kafkaheaders;
 
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
+
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +21,6 @@ import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.threads.JMeterContext;
-
-import java.util.List;
-import java.util.Map;
-
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
 
 @Getter
 @Setter

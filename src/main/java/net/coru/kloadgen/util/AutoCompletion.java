@@ -33,7 +33,7 @@ public class AutoCompletion extends PlainDocument {
   // subsequent calls to remove/insertString should be ignored
   private boolean selecting = false;
 
-  private boolean hidePopupOnFocusLoss;
+  private final boolean hidePopupOnFocusLoss;
 
   private boolean hitBackspace = false;
 
