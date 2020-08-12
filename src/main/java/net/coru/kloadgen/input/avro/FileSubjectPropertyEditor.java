@@ -6,9 +6,6 @@
 
 package net.coru.kloadgen.input.avro;
 
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
-import static org.apache.avro.Schema.Type.RECORD;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -32,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.SchemaExtractor;
+import net.coru.kloadgen.extractor.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
@@ -47,6 +45,10 @@ import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 
+
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
+import static org.apache.avro.Schema.Type.RECORD;
+
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
@@ -58,7 +60,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private PropertyDescriptor propertyDescriptor;
 
-  private final SchemaExtractor schemaExtractor = new SchemaExtractor();
+  private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
   private static Schema parserSchema;
 
