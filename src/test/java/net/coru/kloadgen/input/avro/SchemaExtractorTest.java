@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import net.coru.kloadgen.extractor.SchemaExtractor;
+import net.coru.kloadgen.extractor.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -30,7 +31,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 })
 class SchemaExtractorTest {
 
-  private final SchemaExtractor schemaExtractor = new SchemaExtractor();
+  private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
   @BeforeEach
   public void setUp() {

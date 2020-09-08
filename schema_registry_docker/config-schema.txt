@@ -1,0 +1,3 @@
+"server": "localhost:8081",
+"username": "ckp_tester",
+"password": "test_secret"
