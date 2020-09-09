@@ -6,11 +6,6 @@
 
 package net.coru.kloadgen.processor;
 
-import static org.apache.avro.Schema.Type.ARRAY;
-import static org.apache.avro.Schema.Type.MAP;
-import static org.apache.avro.Schema.Type.RECORD;
-import static org.apache.avro.Schema.Type.UNION;
-
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -28,8 +23,15 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+
+
+import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
+import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.UNION;
 
 public class AvroSchemaProcessor {
 
@@ -73,7 +75,7 @@ public class AvroSchemaProcessor {
                 fieldValueMapping.getFieldValuesList()));
           } else {
             entity.put(fieldName,
-                createObjectArray(entity.getSchema().getField(fieldName).schema().getElementType(),
+                createObjectArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
                     fieldName,
                     calculateSize(fieldValueMapping.getFieldName(), fieldName),
                     fieldExpMappingsQueue));
@@ -94,6 +96,14 @@ public class AvroSchemaProcessor {
       }
     }
     return new EnrichedRecord(metadata, entity);
+  }
+
+  private Schema extractType(Field field, Type typeToMatch) {
+    Schema realField = field.schema();
+    if (UNION.equals(field.schema().getType())){
+      realField = IteratorUtils.find(field.schema().getTypes().iterator(), type -> typeToMatch.equals(type.getType()));
+    }
+    return realField;
   }
 
   private GenericRecord createObject(final Schema subSchema, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
