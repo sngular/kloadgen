@@ -9,5 +9,5 @@ jobs:
     - uses: actions/first-interaction@v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: 'Thank you for collaborate with the project giving us feedback!!'' first issue'
-        pr-message: 'Thank you for collaborate with the project help us to improve!!'' first pr'
+        issue-message: 'Thank you for collaborate with the project giving us feedback!!'' You will help us a lot if you can attach and example AVRO and an example Test Plan in order to be able to reproduce the error. If that is the case. Cheers'
+        pr-message: 'Thank you for collaborate with the project help us to improve!!'''
