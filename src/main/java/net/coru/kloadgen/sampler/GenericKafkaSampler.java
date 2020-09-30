@@ -7,18 +7,6 @@
 
 package net.coru.kloadgen.sampler;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +33,19 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT;
+import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
 
 @Slf4j
 public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
@@ -155,7 +156,9 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
     @Override
     public void teardownTest(JavaSamplerContext context) {
-        producer.close();
+        if (Objects.nonNull(producer)) {
+            producer.close();
+        }
     }
 
     private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
