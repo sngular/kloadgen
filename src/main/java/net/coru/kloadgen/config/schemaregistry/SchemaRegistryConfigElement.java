@@ -20,7 +20,6 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PAS
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
   private String schemaRegistryUrl;
 
-  private List<PropertyMapping> schemaRegistryProperties = new ArrayList<>();
+  private List<PropertyMapping> schemaRegistryProperties;
 
   @Override
   public void iterationStart(LoopIterationEvent iterEvent) {

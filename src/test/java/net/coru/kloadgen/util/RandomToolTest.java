@@ -1,7 +1,5 @@
 package net.coru.kloadgen.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -15,6 +13,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 class RandomToolTest {
 
   private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 6, 12, 0, 0);
@@ -26,6 +27,7 @@ class RandomToolTest {
         Arguments.of("long", 1, Collections.singletonList("1"), 1L),
         Arguments.of("short", 1, Collections.singletonList("1"), (short)1),
         Arguments.of("double", 1, Collections.singletonList("1.0"), 1.0),
+        Arguments.of("float", 1, Collections.singletonList("1.0"), 1.0f),
         Arguments.of("timestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), FIXED_DATE),
         Arguments.of("longTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), FIXED_DATE.toInstant(ZoneOffset.UTC).toEpochMilli()),
         Arguments.of("stringTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), "2019-12-06T12:00"),
@@ -48,6 +50,7 @@ class RandomToolTest {
         Arguments.of("long-array", 1, Collections.singletonList("1"), 1L),
         Arguments.of("short-array", 1, Collections.singletonList("1"), (short) 1),
         Arguments.of("double-array", 1, Collections.singletonList("1.0"), 1.0),
+        Arguments.of("float-array", 1, Collections.singletonList("1.0"), 1.0f),
         Arguments.of("uuid-array", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
             UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"))
     );

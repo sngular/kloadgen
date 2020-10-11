@@ -87,9 +87,12 @@ public final class RandomTool {
       case "double":
         value = getDoubleValueOrRandom(valueLength, fieldValuesList);
         break;
+      case "float":
+        value = getFloatValueOrRandom(valueLength, fieldValuesList);
+        break;
       case "bytes":
 		    value = getByteRandom(valueLength);
-		break;
+		    break;
       case "timestamp":
       case "longTimestamp":
       case "stringTimestamp":
@@ -101,26 +104,39 @@ public final class RandomTool {
       case "boolean":
         value = getBooleanValueOrRandom(fieldValuesList);
         break;
+      default:
+        value = generateRandomArray(fieldType, valueLength, fieldValuesList, 0);
+        break;
+    }
+    return value;
+  }
+
+  public static Object generateRandomArray(String fieldType, int valueLength, List<String> fieldValuesList, int arraySize) {
+    Object value;
+    switch(fieldType) {
       case "int-array":
-        value = generateIntArray(valueLength, fieldValuesList);
+        value = generateIntArray(arraySize, valueLength, fieldValuesList);
         break;
       case "long-array":
-        value = generateLongArray(valueLength, fieldValuesList);
+        value = generateLongArray(arraySize, valueLength, fieldValuesList);
         break;
       case "double-array":
-        value = generateDoubleArray(valueLength, fieldValuesList);
+        value = generateDoubleArray(arraySize, valueLength, fieldValuesList);
+        break;
+      case "float-array":
+        value = generateFloatArray(arraySize, valueLength, fieldValuesList);
         break;
       case "short-array":
-        value = generateShortArray(valueLength, fieldValuesList);
+        value = generateShortArray(arraySize, valueLength, fieldValuesList);
         break;
       case "string-array":
-        value = generateStringArray(valueLength, fieldValuesList);
+        value = generateStringArray(arraySize, valueLength, fieldValuesList);
         break;
       case "uuid-array":
-        value = generateUuidArray(fieldValuesList);
+        value = generateUuidArray(arraySize, fieldValuesList);
         break;
       case "boolean-array":
-        value = generateBooleanArray(fieldValuesList);
+        value = generateBooleanArray(arraySize, fieldValuesList);
         break;
       default:
         value = fieldType;
@@ -128,7 +144,6 @@ public final class RandomTool {
     }
     return value;
   }
-
 
   protected static Object castValue(Object value, String type) {
     Object castValue;
@@ -152,8 +167,8 @@ public final class RandomTool {
     return castValue;
   }
 
-  private static List<Integer> generateIntArray(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static List<Integer> generateIntArray(int arraySize, Integer valueLength, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Integer> intArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
       intArray.add(getIntValueOrRandom(valueLength, fieldValueList));
@@ -161,8 +176,8 @@ public final class RandomTool {
     return intArray;
   }
 
-  private static List<Long> generateLongArray(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static List<Long> generateLongArray(int arraySize, Integer valueLength, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Long> longArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
       longArray.add(getLongValueOrRandom(valueLength, fieldValueList));
@@ -170,8 +185,8 @@ public final class RandomTool {
     return longArray;
   }
 
-  private static List<Double> generateDoubleArray(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static List<Double> generateDoubleArray(int arraySize, Integer valueLength, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Double> doubleArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
       doubleArray.add(getDoubleValueOrRandom(valueLength, fieldValueList));
@@ -179,8 +194,17 @@ public final class RandomTool {
     return doubleArray;
   }
 
-  private static List<Short> generateShortArray(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static List<Float> generateFloatArray(int arraySize, Integer valueLength, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
+    List<Float> floatArray = new ArrayList<>();
+    for (int i=0; i<size; i++) {
+      floatArray.add(getFloatValueOrRandom(valueLength, fieldValueList));
+    }
+    return floatArray;
+  }
+
+  private static List<Short> generateShortArray(int arraySize, Integer valueLength, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Short> shortArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
       shortArray.add(getShortValueOrRandom(valueLength, fieldValueList));
@@ -188,8 +212,8 @@ public final class RandomTool {
     return shortArray;
   }
 
-  private static List<String> generateStringArray(Integer valueLength, List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static List<String> generateStringArray(int arraySize, Integer valueLength, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<String> stringArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
       stringArray.add(getStringValueOrRandom(valueLength, fieldValueList));
@@ -197,8 +221,8 @@ public final class RandomTool {
     return stringArray;
   }
 
-  private static List<UUID> generateUuidArray(List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static List<UUID> generateUuidArray(int arraySize, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<UUID> uuidArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
       uuidArray.add(getUUIDValueOrRandom(fieldValueList));
@@ -206,8 +230,8 @@ public final class RandomTool {
     return uuidArray;
   }
 
-  private static List<Boolean> generateBooleanArray(List<String> fieldValueList) {
-    int size = RandomUtils.nextInt(1,5);
+  private static List<Boolean> generateBooleanArray(int arraySize, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Boolean> booleanArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
       booleanArray.add(getBooleanValueOrRandom(fieldValueList));
@@ -392,6 +416,16 @@ public final class RandomTool {
       value = Double.parseDouble(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
       value = RandomUtils.nextDouble(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
+    }
+    return value;
+  }
+
+  private static Float getFloatValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
+    float value;
+    if (fieldValuesList.size() > 0) {
+      value = Float.parseFloat(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+    } else {
+      value = RandomUtils.nextFloat(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
     return value;
   }
