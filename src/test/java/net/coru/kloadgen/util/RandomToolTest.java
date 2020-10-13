@@ -56,7 +56,7 @@ class RandomToolTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateArrayRandomValue")
   void generateArrayRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat((List<Object>)RandomTool.generateRandom(fieldType, valueLength, fieldValuesList))
+    assertThat((List<Object>)RandomTool.generateRandomList(fieldType, 1, valueLength, fieldValuesList))
         .allMatch(value -> value.equals(expected));
   }
 
@@ -114,8 +114,7 @@ class RandomToolTest {
   void generateMapFixedKeyRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
     String[] expectedKeys = fieldValuesList.toArray(new String[1]);
     Map<String, Object> result = (Map<String, Object>)RandomTool.generateRandomMap(fieldType, valueLength, fieldValuesList,size);
-    assertThat(result).containsKeys(expectedKeys);
-    assertThat(result).doesNotContainValue(null);
+    assertThat(result).containsKeys(expectedKeys).doesNotContainValue(null);
   }
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
@@ -130,7 +129,7 @@ class RandomToolTest {
       Object expectedTyped, Object expectedStored) {
 
     assertThat(RandomTool.generateSeq(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedTyped);
-    assertThat(context.get(fieldName)).isEqualTo(expectedStored);
+    assertThat(context).containsEntry(fieldName,expectedStored);
   }
 
 }
