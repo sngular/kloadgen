@@ -1,0 +1,9 @@
+{
+    "type": "record",
+    "name": "test10",
+    "fields": [
+        { "name": "mapOfString", "type": ["null", { "type": "map", "values": ["null", "string"] }], "default": null },
+        { "name": "arrayOfString", "type": ["null", { "type": "array", "items": "string" }], "default": null },
+        { "name": "arrayOfMap", "type": ["null", { "type": "array", "items": { "type": "map", "values": ["null", "string"] }}], "default": null }
+    ]
+}

@@ -14,6 +14,7 @@ import java.util.Locale;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -31,6 +32,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 })
 class SchemaExtractorTest {
 
+  private final FileHelper fileHelper = new FileHelper();
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
   @BeforeEach
@@ -44,7 +46,7 @@ class SchemaExtractorTest {
   }
 
   @Test
-  public void testFlatPropertiesListSimpleRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
+  void testFlatPropertiesListSimpleRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
@@ -53,15 +55,16 @@ class SchemaExtractorTest {
         "avroSubject"
     );
 
-    assertThat(fieldValueMappingList).hasSize(2);
-    assertThat(fieldValueMappingList).containsExactlyInAnyOrder(
+    assertThat(fieldValueMappingList)
+        .hasSize(2)
+        .containsExactlyInAnyOrder(
         new FieldValueMapping("Name", "string"),
         new FieldValueMapping("Age", "int")
     );
   }
 
   @Test
-  public void testFlatPropertiesListArrayRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
+  void testFlatPropertiesListArrayRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
@@ -70,15 +73,16 @@ class SchemaExtractorTest {
         "users"
     );
 
-    assertThat(fieldValueMappingList).hasSize(2);
-    assertThat(fieldValueMappingList).containsExactlyInAnyOrder(
+    assertThat(fieldValueMappingList)
+        .hasSize(2)
+        .containsExactlyInAnyOrder(
         new FieldValueMapping("Users[].id", "long"),
         new FieldValueMapping("Users[].name", "string")
     );
   }
 
   @Test
-  public void testFlatPropertiesListMapArray(@Wiremock WireMockServer server) throws IOException, RestClientException {
+  void testFlatPropertiesListMapArray(@Wiremock WireMockServer server) throws IOException, RestClientException {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
@@ -87,10 +91,27 @@ class SchemaExtractorTest {
         "arrayMap"
     );
 
-    assertThat(fieldValueMappingList).hasSize(2);
-    assertThat(fieldValueMappingList).containsExactlyInAnyOrder(
+    assertThat(fieldValueMappingList)
+        .hasSize(2)
+        .containsExactlyInAnyOrder(
         new FieldValueMapping("name", "string"),
         new FieldValueMapping("values[]", "string-map-array")
     );
+  }
+
+  @Test
+  void testFlatPropertiesOptionalMapArray() throws IOException, RestClientException {
+
+    File testFile = fileHelper.getFile("/avro-files/testOptionalMap.avsc");
+
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile));
+
+    assertThat(fieldValueMappingList)
+        .hasSize(3)
+        .containsExactlyInAnyOrder(
+            new FieldValueMapping("mapOfString[]", "string-map"),
+            new FieldValueMapping("arrayOfString", "string-array"),
+            new FieldValueMapping("arrayOfMap", "string-map")
+        );
   }
 }
