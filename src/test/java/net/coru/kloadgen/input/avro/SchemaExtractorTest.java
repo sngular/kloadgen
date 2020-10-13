@@ -100,7 +100,7 @@ class SchemaExtractorTest {
   }
 
   @Test
-  void testFlatPropertiesOptionalMapArray() throws IOException, RestClientException {
+  void testFlatPropertiesOptionalMapArray() throws IOException {
 
     File testFile = fileHelper.getFile("/avro-files/testOptionalMap.avsc");
 
@@ -110,8 +110,8 @@ class SchemaExtractorTest {
         .hasSize(3)
         .containsExactlyInAnyOrder(
             new FieldValueMapping("mapOfString[]", "string-map"),
-            new FieldValueMapping("arrayOfString", "string-array"),
-            new FieldValueMapping("arrayOfMap", "string-map")
+            new FieldValueMapping("arrayOfString[]", "string-array"),
+            new FieldValueMapping("arrayOfMap[]", "string-map-array")
         );
   }
 }

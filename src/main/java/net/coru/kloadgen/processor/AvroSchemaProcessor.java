@@ -6,6 +6,11 @@
 
 package net.coru.kloadgen.processor;
 
+import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
+import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.UNION;
+
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -26,12 +31,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-
-
-import static org.apache.avro.Schema.Type.ARRAY;
-import static org.apache.avro.Schema.Type.MAP;
-import static org.apache.avro.Schema.Type.RECORD;
-import static org.apache.avro.Schema.Type.UNION;
 
 public class AvroSchemaProcessor {
 
@@ -58,41 +57,36 @@ public class AvroSchemaProcessor {
     GenericRecord entity = new GenericData.Record(schema);
     if (!fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-      FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
       while (!fieldExpMappingsQueue.isEmpty()) {
+        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.peek();
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
-            fieldExpMappingsQueue.poll();
             entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
                 fieldValueMapping.getFieldValuesList()));
           } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
-            fieldExpMappingsQueue.poll();
             entity.put(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
                 fieldValueMapping.getValueLength(),
                 fieldValueMapping.getFieldValuesList()));
           } else {
             entity.put(fieldName,
-                createObjectArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
+                createArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
                     fieldName,
                     calculateSize(fieldValueMapping.getFieldName(), fieldName),
                     fieldExpMappingsQueue));
-            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           }
         } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
-          fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
           entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
               randomToolAvro.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
                   fieldValueMapping.getFieldValuesList(),
                   schema.getField(fieldValueMapping.getFieldName())));
-          fieldExpMappingsQueue.remove();
-          fieldValueMapping = fieldExpMappingsQueue.peek();
         }
+        fieldExpMappingsQueue.remove();
       }
     }
     return new EnrichedRecord(metadata, entity);
@@ -106,14 +100,13 @@ public class AvroSchemaProcessor {
     return realField;
   }
 
-  private GenericRecord createObject(final Schema subSchema, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
-      throws KLoadGenException {
-    Schema schema = subSchema;
-    GenericRecord subEntity = createRecord(schema);
+  private GenericRecord createObject(final Schema subSchema, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    Schema innerSchema = subSchema;
+    GenericRecord subEntity = createRecord(innerSchema);
     if (null == subEntity) {
       throw new KLoadGenException("Something Odd just happened");
     } else {
-      schema = subEntity.getSchema();
+      innerSchema = subEntity.getSchema();
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
@@ -150,11 +143,20 @@ public class AvroSchemaProcessor {
             fieldValueMapping.getFieldType(),
             fieldValueMapping.getValueLength(),
             fieldValueMapping.getFieldValuesList(),
-            schema.getField(cleanFieldName)));
+            innerSchema.getField(cleanFieldName)));
       }
       fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
     }
     return subEntity;
+  }
+
+  private Object createArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    if (typesSet.contains(subSchema.getType())) {
+      FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.peek();
+      return randomToolAvro.generateRandomList(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(), arraySize);
+    } else {
+      return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
+    }
   }
 
   private Schema extractRecordSchema(Field field) {
@@ -166,11 +168,10 @@ public class AvroSchemaProcessor {
       return getRecordUnion(field.schema().getTypes());
     } else if (typesSet.contains(field.schema().getType())){
       return getRecordUnion(field.schema().getTypes());
-    }else return null;
+    } else return null;
   }
 
-  private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
-      throws KLoadGenException {
+  private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     List<GenericRecord> objectArray = new ArrayList<>(arraySize);
     for(int i=0; i<arraySize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
@@ -180,13 +181,11 @@ public class AvroSchemaProcessor {
     return objectArray;
   }
 
-  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings)
-      throws KLoadGenException {
+  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings) {
     return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, arraySize);
   }
 
-  private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings)
-      throws KLoadGenException {
+  private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings) {
     return randomToolAvro.generateRandomMap(fieldType, mapSize, fieldExpMappings, arraySize);
   }
 
@@ -199,18 +198,16 @@ public class AvroSchemaProcessor {
       return createRecord(schema.getElementType());
     } else if (MAP == schema.getType()) {
       return createRecord(schema.getElementType());
-    } else if (typesSet.contains(schema.getType())) {
-      return createRecord(schema.getElementType());
-    } else{
+    } else {
       return null;
     }
   }
 
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
-    for (Schema schema : types) {
-      if (RECORD == schema.getType() || ARRAY == schema.getType() || MAP == schema.getType() || typesSet.contains(schema.getType())) {
-        isRecord = schema;
+    for (Schema innerSchema : types) {
+      if (RECORD == innerSchema.getType() || ARRAY == innerSchema.getType() || MAP == innerSchema.getType() || typesSet.contains(innerSchema.getType())) {
+        isRecord = innerSchema;
       }
     }
     return isRecord;
@@ -228,7 +225,7 @@ public class AvroSchemaProcessor {
   }
 
   private FieldValueMapping getSafeGetElement(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-    return !fieldExpMappingsQueue.isEmpty() ? fieldExpMappingsQueue.element() : null;
+    return !fieldExpMappingsQueue.isEmpty() ? fieldExpMappingsQueue.poll() : null;
   }
 
   private String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName) {
