@@ -53,11 +53,11 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
     private String topic;
 
-    private String msg_key_type;
+    private String msgKeyType;
 
-    private List<String> msg_key_value;
+    private List<String> msgKeyValue;
 
-    private boolean key_message_flag = false;
+    private boolean keyMessageFlag = false;
 
     private final StatelessRandomTool statelessRandomTool;
 
@@ -71,8 +71,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
     @Override
     public Arguments getDefaultParameters() {
 
-        Arguments defaultParameters = SamplerUtil.getCommonDefaultParameters();
-        return defaultParameters;
+        return SamplerUtil.getCommonDefaultParameters();
     }
 
     @Override
@@ -83,9 +82,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
-            key_message_flag= true;
-            msg_key_type = context.getParameter(MESSAGE_KEY_KEY_TYPE);
-            msg_key_value = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
+            keyMessageFlag = true;
+            msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
+            msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
                     ? emptyList() : singletonList(context.getParameter(MESSAGE_KEY_KEY_VALUE));
         }
 
@@ -106,8 +105,8 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
             ProducerRecord<String, Object> producerRecord;
             try {
-                if (key_message_flag) {
-                    String key = statelessRandomTool.generateRandom("key", msg_key_type, 0, msg_key_value).toString();
+                if (keyMessageFlag) {
+                    String key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
                     producerRecord = new ProducerRecord<>(topic, key, messageVal);
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal);

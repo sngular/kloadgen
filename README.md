@@ -101,19 +101,6 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **sasl.kerberos.service.name** : Kafka Kerberos service name
 * **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing.
 
-Above properties are added by default in sampler as those are more significant in terms of performance in most of the cases. But you can add other non listed kafka properties with prefix "_".
-
-For example to enable SSL properties you can add below properties
-
-```bash
-_ssl.key.password
-_ssl.keystore.location
-_ssl.keystore.password
-_ssl.truststore.location
-_ssl.truststore.password
-
-```
-
 ![Kafka Producer Configuration](/Kafka_producer_properties.png)
 
 ### Schema Registry Configuration
