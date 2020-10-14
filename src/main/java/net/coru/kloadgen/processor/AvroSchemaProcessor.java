@@ -62,16 +62,18 @@ public class AvroSchemaProcessor {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
-            fieldExpMappingsQueue.poll();
-            entity.put(fieldName, createObjectMap(fieldValueMapping.getFieldType(),
+            fieldExpMappingsQueue.remove();
+            entity.put(fieldName, createSimpleTypeMap(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
                 fieldValueMapping.getFieldValuesList()));
+            fieldValueMapping = fieldExpMappingsQueue.peek();
           } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
-            fieldExpMappingsQueue.poll();
-            entity.put(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
+            fieldExpMappingsQueue.remove();
+            entity.put(fieldName, createSimpleTypeMapArray(fieldValueMapping.getFieldType(),
                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
                 fieldValueMapping.getValueLength(),
                 fieldValueMapping.getFieldValuesList()));
+            fieldValueMapping = fieldExpMappingsQueue.peek();
           } else {
             entity.put(fieldName,
                 createArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
@@ -120,13 +122,13 @@ public class AvroSchemaProcessor {
         if (fieldValueMapping.getFieldType().endsWith("map")){
           fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
-          subEntity.put(fieldNameSubEntity, createObjectMap(fieldValueMapping.getFieldType(),
+          subEntity.put(fieldNameSubEntity, createSimpleTypeMap(fieldValueMapping.getFieldType(),
               calculateSize(fieldValueMapping.getFieldName(), fieldName),
               fieldValueMapping.getFieldValuesList()));
         } else if (fieldValueMapping.getFieldType().endsWith("map-array")){
           fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
-          subEntity.put(fieldNameSubEntity, createObjectMapArray(fieldValueMapping.getFieldType(),
+          subEntity.put(fieldNameSubEntity, createSimpleTypeMapArray(fieldValueMapping.getFieldType(),
               calculateSize(fieldValueMapping.getFieldName(), fieldName),
               fieldValueMapping.getValueLength(),
               fieldValueMapping.getFieldValuesList()));
@@ -186,11 +188,11 @@ public class AvroSchemaProcessor {
     return objectArray;
   }
 
-  private Object createObjectMap(String fieldType, Integer arraySize, List<String> fieldExpMappings) {
+  private Object createSimpleTypeMap(String fieldType, Integer arraySize, List<String> fieldExpMappings) {
     return randomToolAvro.generateRandomMap(fieldType, arraySize, fieldExpMappings, arraySize);
   }
 
-  private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings) {
+  private Object createSimpleTypeMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings) {
     return randomToolAvro.generateRandomMap(fieldType, mapSize, fieldExpMappings, arraySize);
   }
 

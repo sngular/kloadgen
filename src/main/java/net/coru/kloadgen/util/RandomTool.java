@@ -9,7 +9,6 @@ package net.coru.kloadgen.util;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,23 +26,23 @@ public final class RandomTool {
 
   private RandomTool() {}
 
-  protected static Object generateRandomMap(String fieldType, Integer mapSize, List<String> fieldValueList, Integer arraySize) {
+  protected static Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValueList, Integer mapSize) {
     Object value;
     switch (fieldType) {
       case "int-map":
-        value = generateIntMap(mapSize, fieldValueList);
+        value = generateIntMap(mapSize, fieldValueList, valueLength);
         break;
       case "long-map":
-        value = generateLongMap(mapSize, fieldValueList);
+        value = generateLongMap(mapSize, fieldValueList, valueLength);
         break;
       case "double-map":
-        value = generateDoubleMap(mapSize, fieldValueList);
+        value = generateDoubleMap(mapSize, fieldValueList, valueLength);
         break;
       case "short-map":
-        value = generateShortMap(mapSize, fieldValueList);
+        value = generateShortMap(mapSize, fieldValueList, valueLength);
         break;
       case "string-map":
-        value = generateStringMap(mapSize, fieldValueList);
+        value = generateStringMap(mapSize, fieldValueList, valueLength);
         break;
       case "uuid-map":
         value = generateUuidMap(mapSize, fieldValueList);
@@ -56,7 +55,7 @@ public final class RandomTool {
         break;
     }
     if (fieldType.endsWith("array")) {
-      value = generateMapArray(fieldType, mapSize, fieldValueList, arraySize);
+      value = generateMapArray(fieldType, mapSize, fieldValueList, mapSize);
     }
     return value;
   }
@@ -223,149 +222,142 @@ public final class RandomTool {
     return booleanArray;
   }
 
-  private static Map<String, Integer> generateIntMap(int mapSize, List<String> fieldValueList) {
+  private static Map<String, Integer> generateIntMap(int mapSize, List<String> fieldValueList, int valueLength) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
-    Map<String, Integer> intMap = new HashMap<>();
-    while (intMap.size() < size) {
-      Map.Entry<String, Integer> mapValue;
-      if (!fieldValueList.isEmpty()) {
+    Map<String, Integer> intMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+      while (intMap.size() < Math.min(size, fieldValueList.size())) {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          mapValue = new SimpleEntry<>(tempValue[0], Integer.parseInt(tempValue[1]));
+          intMap.put(tempValue[0], Integer.parseInt(tempValue[1]));
         } else {
-          mapValue = new SimpleEntry<>(tempValue[0], getIntValueOrRandom(0, Collections.emptyList()));
+          intMap.put(tempValue[0], getIntValueOrRandom(valueLength, Collections.emptyList()));
         }
-      } else {
-        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
-            getIntValueOrRandom(0, Collections.emptyList()));
       }
-      intMap.put(mapValue.getKey(), mapValue.getValue());
+    }
+    for (int i = 0; i < Math.abs(intMap.size() - mapSize); i++ ) {
+      intMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+          getIntValueOrRandom(valueLength, Collections.emptyList()));
     }
     return intMap;
   }
 
-  private static Map<String, Long> generateLongMap(int mapSize, List<String> fieldValueList) {
+  private static Map<String, Long> generateLongMap(int mapSize, List<String> fieldValueList, int valueLength) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
-    Map<String, Long> longMap = new HashMap<>();
-    while (longMap.size() < size) {
-      Map.Entry<String, Long> mapValue;
-      if (!fieldValueList.isEmpty()) {
+    Map<String, Long> longMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+      while (longMap.size() < Math.min(size, fieldValueList.size())) {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          mapValue = new SimpleEntry<>(tempValue[0], Long.parseLong(tempValue[1]));
+          longMap.put(tempValue[0], Long.parseLong(tempValue[1]));
         } else {
-          mapValue = new SimpleEntry<>(tempValue[0], getLongValueOrRandom(0, Collections.emptyList()));
+          longMap.put(tempValue[0], getLongValueOrRandom(valueLength, Collections.emptyList()));
         }
-      } else {
-        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
-            getLongValueOrRandom(0, Collections.emptyList()));
       }
-      longMap.put(mapValue.getKey(), mapValue.getValue());
+    }
+    for (int i = 0; i < Math.abs(longMap.size() - mapSize); i++ ) {
+      longMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+          getLongValueOrRandom(valueLength, Collections.emptyList()));
     }
     return longMap;
   }
 
-  private static Map<String, Double> generateDoubleMap(int mapSize, List<String> fieldValueList) {
+  private static Map<String, Double> generateDoubleMap(int mapSize, List<String> fieldValueList, int valueLength) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
-    Map<String, Double> doubleMap = new HashMap<>();
-    while (doubleMap.size() < size) {
-      Map.Entry<String, Double> mapValue;
-      if (!fieldValueList.isEmpty()) {
+    Map<String, Double> doubleMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+      while (doubleMap.size() < Math.min(size, fieldValueList.size())) {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          mapValue = new SimpleEntry<>(tempValue[0], Double.parseDouble(tempValue[1]));
+          doubleMap.put(tempValue[0], Double.parseDouble(tempValue[1]));
         } else {
-          mapValue = new SimpleEntry<>(tempValue[0], getDoubleValueOrRandom(0, Collections.emptyList()));
+          doubleMap.put(tempValue[0], getDoubleValueOrRandom(valueLength, Collections.emptyList()));
         }
-      } else {
-        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
-            getDoubleValueOrRandom(0, Collections.emptyList()));
       }
-      doubleMap.put(mapValue.getKey(), mapValue.getValue());
+    }
+    for (int i = 0; i < Math.abs(doubleMap.size() - mapSize); i++ ) {
+      doubleMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+          getDoubleValueOrRandom(valueLength, Collections.emptyList()));
     }
     return doubleMap;
   }
 
-  private static Map<String, Short> generateShortMap(int mapSize, List<String> fieldValueList) {
+  private static Map<String, Short> generateShortMap(int mapSize, List<String> fieldValueList, int valueLength) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
-    Map<String, Short> shortMap = new HashMap<>();
-    while (shortMap.size() < size) {
-      Map.Entry<String, Short> mapValue;
-      if (!fieldValueList.isEmpty()) {
+    Map<String, Short> shortMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+      while (shortMap.size() < Math.min(size, fieldValueList.size())) {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          mapValue = new SimpleEntry<>(tempValue[0], Short.parseShort(tempValue[1]));
+          shortMap.put(tempValue[0], Short.parseShort(tempValue[1]));
         } else {
-          mapValue = new SimpleEntry<>(tempValue[0], getShortValueOrRandom(0, Collections.emptyList()));
+          shortMap.put(tempValue[0], getShortValueOrRandom(valueLength, Collections.emptyList()));
         }
-      } else {
-        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
-            getShortValueOrRandom(0, Collections.emptyList()));
       }
-      shortMap.put(mapValue.getKey(), mapValue.getValue());
+    }
+    for (int i = 0; i < Math.abs(shortMap.size() - mapSize); i++ ) {
+      shortMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+          getShortValueOrRandom(valueLength, Collections.emptyList()));
     }
     return shortMap;
   }
 
-  private static Map<String, String> generateStringMap(int mapSize, List<String> fieldValueList) {
+  private static Map<String, String> generateStringMap(int mapSize, List<String> fieldValueList, int valueLength) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
-    Map<String, String> stringMap = new HashMap<>();
-    while (stringMap.size() < size) {
-      Map.Entry<String, String> mapValue;
-      if (!fieldValueList.isEmpty()) {
+    Map<String, String> stringMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+      while (stringMap.size() < Math.min(size, fieldValueList.size())) {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          mapValue = new SimpleEntry<>(tempValue[0], tempValue[1]);
+          stringMap.put(tempValue[0], tempValue[1]);
         } else {
-          mapValue = new SimpleEntry<>(tempValue[0], getStringValueOrRandom(0, Collections.emptyList()));
+          stringMap.put(tempValue[0], getStringValueOrRandom(valueLength, Collections.emptyList()));
         }
-      } else {
-        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
-            getStringValueOrRandom(0, Collections.emptyList()));
       }
-      stringMap.put(mapValue.getKey(), mapValue.getValue());
+    }
+    for (int i = 0; i < Math.abs(stringMap.size() - mapSize); i++ ) {
+      stringMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+          getStringValueOrRandom(valueLength, Collections.emptyList()));
     }
     return stringMap;
   }
 
   private static Map<String, UUID> generateUuidMap(int mapSize, List<String> fieldValueList) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
-    Map<String, UUID> uuidMap = new HashMap<>();
-    while (uuidMap.size() < size) {
-      Map.Entry<String, UUID> mapValue;
-      if (!fieldValueList.isEmpty()) {
+    Map<String, UUID> uuidMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+    while (uuidMap.size() <  Math.min(size, fieldValueList.size())) {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          mapValue = new SimpleEntry<>(tempValue[0], UUID.fromString(tempValue[1]));
+          uuidMap.put(tempValue[0], UUID.fromString(tempValue[1]));
         } else {
-          mapValue = new SimpleEntry<>(tempValue[0], getUUIDValueOrRandom(Collections.emptyList()));
+          uuidMap.put(tempValue[0], getUUIDValueOrRandom(Collections.emptyList()));
         }
-      } else {
-        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
-            getUUIDValueOrRandom(Collections.emptyList()));
       }
-      uuidMap.put(mapValue.getKey(), mapValue.getValue());
+    }
+    for (int i = 0; i < Math.abs(uuidMap.size() - mapSize); i++ ) {
+      uuidMap.put(getStringValueOrRandom(0, Collections.emptyList()),
+          getUUIDValueOrRandom(Collections.emptyList()));
     }
     return uuidMap;
   }
 
   private static Map<String, Boolean> generateBooleanMap(Integer mapSize, List<String> fieldValueList) {
     int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
-    Map<String, Boolean> booleanMap = new HashMap<>();
-    for (int i=0; i<size; i++) {
-      Map.Entry<String, Boolean> mapValue;
-      if (!fieldValueList.isEmpty()) {
+    Map<String, Boolean> booleanMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+      while (booleanMap.size() < Math.min(size, fieldValueList.size())) {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          mapValue = new SimpleEntry<>(tempValue[0], Boolean.parseBoolean(tempValue[1]));
+          booleanMap.put(tempValue[0], Boolean.parseBoolean(tempValue[1]));
         } else {
-          mapValue = new SimpleEntry<>(tempValue[0], getBooleanValueOrRandom(Collections.emptyList()));
+          booleanMap.put(tempValue[0], getBooleanValueOrRandom(Collections.emptyList()));
         }
-      } else {
-        mapValue = new SimpleEntry<>(getStringValueOrRandom(0, Collections.emptyList()),
-            getBooleanValueOrRandom(Collections.emptyList()));
       }
-      booleanMap.put(mapValue.getKey(), mapValue.getValue());
+    }
+    for (int i = 0; i < Math.abs(booleanMap.size() - mapSize); i++ ) {
+      booleanMap.put(getStringValueOrRandom(0, Collections.emptyList()),
+          getBooleanValueOrRandom(Collections.emptyList()));
     }
     return booleanMap;
   }
