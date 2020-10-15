@@ -74,7 +74,7 @@ class AvroSchemaProcessorTest {
   @Test
   void textAvroSchemaProcessorArrayMap(@Wiremock WireMockServer server) throws KLoadGenException {
     List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
-        new FieldValueMapping("values[4]", "string-map-array", 2, "n:1, t:2"));
+        new FieldValueMapping("values[2]", "string-map-array", 2, "n:1, t:2"));
 
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
@@ -107,6 +107,6 @@ class AvroSchemaProcessorTest {
     assertThat(message.getGenericRecord()).isNotNull();
     assertThat(message.getGenericRecord().get("values")).isInstanceOf(List.class);
     List<Map<String, Object>> result = (List<Map<String, Object>>) message.getGenericRecord().get("values");
-    assertThat(result).hasSize(4).contains(Maps.of("n","1","t","2"), Maps.of("n","1","t","2"));
+    assertThat(result).hasSize(2).contains(Maps.of("n","1","t","2"), Maps.of("n","1","t","2"));
   }
 }
