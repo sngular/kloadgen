@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -110,8 +111,10 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     @SneakyThrows
     @Override
     public void setValue(Object value) {
-        this.schemaRegistryUrl.setText(value.toString());
-        propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
+        if (Objects.nonNull(value)) {
+            this.schemaRegistryUrl.setText(value.toString());
+            propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
+        }
     }
 
     public void setSchemaRegistryUrl(String schemaUrl) {
