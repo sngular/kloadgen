@@ -235,9 +235,11 @@ public final class RandomTool {
         }
       }
     }
-    for (int i = 0; i < Math.abs(intMap.size() - mapSize); i++ ) {
-      intMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-          getIntValueOrRandom(valueLength, Collections.emptyList()));
+    if (intMap.size() != mapSize) {
+      for (int i = 0; i < Math.abs(intMap.size() - mapSize); i++) {
+        intMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getIntValueOrRandom(valueLength, Collections.emptyList()));
+      }
     }
     return intMap;
   }
@@ -255,9 +257,11 @@ public final class RandomTool {
         }
       }
     }
-    for (int i = 0; i < Math.abs(longMap.size() - mapSize); i++ ) {
-      longMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-          getLongValueOrRandom(valueLength, Collections.emptyList()));
+    if (longMap.size() != mapSize) {
+      for (int i = 0; i <= Math.abs(longMap.size() - mapSize); i++) {
+        longMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getLongValueOrRandom(valueLength, Collections.emptyList()));
+      }
     }
     return longMap;
   }
@@ -275,9 +279,11 @@ public final class RandomTool {
         }
       }
     }
-    for (int i = 0; i < Math.abs(doubleMap.size() - mapSize); i++ ) {
-      doubleMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-          getDoubleValueOrRandom(valueLength, Collections.emptyList()));
+    if (doubleMap.size() != mapSize) {
+      for (int i = 0; i <= Math.abs(doubleMap.size() - mapSize); i++) {
+        doubleMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getDoubleValueOrRandom(valueLength, Collections.emptyList()));
+      }
     }
     return doubleMap;
   }
@@ -295,9 +301,11 @@ public final class RandomTool {
         }
       }
     }
-    for (int i = 0; i < Math.abs(shortMap.size() - mapSize); i++ ) {
-      shortMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-          getShortValueOrRandom(valueLength, Collections.emptyList()));
+    if (shortMap.size() != mapSize) {
+      for (int i = 0; i <= Math.abs(shortMap.size() - mapSize); i++) {
+        shortMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getShortValueOrRandom(valueLength, Collections.emptyList()));
+      }
     }
     return shortMap;
   }
@@ -315,9 +323,11 @@ public final class RandomTool {
         }
       }
     }
-    for (int i = 0; i < Math.abs(stringMap.size() - mapSize); i++ ) {
-      stringMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-          getStringValueOrRandom(valueLength, Collections.emptyList()));
+    if (stringMap.size() != mapSize) {
+      for (int i = 0; i <= Math.abs(stringMap.size() - mapSize); i++) {
+        stringMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getStringValueOrRandom(valueLength, Collections.emptyList()));
+      }
     }
     return stringMap;
   }
@@ -335,9 +345,11 @@ public final class RandomTool {
         }
       }
     }
-    for (int i = 0; i < Math.abs(uuidMap.size() - mapSize); i++ ) {
-      uuidMap.put(getStringValueOrRandom(0, Collections.emptyList()),
-          getUUIDValueOrRandom(Collections.emptyList()));
+    if (uuidMap.size() != mapSize) {
+      for (int i = 0; i <= Math.abs(uuidMap.size() - mapSize); i++) {
+        uuidMap.put(getStringValueOrRandom(0, Collections.emptyList()),
+            getUUIDValueOrRandom(Collections.emptyList()));
+      }
     }
     return uuidMap;
   }
@@ -355,9 +367,11 @@ public final class RandomTool {
         }
       }
     }
-    for (int i = 0; i < Math.abs(booleanMap.size() - mapSize); i++ ) {
-      booleanMap.put(getStringValueOrRandom(0, Collections.emptyList()),
-          getBooleanValueOrRandom(Collections.emptyList()));
+    if (booleanMap.size() != mapSize) {
+      for (int i = 0; i <= Math.abs(booleanMap.size() - mapSize); i++) {
+        booleanMap.put(getStringValueOrRandom(0, Collections.emptyList()),
+            getBooleanValueOrRandom(Collections.emptyList()));
+      }
     }
     return booleanMap;
   }

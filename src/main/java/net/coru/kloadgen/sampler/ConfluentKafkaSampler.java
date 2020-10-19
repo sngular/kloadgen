@@ -20,13 +20,10 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Future;
@@ -54,21 +51,19 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
     private static final long serialVersionUID = 1L;
 
-    private KafkaProducer<String, Object> producer;
+    private transient KafkaProducer<String, Object> producer;
 
     private String topic;
 
-    private String msg_key_type;
+    private String msgKeyType;
 
-    private List<String> msg_key_value;
+    private List<String> msgKeyValue;
 
-    private boolean key_message_flag = false;
+    private boolean keyMessageFlag = false;
 
-    private final ObjectMapper objectMapperJson = new ObjectMapper();
+    private final transient StatelessRandomTool statelessRandomTool;
 
-    private final StatelessRandomTool statelessRandomTool;
-
-    private final BaseLoadGenerator generator;
+    private final transient BaseLoadGenerator generator;
 
     public ConfluentKafkaSampler() {
         generator = new AvroLoadGenerator();
@@ -97,9 +92,9 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         }
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
-            key_message_flag= true;
-            msg_key_type = context.getParameter(MESSAGE_KEY_KEY_TYPE);
-            msg_key_value = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
+            keyMessageFlag = true;
+            msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
+            msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
                     ? emptyList() : singletonList(context.getParameter(MESSAGE_KEY_KEY_VALUE));
         }
 
@@ -118,19 +113,13 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         if (Objects.nonNull(messageVal)) {
             ProducerRecord<String, Object> producerRecord;
             try {
-                if (key_message_flag) {
-                    String key = statelessRandomTool.generateRandom("key", msg_key_type, 0, msg_key_value).toString();
+                if (keyMessageFlag) {
+                    String key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
                     producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
                 }
-                Map<String, String> jsonTypes = new HashMap<>();
-                jsonTypes.put("contentType", "java.lang.String");
-                producerRecord.headers()
-                    .add("spring_json_header_types", objectMapperJson.writeValueAsBytes(jsonTypes));
-                List<String> headersSB = new ArrayList<>();
-                headersSB.add("spring_json_header_types".concat(objectMapperJson.writeValueAsString(jsonTypes)));
-                headersSB.addAll(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
+                List<String> headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
 
                 sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
                 sampleResult.setSamplerData(producerRecord.value().toString());
