@@ -7,16 +7,6 @@
 
 package net.coru.kloadgen.sampler;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -43,6 +33,17 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
+
 @Slf4j
 public class KafkaSampler extends AbstractJavaSamplerClient implements Serializable {
 
@@ -52,11 +53,11 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
     private String topic;
 
-    private String msg_key_type;
+    private String msgKeyType;
 
-    private List<String> msg_key_value;
+    private List<String> msgKeyValue;
 
-    private boolean key_message_flag = false;
+    private boolean keyMessageFlag = false;
 
     private final StatelessRandomTool statelessRandomTool;
 
@@ -70,8 +71,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
     @Override
     public Arguments getDefaultParameters() {
 
-        Arguments defaultParameters = SamplerUtil.getCommonDefaultParameters();
-        return defaultParameters;
+        return SamplerUtil.getCommonDefaultParameters();
     }
 
     @Override
@@ -82,9 +82,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
-            key_message_flag= true;
-            msg_key_type = context.getParameter(MESSAGE_KEY_KEY_TYPE);
-            msg_key_value = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
+            keyMessageFlag = true;
+            msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
+            msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
                     ? emptyList() : singletonList(context.getParameter(MESSAGE_KEY_KEY_VALUE));
         }
 
@@ -105,8 +105,8 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
             ProducerRecord<String, Object> producerRecord;
             try {
-                if (key_message_flag) {
-                    String key = statelessRandomTool.generateRandom("key", msg_key_type, 0, msg_key_value).toString();
+                if (keyMessageFlag) {
+                    String key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
                     producerRecord = new ProducerRecord<>(topic, key, messageVal);
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal);
@@ -151,7 +151,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
     @Override
     public void teardownTest(JavaSamplerContext context) {
-        producer.close();
+        if (Objects.nonNull(producer)) {
+            producer.close();
+        }
     }
 
     private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {

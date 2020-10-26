@@ -10,7 +10,6 @@ package net.coru.kloadgen.sampler;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
@@ -73,9 +72,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
     @Override
     public Arguments getDefaultParameters() {
 
-        Arguments defaultParameters = SamplerUtil.getCommonDefaultParameters();
-        defaultParameters.addArgument(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
-        return defaultParameters;
+        return SamplerUtil.getCommonDefaultParameters();
     }
 
     @Override

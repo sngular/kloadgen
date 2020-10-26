@@ -9,6 +9,7 @@ package net.coru.kloadgen.util;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -80,6 +81,9 @@ public final class RandomTool {
       case "double-array":
         value = generateDoubleArray(valueLength, fieldValueList, arraySize);
         break;
+      case "float-array":
+        value = generateFloatArray(valueLength, fieldValueList, arraySize);
+        break;
       case "short-array":
         value = generateShortArray(valueLength, fieldValueList, arraySize);
         break;
@@ -115,9 +119,12 @@ public final class RandomTool {
       case "double":
         value = getDoubleValueOrRandom(valueLength, fieldValueList);
         break;
+      case "float":
+        value = getFloatValueOrRandom(valueLength, fieldValueList);
+        break;
       case "bytes":
 		    value = getByteRandom(valueLength);
-		break;
+		    break;
       case "timestamp":
       case "longTimestamp":
       case "stringTimestamp":
@@ -130,12 +137,45 @@ public final class RandomTool {
         value = getBooleanValueOrRandom(fieldValueList);
         break;
       default:
-        value = fieldType;
+        value = generateRandomArray(fieldType, valueLength, fieldValueList, 0);
         break;
     }
     return value;
   }
 
+  public static Object generateRandomArray(String fieldType, int valueLength, List<String> fieldValueList, int arraySize) {
+    Object value;
+    switch(fieldType) {
+      case "int-array":
+        value = generateIntArray(arraySize, valueLength, fieldValueList);
+        break;
+      case "long-array":
+        value = generateLongArray(arraySize, valueLength, fieldValueList);
+        break;
+      case "double-array":
+        value = generateDoubleArray(arraySize, valueLength, fieldValueList);
+        break;
+      case "float-array":
+        value = generateFloatArray(arraySize, valueLength, fieldValueList);
+        break;
+      case "short-array":
+        value = generateShortArray(arraySize, valueLength, fieldValueList);
+        break;
+      case "string-array":
+        value = generateStringArray(arraySize, valueLength, fieldValueList);
+        break;
+      case "uuid-array":
+        value = generateUuidArray(arraySize, fieldValueList);
+        break;
+      case "boolean-array":
+        value = generateBooleanArray(arraySize, fieldValueList);
+        break;
+      default:
+        value = fieldType;
+        break;
+    }
+    return value;
+  }
 
   protected static Object castValue(Object value, String type) {
     Object castValue;
@@ -148,6 +188,9 @@ public final class RandomTool {
         break;
       case "long":
         castValue = Long.valueOf(value.toString());
+        break;
+      case "float":
+        castValue = Float.valueOf(value.toString());
         break;
       case "boolean":
         castValue = Boolean.valueOf(value.toString());
@@ -184,6 +227,15 @@ public final class RandomTool {
       doubleArray.add(getDoubleValueOrRandom(valueLength, fieldValueList));
     }
     return doubleArray;
+  }
+
+  private static List<Float> generateFloatArray(int arraySize, Integer valueLength, List<String> fieldValueList) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
+    List<Float> floatArray = new ArrayList<>();
+    for (int i=0; i<size; i++) {
+      floatArray.add(getFloatValueOrRandom(valueLength, fieldValueList));
+    }
+    return floatArray;
   }
 
   private static List<Short> generateShortArray(Integer valueLength, List<String> fieldValueList, int arraySize) {
@@ -245,7 +297,7 @@ public final class RandomTool {
   }
 
   private static Map<String, Long> generateLongMap(int mapSize, List<String> fieldValueList, int valueLength) {
-    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
+    int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Long> longMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
       while (longMap.size() < Math.min(size, fieldValueList.size())) {
@@ -267,7 +319,7 @@ public final class RandomTool {
   }
 
   private static Map<String, Double> generateDoubleMap(int mapSize, List<String> fieldValueList, int valueLength) {
-    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
+    int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Double> doubleMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
       while (doubleMap.size() < Math.min(size, fieldValueList.size())) {
@@ -288,8 +340,30 @@ public final class RandomTool {
     return doubleMap;
   }
 
+  private static Map<String, Float> generateFloatMap(int mapSize, List<String> fieldValueList, int valueLength) {
+    int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
+    Map<String, Float> floatMap = new HashMap<>(size);
+    if (!fieldValueList.isEmpty()) {
+      while (floatMap.size() < Math.min(size, fieldValueList.size())) {
+        String[] tempValue = getMapEntryValue(fieldValueList);
+        if (tempValue.length > 1) {
+          floatMap.put(tempValue[0], Float.parseFloat(tempValue[1]));
+        } else {
+          floatMap.put(tempValue[0], getFloatValueOrRandom(valueLength, Collections.emptyList()));
+        }
+      }
+    }
+    if (floatMap.size() != mapSize) {
+      for (int i = 0; i <= Math.abs(floatMap.size() - mapSize); i++) {
+        floatMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
+            getFloatValueOrRandom(valueLength, Collections.emptyList()));
+      }
+    }
+    return floatMap;
+  }
+
   private static Map<String, Short> generateShortMap(int mapSize, List<String> fieldValueList, int valueLength) {
-    int size = mapSize>0?mapSize:RandomUtils.nextInt(1,5);
+    int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Short> shortMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
       while (shortMap.size() < Math.min(size, fieldValueList.size())) {
@@ -406,6 +480,16 @@ public final class RandomTool {
       value = Double.parseDouble(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
       value = RandomUtils.nextDouble(1, 9 * Math.pow(10, calculateSize(valueLength)));
+    }
+    return value;
+  }
+
+  private static Float getFloatValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
+    float value;
+    if (fieldValuesList.size() > 0) {
+      value = Float.parseFloat(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
+    } else {
+      value = RandomUtils.nextFloat(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
     }
     return value;
   }
