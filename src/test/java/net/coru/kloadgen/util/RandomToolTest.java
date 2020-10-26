@@ -1,5 +1,7 @@
 package net.coru.kloadgen.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -12,9 +14,6 @@ import org.apache.groovy.util.Maps;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class RandomToolTest {
 
@@ -59,7 +58,7 @@ class RandomToolTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateArrayRandomValue")
   void generateArrayRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat((List<Object>)RandomTool.generateRandomList(fieldType, 1, valueLength, fieldValuesList))
+    assertThat((List<Object>)RandomTool.generateRandomArray(fieldType, valueLength, fieldValuesList, 1))
         .allMatch(value -> value.equals(expected));
   }
 
