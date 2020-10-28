@@ -10,4 +10,4 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         issue-message: 'Thank you for collaborate with the project giving us feedback!!'' You will help us a lot if you can attach and example AVRO and an example Test Plan in order to be able to reproduce the error. If that is the case. Cheers'
-        pr-message: 'Thank you for collaborate with the project help us to improve!!'''
+        pr-message: 'Thank you for collaborate with the project to help us to improve!!'''
