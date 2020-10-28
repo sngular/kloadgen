@@ -43,7 +43,6 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
@@ -109,7 +108,6 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "<Keystore Password>");
     defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "<Truststore Location>");
     defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "<Truststore Password>");
-    defaultParameters.addArgument(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
 
     defaultParameters.addArgument(ProducerConfig.CLIENT_ID_CONFIG, "");
     defaultParameters.addArgument(ProducerConfig.SECURITY_PROVIDERS_CONFIG, "");
@@ -144,8 +142,9 @@ public final class SamplerUtil {
     props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
 
     configSchemRegistryUrl(generator, props);
-    props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
-
+    if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
+      props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+    }
     Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
       if (parameter.startsWith("_")) {

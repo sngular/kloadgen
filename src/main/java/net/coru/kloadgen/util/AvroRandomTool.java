@@ -6,6 +6,11 @@
 
 package net.coru.kloadgen.util;
 
+import static org.apache.avro.Schema.Type.ENUM;
+import static org.apache.avro.Schema.Type.FIXED;
+import static org.apache.avro.Schema.Type.NULL;
+import static org.apache.avro.Schema.Type.UNION;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +23,6 @@ import org.apache.avro.generic.GenericFixed;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.jmeter.threads.JMeterContextService;
-
-import static org.apache.avro.Schema.Type.ENUM;
-import static org.apache.avro.Schema.Type.FIXED;
-import static org.apache.avro.Schema.Type.NULL;
-import static org.apache.avro.Schema.Type.UNION;
 
 
 public class AvroRandomTool {
@@ -39,6 +39,19 @@ public class AvroRandomTool {
     );
 
     return RandomTool.generateRandomMap(fieldType, valueLength, parameterList, size);
+
+  }
+
+  public Object generateRandomList(String fieldType, Integer valueLength, List<String> fieldValuesList, int arraySize) {
+
+    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    parameterList.replaceAll(fieldValue ->
+        fieldValue.matches("\\$\\{\\w*}") ?
+            JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
+            fieldValue
+    );
+
+    return RandomTool.generateRandomArray(fieldType, valueLength, parameterList, arraySize);
 
   }
 

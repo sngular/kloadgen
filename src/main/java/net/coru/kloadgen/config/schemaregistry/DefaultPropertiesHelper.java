@@ -18,15 +18,20 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PAS
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_DEFAULT;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.coru.kloadgen.model.PropertyMapping;
 
 class DefaultPropertiesHelper {
 
-  protected static final List<PropertyMapping> DEFAULTS = asList(
+  protected static final List<PropertyMapping> DEFAULTS = new ArrayList<>(asList(
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_AUTH_FLAG).propertyValue(FLAG_NO).build(),
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_AUTH_KEY).propertyValue(SCHEMA_REGISTRY_AUTH_BASIC_TYPE).build(),
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_USERNAME_KEY).propertyValue(SCHEMA_REGISTRY_USERNAME_DEFAULT).build(),
       PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_PASSWORD_KEY).propertyValue(SCHEMA_REGISTRY_PASSWORD_DEFAULT).build(),
-      PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_AUTH_BEARER_KEY).propertyValue(SCHEMA_REGISTRY_AUTH_BEARER_DEFAULT).build());
+      PropertyMapping.builder().propertyName(SCHEMA_REGISTRY_AUTH_BEARER_KEY).propertyValue(SCHEMA_REGISTRY_AUTH_BEARER_DEFAULT).build()));
+
+  private DefaultPropertiesHelper() {
+  }
+
 }

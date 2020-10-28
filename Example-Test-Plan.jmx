@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.2">
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
@@ -56,7 +56,7 @@
         </net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
         <net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement" testname="Kafka Load Generator Config" enabled="true">
-          <stringProp name="avroSubject">&lt;avro subject&gt;</stringProp>
+          <stringProp name="avroSubject"></stringProp>
           <stringProp name="placeHolder">MESSAGE</stringProp>
           <collectionProp name="schemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
@@ -254,14 +254,14 @@
                 <stringProp name="Argument.value">NO</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="message.key.placeholder" elementType="Argument">
-                <stringProp name="Argument.name">message.key.placeholder</stringProp>
-                <stringProp name="Argument.value">KEY</stringProp>
+              <elementProp name="message.key.type" elementType="Argument">
+                <stringProp name="Argument.name">message.key.type</stringProp>
+                <stringProp name="Argument.value">string</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="message.value.placeholder" elementType="Argument">
-                <stringProp name="Argument.name">message.value.placeholder</stringProp>
-                <stringProp name="Argument.value">MESSAGE</stringProp>
+              <elementProp name="message.key.value" elementType="Argument">
+                <stringProp name="Argument.name">message.key.value</stringProp>
+                <stringProp name="Argument.value">&lt;key.value&gt;</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="kerberos.auth.enabled" elementType="Argument">
@@ -292,11 +292,6 @@
               <elementProp name="sasl.mechanism" elementType="Argument">
                 <stringProp name="Argument.name">sasl.mechanism</stringProp>
                 <stringProp name="Argument.value">GSSAPI</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="auto.register.schemas" elementType="Argument">
-                <stringProp name="Argument.name">auto.register.schemas</stringProp>
-                <stringProp name="Argument.value">true</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="value.subject.name.strategy" elementType="Argument">
@@ -334,13 +329,23 @@
                 <stringProp name="Argument.value">&lt;Truststore Password&gt;</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="auto.register.schemas" elementType="Argument">
+                <stringProp name="Argument.name">auto.register.schemas</stringProp>
+                <stringProp name="Argument.value">true</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="auto.register.schemas" elementType="Argument">
+                <stringProp name="Argument.name">auto.register.schemas</stringProp>
+                <stringProp name="Argument.value">true</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
             </collectionProp>
           </elementProp>
           <stringProp name="classname">net.coru.kloadgen.sampler.ConfluentKafkaSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
-          <stringProp name="schemaRegistryUrl">http://localhost:8082</stringProp>
+          <stringProp name="schemaRegistryUrl">http://localhost:8081</stringProp>
           <collectionProp name="schemaRegistryProperties">
             <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>

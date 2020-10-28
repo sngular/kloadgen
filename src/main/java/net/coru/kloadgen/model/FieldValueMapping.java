@@ -64,6 +64,11 @@ public class FieldValueMapping extends AbstractTestElement {
         setProperty(VALUE_LENGTH, valueLength);
     }
 
+    public void setValueLength(String valueLength) {
+        this.valueLength = Integer.parseInt(valueLength);
+        setProperty(VALUE_LENGTH, valueLength);
+    }
+
     public String getFieldType() {
         return getPropertyAsString(FIELD_TYPE);
     }
@@ -75,9 +80,9 @@ public class FieldValueMapping extends AbstractTestElement {
 
     public List<String> getFieldValuesList() {
         List<String> result;
-        String fieldValueList = getPropertyAsString(FIELD_VALUES_LIST);
-        if (StringUtils.isNotBlank(fieldValueList) && !"[]".equalsIgnoreCase(fieldValueList)) {
-            result = asList(fieldValueList.split(",", -1));
+        String valueList = getPropertyAsString(FIELD_VALUES_LIST);
+        if (StringUtils.isNotBlank(valueList) && !"[]".equalsIgnoreCase(valueList)) {
+            result = asList(valueList.split(",", -1));
         } else {
             result = Collections.emptyList();
         }

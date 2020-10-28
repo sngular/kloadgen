@@ -190,9 +190,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
     String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
     if (Objects.nonNull(subjects)) {
       String[] subjectsList = subjects.split(",");
-      if (subjectNameComboBox.getModel().getSize() != subjectsList.length) {
-        subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjectsList));
-      }
+      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjectsList));
     }
     if (value != null) {
       if (this.subjectNameComboBox.getModel().getSize() == 0) {
