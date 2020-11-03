@@ -68,17 +68,19 @@
   <dependencies>
     <dependency>
       <artifactId>jorphan</artifactId>
+      <groupId>org.apache.jmeter</groupId>
+      <version>${jmeter.version}</version>
       <exclusions>
         <exclusion>
           <artifactId>slf4j-api</artifactId>
           <groupId>org.slf4j</groupId>
         </exclusion>
       </exclusions>
-      <groupId>org.apache.jmeter</groupId>
-      <version>${jmeter.version}</version>
     </dependency>
     <dependency>
       <artifactId>kafka_2.13</artifactId>
+      <groupId>org.apache.kafka</groupId>
+      <version>${kafka.version}</version>
       <exclusions>
         <exclusion>
           <artifactId>slf4j-log4j12</artifactId>
@@ -89,22 +91,20 @@
           <groupId>org.slf4j</groupId>
         </exclusion>
       </exclusions>
-      <groupId>org.apache.kafka</groupId>
-      <version>${kafka.version}</version>
     </dependency>
     <dependency>
-      <artifactId>guava</artifactId>
       <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
       <version>${guava.version}</version>
     </dependency>
     <dependency>
-      <artifactId>minimal-json</artifactId>
       <groupId>com.eclipsesource.minimal-json</groupId>
+      <artifactId>minimal-json</artifactId>
       <version>${minimal-json.version}</version>
     </dependency>
     <dependency>
-      <artifactId>avro</artifactId>
       <groupId>org.apache.avro</groupId>
+      <artifactId>avro</artifactId>
       <version>${avro.version}</version>
       <exclusions>
         <exclusion>
@@ -119,130 +119,135 @@
       <version>2.10.5</version>
     </dependency>
     <dependency>
-      <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
       <scope>provided</scope>
       <version>${lombok.version}</version>
     </dependency>
     <dependency>
-      <artifactId>commons-lang3</artifactId>
       <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
       <version>${commons-lang3.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.confluent</groupId>
       <artifactId>kafka-schema-registry-client</artifactId>
-      <groupId>io.confluent</groupId>
       <version>${kafka-schema-registry-client.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.confluent</groupId>
       <artifactId>kafka-avro-serializer</artifactId>
-      <groupId>io.confluent</groupId>
       <version>${kafka-schema-registry-client.version}</version>
     </dependency>
     <dependency>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-json-schema-provider</artifactId>
+      <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
       <version>${slf4j-api.version}</version>
     </dependency>
     <dependency>
-      <artifactId>commons-collections4</artifactId>
       <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
       <version>${commons-collections4.version}</version>
     </dependency>
     <dependency>
-      <artifactId>commons-cli</artifactId>
       <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
       <version>1.4</version>
     </dependency>
     <!-- Options -->
     <dependency>
+      <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.13</artifactId>
       <classifier>test</classifier>
-      <groupId>org.apache.kafka</groupId>
       <scope>test</scope>
       <version>${kafka.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
       <classifier>test</classifier>
-      <groupId>org.apache.kafka</groupId>
       <scope>test</scope>
       <version>${kafka.version}</version>
     </dependency>
     <dependency>
-      <artifactId>junit-jupiter-api</artifactId>
       <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
       <version>${junit-jupiter-api.version}</version>
     </dependency>
     <dependency>
-      <artifactId>assertj-core</artifactId>
       <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
       <version>${assertj-core.version}</version>
     </dependency>
     <dependency>
-      <artifactId>assertj-json</artifactId>
       <groupId>com.revinate</groupId>
+      <artifactId>assertj-json</artifactId>
       <scope>test</scope>
       <version>${assertj-json.version}</version>
     </dependency>
     <dependency>
-      <artifactId>json-path</artifactId>
       <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
       <scope>compile</scope>
       <version>${json-path.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <groupId>org.mockito</groupId>
       <scope>test</scope>
       <version>${mockito-core.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <groupId>org.mockito</groupId>
       <scope>test</scope>
       <version>${mockito-core.version}</version>
     </dependency>
     <dependency>
-      <artifactId>commons-beanutils</artifactId>
       <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
       <scope>test</scope>
       <version>${commons-beanutils.version}</version>
     </dependency>
     <dependency>
-      <artifactId>wiremock</artifactId>
       <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
       <scope>test</scope>
       <version>${wiremock.version}</version>
     </dependency>
     <dependency>
-      <artifactId>wiremock-junit5</artifactId>
       <groupId>ru.lanwen.wiremock</groupId>
+      <artifactId>wiremock-junit5</artifactId>
       <version>${wiremock-junit5.version}</version>
     </dependency>
     <dependency>
-      <artifactId>rest-assured</artifactId>
       <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
       <scope>test</scope>
       <version>${rest-assured.version}</version>
     </dependency>
     <dependency>
-      <artifactId>jaxb-api</artifactId>
       <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
       <scope>compile</scope>
       <version>${jaxb-api.version}</version>
     </dependency>
     <dependency>
-      <artifactId>junit-jupiter-params</artifactId>
       <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
       <scope>test</scope>
       <version>${junit-jupiter-api.version}</version>
     </dependency>
     <dependency>
-      <artifactId>junit-jupiter-engine</artifactId>
       <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
       <scope>test</scope>
       <version>${junit-jupiter-api.version}</version>
     </dependency>

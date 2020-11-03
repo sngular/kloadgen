@@ -1,20 +1,19 @@
 package net.coru.kloadgen.extractor;
 
+import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import net.coru.kloadgen.model.FieldValueMapping;
-import org.apache.avro.Schema;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import net.coru.kloadgen.model.FieldValueMapping;
 
 public interface SchemaExtractor {
 
 	List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException;
 
-	List<FieldValueMapping> flatPropertiesList(Schema parserSchema);
+	List<FieldValueMapping> flatPropertiesList(ParsedSchema parserSchema);
 
-	Schema schemaTypesList(File schemaFile) throws IOException;
+	ParsedSchema schemaTypesList(File schemaFile) throws IOException;
 
-	List<FieldValueMapping> processSchema(Schema schema);
+	List<FieldValueMapping> processSchema(ParsedSchema schema);
 }

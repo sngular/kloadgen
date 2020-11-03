@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.SchemaExtractor;
-import net.coru.kloadgen.extractor.SchemaExtractorImpl;
+import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;

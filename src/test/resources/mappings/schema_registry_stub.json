@@ -64,7 +64,7 @@
       "priority":10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/71?fetchMaxId=false"
+        "urlPattern": "/schemas/ids/71\\?fetchMaxId=false"
       },
       "response": {
         "status": 200,
@@ -81,7 +81,7 @@
       "priority":10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/72"
+        "urlPattern": "/schemas/ids/72\\?fetchMaxId=false"
       },
       "response": {
         "status": 200,
@@ -98,7 +98,7 @@
       "priority":10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/73"
+        "urlPattern": "/schemas/ids/73\\?fetchMaxId=false"
       },
       "response": {
         "status": 200,

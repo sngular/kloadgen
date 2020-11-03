@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import net.coru.kloadgen.extractor.SchemaExtractor;
-import net.coru.kloadgen.extractor.SchemaExtractorImpl;
+import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.jmeter.threads.JMeterContext;
@@ -69,9 +69,7 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(
-        "users"
-    );
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList("users");
 
     assertThat(fieldValueMappingList)
         .hasSize(2)
@@ -87,9 +85,7 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(
-        "arrayMap"
-    );
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList("arrayMap");
 
     assertThat(fieldValueMappingList)
         .hasSize(2)

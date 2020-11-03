@@ -6,7 +6,7 @@
 
 package net.coru.kloadgen.loadgen.impl;
 
-import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
@@ -39,7 +39,7 @@ public class AvroLoadGenerator implements BaseLoadGenerator {
 
   public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
     try {
-      this.avroSchemaProcessor.processSchema((Schema)retrieveSchema(originals, avroSchemaName).rawSchema(), metadata, fieldExprMappings);
+      this.avroSchemaProcessor.processSchema(retrieveSchema(originals, avroSchemaName), metadata, fieldExprMappings);
     } catch (Exception exc){
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
