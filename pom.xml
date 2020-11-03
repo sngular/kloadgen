@@ -78,7 +78,7 @@
       <version>${jmeter.version}</version>
     </dependency>
     <dependency>
-      <artifactId>kafka_2.11</artifactId>
+      <artifactId>kafka_2.13</artifactId>
       <exclusions>
         <exclusion>
           <artifactId>slf4j-log4j12</artifactId>
@@ -156,7 +156,7 @@
     </dependency>
     <!-- Options -->
     <dependency>
-      <artifactId>kafka_2.11</artifactId>
+      <artifactId>kafka_2.13</artifactId>
       <classifier>test</classifier>
       <groupId>org.apache.kafka</groupId>
       <scope>test</scope>
@@ -453,8 +453,8 @@
     <jmeter.version>5.3</jmeter.version>
     <json-path.version>2.4.0</json-path.version>
     <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
-    <kafka-schema-registry-client.version>5.3.1</kafka-schema-registry-client.version>
-    <kafka.version>2.4.0</kafka.version>
+    <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
+    <kafka.version>2.6.0</kafka.version>
     <lombok.version>1.18.10</lombok.version>
     <minimal-json.version>0.9.4</minimal-json.version>
     <mockito-core.version>3.0.0</mockito-core.version>
