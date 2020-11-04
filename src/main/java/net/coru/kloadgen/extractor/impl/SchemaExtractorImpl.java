@@ -46,9 +46,9 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractorImpl implements SchemaExtractor {
 
-  private AvroExtractor avroExtractor = new AvroExtractor();
+  private final AvroExtractor avroExtractor = new AvroExtractor();
 
-  private JsonExtractor jsonExtractor = new JsonExtractor();
+  private final JsonExtractor jsonExtractor = new JsonExtractor();
 
   @Override
   public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
@@ -81,7 +81,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     if ("AVRO".equalsIgnoreCase(schema.schemaType())) {
       (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> avroExtractor.processField(field, attributeList));
     } else if ("JSON".equalsIgnoreCase(schema.schemaType())){
-      jsonExtractor.processField(((JsonSchema) schema).rawSchema(), attributeList);
+      attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
     } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schema.schemaType()));
     }
@@ -98,14 +98,14 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     return new AvroSchema(readLineByLine(schemaFile.getPath()));
   }
 
-  @Override
-  public List<FieldValueMapping> processSchema(ParsedSchema schema) {
+  private List<FieldValueMapping> processSchema(ParsedSchema schema) {
     if ("AVRO".equalsIgnoreCase(schema.schemaType())) {
       return avroExtractor.processSchema(((AvroSchema)schema).rawSchema());
     } else if ("JSON".equalsIgnoreCase(schema.schemaType())) {
-      return jsonExtractor.processSchema(((JsonSchema)schema).rawSchema());
+      return jsonExtractor.processSchema(((JsonSchema)schema).toJsonNode());
+    } else {
+      throw new KLoadGenException("Unsupported Schema Type");
     }
-    return null;
   }
 
   private static String readLineByLine(String filePath) throws IOException {

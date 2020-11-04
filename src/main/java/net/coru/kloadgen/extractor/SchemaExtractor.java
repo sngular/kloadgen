@@ -15,5 +15,4 @@ public interface SchemaExtractor {
 
 	ParsedSchema schemaTypesList(File schemaFile) throws IOException;
 
-	List<FieldValueMapping> processSchema(ParsedSchema schema);
 }
