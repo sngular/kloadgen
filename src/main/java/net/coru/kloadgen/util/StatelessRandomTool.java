@@ -21,10 +21,36 @@ public class StatelessRandomTool {
     parameterList.replaceAll(fieldValue ->
         fieldValue.matches("\\$\\{\\w*}") ?
             JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-            fieldValue
-    );
+            fieldValue);
 
     Object value = RandomTool.generateRandom(fieldType, valueLength, parameterList);
+    if ("seq".equals(fieldType)) {
+      value = RandomTool.generateSeq(fieldName, fieldType, parameterList, context);
+    }
+
+    return value;
+  }
+
+  public Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
+
+    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    parameterList.replaceAll(fieldValue ->
+                                     fieldValue.matches("\\$\\{\\w*}") ?
+                                             JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
+                                             fieldValue);
+
+    return RandomTool.generateRandomMap(fieldType, valueLength, parameterList, size);
+
+  }
+
+  public Object generateRandomArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
+    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    parameterList.replaceAll(fieldValue ->
+                                     fieldValue.matches("\\$\\{\\w*}") ?
+                                             JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
+                                             fieldValue);
+
+    Object value = RandomTool.generateRandomArray(fieldType, valueLength, parameterList, arraySize);
     if ("seq".equals(fieldType)) {
       value = RandomTool.generateSeq(fieldName, fieldType, parameterList, context);
     }

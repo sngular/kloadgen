@@ -58,7 +58,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.util.StatelessRandomTool;
@@ -141,7 +144,7 @@ public final class SamplerUtil {
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
 
-    configSchemRegistryUrl(generator, props);
+    generator = configSchemRegistryUrl(context, props);
     if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
@@ -199,8 +202,18 @@ public final class SamplerUtil {
     }
   }
 
-  private static void configSchemRegistryUrl(BaseLoadGenerator generator, Properties props) {
+  private static BaseLoadGenerator configSchemRegistryUrl(JavaSamplerContext context, Properties props) {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
+    BaseLoadGenerator generator;
+
+    if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).contains("json")) {
+      generator = new JsonLoadGenerator();
+    } if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).contains("avro")) {
+      generator = new AvroLoadGenerator();
+    } else {
+      throw new KLoadGenException("Unsupported Serializer");
+    }
+
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
       originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
@@ -228,6 +241,8 @@ public final class SamplerUtil {
           JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
           (List<FieldValueMapping>) jMeterVariables.getObject(SCHEMA_PROPERTIES));
     }
+
+    return generator;
   }
 
   public static List<String> populateHeaders(List<HeaderMapping> kafkaHeaders, ProducerRecord<String, Object> producerRecord) {

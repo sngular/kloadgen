@@ -13,6 +13,7 @@ import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.groovy.util.Maps;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -75,9 +76,12 @@ class AvroSchemaProcessorTest {
 
     EnrichedRecord message = avroSchemaProcessor.next();
     assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-    assertThat(message.getGenericRecord()).isNotNull();
-    assertThat(message.getGenericRecord().get("values")).isInstanceOf(List.class);
-    List<Map<String, Object>> result = (List<Map<String, Object>>) message.getGenericRecord().get("values");
+    assertThat(message.getGenericRecord())
+            .isNotNull()
+            .hasFieldOrProperty("values")
+            .extracting("values")
+            .isInstanceOf(List.class);
+    List<Map<String, Object>> result = (List<Map<String, Object>>) ((GenericRecord) message.getGenericRecord()).get("values");
     assertThat(result).hasSize(2).contains(Maps.of("n","1","t","2"), Maps.of("n","1","t","2"));
   }
 
@@ -108,9 +112,11 @@ class AvroSchemaProcessorTest {
 
     EnrichedRecord message = avroSchemaProcessor.next();
     assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-    assertThat(message.getGenericRecord()).isNotNull();
-    assertThat(message.getGenericRecord().get("values")).isInstanceOf(Map.class);
-    Map<String, Object> result = (Map<String, Object>) message.getGenericRecord().get("values");
+    assertThat(message.getGenericRecord()).isNotNull()
+            .hasFieldOrProperty("values")
+            .extracting("values")
+            .hasSize(1);
+    Map<String, String> result = (Map<String, String>)((GenericRecord) message.getGenericRecord()).get("values");
     assertThat(result).hasSize(4).containsEntry("n","1").containsEntry("t","2");
   }
 }
