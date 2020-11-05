@@ -325,7 +325,7 @@ public class JSONSchemaParser implements SchemaParser {
       int minLength = getSafeInt(jsonNode, "minLength");
       int maxLength = getSafeInt(jsonNode, "maxLength");
       String format = getSafeText(jsonNode, "format");
-      if (Set.of("date-time", "time", "date").contains(format)) {
+      if (Objects.nonNull(format) && Set.of("date-time", "time", "date").contains(format)) {
         result = DateField.builder().name(fieldName).format(format).build();
       } else {
         result = StringField.builder().name(fieldName).regex(regexStr).minLength(minLength).maxlength(maxLength).format(format).build();

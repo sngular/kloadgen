@@ -74,7 +74,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
     @Override
     public void setupTest(JavaSamplerContext context) {
 
-        Properties props = SamplerUtil.setupCommonProperties(context, generator);
+        Properties props = SamplerUtil.setupCommonProperties(context);
+        generator = SamplerUtil.configureGenerator(context, props);
+
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
 

@@ -125,7 +125,7 @@ public final class SamplerUtil {
     return defaultParameters;
   }
 
-  public static Properties setupCommonProperties(JavaSamplerContext context, BaseLoadGenerator generator) {
+  public static Properties setupCommonProperties(JavaSamplerContext context) {
     Properties props = new Properties();
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
     if (Objects.nonNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG))) {
@@ -144,7 +144,7 @@ public final class SamplerUtil {
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
 
-    generator = configSchemRegistryUrl(context, props);
+
     if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
@@ -158,6 +158,10 @@ public final class SamplerUtil {
     verifySecurity(context, props);
 
     return props;
+  }
+
+  public static BaseLoadGenerator configureGenerator(JavaSamplerContext context, Properties props) {
+   return configSchemRegistryUrl(context, props);
   }
 
   private static void verifySecurity(JavaSamplerContext context, Properties props) {
@@ -206,9 +210,9 @@ public final class SamplerUtil {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     BaseLoadGenerator generator;
 
-    if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).contains("json")) {
+    if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("json")) {
       generator = new JsonLoadGenerator();
-    } if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).contains("avro")) {
+    } else if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("avro")) {
       generator = new AvroLoadGenerator();
     } else {
       throw new KLoadGenException("Unsupported Serializer");

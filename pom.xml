@@ -141,6 +141,11 @@
     </dependency>
     <dependency>
       <groupId>io.confluent</groupId>
+      <artifactId>kafka-json-serializer</artifactId>
+      <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
       <artifactId>kafka-json-schema-provider</artifactId>
       <version>${kafka-schema-registry-client.version}</version>
     </dependency>

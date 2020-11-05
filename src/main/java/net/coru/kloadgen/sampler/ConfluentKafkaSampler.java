@@ -78,9 +78,10 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
     @Override
     public void setupTest(JavaSamplerContext context) {
 
-        Properties props = SamplerUtil.setupCommonProperties(context, generator);
+        Properties props = SamplerUtil.setupCommonProperties(context);
+        generator = SamplerUtil.configureGenerator(context, props);
 
-        props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+        props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false"));
 
         if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
             props.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
