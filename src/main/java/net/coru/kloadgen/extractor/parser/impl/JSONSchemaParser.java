@@ -401,9 +401,11 @@ public class JSONSchemaParser implements SchemaParser {
           fields.addAll(refField.getProperties());
         }
       } else {
-        for (Iterator<Entry<String, JsonNode>> it = property.get("properties").fields(); it.hasNext(); ) {
-          Entry<String, JsonNode> innProperty = it.next();
-          fields.add(buildProperty(innProperty.getKey(), innProperty.getValue()));
+        if (Objects.nonNull(property.get("properties"))) {
+          for (Iterator<Entry<String, JsonNode>> it = property.get("properties").fields(); it.hasNext(); ) {
+            Entry<String, JsonNode> innProperty = it.next();
+            fields.add(buildProperty(innProperty.getKey(), innProperty.getValue()));
+          }
         }
       }
     }

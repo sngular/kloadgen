@@ -5,13 +5,13 @@
 
 ___
 
-KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO schema Registries. It allows to send kafka messages with a structure defined as an AVRO Subject. It connects to the Scheme Registry Server, retrieve the subject to send and generate a random messages every time.
+KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO and JSON schema. It allows sending kafka messages with a structure defined as an AVRO Schema or a Json Schema. It connects to the Scheme Registry Server, retrieve the subject to send and generate a random message every time.
 
 ## Getting Started
 
 ___
 
-KLoadGen includes four main components
+KLoadGen includes six main components
 
 * **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class used:
 
@@ -21,9 +21,13 @@ KLoadGen includes four main components
 
   * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configure by properties.
 
-  * **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
+* **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
 
 * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
+
+* **File Serialized Config** : This jmeter config element allows to upload a schema file instead to get it from the Schema Registry
+
+* **Schema Registry Config** : This jmeter config element allows to configure the connection to a Schema Registry, security access,....
 
 ### Setup
 
@@ -85,7 +89,7 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
 * **kafka.topic.name** : Topic on which messages will be sent
 * **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
-* **value.serializer** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
+* **value.serializer<sup>[1](#schematype)<sup>** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
 * **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
 * **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
 * **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
@@ -274,3 +278,6 @@ And some optional ones who will let us configura the JMeter Engine and the test 
 ## Special Thanks
 
 * We would like to special thanks to [pepper-box](https://github.com/GSLabDev/pepper-box) for give us the base to create this plugin and the main ideas about how to face it.
+
+## Notes
+<a name="schematype">1</a>: Selection between AVRO or JSON wil be done by chose the serializer class here or "io.confluent.kafka.serializers.KafkaAvroSerializer" or "io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer" for now. We are working in a better way to identify the schema.
