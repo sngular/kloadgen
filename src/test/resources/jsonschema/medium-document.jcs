@@ -1,0 +1,811 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "OrderPublicDetailDocument",
+  "type": "object",
+  "description": "Contains information about items and their shipping, status, payments...",
+  "properties": {
+    "_class": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "OrderPublicDetailDocument"
+      ]
+    },
+    "_entity": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "OrderPublicDetailDocument"
+      ]
+    },
+    "_metadata": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "createdAt": {
+          "type": "number",
+          "description": "",
+          "minimum": 0,
+          "unit": "Timestamp"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": ""
+        },
+        "deletedAt": {
+          "type": "number",
+          "description": "",
+          "minimum": 0,
+          "unit": "Timestamp"
+        },
+        "deletedBy": {
+          "type": "string",
+          "description": ""
+        },
+        "lastUpdatedAt": {
+          "type": "number",
+          "description": "",
+          "minimum": 0,
+          "unit": "Timestamp"
+        },
+        "lastUpdatedBy": {
+          "type": "string",
+          "description": ""
+        },
+        "projectName": {
+          "type": "string",
+          "description": ""
+        },
+        "projectVersion": {
+          "type": "string",
+          "description": ""
+        },
+        "schema": {
+          "type": "number",
+          "description": ""
+        }
+      },
+      "required": [
+        "createdAt",
+        "createdBy",
+        "lastUpdatedAt",
+        "lastUpdatedBy"
+      ],
+      "additionalProperties": false
+    },
+    "orderId": {
+      "type": "string",
+      "description": "",
+      "default": "",
+      "examples": [
+        "f3a57b4f-7a59-4f52-9c82-180028115aa5"
+      ],
+      "pattern": "^(.*)$",
+      "x-metadata": {
+        "binding": {
+          "entity": "Cliente",
+          "attribute": "numeroPedidoOnline",
+          "version": "1.0.0"
+        },
+        "sensitivity": "RESTRINGIDA"
+      }
+    },
+    "storeId": {
+      "type": "integer",
+      "description": "",
+      "default": 0,
+      "examples": [
+        123456
+      ]
+    },
+    "paymentId": {
+      "type": "string",
+      "description": "",
+      "default": "",
+      "examples": [
+        "1db24a06"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "parentId": {
+      "type": "string",
+      "description": "",
+      "default": "",
+      "examples": [
+        "00f505de2c74"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "externalId": {
+      "type": "string",
+      "description": "",
+      "default": "",
+      "examples": [
+        "2f40dc7e17c8"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "editorId": {
+      "type": "integer",
+      "description": "",
+      "default": 0,
+      "examples": [
+        123456
+      ]
+    },
+    "type": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "REGULAR",
+        "REPLACEMENT",
+        "EXCHANGE",
+        "REPOSITION",
+        "ONLINE_EXCHANGE",
+        "STORE_EXCHANGE"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "RECEIVED",
+        "VALIDATED",
+        "PREPARING",
+        "SHIPPED",
+        "CLOSED",
+        "CANCELLED"
+      ]
+    },
+    "fraudStatus": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "NOT_APPLIED",
+        "PENDING",
+        "ACCEPTED",
+        "REQUIRED_REVIEW",
+        "REJECTED"
+      ]
+    },
+    "stockStatus": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "UNKNOWN",
+        "NOT_APPLIED",
+        "SYNCHRONIZED",
+        "SKIPPED"
+      ]
+    },
+    "paymentStatus": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "NOT_APPLIED",
+        "UNKNOWN",
+        "REJECTED",
+        "ACCEPTED"
+      ]
+    },
+    "paymentSystem": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "UNKNOWN",
+        "ALPHA",
+        "WCS"
+      ]
+    },
+    "manualReviewStatus": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "NA",
+        "PENDING",
+        "ACCEPTED",
+        "REFUSED"
+      ]
+    },
+    "customerId": {
+      "type": "integer",
+      "description": "",
+      "default": 0,
+      "examples": [
+        123444
+      ]
+    },
+    "customerType": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "REGISTERED",
+        "GUEST"
+      ]
+    },
+    "guestAction": {
+      "type": "string",
+      "description": "",
+      "enum": [
+        "NO_ACTION",
+        "CONVERSION",
+        "LINK_ACCOUNT"
+      ]
+    },
+    "locale": {
+      "type": "string",
+      "description": "",
+      "default": "",
+      "examples": [
+        "es_ES"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "preorder": {
+      "type": "boolean",
+      "description": "",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "fastSint": {
+      "type": "boolean",
+      "description": "",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "pvpTaxesIncluded": {
+      "type": "boolean",
+      "description": "",
+      "default": false,
+      "examples": [
+        true
+      ]
+    },
+    "placedDatetime": {
+      "type": "string",
+      "description": "",
+      "default": "",
+      "examples": [
+        "2019-12-03T10:15:30Z"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "cancelledDatetime": {
+      "type": "string",
+      "description": "",
+      "default": "",
+      "examples": [
+        "2019-12-04T10:15:30Z"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "lastUpdateDatetime": {
+      "type": "string",
+      "description": "",
+      "examples": [
+        "2019-12-03T10:15:30Z"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "snapshotDatetime": {
+      "type": "string",
+      "description": "",
+      "examples": [
+        "2019-12-03T10:15:30Z"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "duty": {
+      "type": "object",
+      "description": "",
+      "properties": {
+        "amount": {
+          "type": "object",
+          "description": "",
+          "required": [
+            "value",
+            "currency",
+            "exponent"
+          ],
+          "properties": {
+            "value": {
+              "type": "integer",
+              "description": "",
+              "default": 0,
+              "examples": [
+                1000
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "description": "",
+              "default": "",
+              "examples": [
+                "EUR"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "exponent": {
+              "type": "integer",
+              "description": "",
+              "default": 0,
+              "examples": [
+                2
+              ]
+            }
+          }
+        },
+        "confirmedAmount": {
+          "type": "object",
+          "description": "",
+          "required": [
+            "value",
+            "currency",
+            "exponent"
+          ],
+          "properties": {
+            "value": {
+              "type": "integer",
+              "description": "",
+              "default": 0,
+              "examples": [
+                900
+              ]
+            },
+            "currency": {
+              "type": "string",
+              "description": "",
+              "default": "",
+              "examples": [
+                "EUR"
+              ],
+              "pattern": "^(.*)$"
+            },
+            "exponent": {
+              "type": "integer",
+              "description": "",
+              "default": 0,
+              "examples": [
+                2
+              ]
+            }
+          }
+        }
+      }
+    },
+    "billing": {
+      "type": "object",
+      "description": "",
+      "required": [
+        "status",
+        "addressId"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "",
+          "enum": [
+            "NOT_APPLIED",
+            "PENDING",
+            "BILLED"
+          ]
+        },
+        "addressId": {
+          "type": "string",
+          "description": "",
+          "default": "",
+          "examples": [
+            "44138f25"
+          ],
+          "pattern": "^(.*)$"
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "description": "",
+      "required": [
+        "systemType"
+      ],
+      "properties": {
+        "systemCode": {
+          "type": "string",
+          "description": "",
+          "default": "",
+          "examples": [
+            "a_systemCode"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "systemType": {
+          "type": "string",
+          "description": "",
+          "enum": [
+            "CHECKOUT",
+            "MPS",
+            "BACKOFFICE",
+            "STORE"
+          ]
+        },
+        "systemUser": {
+          "type": "string",
+          "description": "",
+          "default": "",
+          "examples": [
+            "1db24a06"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "systemDeviceId": {
+          "type": "string",
+          "description": "",
+          "default": "",
+          "examples": [
+            "1db24a06"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "deviceType": {
+          "type": "string",
+          "description": "",
+          "default": "",
+          "examples": [
+            "mobile"
+          ],
+          "pattern": "^(.*)$",
+          "x-metadata": {
+            "binding": {
+              "entity": "Cliente",
+              "attribute": "dispositivo",
+              "version": "1.0.0"
+            },
+            "sensitivity": "RESTRINGIDA"
+          }
+        },
+        "deviceUserAgent": {
+          "type": "string",
+          "description": "",
+          "default": "",
+          "examples": [
+            "ZaraApp/8.15.3 (iPhone; iOS 13.5.1) (compatible; Zara/App/v8.15.3)"
+          ],
+          "pattern": "^(.*)$",
+          "x-metadata": {
+            "binding": {
+              "entity": "Cliente",
+              "attribute": "navegador",
+              "version": "1.0.0"
+            },
+            "sensitivity": "RESTRINGIDA"
+          }
+        }
+      }
+    },
+    "orderItems": {
+      "type": "array",
+      "description": "",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "pvpAmount",
+          "promotions"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "",
+            "default": "",
+            "examples": [
+              "d011c1f751bf"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "partNumber": {
+            "type": "string",
+            "description": "",
+            "default": "",
+            "examples": [
+              "1814229826d1"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "type": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "PRODUCT",
+              "VIRTUAL_GIFT_CARD",
+              "PHYSICAL_GIFT_CARD",
+              "SHIPPING_COST",
+              "SERVICE"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "",
+            "enum": [
+              "RECEIVED",
+              "PREPARING",
+              "SHIPPED",
+              "CLOSED",
+              "CANCELLED"
+            ]
+          },
+          "statusReason": {
+            "type": "string",
+            "description": "",
+            "default": "",
+            "pattern": "^(.*)$"
+          },
+          "statusDatetime": {
+            "type": "string",
+            "description": "",
+            "default": "",
+            "examples": [
+              "2019-11-06T10:15:30Z"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "pvpAmount": {
+            "$ref": "#/definitions/amount"
+          },
+          "taxesAmount": {
+            "$ref": "#/definitions/amount"
+          },
+          "taxesPercentage": {
+            "type": "number",
+            "description": "",
+            "default": 0.0,
+            "examples": [
+              10.4
+            ]
+          },
+          "initialMinimumDate": {
+            "type": "string",
+            "description": "",
+            "default": "",
+            "examples": [
+              "2019-11-06T10:15:30Z"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "initialMaximumDate": {
+            "type": "string",
+            "description": "",
+            "default": "",
+            "examples": [
+              "2019-11-06T10:15:30Z"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "adjustment": {
+            "$ref": "#/definitions/amount"
+          },
+          "product": {
+            "type": "object",
+            "description": "",
+            "required": [
+              "catalogEntryId",
+              "stockMode"
+            ],
+            "properties": {
+              "catalogEntryId": {
+                "type": "integer",
+                "description": "",
+                "default": 0,
+                "examples": [
+                  1234
+                ]
+              },
+              "stockMode": {
+                "type": "string",
+                "description": "",
+                "enum": [
+                  "UNKNOWN",
+                  "NORMAL",
+                  "TRANSIT_PRESALE",
+                  "VIRTUALSTOCK_PRESALE",
+                  "SOD_PRESALE",
+                  "PREORDER"
+                ]
+              }
+            }
+          },
+          "virtualGiftCard": {
+            "type": "object",
+            "description": "",
+            "required": [
+              "catalogEntryId"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/definitions/giftCard"
+              },
+              {
+                "properties": {
+                  "style": {
+                    "type": "string",
+                    "description": "",
+                    "default": "",
+                    "examples": [
+                      "a_style"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "receiverName": {
+                    "type": "string",
+                    "description": "",
+                    "default": "",
+                    "examples": [
+                      "a_receiverName"
+                    ],
+                    "pattern": "^(.*)$",
+                    "x-metadata": {
+                      "binding": {
+                        "entity": "Cliente",
+                        "attribute": "nombreTitularTarjetaRegalo",
+                        "version": "1.0.0"
+                      },
+                      "sensitivity": "RESTRINGIDA"
+                    }
+                  },
+                  "deliveryDate": {
+                    "type": "string",
+                    "description": "",
+                    "default": "",
+                    "examples": [
+                      "2019-11-06T10:15:30Z"
+                    ],
+                    "pattern": "^(.*)$"
+                  }
+                }
+              }
+            ]
+          },
+          "physicalGiftCard": {
+            "type": "object",
+            "description": "",
+            "required": [
+              "catalogEntryId"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/definitions/giftCard"
+              },
+              {
+                "properties": {
+                  "receiverPhonePrefix": {
+                    "type": "string",
+                    "description": "",
+                    "default": "",
+                    "examples": [
+                      "a_receiverPhonePrefix"
+                    ],
+                    "pattern": "^(.*)$",
+                    "x-metadata": {
+                      "binding": {
+                        "entity": "Cliente",
+                        "attribute": "telefono",
+                        "version": "1.0.0"
+                      },
+                      "sensitivity": "RESTRINGIDA"
+                    }
+                  },
+                  "receiverPhoneNumber": {
+                    "type": "string",
+                    "description": "",
+                    "default": "",
+                    "examples": [
+                      "a_receiverPhoneNumber"
+                    ],
+                    "pattern": "^(.*)$",
+                    "x-metadata": {
+                      "binding": {
+                        "entity": "Cliente",
+                        "attribute": "telefono",
+                        "version": "1.0.0"
+                      },
+                      "sensitivity": "RESTRINGIDA"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "_class",
+    "_entity",
+    "_metadata",
+    "orderId",
+    "storeId",
+    "type",
+    "status",
+    "origin",
+    "orderItems"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "amount": {
+      "type": "object",
+      "description": "",
+      "required": [
+        "value",
+        "currency",
+        "exponent"
+      ],
+      "properties": {
+        "value": {
+          "type": "integer",
+          "description": "",
+          "default": 0,
+          "examples": [
+            400
+          ]
+        },
+        "currency": {
+          "type": "string",
+          "description": "",
+          "default": "",
+          "examples": [
+            "EUR"
+          ],
+          "pattern": "^(.*)$"
+        },
+        "exponent": {
+          "type": "integer",
+          "description": "",
+          "default": 0,
+          "examples": [
+            2
+          ]
+        }
+      }
+    },
+    "giftCard": {
+      "catalogEntryId": {
+        "type": "integer",
+        "description": "",
+        "default": 0,
+        "examples": [
+          234561
+        ]
+      },
+      "senderName": {
+        "type": "string",
+        "description": "",
+        "default": "",
+        "examples": [
+          "a_senderName"
+        ],
+        "pattern": "^(.*)$",
+        "x-metadata": {
+          "binding": {
+            "entity": "Cliente",
+            "attribute": "nombre",
+            "version": "1.0.0"
+          },
+          "sensitivity": "RESTRINGIDA"
+        }
+      },
+      "message": {
+        "type": "string",
+        "description": "",
+        "default": "",
+        "examples": [
+          "a_message"
+        ],
+        "pattern": "^(.*)$"
+      }
+    }
+  }
+}

@@ -17,7 +17,6 @@ import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.json.ArrayField;
-import net.coru.kloadgen.model.json.DateField;
 import net.coru.kloadgen.model.json.EnumField;
 import net.coru.kloadgen.model.json.Field;
 import net.coru.kloadgen.model.json.MapField;
@@ -105,8 +104,6 @@ public class JsonExtractor {
       addConstraint(builder, FORMAT, ((StringField) innerField).getFormat());
 
       completeFieldList.add(builder.build());
-    } else if (innerField instanceof DateField) {
-      completeFieldList.add(FieldValueMapping.builder().fieldType(innerField.getType()).fieldName(innerField.getName()).build());
     } else {
       completeFieldList.add(FieldValueMapping.builder().fieldName(innerField.getName()).fieldType(innerField.getType()).build());
     }
