@@ -36,7 +36,7 @@ public class JsonSchemaProcessor {
   }
 
   @SneakyThrows
-  public String next() {
+  public ObjectNode next() {
     ObjectNode entity = JsonNodeFactory.instance.objectNode();
     if (!fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
@@ -96,7 +96,7 @@ public class JsonSchemaProcessor {
         }
       }
     }
-    return entity.toString();
+    return entity;
   }
 
   private ObjectNode createObject(final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
