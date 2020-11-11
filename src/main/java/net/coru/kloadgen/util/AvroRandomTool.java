@@ -12,6 +12,7 @@ import static org.apache.avro.Schema.Type.NULL;
 import static org.apache.avro.Schema.Type.UNION;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class AvroRandomTool {
             fieldValue
     );
 
-    return RandomTool.generateRandomMap(fieldType, valueLength, parameterList, size);
+    return RandomTool.generateRandomMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
 
   }
 
@@ -51,7 +52,7 @@ public class AvroRandomTool {
             fieldValue
     );
 
-    return RandomTool.generateRandomArray(fieldType, valueLength, parameterList, arraySize);
+    return RandomTool.generateRandomArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
 
   }
 
@@ -64,7 +65,7 @@ public class AvroRandomTool {
             fieldValue
     );
 
-    Object value = RandomTool.generateRandom(fieldType, valueLength, parameterList);
+    Object value = RandomTool.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
 
     if (ENUM == field.schema().getType()) {
       value = getEnumOrGenerate(fieldType, field.schema(),parameterList);

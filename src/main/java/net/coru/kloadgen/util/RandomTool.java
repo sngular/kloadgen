@@ -6,6 +6,7 @@
 
 package net.coru.kloadgen.util;
 
+import com.github.curiousoddman.rgxgen.RgxGen;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -16,9 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public final class RandomTool {
 
@@ -26,26 +30,27 @@ public final class RandomTool {
 
   private RandomTool() {}
 
-  protected static Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValueList, Integer mapSize) {
+  protected static Object generateRandomMap(String fieldType, Integer mapSize, List<String> fieldValueList, Integer arraySize,
+                                            Map<ConstraintTypeEnum, String> constrains) {
     Object value;
     switch (fieldType) {
       case "int-map":
-        value = generateIntMap(mapSize, fieldValueList, valueLength);
+        value = generateIntMap(mapSize, fieldValueList, mapSize, constrains);
         break;
       case "long-map":
-        value = generateLongMap(mapSize, fieldValueList, valueLength);
+        value = generateLongMap(mapSize, fieldValueList, mapSize, constrains);
         break;
       case "double-map":
-        value = generateDoubleMap(mapSize, fieldValueList, valueLength);
+        value = generateDoubleMap(mapSize, fieldValueList, mapSize, constrains);
         break;
       case "short-map":
-        value = generateShortMap(mapSize, fieldValueList, valueLength);
+        value = generateShortMap(mapSize, fieldValueList, mapSize, constrains);
         break;
       case "float-map":
-        value = generateFloatMap(mapSize, fieldValueList, valueLength);
+        value = generateFloatMap(mapSize, fieldValueList, mapSize, constrains);
         break;
       case "string-map":
-        value = generateStringMap(mapSize, fieldValueList, valueLength);
+        value = generateStringMap(mapSize, fieldValueList, mapSize, constrains);
         break;
       case "uuid-map":
         value = generateUuidMap(mapSize, fieldValueList);
@@ -58,39 +63,80 @@ public final class RandomTool {
         break;
     }
     if (fieldType.endsWith("array")) {
-      value = generateMapArray(fieldType, mapSize, fieldValueList, mapSize);
+      value = generateRandomMapArray(fieldType, mapSize, fieldValueList, arraySize, constrains);
     }
     return value;
   }
 
-  protected static Object generateMapArray(String type, Integer valueLength, List<String> fieldValueList, Integer arraySize) {
+  protected static Object generateRandomMapArray(String type, Integer valueLength, List<String> fieldValueList, Integer arraySize,
+      Map<ConstraintTypeEnum, String> constrains) {
     List<Map<String, Object>> generatedMapArray = new ArrayList<>(valueLength);
     for (int i = 0; i < arraySize; i++) {
-      generatedMapArray.add((Map)generateRandomMap(type.substring(0, type.length() - 6), valueLength, fieldValueList, arraySize));
+      generatedMapArray.add((Map<String, Object>)generateRandomMap(type.substring(0, type.length() - 6), valueLength, fieldValueList, arraySize,
+          constrains));
     }
     return generatedMapArray;
   }
 
-  protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList) {
+  protected static Object generateRandomArray(String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
+      Map<ConstraintTypeEnum, String> constrains) {
+    Object value;
+    switch (fieldType) {
+      case "int-array":
+        value = generateIntArray(arraySize, valueLength, fieldValueList, constrains);
+        break;
+      case "number-array":
+        value = generateNumberArray(arraySize, valueLength, fieldValueList, constrains);
+        break;
+      case "long-array":
+        value = generateLongArray(arraySize, valueLength, fieldValueList, constrains);
+        break;
+      case "double-array":
+        value = generateDoubleArray(arraySize, valueLength, fieldValueList, constrains);
+        break;
+      case "short-array":
+        value = generateShortArray(arraySize, valueLength, fieldValueList, constrains);
+        break;
+      case "string-array":
+        value = generateStringArray(arraySize, valueLength, fieldValueList, constrains);
+        break;
+      case "uuid-array":
+        value = generateUuidArray(arraySize, fieldValueList);
+        break;
+      case "boolean-array":
+        value = generateBooleanArray(arraySize, fieldValueList);
+        break;
+      default:
+        value = new ArrayList<>();
+        break;
+    }
+    return value;
+  }
+
+  protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     Object value;
     switch (fieldType) {
       case "string":
-        value = getStringValueOrRandom(valueLength, fieldValueList);
+        value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
+        break;
+      case "number":
+        value = getNumberValueOrRandom(valueLength, fieldValueList, constrains);
         break;
       case "int":
-        value = getIntValueOrRandom(valueLength, fieldValueList);
+        value = getIntValueOrRandom(valueLength, fieldValueList, constrains);
         break;
       case "long":
-        value = getLongValueOrRandom(valueLength, fieldValueList);
+        value = getLongValueOrRandom(valueLength, fieldValueList, constrains);
         break;
       case "short":
-        value = getShortValueOrRandom(valueLength, fieldValueList);
+        value = getShortValueOrRandom(valueLength, fieldValueList, constrains);
         break;
       case "double":
-        value = getDoubleValueOrRandom(valueLength, fieldValueList);
+        value = getDoubleValueOrRandom(valueLength, fieldValueList, constrains);
         break;
       case "float":
-        value = getFloatValueOrRandom(valueLength, fieldValueList);
+        value = getFloatValueOrRandom(valueLength, fieldValueList, constrains);
         break;
       case "bytes":
 		    value = getByteRandom(valueLength);
@@ -106,43 +152,22 @@ public final class RandomTool {
       case "boolean":
         value = getBooleanValueOrRandom(fieldValueList);
         break;
+      case "enum":
+        value = getEnumValueOrRandom(fieldValueList);
+        break;
       default:
-        value = generateRandomArray(fieldType, valueLength, fieldValueList, 0);
+        value = fieldType;
         break;
     }
     return value;
   }
 
-  protected static Object generateRandomArray(String fieldType, int valueLength, List<String> fieldValueList, int arraySize) {
-    Object value;
-    switch(fieldType) {
-      case "int-array":
-        value = generateIntArray(valueLength, fieldValueList, arraySize);
-        break;
-      case "long-array":
-        value = generateLongArray(valueLength, fieldValueList, arraySize);
-        break;
-      case "double-array":
-        value = generateDoubleArray(valueLength, fieldValueList, arraySize);
-        break;
-      case "float-array":
-        value = generateFloatArray(valueLength, fieldValueList, arraySize);
-        break;
-      case "short-array":
-        value = generateShortArray(valueLength, fieldValueList, arraySize);
-        break;
-      case "string-array":
-        value = generateStringArray(valueLength, fieldValueList, arraySize);
-        break;
-      case "uuid-array":
-        value = generateUuidArray(fieldValueList, arraySize);
-        break;
-      case "boolean-array":
-        value = generateBooleanArray(fieldValueList, arraySize);
-        break;
-      default:
-        value = fieldType;
-        break;
+  private static String getEnumValueOrRandom(List<String> fieldValueList) {
+    String value;
+    if (!fieldValueList.isEmpty()) {
+      value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
+    } else {
+      throw new KLoadGenException("Wrong enums values, problem in the parsing process");
     }
     return value;
   }
@@ -172,61 +197,77 @@ public final class RandomTool {
     return castValue;
   }
 
-  private static List<Integer> generateIntArray(Integer valueLength, List<String> fieldValueList, int arraySize) {
+  private static List<Integer> generateIntArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Integer> intArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
-      intArray.add(getIntValueOrRandom(valueLength, fieldValueList));
+      intArray.add(getIntValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return intArray;
   }
 
-  private static List<Long> generateLongArray(Integer valueLength, List<String> fieldValueList, int arraySize) {
+  private static List<Number> generateNumberArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
+    List<Number> intArray = new ArrayList<>();
+    for (int i=0; i<size; i++) {
+      intArray.add(getIntValueOrRandom(valueLength, fieldValueList, constrains));
+    }
+    return intArray;
+  }
+
+  private static List<Long> generateLongArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Long> longArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
-      longArray.add(getLongValueOrRandom(valueLength, fieldValueList));
+      longArray.add(getLongValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return longArray;
   }
 
-  private static List<Double> generateDoubleArray(Integer valueLength, List<String> fieldValueList, int arraySize) {
+  private static List<Double> generateDoubleArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Double> doubleArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
-      doubleArray.add(getDoubleValueOrRandom(valueLength, fieldValueList));
+      doubleArray.add(getDoubleValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return doubleArray;
   }
 
-  private static List<Float> generateFloatArray(Integer valueLength, List<String> fieldValueList, int arraySize) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
-    List<Float> floatArray = new ArrayList<>();
-    for (int i=0; i<size; i++) {
-      floatArray.add(getFloatValueOrRandom(valueLength, fieldValueList));
-    }
-    return floatArray;
-  }
-
-  private static List<Short> generateShortArray(Integer valueLength, List<String> fieldValueList, int arraySize) {
+  private static List<Short> generateShortArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
+                                                Map<ConstraintTypeEnum, String> constrains) {
     int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Short> shortArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
-      shortArray.add(getShortValueOrRandom(valueLength, fieldValueList));
+      shortArray.add(getShortValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return shortArray;
   }
 
-  private static List<String> generateStringArray(Integer valueLength, List<String> fieldValueList, int arraySize) {
+  private static List<Float> generateFloatArray(Integer valueLength, List<String> fieldValueList, int arraySize,
+                                                Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
+    List<Float> floatArray = new ArrayList<>();
+    for (int i=0; i<size; i++) {
+      floatArray.add(getFloatValueOrRandom(valueLength, fieldValueList, constrains));
+    }
+    return floatArray;
+  }
+
+  private static List<String> generateStringArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
+                                                  Map<ConstraintTypeEnum, String> constrains) {
     int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<String> stringArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
-      stringArray.add(getStringValueOrRandom(valueLength, fieldValueList));
+      stringArray.add(getStringValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return stringArray;
   }
 
-  private static List<UUID> generateUuidArray(List<String> fieldValueList, int arraySize) {
+  private static List<UUID> generateUuidArray(Integer arraySize, List<String> fieldValueList) {
     int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<UUID> uuidArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
@@ -235,7 +276,7 @@ public final class RandomTool {
     return uuidArray;
   }
 
-  private static List<Boolean> generateBooleanArray(List<String> fieldValueList, int arraySize) {
+  private static List<Boolean> generateBooleanArray(Integer arraySize, List<String> fieldValueList) {
     int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
     List<Boolean> booleanArray = new ArrayList<>();
     for (int i=0; i<size; i++) {
@@ -244,7 +285,8 @@ public final class RandomTool {
     return booleanArray;
   }
 
-  private static Map<String, Integer> generateIntMap(int mapSize, List<String> fieldValueList, int valueLength) {
+  private static Map<String, Integer> generateIntMap(Integer mapSize, List<String> fieldValueList, int valueLength,
+                                                     Map<ConstraintTypeEnum, String> constrains) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Integer> intMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
@@ -253,20 +295,21 @@ public final class RandomTool {
         if (tempValue.length > 1) {
           intMap.put(tempValue[0], Integer.parseInt(tempValue[1]));
         } else {
-          intMap.put(tempValue[0], getIntValueOrRandom(valueLength, Collections.emptyList()));
+          intMap.put(tempValue[0], getIntValueOrRandom(valueLength, Collections.emptyList(), constrains));
         }
       }
     }
     if (intMap.size() != mapSize) {
       for (int i = 0; i < Math.abs(intMap.size() - mapSize); i++) {
-        intMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-            getIntValueOrRandom(valueLength, Collections.emptyList()));
+        intMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+            getIntValueOrRandom(valueLength, Collections.emptyList(), constrains));
       }
     }
     return intMap;
   }
 
-  private static Map<String, Long> generateLongMap(int mapSize, List<String> fieldValueList, int valueLength) {
+  private static Map<String, Long> generateLongMap(int mapSize, List<String> fieldValueList, int valueLength,
+                                                   Map<ConstraintTypeEnum, String> constrains) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Long> longMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
@@ -275,20 +318,21 @@ public final class RandomTool {
         if (tempValue.length > 1) {
           longMap.put(tempValue[0], Long.parseLong(tempValue[1]));
         } else {
-          longMap.put(tempValue[0], getLongValueOrRandom(valueLength, Collections.emptyList()));
+          longMap.put(tempValue[0], getLongValueOrRandom(valueLength, Collections.emptyList(), constrains));
         }
       }
     }
     if (longMap.size() != mapSize) {
       for (int i = 0; i <= Math.abs(longMap.size() - mapSize); i++) {
-        longMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-            getLongValueOrRandom(valueLength, Collections.emptyList()));
+        longMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+            getLongValueOrRandom(valueLength, Collections.emptyList(), constrains));
       }
     }
     return longMap;
   }
 
-  private static Map<String, Double> generateDoubleMap(int mapSize, List<String> fieldValueList, int valueLength) {
+  private static Map<String, Double> generateDoubleMap(int mapSize, List<String> fieldValueList, int valueLength,
+                                                       Map<ConstraintTypeEnum, String> constrains) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Double> doubleMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
@@ -297,20 +341,22 @@ public final class RandomTool {
         if (tempValue.length > 1) {
           doubleMap.put(tempValue[0], Double.parseDouble(tempValue[1]));
         } else {
-          doubleMap.put(tempValue[0], getDoubleValueOrRandom(valueLength, Collections.emptyList()));
+          doubleMap.put(tempValue[0], getDoubleValueOrRandom(valueLength, Collections.emptyList(), constrains));
         }
       }
     }
     if (doubleMap.size() != mapSize) {
       for (int i = 0; i <= Math.abs(doubleMap.size() - mapSize); i++) {
-        doubleMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-            getDoubleValueOrRandom(valueLength, Collections.emptyList()));
+        doubleMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+            getDoubleValueOrRandom(valueLength, Collections.emptyList(), constrains));
       }
     }
     return doubleMap;
   }
 
-  private static Map<String, Float> generateFloatMap(int mapSize, List<String> fieldValueList, int valueLength) {
+  private static Map<String, Float> generateFloatMap(int mapSize, List<String> fieldValueList, int valueLength,
+                                                     Map<ConstraintTypeEnum, String> constrains) {
+
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Float> floatMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
@@ -319,20 +365,21 @@ public final class RandomTool {
         if (tempValue.length > 1) {
           floatMap.put(tempValue[0], Float.parseFloat(tempValue[1]));
         } else {
-          floatMap.put(tempValue[0], getFloatValueOrRandom(valueLength, Collections.emptyList()));
+          floatMap.put(tempValue[0], getFloatValueOrRandom(valueLength, Collections.emptyList(), constrains));
         }
       }
     }
     if (floatMap.size() != mapSize) {
       for (int i = 0; i <= Math.abs(floatMap.size() - mapSize); i++) {
-        floatMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-            getFloatValueOrRandom(valueLength, Collections.emptyList()));
+        floatMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+            getFloatValueOrRandom(valueLength, Collections.emptyList(), constrains));
       }
     }
     return floatMap;
   }
 
-  private static Map<String, Short> generateShortMap(int mapSize, List<String> fieldValueList, int valueLength) {
+  private static Map<String, Short> generateShortMap(int mapSize, List<String> fieldValueList, int valueLength,
+                                                     Map<ConstraintTypeEnum, String> constrains) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, Short> shortMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
@@ -341,20 +388,21 @@ public final class RandomTool {
         if (tempValue.length > 1) {
           shortMap.put(tempValue[0], Short.parseShort(tempValue[1]));
         } else {
-          shortMap.put(tempValue[0], getShortValueOrRandom(valueLength, Collections.emptyList()));
+          shortMap.put(tempValue[0], getShortValueOrRandom(valueLength, Collections.emptyList(), constrains));
         }
       }
     }
     if (shortMap.size() != mapSize) {
       for (int i = 0; i <= Math.abs(shortMap.size() - mapSize); i++) {
-        shortMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-            getShortValueOrRandom(valueLength, Collections.emptyList()));
+        shortMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+            getShortValueOrRandom(valueLength, Collections.emptyList(), constrains));
       }
     }
     return shortMap;
   }
 
-  private static Map<String, String> generateStringMap(int mapSize, List<String> fieldValueList, int valueLength) {
+  private static Map<String, String> generateStringMap(int mapSize, List<String> fieldValueList, int valueLength,
+                                                       Map<ConstraintTypeEnum, String> constrains) {
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1,5);
     Map<String, String> stringMap = new HashMap<>(size);
     if (!fieldValueList.isEmpty()) {
@@ -363,14 +411,14 @@ public final class RandomTool {
         if (tempValue.length > 1) {
           stringMap.put(tempValue[0], tempValue[1]);
         } else {
-          stringMap.put(tempValue[0], getStringValueOrRandom(valueLength, Collections.emptyList()));
+          stringMap.put(tempValue[0], getStringValueOrRandom(valueLength, Collections.emptyList(), constrains));
         }
       }
     }
     if (stringMap.size() != mapSize) {
       for (int i = 0; i <= Math.abs(stringMap.size() - mapSize); i++) {
-        stringMap.put(getStringValueOrRandom(valueLength, Collections.emptyList()),
-            getStringValueOrRandom(valueLength, Collections.emptyList()));
+        stringMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+            getStringValueOrRandom(valueLength, Collections.emptyList(), constrains));
       }
     }
     return stringMap;
@@ -391,7 +439,7 @@ public final class RandomTool {
     }
     if (uuidMap.size() != mapSize) {
       for (int i = 0; i <= Math.abs(uuidMap.size() - mapSize); i++) {
-        uuidMap.put(getStringValueOrRandom(0, Collections.emptyList()),
+        uuidMap.put(getStringValueOrRandom(0, Collections.emptyList(), Collections.emptyMap()),
             getUUIDValueOrRandom(Collections.emptyList()));
       }
     }
@@ -413,7 +461,7 @@ public final class RandomTool {
     }
     if (booleanMap.size() != mapSize) {
       for (int i = 0; i <= Math.abs(booleanMap.size() - mapSize); i++) {
-        booleanMap.put(getStringValueOrRandom(0, Collections.emptyList()),
+        booleanMap.put(getStringValueOrRandom(0, Collections.emptyList(), Collections.emptyMap()),
             getBooleanValueOrRandom(Collections.emptyList()));
       }
     }
@@ -424,44 +472,129 @@ public final class RandomTool {
     return fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim().split(":");
   }
 
-  private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValueList) {
+  private static Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValueList,
+                                             Map<ConstraintTypeEnum, String> constrains) {
     int value;
     if (!fieldValueList.isEmpty()) {
       value = Integer.parseInt(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      value = RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
+      int minimum = calculateMinimum(1, constrains);
+      int maximum = calculateMaximum(valueLength, constrains);
+      if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+        int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+        maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
+        value = RandomUtils.nextInt(minimum, maximum) * multipleOf;
+      } else {
+        value = RandomUtils.nextInt(minimum, maximum);
+      }
     }
     return value;
   }
 
-  private static Long getLongValueOrRandom(Integer valueLength, List<String> fieldValueList) {
+  private static Number getNumberValueOrRandom(Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
+    Number value;
+    if (!fieldValueList.isEmpty()) {
+      String chosenValue = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
+      if (chosenValue.contains(".")) {
+        value = Float.parseFloat(chosenValue);
+      } else {
+        value = Integer.parseInt(chosenValue);
+      }
+    } else {
+      int minimum = calculateMinimum(1, constrains);
+      int maximum = calculateMaximum(valueLength, constrains);
+      if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+        int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+        maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
+        value = RandomUtils.nextFloat(minimum, maximum) * multipleOf;
+      } else {
+        value = RandomUtils.nextFloat(minimum, maximum);
+      }
+    }
+    return value;
+  }
+
+  private static Long getLongValueOrRandom(Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     long value;
     if (!fieldValueList.isEmpty()) {
       value = Long.parseLong(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      value = RandomUtils.nextLong(1, 9 * (long) Math.pow(10, calculateSize(valueLength)));
+      int minimum = calculateMinimum(1, constrains);
+      int maximum = calculateMaximum(valueLength, constrains);
+      if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+        int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+        maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
+        value = RandomUtils.nextLong(minimum, maximum) * multipleOf;
+      } else {
+        value = RandomUtils.nextLong(minimum, maximum);
+      }
     }
     return value;
   }
 
-  private static Double getDoubleValueOrRandom(Integer valueLength, List<String> fieldValueList) {
+  private static Double getDoubleValueOrRandom(Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     double value;
     if (!fieldValueList.isEmpty()) {
       value = Double.parseDouble(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      value = RandomUtils.nextDouble(1, 9 * Math.pow(10, calculateSize(valueLength)));
-    }
+      int minimum = calculateMinimum(1, constrains);
+      int maximum = calculateMaximum(valueLength, constrains);
+      if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+        int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+        maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
+        value = RandomUtils.nextDouble(minimum, maximum) * multipleOf;
+      } else {
+        value = RandomUtils.nextDouble(minimum, maximum);
+      }    }
     return value;
   }
 
-  private static Float getFloatValueOrRandom(Integer valueLength, List<String> fieldValuesList) {
+  private static Float getFloatValueOrRandom(Integer valueLength, List<String> fieldValuesList,
+                                             Map<ConstraintTypeEnum, String> constrains) {
     float value;
     if (!fieldValuesList.isEmpty()) {
       value = Float.parseFloat(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
-      value = RandomUtils.nextFloat(1, 9 * (float) Math.pow(10, calculateSize(valueLength)));
+      int minimum = calculateMinimum(1, constrains);
+      int maximum = calculateMaximum(valueLength, constrains);
+      if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+        int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+        maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
+        value = RandomUtils.nextFloat(minimum, maximum) * multipleOf;
+      } else {
+        value = RandomUtils.nextFloat(minimum, maximum);
+      }
     }
     return value;
+  }
+
+
+  private static int calculateMaximum(Integer valueLength, Map<ConstraintTypeEnum, String> constrains) {
+    int maximum;
+    if (constrains.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
+      if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) {
+        maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1;
+      } else {
+        maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE));
+      }
+    } else {
+      maximum = 9 * (int) Math.pow(10, calculateSize(valueLength));
+    }
+    return maximum;
+  }
+
+  private static int calculateMinimum(int minimum, Map<ConstraintTypeEnum, String> constrains) {
+    if (constrains.containsKey(ConstraintTypeEnum.MINIMUM_VALUE)) {
+      if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) {
+        minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
+      } else {
+        minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MINIMUM_VALUE));
+      }
+    }
+    return minimum;
   }
 
   private static ByteBuffer getByteRandom(Integer valueLength) {
@@ -474,23 +607,48 @@ public final class RandomTool {
     return value;
   }
 
-  private static String getStringValueOrRandom(Integer valueLength, List<String> fieldValueList) {
+  private static String getStringValueOrRandom(Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     String value;
     if (!fieldValueList.isEmpty()) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
-      value = RandomStringUtils.randomAlphabetic(valueLength == 0 ? RandomUtils.nextInt(1,20): valueLength);
-    }
+      if (constrains.containsKey(ConstraintTypeEnum.REGEX)) {
+        RgxGen rxGenerator = new RgxGen(constrains.get(ConstraintTypeEnum.REGEX));
+        value = rxGenerator.generate();
+        if (valueLength > 0 || constrains.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
+          value = value.substring(0, getMaxLength(valueLength, constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE)));
+        }
+      } else {
+        value = RandomStringUtils.randomAlphabetic(valueLength == 0 ? RandomUtils.nextInt(1, 20) : valueLength);
+      }    }
     return value;
   }
 
-  private static Short getShortValueOrRandom(Integer valueLength, List<String> fieldValueList) {
+  private static int getMaxLength(Integer valueLength, String maxValueStr) {
+    int maxValue = Integer.parseInt(StringUtils.defaultIfEmpty(maxValueStr, "0"));
+    if (valueLength > 0 && maxValue == 0 ) {
+      maxValue = valueLength;
+    }
+    return maxValue;
+  }
+
+  private static Short getShortValueOrRandom(Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     short value;
     if (!fieldValueList.isEmpty()) {
       value = Short.parseShort(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
       if (valueLength < 5 ) {
-        value = (short) RandomUtils.nextInt(1, 9 * (int) Math.pow(10, calculateSize(valueLength)));
+        int minimum = calculateMinimum(1, constrains);
+        int maximum = calculateMaximum(valueLength, constrains);
+        if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+          int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+          maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
+          value = (short) (RandomUtils.nextInt(minimum, maximum) * multipleOf);
+        } else {
+          value = (short) RandomUtils.nextInt(minimum, maximum);
+        }
       } else {
         value = (short) RandomUtils.nextInt(1, 32767);
       }
@@ -537,8 +695,11 @@ public final class RandomTool {
 
     return RandomTool.castValue(
         context.compute(fieldName, (fieldNameMap,
-            seqObject) -> seqObject == null ? (fieldValueList.isEmpty() ? 1L : Long.parseLong(fieldValueList.get(0)))
-            : ((Long) seqObject) + 1),
+            seqObject) -> seqObject == null ? getSafeValue(fieldValueList) : ((Long) seqObject) + 1),
         fieldType);
+  }
+
+  private static Long getSafeValue(List<String> fieldValueList) {
+    return fieldValueList.isEmpty() ? 1L : Long.parseLong(fieldValueList.get(0));
   }
 }
