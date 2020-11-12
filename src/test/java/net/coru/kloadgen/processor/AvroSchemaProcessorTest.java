@@ -115,6 +115,7 @@ class AvroSchemaProcessorTest {
     assertThat(message.getGenericRecord()).isNotNull()
             .hasFieldOrProperty("values")
             .extracting("values")
+            .asList()
             .hasSize(1);
     Map<String, String> result = (Map<String, String>)((GenericRecord) message.getGenericRecord()).get("values");
     assertThat(result).hasSize(4).containsEntry("n","1").containsEntry("t","2");

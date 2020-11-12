@@ -54,8 +54,11 @@ class JSONSchemaParserTest {
 
     Schema result = jsonSchemaParser.parse(resourceAsFile.getContent("/jsonschema/multiple-type.jcs"));
 
-    assertThat(result).extracting("properties").satisfies(this::multiTypeTestStringOrNumber)
-        .satisfies(propertyNamesAre("id", "version", "dtype", "timestamp", "event_type"));
+    assertThat(result)
+            .extracting("properties")
+            .satisfies(this::multiTypeTestStringOrNumber)
+            .asList()
+            .satisfies(propertyNamesAre("id", "version", "dtype", "timestamp", "event_type"));
   }
 
   private Consumer<List<?>> propertyNamesAre(String... propertiesNames) {
