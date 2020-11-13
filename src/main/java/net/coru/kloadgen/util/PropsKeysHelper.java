@@ -20,4 +20,6 @@ public class PropsKeysHelper {
     public static final String AVRO_SUBJECT_NAME = "subject.name";
     public static final String AVRO_SCHEMA = "subject.schema";
     public static final String SCHEMA_PROPERTIES = "schema.properties";
+
+    public static final String SCHEMA_TYPE = "schema.type";
 }

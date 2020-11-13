@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.property.editor;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

@@ -105,7 +105,7 @@ class SchemaExtractorTest {
 
     File testFile = fileHelper.getFile("/avro-files/testOptionalMap.avsc");
 
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile));
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
 
     assertThat(fieldValueMappingList)
         .hasSize(3)

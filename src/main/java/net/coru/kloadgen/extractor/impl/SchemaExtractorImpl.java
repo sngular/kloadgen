@@ -96,8 +96,14 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   }
 
   @Override
-  public ParsedSchema schemaTypesList(File schemaFile) throws IOException {
-    return new AvroSchema(readLineByLine(schemaFile.getPath()));
+  public ParsedSchema schemaTypesList(File schemaFile, String schemaType) throws IOException {
+    ParsedSchema parsedSchema;
+    if ("AVRO".equalsIgnoreCase(schemaType)) {
+      parsedSchema = new AvroSchema(readLineByLine(schemaFile.getPath()));
+    } else {
+      parsedSchema = new JsonSchema(readLineByLine(schemaFile.getPath()));
+    }
+    return parsedSchema;
   }
 
   private List<FieldValueMapping> processSchema(ParsedSchema schema) {

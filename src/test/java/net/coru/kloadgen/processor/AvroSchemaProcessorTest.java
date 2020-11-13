@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -111,10 +112,14 @@ class AvroSchemaProcessorTest {
         fieldValueMappingList);
 
     EnrichedRecord message = avroSchemaProcessor.next();
-    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-    assertThat(message.getGenericRecord()).isNotNull()
+    assertThat(message)
+            .isNotNull()
+            .isInstanceOf(EnrichedRecord.class)
+            .extracting(EnrichedRecord::getGenericRecord)
+            .isNotNull()
             .hasFieldOrProperty("values")
             .extracting("values")
+            .extracting(Arrays::asList)
             .asList()
             .hasSize(1);
     Map<String, String> result = (Map<String, String>)((GenericRecord) message.getGenericRecord()).get("values");

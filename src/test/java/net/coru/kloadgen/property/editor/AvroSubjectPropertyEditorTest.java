@@ -1,4 +1,4 @@
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.property.editor;
 
 import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;

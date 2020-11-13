@@ -4,8 +4,9 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.property.editor;
 
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -36,7 +37,6 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
-import org.apache.avro.Schema;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -48,6 +48,8 @@ import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
+
+  private JComboBox<String> schemaTypeComboBox;
 
   private JComboBox<String> subjectNameComboBox;
 
@@ -80,12 +82,18 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   private void init() {
+    schemaTypeComboBox = new JComboBox<>();
+    schemaTypeComboBox.setEditable(false);
+    schemaTypeComboBox.insertItemAt("AVRO", 0);
+    schemaTypeComboBox.insertItemAt("JSON-Schema", 1);
+    schemaTypeComboBox.setSelectedIndex(0);
     subjectNameComboBox = new JComboBox<>();
     subjectNameComboBox.setEditable(true);
     panel.setLayout(new BorderLayout());
     openFileDialogButton.addActionListener(this::actionFileChooser);
     panel.add(openFileDialogButton, BorderLayout.LINE_END);
     panel.add(subjectNameComboBox);
+    panel.add(schemaTypeComboBox);
     AutoCompletion.enable(subjectNameComboBox);
     this.subjectNameComboBox.addActionListener(this);
   }
@@ -96,7 +104,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
       File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
       try {
-        parserSchema = schemaExtractor.schemaTypesList(subjectName);
+        String schemaType = schemaTypeComboBox.getSelectedItem().toString();
+        parserSchema = schemaExtractor.schemaTypesList(subjectName, schemaType);
         subjectNameComboBox.removeAllItems();
         subjectNameComboBox.addItem(parserSchema.name());
       } catch (IOException e) {
@@ -112,20 +121,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     return parserSchema;
   }
 
-  private Schema getRecordUnion(List<Schema> types, String name) {
-    Schema unionSchema = null;
-    for (Schema schema : types) {
-      if (schema.getName().equalsIgnoreCase(name)) {
-        unionSchema = schema;
-      }
-    }
-    return unionSchema;
-  }
-
   @Override
   public void actionPerformed(ActionEvent event) {
     if (subjectNameComboBox.getItemCount() != 0) {
-
+      JMeterContextService.getContext().getVariables().put(SCHEMA_TYPE, schemaTypeComboBox.getSelectedItem().toString());
       String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
 

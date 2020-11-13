@@ -8,7 +8,7 @@ package net.coru.kloadgen.config.avroserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
-import net.coru.kloadgen.input.avro.AvroSubjectPropertyEditor;
+import net.coru.kloadgen.property.editor.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;

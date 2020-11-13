@@ -8,8 +8,8 @@ package net.coru.kloadgen.config.fileserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
-import net.coru.kloadgen.input.avro.FileSubjectPropertyEditor;
-import net.coru.kloadgen.input.avro.SchemaConverterPropertyEditor;
+import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
+import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
