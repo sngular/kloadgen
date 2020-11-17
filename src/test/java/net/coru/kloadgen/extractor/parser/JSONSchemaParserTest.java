@@ -7,9 +7,7 @@ import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixtures.SIMP
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixtures.SIMPLE_SCHEMA_NUMBER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.json.Field;
@@ -18,7 +16,6 @@ import net.coru.kloadgen.model.json.Schema;
 import net.coru.kloadgen.model.json.StringField;
 import net.coru.kloadgen.model.json.UUIDField;
 import net.coru.kloadgen.testutil.FileHelper;
-import org.apache.commons.collections4.IterableUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -55,19 +52,14 @@ class JSONSchemaParserTest {
     Schema result = jsonSchemaParser.parse(resourceAsFile.getContent("/jsonschema/multiple-type.jcs"));
 
     assertThat(result)
-            .extracting("properties")
-            .satisfies(this::multiTypeTestStringOrNumber)
-            .asList()
-            .satisfies(propertyNamesAre("id", "version", "dtype", "timestamp", "event_type"));
-  }
-
-  private Consumer<List<?>> propertyNamesAre(String... propertiesNames) {
-    Set<String> propertyNames = Set.of(propertiesNames);
-    return fields -> IterableUtils.matchesAll((List)fields.get(0), field-> propertyNames.contains(((Field)field).getName()));
+            .extracting(Schema::getProperties)
+            .satisfies(this::multiTypeTestStringOrNumber);
   }
 
   private boolean multiTypeTestStringOrNumber(Object field) {
-    return field instanceof StringField || field instanceof NumberField || field instanceof UUIDField;
+    Set<String> propertyNames = Set.of("id", "version", "dtype", "timestamp", "event_type");
+    return (field instanceof StringField || field instanceof NumberField || field instanceof UUIDField) &&
+        propertyNames.contains(((Field)field).getName());
   }
 
 }

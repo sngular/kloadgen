@@ -76,12 +76,16 @@ class AvroSchemaProcessorTest {
         fieldValueMappingList);
 
     EnrichedRecord message = avroSchemaProcessor.next();
-    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-    assertThat(message.getGenericRecord())
-            .isNotNull()
-            .hasFieldOrProperty("values")
-            .extracting("values")
-            .isInstanceOf(List.class);
+    assertThat(message)
+        .isNotNull()
+        .isInstanceOf(EnrichedRecord.class)
+        .extracting(EnrichedRecord::getGenericRecord)
+        .isNotNull()
+        .hasFieldOrProperty("values")
+        .extracting("values")
+        .extracting(Arrays::asList)
+        .asList()
+        .hasSize(1);
     List<Map<String, Object>> result = (List<Map<String, Object>>) ((GenericRecord) message.getGenericRecord()).get("values");
     assertThat(result).hasSize(2).contains(Maps.of("n","1","t","2"), Maps.of("n","1","t","2"));
   }
