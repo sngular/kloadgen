@@ -220,8 +220,8 @@ public class JavaConfigGui extends AbstractConfigGui implements ChangeListener {
                             value = newVal;
                         }
                         currArgsMap.remove(name);
+                        newArgs.addArgument(name, value);
                     }
-                    newArgs.addArgument(name, value);
                 }
                 currArgsMap.forEach(newArgs::addArgument);
             }

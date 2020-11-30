@@ -103,7 +103,10 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **java.security.auth.login.config** : jaas.conf of kafka Kerberos
 * **java.security.krb5.conf** : Kerberos server krb5.conf file
 * **sasl.kerberos.service.name** : Kafka Kerberos service name
-* **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing.
+* **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing
+* **keyed.message** : Enable adding a Key to the messages
+* **message.key.type**: Allow to specify the key type, used for random generated keys.
+* **message.key.value**: Allow to specify a fixed value, or a variable, with the key to pass through
 
 ![Kafka Producer Configuration](/Kafka_producer_properties.png)
 

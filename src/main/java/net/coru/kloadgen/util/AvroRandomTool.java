@@ -65,27 +65,33 @@ public class AvroRandomTool {
             fieldValue
     );
 
-    Object value = RandomTool.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
+    Object value;
 
     if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(fieldType, field.schema(),parameterList);
+      value = getEnumOrGenerate(fieldType, field.schema(), parameterList);
     } else if (UNION == field.schema().getType()) {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
-      if ("null".equalsIgnoreCase(value.toString())) {
-        value = null;
-      } else if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
+      if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
+        value = RandomTool.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
         value = RandomTool.castValue(value, field.schema().getType().getName());
       } else if (ENUM == safeSchema.getType()) {
-        value = getEnumOrGenerate(fieldType, safeSchema,parameterList);
+        value = getEnumOrGenerate(fieldType, safeSchema, parameterList);
+      } else {
+        value = RandomTool.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
+        if ("null".equalsIgnoreCase(value.toString())) {
+          value = null;
+        }
       }
-    } else if ("seq".equalsIgnoreCase(value.toString())) {
+    } else if ("seq".equalsIgnoreCase(fieldType)) {
       value = RandomTool.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
+      value = RandomTool.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
       value = RandomTool.castValue(value, field.schema().getType().getName());
+    } else if (FIXED == field.schema().getType()) {
+      value = getFixedOrGenerate(field.schema());
+    } else {
+      value = RandomTool.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
     }
-	if(FIXED == field.schema().getType()) {
-		value = getFixedOrGenerate(field.schema());
-	}
     return value;
   }
 
@@ -143,7 +149,7 @@ public class AvroRandomTool {
     }
   }
 
-  private static Object getEnumOrGenerate(String fieldType, Schema schema,List<String> parameterList) {
+  private static Object getEnumOrGenerate(String fieldType, Schema schema, List<String> parameterList) {
     Object value;
     if ("ENUM".equalsIgnoreCase(fieldType)) {
       if(parameterList.isEmpty()) {

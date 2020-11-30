@@ -212,13 +212,16 @@ public final class SamplerUtil {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     BaseLoadGenerator generator;
 
-    if (Objects.nonNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG)) &&
-        context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("json")) {
-      generator = new JsonLoadGenerator();
-    } else if (Objects.isNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG)) || context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("avro")) {
-      generator = new AvroLoadGenerator();
+    if (Objects.nonNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG))) {
+      if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("json")) {
+        generator = new JsonLoadGenerator();
+      } else if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("avro")) {
+        generator = new AvroLoadGenerator();
+      } else {
+        throw new KLoadGenException("Unsupported Serializer");
+      }
     } else {
-      throw new KLoadGenException("Unsupported Serializer");
+      generator = new AvroLoadGenerator();
     }
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
