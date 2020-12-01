@@ -41,6 +41,6 @@ public class GenericRecordSerializer<T extends GenericRecord>  implements Serial
 
   @Override
   public byte[] serialize(String topic, Headers headers, T data) {
-    return new byte[0];
+    return serialize(topic, data);
   }
 }

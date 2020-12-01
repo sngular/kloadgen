@@ -1,13 +1,13 @@
 version: '3'
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper
+    image: confluentinc/cp-zookeeper:5.4.1
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
       - 2181:2181
   kafka:
-    image: confluentinc/cp-kafka
+    image: confluentinc/cp-kafka:5.4.1
     depends_on:
       - zookeeper
     environment:
@@ -16,8 +16,10 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - 29092:29092
   schema-registry:
-    image: confluentinc/cp-schema-registry
+    image: confluentinc/cp-schema-registry:5.4.1
     depends_on:
       - zookeeper
       - kafka
