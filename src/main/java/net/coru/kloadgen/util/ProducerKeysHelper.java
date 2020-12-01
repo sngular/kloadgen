@@ -6,7 +6,7 @@
 
 package net.coru.kloadgen.util;
 
-import net.coru.kloadgen.serializer.GenericRecordSerializer;
+import net.coru.kloadgen.serializer.GenericAvroRecordSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 public class ProducerKeysHelper {
@@ -21,7 +21,7 @@ public class ProducerKeysHelper {
 
     public static final String KEY_SERIALIZER_CLASS_CONFIG_DEFAULT = StringSerializer.class.getName();
 
-    public static final String VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT = GenericRecordSerializer.class.getName();
+    public static final String VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT = GenericAvroRecordSerializer.class.getName();
 
     public static final String ACKS_CONFIG_DEFAULT = "1";
 

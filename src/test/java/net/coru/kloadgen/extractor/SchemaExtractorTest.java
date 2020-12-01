@@ -20,6 +20,7 @@ import java.util.Locale;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -56,11 +57,11 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(
+    Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList(
         "avroSubject"
     );
 
-    assertThat(fieldValueMappingList)
+    assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
         .containsExactlyInAnyOrder(
         new FieldValueMapping("Name", "string"),
@@ -74,9 +75,9 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList("users");
+    Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList("users");
 
-    assertThat(fieldValueMappingList)
+    assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
         .containsExactlyInAnyOrder(
         new FieldValueMapping("Users[].id", "long"),
@@ -90,9 +91,9 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList("arrayMap");
+    Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList("arrayMap");
 
-    assertThat(fieldValueMappingList)
+    assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
         .containsExactlyInAnyOrder(
         new FieldValueMapping("name", "string"),

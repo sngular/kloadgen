@@ -6,33 +6,26 @@
 
 package net.coru.kloadgen.serializer;
 
-import java.io.ByteArrayOutputStream;
+import com.fasterxml.jackson.core.json.JsonWriteFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumWriter;
-import org.apache.avro.io.Encoder;
-import org.apache.avro.io.EncoderFactory;
-import org.apache.avro.specific.SpecificDatumWriter;
+import org.apache.commons.lang3.CharSet;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
-public class GenericRecordSerializer<T extends GenericRecord>  implements Serializer<T> {
+public class GenericJsonRecordSerializer<T extends ObjectNode>  implements Serializer<T> {
 
   @Override
   public byte[] serialize(String topic, T record) {
 
-    DatumWriter<T> writer = new SpecificDatumWriter<>(record.getSchema());
     byte[] data = new byte[0];
-    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    Encoder jsonEncoder;
     try {
-      jsonEncoder = EncoderFactory.get().jsonEncoder(
-          record.getSchema(), stream);
-      writer.write(record, jsonEncoder);
-      jsonEncoder.flush();
-      data = stream.toByteArray();
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
+      data = mapper.writeValueAsString(record).getBytes(CharSet.ASCII_ALPHA.toString());
     } catch (IOException e) {
       log.error("Serialization error:" + e.getMessage());
     }

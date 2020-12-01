@@ -6,7 +6,6 @@
 
 package net.coru.kloadgen.property.editor;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -124,7 +123,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   @Override
   public void actionPerformed(ActionEvent event) {
     if (subjectNameComboBox.getItemCount() != 0) {
-      JMeterContextService.getContext().getVariables().put(SCHEMA_TYPE, schemaTypeComboBox.getSelectedItem().toString());
+      String schemaType =  schemaTypeComboBox.getSelectedItem().toString();
       String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
 
@@ -148,6 +147,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
               propertyEditor.setValue(attributeList);
             } else if (propertyEditor instanceof SchemaConverterPropertyEditor) {
               propertyEditor.setValue(selectedSchema);
+            } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
+              propertyEditor.setValue(schemaType);
             }
           }
         } catch (NoSuchFieldException | IllegalAccessException e) {

@@ -8,36 +8,45 @@ package net.coru.kloadgen.config.fileserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
-import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String AVRO_SUBJECT = "avroSubject";
+  private static final String SUBJECT_NAME = "subjectName";
 
   private static final String SCHEMA_PROPERTIES = "schemaProperties";
 
-  private static final String AVRO_SCHEMA = "avroSchema";
+  private static final String SCHEMA_DEFINITION = "schemaDefinition";
+
+  private static final String SCHEMA_TYPE = "schemaType";
 
   public FileSerializedConfigElementBeanInfo() {
 
     super(FileSerializedConfigElement.class);
 
     createPropertyGroup("file_serialized_load_generator", new String[]{
-        AVRO_SUBJECT, SCHEMA_PROPERTIES, AVRO_SCHEMA
+            SUBJECT_NAME, SCHEMA_PROPERTIES, SCHEMA_DEFINITION, SCHEMA_TYPE
     });
 
-    PropertyDescriptor subjectNameProps = property(AVRO_SUBJECT);
+    PropertyDescriptor subjectNameProps = property(SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "<avro subject>");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor avroSchemaProps = property(AVRO_SCHEMA);
+    PropertyDescriptor schemaType = property(SCHEMA_TYPE);
+    schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
+    schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    schemaType.setValue(DEFAULT, "<avro subject>");
+    schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+    PropertyDescriptor avroSchemaProps = property(SCHEMA_DEFINITION);
     avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
     avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     avroSchemaProps.setValue(DEFAULT, "");

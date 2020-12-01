@@ -6,10 +6,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import net.coru.kloadgen.model.FieldValueMapping;
+import org.apache.commons.lang3.tuple.Pair;
 
 public interface SchemaExtractor {
 
-	List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException;
+	Pair<String, List<FieldValueMapping>> flatPropertiesList(String subjectName) throws IOException, RestClientException;
 
 	List<FieldValueMapping> flatPropertiesList(ParsedSchema parserSchema);
 

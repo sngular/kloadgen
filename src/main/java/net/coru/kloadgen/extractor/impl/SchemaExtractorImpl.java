@@ -44,6 +44,7 @@ import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.extractors.AvroExtractor;
 import net.coru.kloadgen.extractor.extractors.JsonExtractor;
 import net.coru.kloadgen.model.FieldValueMapping;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractorImpl implements SchemaExtractor {
@@ -53,7 +54,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   private final JsonExtractor jsonExtractor = new JsonExtractor();
 
   @Override
-  public List<FieldValueMapping> flatPropertiesList(String subjectName) throws IOException, RestClientException {
+  public Pair<String, List<FieldValueMapping>> flatPropertiesList(String subjectName) throws IOException, RestClientException {
     Map<String, String> originals = new HashMap<>();
 
     Properties properties = JMeterContextService.getContext().getProperties();
@@ -87,7 +88,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schema.schemaType()));
     }
-    return attributeList;
+    return Pair.of(schema.schemaType(), attributeList);
   }
 
   @Override

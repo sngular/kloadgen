@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test;
 
 class AvroSerializedConfigElementBeanInfoTest {
 
-  private static final String AVRO_SUBJECT = "avroSubject";
+  private static final String SUBJECT_NAME = "subjectName";
 
   private static final String SCHEMA_PROPERTIES = "schemaProperties";
+
+  private static final String SCHEMA_TYPE = "schemaType";
 
   private AvroSerializedConfigElementBeanInfo avroSerializedConfigElementBeanInfo;
 
@@ -26,8 +28,9 @@ class AvroSerializedConfigElementBeanInfoTest {
   @Test
   public void shouldGenerateElements() {
     PropertyDescriptor[] propertyDescriptors = avroSerializedConfigElementBeanInfo.getPropertyDescriptors();
-    assertThat(propertyDescriptors).hasSize(2);
-    assertThat(propertyDescriptors[0].getName()).isEqualTo(AVRO_SUBJECT);
-    assertThat(propertyDescriptors[1].getName()).isEqualTo(SCHEMA_PROPERTIES);
+    assertThat(propertyDescriptors).hasSize(3);
+    assertThat(propertyDescriptors[0].getName()).isEqualTo(SCHEMA_PROPERTIES);
+    assertThat(propertyDescriptors[1].getName()).isEqualTo(SCHEMA_TYPE);
+    assertThat(propertyDescriptors[2].getName()).isEqualTo(SUBJECT_NAME);
   }
 }

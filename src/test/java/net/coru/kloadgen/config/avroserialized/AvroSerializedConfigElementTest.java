@@ -45,7 +45,7 @@ class AvroSerializedConfigElementTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList());
+    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO");
     avroSerializedConfigElement.iterationStart(null);
     assertThat(JMeterContextService.getContext().getVariables().getObject(AVRO_SUBJECT_NAME)).isNotNull();
     assertThat(JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES)).isNotNull();

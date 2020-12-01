@@ -34,6 +34,7 @@ import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -85,7 +86,7 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
     String subjectName = Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
 
     try {
-      List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(subjectName);
+      Pair<String, List<FieldValueMapping>> attributeList = schemaExtractor.flatPropertiesList(subjectName);
 
       //Get current test GUI component
       TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
@@ -102,7 +103,9 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
           TableEditor tableEditor = (TableEditor) propertyEditor;
-          propertyEditor.setValue(mergeValue(tableEditor.getValue(), attributeList));
+          propertyEditor.setValue(mergeValue(tableEditor.getValue(), attributeList.getRight()));
+        } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
+          propertyEditor.setValue(attributeList.getKey());
         }
       }
       JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",

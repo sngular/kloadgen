@@ -42,6 +42,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
@@ -80,6 +82,8 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 public final class SamplerUtil {
 
   private static final StatelessRandomTool statelessRandomTool = new StatelessRandomTool();
+
+  private static final Set<String> JSON_TYPE_SET = Set.of("json-schema", "json");
 
   private SamplerUtil() { }
 
@@ -212,10 +216,10 @@ public final class SamplerUtil {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     BaseLoadGenerator generator;
 
-    if (Objects.nonNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG))) {
-      if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("json")) {
+    if (Objects.nonNull(jMeterVariables.get(SCHEMA_TYPE))) {
+      if (JSON_TYPE_SET.contains(jMeterVariables.get(SCHEMA_TYPE).toLowerCase())) {
         generator = new JsonLoadGenerator();
-      } else if (context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toLowerCase().contains("avro")) {
+      } else if (jMeterVariables.get(SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");

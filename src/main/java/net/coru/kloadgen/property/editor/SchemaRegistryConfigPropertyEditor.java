@@ -167,8 +167,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
                         .setProperty(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
 
                     originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-                    originals.put(USER_INFO_CONFIG,
-                        schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
+                    originals.put(USER_INFO_CONFIG,schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
                 }
             }
             SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);

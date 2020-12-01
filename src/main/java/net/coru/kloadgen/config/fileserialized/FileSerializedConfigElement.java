@@ -8,6 +8,7 @@ package net.coru.kloadgen.config.fileserialized;
 
 import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -30,18 +31,21 @@ import org.apache.jmeter.threads.JMeterVariables;
 @NoArgsConstructor
 public class FileSerializedConfigElement  extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String avroSubject;
+  private String subjectName;
 
   private List<FieldValueMapping> schemaProperties;
 
-  private String avroSchema;
+  private String schemaDefinition;
+
+  private String schemaType;
 
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(AVRO_SCHEMA, avroSchema);
+    variables.putObject(AVRO_SCHEMA, schemaDefinition);
     variables.putObject(SCHEMA_PROPERTIES, schemaProperties);
+    variables.putObject(SCHEMA_TYPE, schemaType);
   }
 
 }
