@@ -62,7 +62,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
     private final transient StatelessRandomTool statelessRandomTool;
 
-    private final transient BaseLoadGenerator generator;
+    private transient BaseLoadGenerator generator;
 
     public ConfluentKafkaSampler() {
         generator = new AvroLoadGenerator();
@@ -71,8 +71,10 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
     @Override
     public Arguments getDefaultParameters() {
-
-        return SamplerUtil.getCommonDefaultParameters();
+        Arguments arguments = SamplerUtil.getCommonDefaultParameters();
+        arguments.addArgument(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
+        arguments.addArgument(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
+        return arguments;
     }
 
     @Override
@@ -82,7 +84,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
 
-        props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+        props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false"));
 
         if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
             props.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
