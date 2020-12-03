@@ -32,10 +32,10 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
   kafka-manager:
     image: kafkamanager/kafka-manager
-    depends_on: 
+    depends_on:
       - kafka
       - zookeeper
     ports:
       - 9000:9000
-    environment: 
+    environment:
       ZK_HOSTS: http://zookeper:2181

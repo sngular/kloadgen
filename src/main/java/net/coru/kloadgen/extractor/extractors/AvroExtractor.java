@@ -80,7 +80,7 @@ public class AvroExtractor {
         internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat(ARRAY_POSTFIX));
         createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
       } else {
-        createArrayType(completeFieldList, internalFields, innerField.name());
+        createArrayType(completeFieldList, internalFields, innerField.name() + "[]");
       }
     } else if (UNION.equals(innerField.schema().getType())) {
       extractUnionRecord(innerField, completeFieldList);

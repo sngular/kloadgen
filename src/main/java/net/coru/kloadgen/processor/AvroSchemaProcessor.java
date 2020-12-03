@@ -6,7 +6,7 @@
 
 package net.coru.kloadgen.processor;
 
-import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache .avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
@@ -142,9 +142,9 @@ public class AvroSchemaProcessor {
               fieldValueMapping.getFieldValuesList()));
         } else {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-          subEntity.put(fieldNameSubEntity, createObjectArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
+          subEntity.put(fieldNameSubEntity, createArray(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity)),
               fieldNameSubEntity,
-              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+              calculateSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
               fieldExpMappingsQueue));
         }
       } else if (cleanFieldName.contains(".")) {
