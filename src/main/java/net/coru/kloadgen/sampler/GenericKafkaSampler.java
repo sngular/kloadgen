@@ -80,7 +80,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
     public void setupTest(JavaSamplerContext context) {
 
         Properties props = SamplerUtil.setupCommonProperties(context);
-        generator = SamplerUtil.configureGenerator(context, props);
+        generator = SamplerUtil.configureGenerator(props);
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
             keyMessageFlag = true;

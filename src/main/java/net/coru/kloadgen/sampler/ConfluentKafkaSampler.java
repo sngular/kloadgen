@@ -79,7 +79,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
     public void setupTest(JavaSamplerContext context) {
 
         Properties props = SamplerUtil.setupCommonProperties(context);
-        generator = SamplerUtil.configureGenerator(context, props);
+        generator = SamplerUtil.configureGenerator(props);
 
         props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false"));
 

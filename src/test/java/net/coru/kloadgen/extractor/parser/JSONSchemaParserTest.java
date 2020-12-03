@@ -1,10 +1,10 @@
 package net.coru.kloadgen.extractor.parser;
 
-import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixtures.COMPLEX_SCHEMA;
-import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixtures.MEDIUM_COMPLEX_SCHEMA;
-import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixtures.SIMPLE_SCHEMA;
-import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixtures.SIMPLE_SCHEMA_ARRAY;
-import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixtures.SIMPLE_SCHEMA_NUMBER;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.COMPLEX_SCHEMA;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.MEDIUM_COMPLEX_SCHEMA;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_ARRAY;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NUMBER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;

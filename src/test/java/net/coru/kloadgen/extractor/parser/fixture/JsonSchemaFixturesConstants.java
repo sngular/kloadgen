@@ -13,7 +13,7 @@ import net.coru.kloadgen.model.json.ObjectField;
 import net.coru.kloadgen.model.json.Schema;
 import net.coru.kloadgen.model.json.StringField;
 
-public class JsonSchemaFixtures {
+public class JsonSchemaFixturesConstants {
 
   public static final Schema SIMPLE_SCHEMA =
           Schema.builder()

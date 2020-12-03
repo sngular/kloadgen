@@ -166,8 +166,8 @@ public final class SamplerUtil {
     return props;
   }
 
-  public static BaseLoadGenerator configureGenerator(JavaSamplerContext context, Properties props) {
-   return configSchemRegistryUrl(context, props);
+  public static BaseLoadGenerator configureGenerator(Properties props) {
+   return configSchemRegistryUrl(props);
   }
 
   private static void verifySecurity(JavaSamplerContext context, Properties props) {
@@ -212,7 +212,7 @@ public final class SamplerUtil {
     }
   }
 
-  private static BaseLoadGenerator configSchemRegistryUrl(JavaSamplerContext context, Properties props) {
+  private static BaseLoadGenerator configSchemRegistryUrl(Properties props) {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     BaseLoadGenerator generator;
 
