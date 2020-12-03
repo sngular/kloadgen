@@ -31,19 +31,19 @@ public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     super(FileSerializedConfigElement.class);
 
     createPropertyGroup("file_serialized_load_generator", new String[]{
-            SUBJECT_NAME, SCHEMA_PROPERTIES, SCHEMA_DEFINITION, SCHEMA_TYPE
+            SCHEMA_TYPE, SCHEMA_PROPERTIES, SCHEMA_DEFINITION, SUBJECT_NAME
     });
 
-    PropertyDescriptor subjectNameProps = property(SUBJECT_NAME);
+    PropertyDescriptor subjectNameProps = property(SCHEMA_TYPE);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    subjectNameProps.setValue(DEFAULT, "<avro subject>");
+    subjectNameProps.setValue(DEFAULT, "");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor schemaType = property(SCHEMA_TYPE);
+    PropertyDescriptor schemaType = property(SUBJECT_NAME);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    schemaType.setValue(DEFAULT, "<avro subject>");
+    schemaType.setValue(DEFAULT, "");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor avroSchemaProps = property(SCHEMA_DEFINITION);
