@@ -1,4 +1,4 @@
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.property.editor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

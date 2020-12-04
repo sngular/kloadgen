@@ -37,8 +37,8 @@ public class AvroSerializer<T extends EnrichedRecord>  implements Serializer<T> 
         byteArrayOutputStream.write(MAGIC_BYTE);
         byteArrayOutputStream.write(ByteBuffer.allocate(idSize).putInt(data.getSchemaMetadata().getId()).array());
         BinaryEncoder binaryEncoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
-        DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(data.getGenericRecord().getSchema());
-        datumWriter.write(data.getGenericRecord(), binaryEncoder);
+        DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(((GenericRecord)data.getGenericRecord()).getSchema());
+        datumWriter.write((GenericRecord)data.getGenericRecord(), binaryEncoder);
 
         binaryEncoder.flush();
         byteArrayOutputStream.close();

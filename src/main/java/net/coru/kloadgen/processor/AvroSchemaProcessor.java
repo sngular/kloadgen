@@ -11,6 +11,7 @@ import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
 
+import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -44,6 +45,13 @@ public class AvroSchemaProcessor {
 
   private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING,
       Type.LONG, Type.BYTES, Type.FIXED);
+
+  public void processSchema(ParsedSchema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
+    this.schema = (Schema) schema.rawSchema();
+    this.fieldExprMappings = fieldExprMappings;
+    this.metadata = metadata;
+    randomToolAvro = new AvroRandomTool();
+  }
 
   public void processSchema(Schema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
     this.schema = schema;

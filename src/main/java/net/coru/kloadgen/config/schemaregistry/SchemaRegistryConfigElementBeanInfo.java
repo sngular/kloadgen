@@ -10,7 +10,7 @@ import static net.coru.kloadgen.config.schemaregistry.DefaultPropertiesHelper.DE
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL_DEFAULT;
 
 import java.beans.PropertyDescriptor;
-import net.coru.kloadgen.input.avro.SchemaRegistryConfigPropertyEditor;
+import net.coru.kloadgen.property.editor.SchemaRegistryConfigPropertyEditor;
 import net.coru.kloadgen.model.PropertyMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;

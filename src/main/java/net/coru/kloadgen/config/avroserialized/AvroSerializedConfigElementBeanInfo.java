@@ -8,24 +8,27 @@ package net.coru.kloadgen.config.avroserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
-import net.coru.kloadgen.input.avro.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.property.editor.AvroSubjectPropertyEditor;
+import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
-    private static final String AVRO_SUBJECT = "avroSubject";
+    private static final String SUBJECT_NAME = "subjectName";
 
     private static final String SCHEMA_PROPERTIES = "schemaProperties";
+
+    private static final String SCHEMA_TYPE = "schemaType";
 
     public AvroSerializedConfigElementBeanInfo() {
 
         super(AvroSerializedConfigElement.class);
 
         createPropertyGroup("avro_serialized_load_generator", new String[] {
-            AVRO_SUBJECT, SCHEMA_PROPERTIES
+            SUBJECT_NAME, SCHEMA_PROPERTIES, SCHEMA_TYPE
         });
 
         TypeEditor tableEditor = TypeEditor.TableEditor;
@@ -48,9 +51,15 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         tableProperties.setValue(DEFAULT, new ArrayList<>());
         tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
 
-        PropertyDescriptor subjectNameProps = property(AVRO_SUBJECT);
+        PropertyDescriptor subjectNameProps = property(SUBJECT_NAME);
         subjectNameProps.setPropertyEditorClass(AvroSubjectPropertyEditor.class);
         subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
         subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+        PropertyDescriptor schemaType = property(SCHEMA_TYPE);
+        schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
+        schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        schemaType.setValue(DEFAULT, "<avro subject>");
+        schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
     }
 }

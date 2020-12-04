@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
-import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.StatelessRandomTool;
@@ -65,7 +64,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
     private transient BaseLoadGenerator generator;
 
     public ConfluentKafkaSampler() {
-        generator = new AvroLoadGenerator();
         statelessRandomTool = new StatelessRandomTool();
     }
 
@@ -80,9 +78,8 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
     @Override
     public void setupTest(JavaSamplerContext context) {
 
-        Properties props = SamplerUtil.setupCommonProperties(context, generator);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer");
+        Properties props = SamplerUtil.setupCommonProperties(context);
+        generator = SamplerUtil.configureGenerator(props);
 
         props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false"));
 

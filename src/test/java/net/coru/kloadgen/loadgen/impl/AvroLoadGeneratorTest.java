@@ -43,7 +43,7 @@ class AvroLoadGeneratorTest {
   }
 
   @Test
-  public void testAvroLoadGenerator(@Wiremock WireMockServer server) throws KLoadGenException {
+  void testAvroLoadGenerator(@Wiremock WireMockServer server) throws KLoadGenException {
 
     List<FieldValueMapping> fieldValueMappingList = asList(
         new FieldValueMapping("Name", "string", 0, "Jose"),
@@ -57,11 +57,9 @@ class AvroLoadGeneratorTest {
     AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator();
     avroLoadGenerator.setUpGenerator(originals, "avroSubject", fieldValueMappingList);
     Object message = avroLoadGenerator.nextMessage();
-    assertThat(message).isNotNull();
-    assertThat(message).isInstanceOf(EnrichedRecord.class);
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
 
     EnrichedRecord enrichedRecord = (EnrichedRecord) message;
-    assertThat(enrichedRecord.getGenericRecord()).isNotNull();
-    assertThat(enrichedRecord.getGenericRecord()).hasFieldOrPropertyWithValue("values", asList("Jose", 43).toArray());
+    assertThat(enrichedRecord.getGenericRecord()).isNotNull().hasFieldOrPropertyWithValue("values", asList("Jose", 43).toArray());
   }
 }

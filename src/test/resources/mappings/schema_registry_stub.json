@@ -12,6 +12,7 @@
           "subject": "users",
           "version": 1,
           "id": 72,
+          "schemaType": "AVRO",
           "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\":[\"null\",\"long\"]}]}}}]}"
         },
         "headers": {
@@ -31,6 +32,7 @@
           "subject": "AvroSubject",
           "version": 1,
           "id": 71,
+          "schemaType": "AVRO",
           "schema":"{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
         },
         "headers": {
@@ -50,6 +52,7 @@
           "subject": "arraymap",
           "version": 1,
           "id": 73,
+          "schemaType": "AVRO",
           "schema":"{ \"type\" : \"record\", \"name\" : \"Test\", \"fields\" : [ { \"name\" : \"name\", \"type\" : \"string\" }, { \"name\" : \"values\", \"type\" : { \"type\" : \"array\", \"items\" : { \"type\" : \"map\", \"values\" : \"string\" } } } ] } }"
         },
         "headers": {
@@ -61,7 +64,7 @@
       "priority":10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/71"
+        "urlPattern": "/schemas/ids/71\\?fetchMaxId=false"
       },
       "response": {
         "status": 200,
@@ -78,7 +81,7 @@
       "priority":10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/72"
+        "urlPattern": "/schemas/ids/72\\?fetchMaxId=false"
       },
       "response": {
         "status": 200,
@@ -95,7 +98,7 @@
       "priority":10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/73"
+        "urlPattern": "/schemas/ids/73\\?fetchMaxId=false"
       },
       "response": {
         "status": 200,

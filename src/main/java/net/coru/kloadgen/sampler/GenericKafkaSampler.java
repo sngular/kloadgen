@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
-import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.StatelessRandomTool;
@@ -60,12 +59,11 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
     private boolean keyMessageFlag = false;
 
-    private final StatelessRandomTool statelessRandomTool;
+    private final transient StatelessRandomTool statelessRandomTool;
 
-    private final BaseLoadGenerator generator;
+    private transient BaseLoadGenerator generator;
 
     public GenericKafkaSampler() {
-        generator = new AvroLoadGenerator();
         statelessRandomTool = new StatelessRandomTool();
     }
 
@@ -81,7 +79,8 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
     @Override
     public void setupTest(JavaSamplerContext context) {
 
-        Properties props = SamplerUtil.setupCommonProperties(context, generator);
+        Properties props = SamplerUtil.setupCommonProperties(context);
+        generator = SamplerUtil.configureGenerator(props);
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
             keyMessageFlag = true;

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -13,6 +14,7 @@ import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.groovy.util.Maps;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -74,10 +76,17 @@ class AvroSchemaProcessorTest {
         fieldValueMappingList);
 
     EnrichedRecord message = avroSchemaProcessor.next();
-    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-    assertThat(message.getGenericRecord()).isNotNull();
-    assertThat(message.getGenericRecord().get("values")).isInstanceOf(List.class);
-    List<Map<String, Object>> result = (List<Map<String, Object>>) message.getGenericRecord().get("values");
+    assertThat(message)
+        .isNotNull()
+        .isInstanceOf(EnrichedRecord.class)
+        .extracting(EnrichedRecord::getGenericRecord)
+        .isNotNull()
+        .hasFieldOrProperty("values")
+        .extracting("values")
+        .extracting(Arrays::asList)
+        .asList()
+        .hasSize(1);
+    List<Map<String, Object>> result = (List<Map<String, Object>>) ((GenericRecord) message.getGenericRecord()).get("values");
     assertThat(result).hasSize(2).contains(Maps.of("n","1","t","2"), Maps.of("n","1","t","2"));
   }
 
@@ -107,10 +116,17 @@ class AvroSchemaProcessorTest {
         fieldValueMappingList);
 
     EnrichedRecord message = avroSchemaProcessor.next();
-    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-    assertThat(message.getGenericRecord()).isNotNull();
-    assertThat(message.getGenericRecord().get("values")).isInstanceOf(Map.class);
-    Map<String, Object> result = (Map<String, Object>) message.getGenericRecord().get("values");
+    assertThat(message)
+            .isNotNull()
+            .isInstanceOf(EnrichedRecord.class)
+            .extracting(EnrichedRecord::getGenericRecord)
+            .isNotNull()
+            .hasFieldOrProperty("values")
+            .extracting("values")
+            .extracting(Arrays::asList)
+            .asList()
+            .hasSize(1);
+    Map<String, String> result = (Map<String, String>)((GenericRecord) message.getGenericRecord()).get("values");
     assertThat(result).hasSize(4).containsEntry("n","1").containsEntry("t","2");
   }
 }

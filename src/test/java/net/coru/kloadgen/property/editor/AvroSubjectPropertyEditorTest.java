@@ -1,4 +1,4 @@
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.property.editor;
 
 import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
@@ -54,7 +54,7 @@ class AvroSubjectPropertyEditorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList());
+    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO");
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     avroSerializedConfigElement.iterationStart(null);
 

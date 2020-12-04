@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.property.editor;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -19,23 +19,23 @@ import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 
 @Slf4j
-public class SchemaConverterPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
+public class SchemaTypePropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
   private PropertyDescriptor propertyDescriptor;
 
   private final JPanel panel = new JPanel();
 
-  private String schemaAsString;
+  private String schemaType;
 
-  public SchemaConverterPropertyEditor() {
+  public SchemaTypePropertyEditor() {
   }
 
-  public SchemaConverterPropertyEditor(Object source) {
+  public SchemaTypePropertyEditor(Object source) {
     super(source);
     this.setValue(source);
   }
 
-  public SchemaConverterPropertyEditor(PropertyDescriptor propertyDescriptor) {
+  public SchemaTypePropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
     this.propertyDescriptor = propertyDescriptor;
   }
@@ -60,13 +60,13 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public String getAsText() {
-    return schemaAsString;
+    return schemaType;
   }
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
-    propertyDescriptor.setValue("schemaAsString", value);
-    schemaAsString = value;
+    propertyDescriptor.setValue("schemaType", value);
+    schemaType = value;
   }
 
   @Override
@@ -78,7 +78,7 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public Object getValue() {
-    return schemaAsString;
+    return schemaType;
   }
 
   @Override

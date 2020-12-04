@@ -7,6 +7,16 @@
 
 package net.coru.kloadgen.sampler;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
+
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -17,7 +27,6 @@ import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
-import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.StatelessRandomTool;
@@ -32,17 +41,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
 
 @Slf4j
 public class KafkaSampler extends AbstractJavaSamplerClient implements Serializable {
@@ -59,12 +57,11 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
     private boolean keyMessageFlag = false;
 
-    private final StatelessRandomTool statelessRandomTool;
+    private final transient StatelessRandomTool statelessRandomTool;
 
-    private final BaseLoadGenerator generator;
+    private transient BaseLoadGenerator generator;
 
     public KafkaSampler() {
-        generator = new AvroLoadGenerator();
         statelessRandomTool = new StatelessRandomTool();
     }
 
@@ -77,7 +74,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
     @Override
     public void setupTest(JavaSamplerContext context) {
 
-        Properties props = SamplerUtil.setupCommonProperties(context, generator);
+        Properties props = SamplerUtil.setupCommonProperties(context);
+        generator = SamplerUtil.configureGenerator(props);
+
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
 

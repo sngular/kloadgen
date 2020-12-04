@@ -4,7 +4,7 @@ import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfi
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
-import static io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
 import static java.util.Collections.emptyList;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ACKS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BATCH_SIZE_CONFIG_DEFAULT;
@@ -42,6 +42,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
@@ -58,7 +59,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.util.ProducerKeysHelper;
@@ -77,6 +82,8 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 public final class SamplerUtil {
 
   private static final StatelessRandomTool statelessRandomTool = new StatelessRandomTool();
+
+  private static final Set<String> JSON_TYPE_SET = Set.of("json-schema", "json");
 
   private SamplerUtil() { }
 
@@ -124,7 +131,7 @@ public final class SamplerUtil {
     return defaultParameters;
   }
 
-  public static Properties setupCommonProperties(JavaSamplerContext context, BaseLoadGenerator generator) {
+  public static Properties setupCommonProperties(JavaSamplerContext context) {
     Properties props = new Properties();
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
     if (Objects.nonNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG))) {
@@ -143,7 +150,7 @@ public final class SamplerUtil {
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
 
-    configSchemRegistryUrl(generator, props);
+
     if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
@@ -157,6 +164,10 @@ public final class SamplerUtil {
     verifySecurity(context, props);
 
     return props;
+  }
+
+  public static BaseLoadGenerator configureGenerator(Properties props) {
+   return configSchemRegistryUrl(props);
   }
 
   private static void verifySecurity(JavaSamplerContext context, Properties props) {
@@ -201,8 +212,22 @@ public final class SamplerUtil {
     }
   }
 
-  private static void configSchemRegistryUrl(BaseLoadGenerator generator, Properties props) {
+  private static BaseLoadGenerator configSchemRegistryUrl(Properties props) {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
+    BaseLoadGenerator generator;
+
+    if (Objects.nonNull(jMeterVariables.get(SCHEMA_TYPE))) {
+      if (JSON_TYPE_SET.contains(jMeterVariables.get(SCHEMA_TYPE).toLowerCase())) {
+        generator = new JsonLoadGenerator();
+      } else if (jMeterVariables.get(SCHEMA_TYPE).equalsIgnoreCase("avro")) {
+        generator = new AvroLoadGenerator();
+      } else {
+        throw new KLoadGenException("Unsupported Serializer");
+      }
+    } else {
+      generator = new AvroLoadGenerator();
+    }
+
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
       originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
@@ -230,6 +255,8 @@ public final class SamplerUtil {
           JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
           (List<FieldValueMapping>) jMeterVariables.getObject(SCHEMA_PROPERTIES));
     }
+
+    return generator;
   }
 
   public static List<String> populateHeaders(List<HeaderMapping> kafkaHeaders, ProducerRecord<String, Object> producerRecord) {

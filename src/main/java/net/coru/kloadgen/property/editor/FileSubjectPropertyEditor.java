@@ -4,8 +4,11 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.input.avro;
+package net.coru.kloadgen.property.editor;
 
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
+
+import io.confluent.kafka.schemaregistry.ParsedSchema;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -29,13 +32,10 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.SchemaExtractor;
-import net.coru.kloadgen.extractor.SchemaExtractorImpl;
+import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Type;
-import org.apache.commons.collections4.IterableUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -45,12 +45,10 @@ import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 
-
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
-import static org.apache.avro.Schema.Type.RECORD;
-
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
+
+  private JComboBox<String> schemaTypeComboBox;
 
   private JComboBox<String> subjectNameComboBox;
 
@@ -62,7 +60,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
-  private static Schema parserSchema;
+  private static ParsedSchema parserSchema;
 
   private final JButton openFileDialogButton = new JButton(JMeterUtils.getResString("file_visualizer_open"));
 
@@ -83,12 +81,18 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   private void init() {
+    schemaTypeComboBox = new JComboBox<>();
+    schemaTypeComboBox.setEditable(false);
+    schemaTypeComboBox.insertItemAt("AVRO", 0);
+    schemaTypeComboBox.insertItemAt("JSON-Schema", 1);
+    schemaTypeComboBox.setSelectedIndex(0);
     subjectNameComboBox = new JComboBox<>();
     subjectNameComboBox.setEditable(true);
     panel.setLayout(new BorderLayout());
     openFileDialogButton.addActionListener(this::actionFileChooser);
     panel.add(openFileDialogButton, BorderLayout.LINE_END);
     panel.add(subjectNameComboBox);
+    panel.add(schemaTypeComboBox);
     AutoCompletion.enable(subjectNameComboBox);
     this.subjectNameComboBox.addActionListener(this);
   }
@@ -99,16 +103,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
       File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
       try {
-        parserSchema = schemaExtractor.schemaTypesList(subjectName);
+        String schemaType = schemaTypeComboBox.getSelectedItem().toString();
+        parserSchema = schemaExtractor.schemaTypesList(subjectName, schemaType);
         subjectNameComboBox.removeAllItems();
-        if (Type.UNION == parserSchema.getType()) {
-          Iterable<Schema> schemaList = IterableUtils.filteredIterable(parserSchema.getTypes(), t -> t.getType() == RECORD);
-          for (Schema types : schemaList) {
-            subjectNameComboBox.addItem(types.getName());
-          }
-        } else {
-          subjectNameComboBox.addItem(parserSchema.getName());
-        }
+        subjectNameComboBox.addItem(parserSchema.name());
       } catch (IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
             JOptionPane.ERROR_MESSAGE);
@@ -118,30 +116,16 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public Schema getSelectedSchema(String name) {
-    if (Type.UNION == parserSchema.getType()) {
-      return getRecordUnion(parserSchema.getTypes(), name);
-    } else {
-      return parserSchema;
-    }
-  }
-
-  private Schema getRecordUnion(List<Schema> types, String name) {
-    Schema unionSchema = null;
-    for (Schema schema : types) {
-      if (schema.getName().equalsIgnoreCase(name)) {
-        unionSchema = schema;
-      }
-    }
-    return unionSchema;
+  public ParsedSchema getSelectedSchema(String name) {
+    return parserSchema;
   }
 
   @Override
   public void actionPerformed(ActionEvent event) {
     if (subjectNameComboBox.getItemCount() != 0) {
-
+      String schemaType =  schemaTypeComboBox.getSelectedItem().toString();
       String selectedItem = (String) subjectNameComboBox.getSelectedItem();
-      Schema selectedSchema = getSelectedSchema(selectedItem);
+      ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
 
       if (Objects.nonNull(selectedSchema)) {
         try {
@@ -163,6 +147,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
               propertyEditor.setValue(attributeList);
             } else if (propertyEditor instanceof SchemaConverterPropertyEditor) {
               propertyEditor.setValue(selectedSchema);
+            } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
+              propertyEditor.setValue(schemaType);
             }
           }
         } catch (NoSuchFieldException | IllegalAccessException e) {

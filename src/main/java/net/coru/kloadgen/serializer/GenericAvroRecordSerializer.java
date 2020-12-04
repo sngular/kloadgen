@@ -18,7 +18,7 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
-public class GenericRecordSerializer<T extends GenericRecord>  implements Serializer<T> {
+public class GenericAvroRecordSerializer<T extends GenericRecord>  implements Serializer<T> {
 
   @Override
   public byte[] serialize(String topic, T record) {

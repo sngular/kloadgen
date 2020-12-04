@@ -1,0 +1,360 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "Model object that holds an address snapshot data.",
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "type": "string",
+      "description": "Immutable ID that represents unequivocaly this document.",
+      "comments": "2457812::3\n[addressId]::[snapshotId]",
+      "sample": "2457812::3"
+    },
+    "userId": {
+      "type": "number",
+      "description": "User's unique identifier.",
+      "minimum": 1,
+      "sample": 1457204900
+    },
+    "storeId": {
+      "type": "number",
+      "description": "Store's unique identifier."
+    },
+    "snapshotId": {
+      "type": "string",
+      "description": "Mutable ID that represents the immutable snapshot of the address's current state."
+    },
+    "addressId": {
+      "type": "string",
+      "description": "Address unique identifier. Immutable ID that represents an address across all its permutations."
+    },
+    "addressLine": {
+      "type": "string",
+      "description": "Address defined in natural language."
+    },
+    "alias": {
+      "type": "string",
+      "description": "User assigned alias for the address."
+    },
+    "contactInformation": {
+      "type": "object",
+      "description": "Contact information for the specificied location.",
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string",
+          "documentKind": false,
+          "key": false
+        },
+        "firstName": {
+          "type": "string",
+          "documentKind": false,
+          "key": false
+        },
+        "middleName": {
+          "type": "string",
+          "documentKind": false,
+          "key": false
+        },
+        "lastName": {
+          "type": "string",
+          "documentKind": false,
+          "key": false
+        },
+        "honorific": {
+          "type": "string",
+          "description": "ISO Code language: ISO 639-1 or ISO 639-2 if the language cannot be set with alpha 1 version.",
+          "documentKind": false,
+          "key": false,
+          "maxLength": 3,
+          "minLength": 2,
+          "pattern": "^[a-zA-Z]{2,3}$",
+          "sample": "Mr"
+        },
+        "phones": {
+          "type": "array",
+          "additionalItems": true,
+          "uniqueItems": false,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "arrayItem": true,
+            "properties": {
+              "prefix": {
+                "type": "string",
+                "description": "Phone number country preffix.",
+                "documentKind": false,
+                "key": false,
+                "maxLength": 3,
+                "minLength": 2,
+                "sample": "+44"
+              },
+              "number": {
+                "type": "string",
+                "description": "Phone number.",
+                "documentKind": false,
+                "key": false,
+                "maxLength": 6,
+                "sample": "649872"
+              }
+            },
+            "required": [
+              "prefix",
+              "number"
+            ]
+          }
+        }
+      },
+      "required": [
+        "email",
+        "firstName",
+        "phones"
+      ]
+    },
+    "countryCode": {
+      "type": "string",
+      "description": "Holds country information following the standar ISO 3166-1 alpha-2 two letter country code.",
+      "minLength": 2,
+      "maxLength": 2,
+      "pattern": "^[a-zA-Z]{2}$"
+    },
+    "location": {
+      "type": "object",
+      "description": "Specific location information to identify a physical address within the last defined geopolitical subdivision.",
+      "additionalProperties": false,
+      "properties": {
+        "streetName": {
+          "type": "string",
+          "description": "Street name.",
+          "documentKind": false,
+          "key": false
+        },
+        "streetNumber": {
+          "type": "string",
+          "description": "Street number.",
+          "documentKind": false,
+          "key": false
+        },
+        "floor": {
+          "type": "string",
+          "description": "Level identification in a multi-level building.",
+          "documentKind": false,
+          "key": false
+        },
+        "door": {
+          "type": "string",
+          "description": "Door or room number for a location where multiple are available.",
+          "documentKind": false,
+          "key": false
+        },
+        "doorCode": {
+          "type": "string",
+          "description": "Code to either access a delivery area in the location or to ring at the specified door from the street.",
+          "documentKind": false,
+          "key": false
+        },
+        "zipCode": {
+          "type": "string",
+          "description": "Zipcode or postal code as defined by the corresponding authority in any given country.",
+          "documentKind": false,
+          "key": false
+        }
+      }
+    },
+    "geopoliticalSubdivisions": {
+      "type": "object",
+      "description": "Geopolitical subdivisions to which the location belongs. Levels are nested with each other, with level_1 being the first level of division in any given country.\n",
+      "additionalProperties": false,
+      "properties": {
+        "level1": {
+          "type": "object",
+          "description": "First level of geopolitical subdivision for a specific country.",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Geopolitical subdivision identifier.\n\nISO 3166-2 codes are used for all entities defined in the standard, while hyphen separated enumerations from the last ISO defined entity are used otherwise.",
+              "documentKind": false,
+              "key": false,
+              "maxLength": 3,
+              "minLength": 2,
+              "sample": "en"
+            },
+            "freeForm": {
+              "type": "string",
+              "maxLength": 256,
+              "minLength": 1
+            }
+          }
+        },
+        "level2": {
+          "type": "object",
+          "description": "Geopolitical subdivision within a specific first level geopolitical subdivision.",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Geopolitical subdivision identifier.\n\nISO 3166-2 codes are used for all entities defined in the standard, while hyphen separated enumerations from the last ISO defined entity are used otherwise.",
+              "documentKind": false,
+              "key": false,
+              "maxLength": 3,
+              "minLength": 2,
+              "sample": "en"
+            },
+            "freeForm": {
+              "type": "string",
+              "maxLength": 256,
+              "minLength": 1
+            }
+          }
+        },
+        "level3": {
+          "type": "object",
+          "description": "Geopolitical subdivision within a specific second level geopolitical subdivision.",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Geopolitical subdivision identifier.\n\nISO 3166-2 codes are used for all entities defined in the standard, while hyphen separated enumerations from the last ISO defined entity are used otherwise.",
+              "documentKind": false,
+              "key": false,
+              "maxLength": 3,
+              "minLength": 2,
+              "sample": "en"
+            },
+            "freeForm": {
+              "type": "string",
+              "maxLength": 256,
+              "minLength": 1
+            }
+          }
+        },
+        "level4": {
+          "type": "object",
+          "description": "Geopolitical subdivision within a specific third level geopolitical subdivision.",
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Geopolitical subdivision identifier.\n\nISO 3166-2 codes are used for all entities defined in the standard, while hyphen separated enumerations from the last ISO defined entity are used otherwise.",
+              "documentKind": false,
+              "key": false,
+              "maxLength": 3,
+              "minLength": 2,
+              "sample": "en"
+            },
+            "freeForm": {
+              "type": "string",
+              "maxLength": 256,
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "required": [
+        "level1"
+      ]
+    },
+    "_metadata": {
+      "type": "object",
+      "description": "Non-functional attribute. Metadata associated with the document (audit data).",
+      "additionalProperties": false,
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "Creation date and time of the document.",
+          "format": "date-time",
+          "sample": "ISODate(\"2019-02-26T17:29:33.909Z\")"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "User identifier for mongodb access user that has created the document.\n",
+          "sample": "dmecprefscopreferences"
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "description": "Date and time for last document's modification.",
+          "format": "date-time",
+          "sample": "ISODate(\"2019-02-26T17:29:33.909Z\")"
+        },
+        "lastUpdatedBy": {
+          "type": "string",
+          "description": "User identifier for mongodb access user that has modified the document.\n",
+          "sample": "dmecprefscopreferences"
+        },
+        "deletedAt": {
+          "type": "string",
+          "description": "Date and time document deletion.",
+          "format": "date-time",
+          "sample": "ISODate(\"2019-02-26T17:29:33.909Z\")"
+        },
+        "projectVersion": {
+          "type": "string",
+          "description": "Document's version which is related with the project's version. As for OFDA team needs the value of this field is also the schema version.",
+          "documentKind": false,
+          "key": false,
+          "sample": "1.1-SNAPSHOT"
+        },
+        "projectName": {
+          "type": "string",
+          "description": "Project that document belongs to",
+          "documentKind": false,
+          "key": false,
+          "sample": "APPMIC-MECPreferencesCore"
+        },
+        "deletedBy": {
+          "type": "string",
+          "description": "User identifier for mongodb access user that has deleted the document.",
+          "sample": "dmecprefscopreferences"
+        },
+        "schema": {
+          "type": "number",
+          "description": "Internally updated by development team. This field is not governed by OFDA team.",
+          "minimum": 0,
+          "sample": 1
+        }
+      },
+      "required": [
+        "createdAt",
+        "createdBy",
+        "lastUpdatedAt",
+        "lastUpdatedBy",
+        "projectVersion",
+        "projectName",
+        "schema"
+      ]
+    },
+    "_entity": {
+      "type": "string",
+      "description": " Identifies the entity described by the document.",
+      "enum": [
+        "AddressSnapshot"
+      ]
+    },
+    "_class": {
+      "type": "string",
+      "description": "Java class associated. Identifies the entity described by the document.",
+      "enum": [
+        "AddressSnapshot"
+      ]
+    }
+  },
+  "capped": false,
+  "validationLevel": "Off",
+  "validationAction": "Warn",
+  "required": [
+    "_id",
+    "userId",
+    "storeId",
+    "snapshotId",
+    "addressId",
+    "addressLine",
+    "alias",
+    "contactInformation",
+    "countryCode",
+    "geopoliticalSubdivisions",
+    "_metadata",
+    "_entity",
+    "_class"
+  ]
+}
