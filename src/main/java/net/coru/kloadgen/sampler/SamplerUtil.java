@@ -33,16 +33,20 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.TOPIC_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_DEFAULT;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
@@ -166,10 +170,6 @@ public final class SamplerUtil {
     return props;
   }
 
-  public static BaseLoadGenerator configureGenerator(Properties props) {
-   return configSchemRegistryUrl(props);
-  }
-
   private static void verifySecurity(JavaSamplerContext context, Properties props) {
     if (FLAG_YES.equalsIgnoreCase(context.getParameter(SSL_ENABLED))) {
 
@@ -212,14 +212,14 @@ public final class SamplerUtil {
     }
   }
 
-  private static BaseLoadGenerator configSchemRegistryUrl(Properties props) {
+  public static BaseLoadGenerator configureValueGenerator(Properties props) {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     BaseLoadGenerator generator;
 
-    if (Objects.nonNull(jMeterVariables.get(SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jMeterVariables.get(SCHEMA_TYPE).toLowerCase())) {
+    if (Objects.nonNull(jMeterVariables.get(VALUE_SCHEMA_TYPE))) {
+      if (JSON_TYPE_SET.contains(jMeterVariables.get(VALUE_SCHEMA_TYPE).toLowerCase())) {
         generator = new JsonLoadGenerator();
-      } else if (jMeterVariables.get(SCHEMA_TYPE).equalsIgnoreCase("avro")) {
+      } else if (jMeterVariables.get(VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");
@@ -230,7 +230,7 @@ public final class SamplerUtil {
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
-      originals.put(SCHEMA_REGISTRY_URL_CONFIG, JMeterContextService.getContext().getVariables().get(SCHEMA_REGISTRY_URL));
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
 
       if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
         if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
@@ -248,18 +248,65 @@ public final class SamplerUtil {
 
       generator.setUpGenerator(
           originals,
-          JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
-          (List<FieldValueMapping>) jMeterVariables.getObject(SCHEMA_PROPERTIES));
+          jMeterVariables.get(VALUE_SUBJECT_NAME),
+          (List<FieldValueMapping>) jMeterVariables.getObject(VALUE_SCHEMA_PROPERTIES));
     } else {
       generator.setUpGenerator(
-          JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
-          (List<FieldValueMapping>) jMeterVariables.getObject(SCHEMA_PROPERTIES));
+          jMeterVariables.get(VALUE_SCHEMA),
+          (List<FieldValueMapping>) jMeterVariables.getObject(VALUE_SCHEMA_PROPERTIES));
     }
 
     return generator;
   }
 
-  public static List<String> populateHeaders(List<HeaderMapping> kafkaHeaders, ProducerRecord<String, Object> producerRecord) {
+  public static BaseLoadGenerator configureKeyGenerator(Properties props) {
+    JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
+    BaseLoadGenerator generator;
+
+    if (Objects.nonNull(jMeterVariables.get(KEY_SCHEMA_TYPE))) {
+      if (JSON_TYPE_SET.contains(jMeterVariables.get(KEY_SCHEMA_TYPE).toLowerCase())) {
+        generator = new JsonLoadGenerator();
+      } else if (jMeterVariables.get(KEY_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
+        generator = new AvroLoadGenerator();
+      } else {
+        throw new KLoadGenException("Unsupported Serializer");
+      }
+    } else {
+      generator = new AvroLoadGenerator();
+    }
+
+    if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
+      Map<String, String> originals = new HashMap<>();
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
+
+      if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
+            .equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
+              jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
+          originals.put(USER_INFO_CONFIG, jMeterVariables.get(USER_INFO_CONFIG));
+        } else {
+          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
+              jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
+          originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
+        }
+      }
+      props.putAll(originals);
+
+      generator.setUpGenerator(
+          originals,
+          jMeterVariables.get(KEY_SUBJECT_NAME),
+          (List<FieldValueMapping>) jMeterVariables.getObject(KEY_SCHEMA_PROPERTIES));
+    } else {
+      generator.setUpGenerator(
+          jMeterVariables.get(KEY_SCHEMA),
+          (List<FieldValueMapping>) jMeterVariables.getObject(KEY_SCHEMA_PROPERTIES));
+    }
+
+    return generator;
+  }
+
+  public static List<String> populateHeaders(List<HeaderMapping> kafkaHeaders, ProducerRecord<Object, Object> producerRecord) {
     List<String> headersSB = new ArrayList<>();
     for (HeaderMapping kafkaHeader : kafkaHeaders) {
       String headerValue = statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),

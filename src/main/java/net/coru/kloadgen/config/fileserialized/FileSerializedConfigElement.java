@@ -6,9 +6,10 @@
 
 package net.coru.kloadgen.config.fileserialized;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -31,21 +32,22 @@ import org.apache.jmeter.threads.JMeterVariables;
 @NoArgsConstructor
 public class FileSerializedConfigElement  extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String subjectName;
+  private String valueSubjectName;
 
-  private List<FieldValueMapping> schemaProperties;
+  private List<FieldValueMapping> valueSchemaProperties;
 
-  private String schemaDefinition;
+  private String valueSchemaDefinition;
 
-  private String schemaType;
+  private String valueSchemaType;
 
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(AVRO_SCHEMA, schemaDefinition);
-    variables.putObject(SCHEMA_PROPERTIES, schemaProperties);
-    variables.putObject(SCHEMA_TYPE, schemaType);
+    variables.putObject(VALUE_SCHEMA, valueSchemaDefinition);
+    variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
+    variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
+    variables.putObject(VALUE_SUBJECT_NAME, valueSubjectName);
   }
 
 }

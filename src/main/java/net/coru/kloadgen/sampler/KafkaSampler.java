@@ -16,6 +16,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -59,7 +60,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
     private final transient StatelessRandomTool statelessRandomTool;
 
-    private transient BaseLoadGenerator generator;
+    private transient BaseLoadGenerator valueGenerator;
+
+    private transient BaseLoadGenerator keyGenerator;
 
     public KafkaSampler() {
         statelessRandomTool = new StatelessRandomTool();
@@ -75,16 +78,21 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
     public void setupTest(JavaSamplerContext context) {
 
         Properties props = SamplerUtil.setupCommonProperties(context);
-        generator = SamplerUtil.configureGenerator(props);
+        valueGenerator = SamplerUtil.configureValueGenerator(props);
 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
-            keyMessageFlag = true;
-            msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
-            msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
-                    ? emptyList() : singletonList(context.getParameter(MESSAGE_KEY_KEY_VALUE));
+            
+            if (Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
+                keyGenerator = SamplerUtil.configureKeyGenerator(props);
+            } else {
+                keyMessageFlag = true;
+                msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
+                msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
+                        ? emptyList() : singletonList(context.getParameter(MESSAGE_KEY_KEY_VALUE));
+            }
         }
 
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
@@ -97,15 +105,20 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         SampleResult sampleResult = new SampleResult();
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
-        EnrichedRecord messageVal = generator.nextMessage();
+        EnrichedRecord messageVal = valueGenerator.nextMessage();
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
         if (Objects.nonNull(messageVal)) {
 
-            ProducerRecord<String, Object> producerRecord;
+            ProducerRecord<Object, Object> producerRecord;
             try {
                 if (keyMessageFlag) {
-                    String key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
+                    Object key;
+                    if (Objects.isNull(keyGenerator)) {
+                        key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
+                    } else {
+                        key = keyGenerator.nextMessage();
+                    }
                     producerRecord = new ProducerRecord<>(topic, key, messageVal);
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal);
