@@ -6,19 +6,8 @@
 
 package net.coru.kloadgen.processor;
 
-import static org.apache .avro.Schema.Type.ARRAY;
-import static org.apache.avro.Schema.Type.MAP;
-import static org.apache.avro.Schema.Type.RECORD;
-import static org.apache.avro.Schema.Type.UNION;
-
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -32,6 +21,10 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
+
+import static org.apache.avro.Schema.Type.*;
 
 public class AvroSchemaProcessor {
 
@@ -63,11 +56,12 @@ public class AvroSchemaProcessor {
   @SneakyThrows
   public EnrichedRecord next() {
     GenericRecord entity = new GenericData.Record(schema);
-    if (!fieldExprMappings.isEmpty()) {
+    if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
       while (!fieldExpMappingsQueue.isEmpty()) {
-        if (cleanUpPath(fieldValueMapping, "").contains("[")) {
+        String cleanPath = cleanUpPath(fieldValueMapping, "");
+        if (cleanPath.contains("[") && !cleanPath.contains(".")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
             fieldExpMappingsQueue.remove();
@@ -90,7 +84,7 @@ public class AvroSchemaProcessor {
                     fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           }
-        } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
+        } else if (cleanPath.contains(".")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
@@ -124,7 +118,11 @@ public class AvroSchemaProcessor {
       innerSchema = subEntity.getSchema();
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
+    while (!fieldExpMappingsQueue.isEmpty()
+            && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
+            || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
+            || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
+            || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
         if (fieldValueMapping.getFieldType().endsWith("map")){
