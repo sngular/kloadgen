@@ -1,7 +1,7 @@
 package net.coru.kloadgen.property.editor;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
-import net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement;
+import net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -36,7 +36,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
     WiremockResolver.class,
     WiremockUriResolver.class
 })
-class AvroSubjectPropertyEditorTest {
+class SerialisedSubjectPropertyEditorTest {
 
   @BeforeEach
   public void setUp() {
@@ -49,18 +49,19 @@ class AvroSubjectPropertyEditorTest {
   }
 
   @Test
-  public void iterationStart(@Wiremock WireMockServer server) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+  void iterationStart(@Wiremock WireMockServer server) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO");
+    ValueSerializedConfigElement
+        valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO");
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    avroSerializedConfigElement.iterationStart(null);
+    valueSerializedConfigElement.iterationStart(null);
 
     assertThat(variables).isNotNull();
-    assertThat(variables.getObject(AVRO_SUBJECT_NAME)).isNotNull();
-    assertThat(variables.getObject(SCHEMA_PROPERTIES)).isNotNull();
+    assertThat(variables.getObject(VALUE_SUBJECT_NAME)).isNotNull();
+    assertThat(variables.getObject(VALUE_SCHEMA_PROPERTIES)).isNotNull();
 
   }
 
@@ -90,9 +91,9 @@ class AvroSubjectPropertyEditorTest {
 
   @ParameterizedTest
   @MethodSource("parametersForMergeValue")
-  public void mergeValueTest(Object atributeListTable, List<FieldValueMapping> attributeList, List<FieldValueMapping> expected) {
+  void mergeValueTest(Object atributeListTable, List<FieldValueMapping> attributeList, List<FieldValueMapping> expected) {
 
-    List<FieldValueMapping> result = new AvroSubjectPropertyEditor().mergeValue(atributeListTable, attributeList);
+    List<FieldValueMapping> result = new SerialisedSubjectPropertyEditor().mergeValue(atributeListTable, attributeList);
 
     assertThat(result).isEqualTo(expected);
 

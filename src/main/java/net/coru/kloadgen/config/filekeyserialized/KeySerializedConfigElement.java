@@ -4,12 +4,12 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.fileserialized;
+package net.coru.kloadgen.config.filekeyserialized;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -30,24 +30,24 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileSerializedConfigElement  extends ConfigTestElement implements TestBean, LoopIterationListener {
+public class KeySerializedConfigElement  extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String valueSubjectName;
+  private String keyName;
 
-  private List<FieldValueMapping> valueSchemaProperties;
+  private List<FieldValueMapping> keySchemaProperties;
 
-  private String valueSchemaDefinition;
+  private String keySchemaDefinition;
 
-  private String valueSchemaType;
+  private String keySchemaType;
 
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(VALUE_SCHEMA, valueSchemaDefinition);
-    variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
-    variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
-    variables.putObject(VALUE_SUBJECT_NAME, valueSubjectName);
+    variables.putObject(KEY_SCHEMA, keySchemaDefinition);
+    variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
+    variables.putObject(KEY_SUBJECT_NAME, keyName);
+    variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
   }
 
 }

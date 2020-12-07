@@ -4,18 +4,18 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.avroserialized;
+package net.coru.kloadgen.config.valueserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.property.editor.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
+import net.coru.kloadgen.property.editor.SerialisedSubjectPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
-public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
+public class ValueSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
     private static final String VALUE_SUBJECT_NAME = "valueSubjectName";
 
@@ -23,11 +23,11 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
     private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
-    public AvroSerializedConfigElementBeanInfo() {
+    public ValueSerializedConfigElementBeanInfo() {
 
-        super(AvroSerializedConfigElement.class);
+        super(ValueSerializedConfigElement.class);
 
-        createPropertyGroup("avro_serialized_load_generator", new String[] {
+        createPropertyGroup("value_serialized_load_generator", new String[] {
             VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
         });
 
@@ -52,7 +52,7 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
 
         PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
-        subjectNameProps.setPropertyEditorClass(AvroSubjectPropertyEditor.class);
+        subjectNameProps.setPropertyEditorClass(SerialisedSubjectPropertyEditor.class);
         subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
         subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 

@@ -4,8 +4,9 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.keyserialized;
+package net.coru.kloadgen.config.filevalueserialized;
 
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
@@ -29,21 +30,24 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-public class KeySerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
+public class FileValueSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String keySubjectName;
+  private String valueSubjectName;
 
-  private List<FieldValueMapping> keySchemaProperties;
+  private List<FieldValueMapping> valueSchemaProperties;
 
-  private String keySchemaType;
+  private String valueSchemaDefinition;
+
+  private String valueSchemaType;
 
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
-      JMeterVariables variables = JMeterContextService.getContext().getVariables();
-      variables.putObject(VALUE_SUBJECT_NAME, keySubjectName);
-      variables.putObject(VALUE_SCHEMA_PROPERTIES, keySchemaProperties);
-      variables.putObject(VALUE_SCHEMA_TYPE, keySchemaType);
+    JMeterVariables variables = JMeterContextService.getContext().getVariables();
+    variables.putObject(VALUE_SCHEMA, valueSchemaDefinition);
+    variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
+    variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
+    variables.putObject(VALUE_SUBJECT_NAME, valueSubjectName);
   }
 
 }

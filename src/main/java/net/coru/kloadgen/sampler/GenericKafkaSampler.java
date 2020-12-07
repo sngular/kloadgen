@@ -15,10 +15,10 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -50,7 +50,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
     private static final long serialVersionUID = 1L;
 
-    private KafkaProducer<String, Object> producer;
+    private KafkaProducer<Object, Object> producer;
 
     private String topic;
 
@@ -86,7 +86,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
         valueGenerator = SamplerUtil.configureValueGenerator(props);
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
-            
+
             if (Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
                 keyGenerator = SamplerUtil.configureKeyGenerator(props);
             } else {
@@ -120,7 +120,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
                         key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
                     } else {
                         key = keyGenerator.nextMessage();
-                    }                        
+                    }
                     producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());

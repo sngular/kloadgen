@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.fileserialized;
+package net.coru.kloadgen.config.filekeyserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
@@ -16,44 +16,44 @@ import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
-public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
+public class KeySerializedConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String VALUE_SUBJECT_NAME = "valueSubjectName";
+  private static final String KEY_NAME = "keyName";
 
-  private static final String VALUE_SCHEMA_PROPERTIES = "valueSchemaProperties";
+  private static final String KEY_SCHEMA_PROPERTIES = "keySchemaProperties";
 
-  private static final String VALUE_SCHEMA_DEFINITION = "valueSchemaDefinition";
+  private static final String KEY_SCHEMA_DEFINITION = "keySchemaDefinition";
 
-  private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
+  private static final String KEY_SCHEMA_TYPE = "keySchemaType";
 
-  public FileSerializedConfigElementBeanInfo() {
+  public KeySerializedConfigElementBeanInfo() {
 
-    super(FileSerializedConfigElement.class);
+    super(KeySerializedConfigElement.class);
 
-    createPropertyGroup("file_serialized_load_generator", new String[]{
-            VALUE_SCHEMA_TYPE, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION, VALUE_SUBJECT_NAME
+    createPropertyGroup("key_serialized_load_generator", new String[]{
+            KEY_SCHEMA_TYPE, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_DEFINITION, KEY_NAME
     });
 
-    PropertyDescriptor subjectNameProps = property(VALUE_SCHEMA_TYPE);
+    PropertyDescriptor subjectNameProps = property(KEY_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor schemaType = property(VALUE_SUBJECT_NAME);
+    PropertyDescriptor schemaType = property(KEY_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
     schemaType.setValue(DEFAULT, "");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor avroSchemaProps = property(VALUE_SCHEMA_DEFINITION);
+    PropertyDescriptor avroSchemaProps = property(KEY_SCHEMA_DEFINITION);
     avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
     avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     avroSchemaProps.setValue(DEFAULT, "");
     avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     TypeEditor tableEditor = TypeEditor.TableEditor;
-    PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
+    PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
         new String[]{

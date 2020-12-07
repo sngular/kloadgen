@@ -13,10 +13,10 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -48,7 +48,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
 
     private static final long serialVersionUID = 1L;
 
-    private KafkaProducer<String, Object> producer;
+    private KafkaProducer<Object, Object> producer;
 
     private String topic;
 
@@ -84,7 +84,7 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroSerializer");
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
-            
+
             if (Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
                 keyGenerator = SamplerUtil.configureKeyGenerator(props);
             } else {

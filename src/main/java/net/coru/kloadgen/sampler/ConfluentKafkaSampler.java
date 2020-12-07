@@ -15,11 +15,10 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
-
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -51,7 +50,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
     private static final long serialVersionUID = 1L;
 
-    private transient KafkaProducer<String, Object> producer;
+    private transient KafkaProducer<Object, Object> producer;
 
     private String topic;
 
@@ -96,7 +95,7 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             if (Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
                 keyGenerator = SamplerUtil.configureKeyGenerator(props);
             } else {
-            
+
                 keyMessageFlag = true;
                 msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
                 msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))

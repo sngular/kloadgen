@@ -1,7 +1,7 @@
-package net.coru.kloadgen.config.avroserialized;
+package net.coru.kloadgen.config.valueserialized;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
@@ -26,7 +26,7 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
     WiremockResolver.class,
     WiremockUriResolver.class
 })
-class AvroSerializedConfigElementTest {
+class ValueSerializedConfigElementTest {
 
   @BeforeEach
   public void setUp() {
@@ -45,10 +45,11 @@ class AvroSerializedConfigElementTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO");
-    avroSerializedConfigElement.iterationStart(null);
-    assertThat(JMeterContextService.getContext().getVariables().getObject(AVRO_SUBJECT_NAME)).isNotNull();
-    assertThat(JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES)).isNotNull();
+    ValueSerializedConfigElement
+        valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO");
+    valueSerializedConfigElement.iterationStart(null);
+    assertThat(JMeterContextService.getContext().getVariables().getObject(VALUE_SUBJECT_NAME)).isNotNull();
+    assertThat(JMeterContextService.getContext().getVariables().getObject(VALUE_SCHEMA_PROPERTIES)).isNotNull();
 
   }
 
