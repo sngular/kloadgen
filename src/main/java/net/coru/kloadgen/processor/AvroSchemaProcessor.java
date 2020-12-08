@@ -21,10 +21,12 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache .avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
+import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.UNION;
 
 import java.util.*;
-
-import static org.apache.avro.Schema.Type.*;
 
 public class AvroSchemaProcessor {
 
