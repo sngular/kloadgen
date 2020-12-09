@@ -1,3 +1,4 @@
+
 /*
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,8 +7,19 @@
 
 package net.coru.kloadgen.processor;
 
+import static org.apache .avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
+import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.UNION;
+
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -21,12 +33,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import static org.apache .avro.Schema.Type.ARRAY;
-import static org.apache.avro.Schema.Type.MAP;
-import static org.apache.avro.Schema.Type.RECORD;
-import static org.apache.avro.Schema.Type.UNION;
-
-import java.util.*;
 
 public class AvroSchemaProcessor {
 
