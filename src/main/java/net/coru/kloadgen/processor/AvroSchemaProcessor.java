@@ -63,11 +63,12 @@ public class AvroSchemaProcessor {
   @SneakyThrows
   public EnrichedRecord next() {
     GenericRecord entity = new GenericData.Record(schema);
-    if (!fieldExprMappings.isEmpty()) {
+    if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
       while (!fieldExpMappingsQueue.isEmpty()) {
-        if (cleanUpPath(fieldValueMapping, "").contains("[")) {
+        String cleanPath = cleanUpPath(fieldValueMapping, "");
+        if (cleanPath.contains("[") && !cleanPath.contains(".")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
             fieldExpMappingsQueue.remove();
@@ -90,7 +91,7 @@ public class AvroSchemaProcessor {
                     fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           }
-        } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
+        } else if (cleanPath.contains(".")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
@@ -124,7 +125,11 @@ public class AvroSchemaProcessor {
       innerSchema = subEntity.getSchema();
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
+    while (!fieldExpMappingsQueue.isEmpty()
+            && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
+            || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
+            || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
+            || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
         if (fieldValueMapping.getFieldType().endsWith("map")){
