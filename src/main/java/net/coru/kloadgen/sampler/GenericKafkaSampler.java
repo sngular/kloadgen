@@ -87,10 +87,10 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
 
-            if (Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
+            keyMessageFlag = true;
+            if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
                 keyGenerator = SamplerUtil.configureKeyGenerator(props);
             } else {
-                keyMessageFlag = true;
                 msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
                 msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
                     ? emptyList() : singletonList(context.getParameter(MESSAGE_KEY_KEY_VALUE));
@@ -115,21 +115,26 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
             ProducerRecord<Object, Object> producerRecord;
             try {
                 if (keyMessageFlag) {
-                    Object key;
                     if (Objects.isNull(keyGenerator)) {
-                        key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
+                        Object key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
+                        producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
                     } else {
-                        key = keyGenerator.nextMessage();
+                        EnrichedRecord key = keyGenerator.nextMessage();
+                        producerRecord = new ProducerRecord<>(topic, key.getGenericRecord(), messageVal.getGenericRecord());
                     }
-                    producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
                 }
                 List<String> headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
 
                 sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
-                sampleResult.setSamplerData(producerRecord.value().toString());
 
+                if (keyMessageFlag) {
+                    sampleResult.setSamplerData("Key:" + producerRecord.key().toString() + " Payload:" + producerRecord.value().toString());
+                } else {
+                    sampleResult.setSamplerData("Payload:" + producerRecord.value().toString());
+
+                }
                 Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
                     if (e != null) {
                         log.error("Send failed for record {}", producerRecord, e);

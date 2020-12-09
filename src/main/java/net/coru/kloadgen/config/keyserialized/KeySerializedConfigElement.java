@@ -6,9 +6,9 @@
 
 package net.coru.kloadgen.config.keyserialized;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -41,9 +41,9 @@ public class KeySerializedConfigElement extends ConfigTestElement implements Tes
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
       JMeterVariables variables = JMeterContextService.getContext().getVariables();
-      variables.putObject(VALUE_SUBJECT_NAME, keySubjectName);
-      variables.putObject(VALUE_SCHEMA_PROPERTIES, keySchemaProperties);
-      variables.putObject(VALUE_SCHEMA_TYPE, keySchemaType);
+      variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
+      variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
+      variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
   }
 
 }

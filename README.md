@@ -11,7 +11,7 @@ KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO an
 
 ___
 
-KLoadGen includes six main components
+KLoadGen includes eight main components
 
   * **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class used:
 
@@ -21,14 +21,17 @@ KLoadGen includes six main components
 
     * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configure by properties.
 
-  * **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
-
   * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
+    
+  * **Value Serialized Config** : This jmeter config element generates plaintext messages based on input schema template designed.
 
-  * **File Serialized Config** : This jmeter config element allows to upload a schema file instead to get it from the Schema Registry
+  * **Value File Serialized Config** : This jmeter config element allows to upload a value schema file instead to get it from the Schema Registry
 
   * **Schema Registry Config** : This jmeter config element allows to configure the connection to a Schema Registry, security access,....
 
+  * **Key Serialized Config** : This jmeter config allows to configure a Key Schema from a Schema Registry
+
+  * **Key File Serialized Config** : This jmeter config allows to upload a key schema file instead to get it from the Schema Registry
 ### Setup
 
 ___
@@ -85,28 +88,28 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 
 ### KLoadGenSampler
 
-  * **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
-  * **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
-  * **kafka.topic.name** : Topic on which messages will be sent
-  * **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
-  * **value.serializer<sup>[1](#schematype)<sup>** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
-  * **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
-  * **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
-  * **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
-  * **buffer.memory** : Total buffer memory for producer.
-  * **acks** : Message sent acknowledgement, value can be (0/1/-1).
-  * **send.buffer.bytes** : The size of the TCP send buffer (SO_SNDBUF) to use when sending data. If the value is -1, the OS default will be used.
-  * **receive.buffer.bytes** : The size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is -1, the OS default will be used.
-  * **security.protocol** : kafka producer protocol. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
-  * **message.placeholder.key** : Config element message variable name. This name should be same as message placeholder key in serialized/plaintext config element.
-  * **kerberos.auth.enabled** : YES/NO if it is disabled all below properties will be ignored
-  * **java.security.auth.login.config** : jaas.conf of kafka Kerberos
-  * **java.security.krb5.conf** : Kerberos server krb5.conf file
-  * **sasl.kerberos.service.name** : Kafka Kerberos service name
-  * **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing
-  * **keyed.message** : Enable adding a Key to the messages
-  * **message.key.type**: Allow to specify the key type, used for random generated keys.
-  * **message.key.value**: Allow to specify a fixed value, or a variable, with the key to pass through
+* **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
+* **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
+* **kafka.topic.name** : Topic on which messages will be sent
+* **keyed.message** : Enable adding a Key to the messages
+* **message.key.type**: Allow to specify the key type, used for random generated keys.
+* **message.key.value**: Allow to specify a fixed value, or a variable, with the key to pass through
+* **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
+* **value.serializer<sup>[1](#schematype)<sup>** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
+* **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
+* **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
+* **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
+* **buffer.memory** : Total buffer memory for producer.
+* **acks** : Message sent acknowledgement, value can be (0/1/-1).
+* **send.buffer.bytes** : The size of the TCP send buffer (SO_SNDBUF) to use when sending data. If the value is -1, the OS default will be used.
+* **receive.buffer.bytes** : The size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is -1, the OS default will be used.
+* **security.protocol** : kafka producer protocol. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+* **message.placeholder.key** : Config element message variable name. This name should be same as message placeholder key in serialized/plaintext config element.
+* **kerberos.auth.enabled** : YES/NO if it is disabled all below properties will be ignored
+* **java.security.auth.login.config** : jaas.conf of kafka Kerberos
+* **java.security.krb5.conf** : Kerberos server krb5.conf file
+* **sasl.kerberos.service.name** : Kafka Kerberos service name
+* **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing
 
 ![Kafka Producer Configuration](/Kafka_producer_properties.png)
 
@@ -132,7 +135,7 @@ Subject list will be used when configure the AVRO schema to download.
 
 A confirmation message will be show with the number of subjects retrieved from the Registry.
 
-### Load Generator Configuration
+### Value Schema Configuration
 
 This screen will allow to choose a subject and download it schema.
 AVRO structure will be flattened and show in the table.
@@ -145,7 +148,7 @@ We will see 4 columns where we will configure the Random Generator system.
 
 ![Load Generator Table](/Kafka_load_generator_Success.png)
 
-### File Load Generator Configuration
+### Value File Load Generator Configuration
 
 This screen will allow to choose a schema from file(.avsc or.json).
 
@@ -167,6 +170,18 @@ We will see 4 columns where we will configure the Random Generator system.
 
 
 ![File Generator Table](/Kafka_file_load_generator_config_success.png)
+
+### Key Schema Configuration
+
+Similar to the Value Schema configuration element, but focus to configure a Key Schema. Whatever schema define and configure here will be used as a Key Message.
+
+**NOTE**: This component requires the _keyed.message_ configuration variable to _YES_ in the sampler
+
+### Key File Load Generator Configuration
+
+Similar to the Value File Schema configuration element, but focus to configure a Key Schema. Whatever schema define and configure here will be used as a Key Message.
+
+**NOTE**: This component requires the _keyed.message_ configuration variable to _YES_ in the sampler
 
 ### Schema Template Functions
 

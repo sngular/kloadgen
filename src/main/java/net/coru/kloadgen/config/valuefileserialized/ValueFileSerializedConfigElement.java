@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.filevalueserialized;
+package net.coru.kloadgen.config.valuefileserialized;
 
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
@@ -30,7 +30,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileValueSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
+public class ValueFileSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String valueSubjectName;
 

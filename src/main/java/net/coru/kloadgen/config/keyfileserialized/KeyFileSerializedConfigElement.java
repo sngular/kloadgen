@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.filekeyserialized;
+package net.coru.kloadgen.config.keyfileserialized;
 
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
@@ -30,7 +30,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-public class KeySerializedConfigElement  extends ConfigTestElement implements TestBean, LoopIterationListener {
+public class KeyFileSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String keyName;
 
