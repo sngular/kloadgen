@@ -32,8 +32,13 @@ import java.util.concurrent.Future;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static net.coru.kloadgen.util.ProducerKeysHelper.*;
-import static net.coru.kloadgen.util.PropsKeysHelper.*;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 
 public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
     private static final long serialVersionUID = 1L;
