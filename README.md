@@ -19,7 +19,9 @@ KLoadGen includes eight main components
 
     * **Kafka Sampler** : Our own and simple Kafka Sampler
 
-    * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configure by properties.
+    * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer with avro json encode is configure by properties.
+    
+    * **Generic Binary Kafka Sampler** : Simple Kafka Sampler where serializer with avro binary encoder is configure by properties.
 
   * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
     
