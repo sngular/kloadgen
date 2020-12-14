@@ -92,7 +92,7 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
                 List<String> headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
 
                 sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
-                sampleResult.setSamplerData(producerRecord.value().toString());
+                fillSamplerResult(producerRecord, sampleResult);
 
                 Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
                     if (e != null) {
@@ -114,18 +114,26 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
         return sampleResult;
     }
 
+    private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord, SampleResult sampleResult) {
+        if (Objects.isNull(producerRecord.key())) {
+            sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
+        } else {
+            sampleResult.setSamplerData(String.format("key: %s, payload: %s", producerRecord.key().toString(), producerRecord.value().toString()));
+        }
+    }
+
     private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal) {
         ProducerRecord<Object, Object> producerRecord;
         if (keyMessageFlag) {
             if (Objects.isNull(keyGenerator)) {
                 Object key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
-                producerRecord = new ProducerRecord<>(topic, key, messageVal);
+                producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
             } else {
                 EnrichedRecord key = keyGenerator.nextMessage();
-                producerRecord = new ProducerRecord<>(topic, key.getGenericRecord(), messageVal);
+                producerRecord = new ProducerRecord<>(topic, key.getGenericRecord(), messageVal.getGenericRecord());
             }
         } else {
-            producerRecord = new ProducerRecord<>(topic, messageVal);
+            producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
         }
         return producerRecord;
     }
