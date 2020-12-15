@@ -56,14 +56,14 @@ Install openjdk on Fedora, Oracle Linux, Red Hat Enterprise Linux, etc.,
 
 For windows and mac and you can:
 
-* download oracle JDK 8 setup from [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* download oracle JDK 11 setup from [here](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
 * using chocolatey (windows):
         <https://chocolatey.org/packages?q=java>
    brew (mac):
 
 ```bash
  brew tap adoptopenjdk/openjdk
- brew cask install adoptopenjdk8
+ brew cask install adoptopenjdk11
 ```
 
 #### Build Project
