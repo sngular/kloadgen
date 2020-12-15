@@ -4,35 +4,35 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.avroserialized;
+package net.coru.kloadgen.config.valueserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.property.editor.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
+import net.coru.kloadgen.property.editor.SerialisedSubjectPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
-public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
+public class ValueSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
-    private static final String SUBJECT_NAME = "subjectName";
+    private static final String VALUE_SUBJECT_NAME = "valueSubjectName";
 
-    private static final String SCHEMA_PROPERTIES = "schemaProperties";
+    private static final String VALUE_SCHEMA_PROPERTIES = "valueSchemaProperties";
 
-    private static final String SCHEMA_TYPE = "schemaType";
+    private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
-    public AvroSerializedConfigElementBeanInfo() {
+    public ValueSerializedConfigElementBeanInfo() {
 
-        super(AvroSerializedConfigElement.class);
+        super(ValueSerializedConfigElement.class);
 
-        createPropertyGroup("avro_serialized_load_generator", new String[] {
-            SUBJECT_NAME, SCHEMA_PROPERTIES, SCHEMA_TYPE
+        createPropertyGroup("value_serialized_load_generator", new String[] {
+            VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
         });
 
         TypeEditor tableEditor = TypeEditor.TableEditor;
-        PropertyDescriptor tableProperties = property(SCHEMA_PROPERTIES, tableEditor);
+        PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
         tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
         tableProperties.setValue(TableEditor.HEADERS,
             new String[]{
@@ -51,12 +51,12 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         tableProperties.setValue(DEFAULT, new ArrayList<>());
         tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
 
-        PropertyDescriptor subjectNameProps = property(SUBJECT_NAME);
-        subjectNameProps.setPropertyEditorClass(AvroSubjectPropertyEditor.class);
+        PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
+        subjectNameProps.setPropertyEditorClass(SerialisedSubjectPropertyEditor.class);
         subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
         subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-        PropertyDescriptor schemaType = property(SCHEMA_TYPE);
+        PropertyDescriptor schemaType = property(VALUE_SCHEMA_TYPE);
         schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
         schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
         schemaType.setValue(DEFAULT, "<avro subject>");

@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.fileserialized;
+package net.coru.kloadgen.config.valuefileserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
@@ -16,44 +16,44 @@ import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
-public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
+public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String SUBJECT_NAME = "subjectName";
+  private static final String VALUE_SUBJECT_NAME = "valueSubjectName";
 
-  private static final String SCHEMA_PROPERTIES = "schemaProperties";
+  private static final String VALUE_SCHEMA_PROPERTIES = "valueSchemaProperties";
 
-  private static final String SCHEMA_DEFINITION = "schemaDefinition";
+  private static final String VALUE_SCHEMA_DEFINITION = "valueSchemaDefinition";
 
-  private static final String SCHEMA_TYPE = "schemaType";
+  private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
-  public FileSerializedConfigElementBeanInfo() {
+  public ValueFileSerializedConfigElementBeanInfo() {
 
-    super(FileSerializedConfigElement.class);
+    super(ValueFileSerializedConfigElement.class);
 
     createPropertyGroup("file_serialized_load_generator", new String[]{
-            SCHEMA_TYPE, SCHEMA_PROPERTIES, SCHEMA_DEFINITION, SUBJECT_NAME
+            VALUE_SCHEMA_TYPE, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION, VALUE_SUBJECT_NAME
     });
 
-    PropertyDescriptor subjectNameProps = property(SCHEMA_TYPE);
+    PropertyDescriptor subjectNameProps = property(VALUE_SCHEMA_TYPE);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor schemaType = property(SUBJECT_NAME);
+    PropertyDescriptor schemaType = property(VALUE_SUBJECT_NAME);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
     schemaType.setValue(DEFAULT, "");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor avroSchemaProps = property(SCHEMA_DEFINITION);
+    PropertyDescriptor avroSchemaProps = property(VALUE_SCHEMA_DEFINITION);
     avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
     avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     avroSchemaProps.setValue(DEFAULT, "");
     avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     TypeEditor tableEditor = TypeEditor.TableEditor;
-    PropertyDescriptor tableProperties = property(SCHEMA_PROPERTIES, tableEditor);
+    PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
         new String[]{

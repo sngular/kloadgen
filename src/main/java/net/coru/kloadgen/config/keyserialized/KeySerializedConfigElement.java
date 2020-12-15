@@ -4,11 +4,11 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.avroserialized;
+package net.coru.kloadgen.config.keyserialized;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -29,21 +29,21 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-public class AvroSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
+public class KeySerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String subjectName;
+  private String keySubjectName;
 
-  private List<FieldValueMapping> schemaProperties;
+  private List<FieldValueMapping> keySchemaProperties;
 
-  private String schemaType;
+  private String keySchemaType;
 
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
       JMeterVariables variables = JMeterContextService.getContext().getVariables();
-      variables.putObject(AVRO_SUBJECT_NAME, subjectName);
-      variables.putObject(SCHEMA_PROPERTIES, schemaProperties);
-      variables.putObject(SCHEMA_TYPE, schemaType);
+      variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
+      variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
+      variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
   }
 
 }

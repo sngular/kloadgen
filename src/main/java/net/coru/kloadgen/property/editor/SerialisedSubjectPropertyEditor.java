@@ -44,7 +44,7 @@ import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
-public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
+public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
   private JComboBox<String> subjectNameComboBox;
 
@@ -56,17 +56,17 @@ public class AvroSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
-  public AvroSubjectPropertyEditor() {
+  public SerialisedSubjectPropertyEditor() {
     this.init();
   }
 
-  public AvroSubjectPropertyEditor(Object source) {
+  public SerialisedSubjectPropertyEditor(Object source) {
     super(source);
     this.init();
     this.setValue(source);
   }
 
-  public AvroSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
+  public SerialisedSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
     this.propertyDescriptor = propertyDescriptor;
     this.init();

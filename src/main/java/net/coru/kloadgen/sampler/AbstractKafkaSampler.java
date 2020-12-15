@@ -6,6 +6,24 @@
 
 package net.coru.kloadgen.sampler;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
+
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.concurrent.Future;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
@@ -22,48 +40,35 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.concurrent.Future;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
-
 public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient implements Serializable {
     private static final long serialVersionUID = 1L;
     private final transient StatelessRandomTool statelessRandomTool;
-    private transient KafkaProducer<String, Object> producer;
+    private transient KafkaProducer<Object, Object> producer;
     private String topic;
     private String msgKeyType;
     private List<String> msgKeyValue;
     private boolean keyMessageFlag = false;
     private transient BaseLoadGenerator generator;
+    private transient BaseLoadGenerator keyGenerator;
 
-    public AbstractKafkaSampler() {
+    AbstractKafkaSampler() {
         this.statelessRandomTool = new StatelessRandomTool();
     }
 
     @Override
     public void setupTest(JavaSamplerContext context) {
         Properties props = properties(context);
-        generator = SamplerUtil.configureGenerator(props);
+        generator = SamplerUtil.configureValueGenerator(props);
 
         if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
             keyMessageFlag = true;
-            msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
-            msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
+            if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
+                keyGenerator = SamplerUtil.configureKeyGenerator(props);
+            } else {
+                msgKeyType = context.getParameter(MESSAGE_KEY_KEY_TYPE);
+                msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(context.getParameter(MESSAGE_KEY_KEY_VALUE))
                     ? emptyList() : singletonList(context.getParameter(MESSAGE_KEY_KEY_VALUE));
+            }
         }
 
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
@@ -81,18 +86,13 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
 
         if (Objects.nonNull(messageVal)) {
 
-            ProducerRecord<String, Object> producerRecord;
+            ProducerRecord<Object, Object> producerRecord;
             try {
-                if (keyMessageFlag) {
-                    String key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
-                    producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
-                } else {
-                    producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
-                }
+                producerRecord = getProducerRecord(messageVal);
                 List<String> headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
 
                 sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
-                sampleResult.setSamplerData(producerRecord.value().toString());
+                fillSamplerResult(producerRecord, sampleResult);
 
                 Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
                     if (e != null) {
@@ -102,24 +102,46 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
                 });
 
                 logger().info("Send message to body: {}", producerRecord.value());
-
-                sampleResult.setResponseData(prettyPrint(result.get()), StandardCharsets.UTF_8.name());
-                sampleResult.setSuccessful(true);
-                sampleResult.sampleEnd();
-
+                fillSampleResult(sampleResult, prettyPrint(result.get()),true);
             } catch (Exception e) {
                 logger().error("Failed to send message", e);
-                sampleResult.setResponseData(e.getMessage() != null ? e.getMessage() : "", StandardCharsets.UTF_8.name());
-                sampleResult.setSuccessful(false);
-                sampleResult.sampleEnd();
+                fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",false);
             }
         } else {
             logger().error("Failed to Generate message");
-            sampleResult.setResponseData("Failed to Generate message", StandardCharsets.UTF_8.name());
-            sampleResult.setSuccessful(false);
-            sampleResult.sampleEnd();
+            fillSampleResult(sampleResult,"Failed to Generate message",false);
         }
         return sampleResult;
+    }
+
+    private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord, SampleResult sampleResult) {
+        if (Objects.isNull(producerRecord.key())) {
+            sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
+        } else {
+            sampleResult.setSamplerData(String.format("key: %s, payload: %s", producerRecord.key().toString(), producerRecord.value().toString()));
+        }
+    }
+
+    private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal) {
+        ProducerRecord<Object, Object> producerRecord;
+        if (keyMessageFlag) {
+            if (Objects.isNull(keyGenerator)) {
+                Object key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
+                producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
+            } else {
+                EnrichedRecord key = keyGenerator.nextMessage();
+                producerRecord = new ProducerRecord<>(topic, key.getGenericRecord(), messageVal.getGenericRecord());
+            }
+        } else {
+            producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
+        }
+        return producerRecord;
+    }
+
+    private void fillSampleResult(SampleResult sampleResult, String respondeData, boolean successful) {
+        sampleResult.setResponseData(respondeData, StandardCharsets.UTF_8.name());
+        sampleResult.setSuccessful(successful);
+        sampleResult.sampleEnd();
     }
 
     @Override
