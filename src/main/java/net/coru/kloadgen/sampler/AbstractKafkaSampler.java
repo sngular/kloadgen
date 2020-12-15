@@ -102,7 +102,7 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
                 });
 
                 logger().info("Send message to body: {}", producerRecord.value());
-                fillSampleResult(sampleResult, prettyPrint(result.get()),false);
+                fillSampleResult(sampleResult, prettyPrint(result.get()),true);
             } catch (Exception e) {
                 logger().error("Failed to send message", e);
                 fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",false);
