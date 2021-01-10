@@ -8,11 +8,17 @@ package net.coru.kloadgen.model;
 
 import static java.util.Arrays.asList;
 
-import java.util.Collections;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,6 +30,8 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class FieldValueMapping extends AbstractTestElement {
+
+    private static final Pattern IS_JSON = Pattern.compile("([{]{1}([:{}\\[\\]0-9.\\-+Eaeflnr]|\".*?\"[\\\",\\\"])+[}]{1})");
 
     public static final String FIELD_NAME = "fieldName";
     public static final String FIELD_TYPE = "fieldType";
@@ -88,19 +96,30 @@ public class FieldValueMapping extends AbstractTestElement {
     }
 
     public List<String> getFieldValuesList() {
-        List<String> result;
+        List<String> result = new ArrayList<>();
         String inputFieldValueList = getPropertyAsString(FIELD_VALUES_LIST);
         if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
-            result = asList(inputFieldValueList.split(",", -1));
-        } else {
-            result = Collections.emptyList();
+            if (IS_JSON.matcher(inputFieldValueList).matches()) {
+                ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+                try {
+                    JsonNode nodes = mapper.readTree("[" + inputFieldValueList + "]");
+                    Iterator<JsonNode> nodeElements = nodes.elements();
+                    while (nodeElements.hasNext()) {
+                        result.add(nodeElements.next().toString());
+                    }
+                } catch (JsonProcessingException e) {
+                    result.addAll(asList(inputFieldValueList.split(",", - 1)));
+                }
+            } else {
+                result.addAll(asList(inputFieldValueList.split(",", - 1)));
+            }
         }
         return result;
     }
 
     public void setFieldValuesList(String fieldValuesList) {
         this.fieldValueList = fieldValuesList;
-        setProperty(FIELD_VALUES_LIST, fieldValuesList.replace("[","").replace("]",""));
+        setProperty(FIELD_VALUES_LIST, fieldValuesList.substring(0, fieldValuesList.length()));
     }
 
     public void init() {

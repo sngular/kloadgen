@@ -55,7 +55,7 @@
           </collectionProp>
         </net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
-        <net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement" testname="Kafka Load Generator Config" enabled="true">
+        <net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement" testname="Value Schema Load Generator Config" enabled="true">
           <stringProp name="avroSubject"></stringProp>
           <stringProp name="placeHolder">MESSAGE</stringProp>
           <collectionProp name="schemaProperties">
