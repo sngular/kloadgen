@@ -48,9 +48,9 @@ class FieldValueMappingTest {
 
   @Test
   void getFieldValuesListSingleJson() {
-    fieldValueMapping.setFieldValuesList("{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}");
+    fieldValueMapping.setFieldValuesList("{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"jj\",\"action\":\"kk\"}]}]}");
     assertThat(fieldValueMapping.getFieldValuesList())
             .hasSize(1)
-            .containsExactlyElementsOf(List.of("{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}"));
+            .containsExactlyElementsOf(List.of("{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"jj\",\"action\":\"kk\"}]}]}"));
   }
 }

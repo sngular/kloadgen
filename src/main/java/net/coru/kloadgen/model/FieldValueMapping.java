@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,8 +30,6 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 @EqualsAndHashCode(callSuper = false)
 public class FieldValueMapping extends AbstractTestElement {
 
-    private static final Pattern IS_JSON = Pattern.compile("([{]{1}([:{}\\[\\]0-9.\\-+Eaeflnr]|\".*?\"[\\\",\\\"])+[}]{1})");
-
     public static final String FIELD_NAME = "fieldName";
     public static final String FIELD_TYPE = "fieldType";
     public static final String VALUE_LENGTH = "valueLength";
@@ -44,6 +41,8 @@ public class FieldValueMapping extends AbstractTestElement {
     private String fieldValueList;
 
     private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
+
+    private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
     public FieldValueMapping(String fieldName, String fieldType) {
         this.setFieldName(fieldName);
@@ -99,20 +98,16 @@ public class FieldValueMapping extends AbstractTestElement {
         List<String> result = new ArrayList<>();
         String inputFieldValueList = getPropertyAsString(FIELD_VALUES_LIST);
         if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
-            if (IS_JSON.matcher(inputFieldValueList).matches()) {
-                ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-                try {
-                    JsonNode nodes = mapper.readTree("[" + inputFieldValueList + "]");
-                    Iterator<JsonNode> nodeElements = nodes.elements();
-                    while (nodeElements.hasNext()) {
-                        result.add(nodeElements.next().toString());
-                    }
-                } catch (JsonProcessingException e) {
-                    result.addAll(asList(inputFieldValueList.split(",", - 1)));
+            try {
+                JsonNode nodes = mapper.readTree("[" + inputFieldValueList + "]");
+                Iterator<JsonNode> nodeElements = nodes.elements();
+                while (nodeElements.hasNext()) {
+                    result.add(nodeElements.next().toString());
                 }
-            } else {
+            } catch (JsonProcessingException e) {
                 result.addAll(asList(inputFieldValueList.split(",", - 1)));
             }
+
         }
         return result;
     }
