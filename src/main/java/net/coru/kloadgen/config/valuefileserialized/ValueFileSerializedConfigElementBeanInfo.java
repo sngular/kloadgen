@@ -31,16 +31,16 @@ public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     super(ValueFileSerializedConfigElement.class);
 
     createPropertyGroup("file_serialized_load_generator", new String[]{
-            VALUE_SCHEMA_TYPE, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION, VALUE_SUBJECT_NAME
+            VALUE_SUBJECT_NAME, VALUE_SCHEMA_TYPE, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION
     });
 
-    PropertyDescriptor subjectNameProps = property(VALUE_SCHEMA_TYPE);
+    PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor schemaType = property(VALUE_SUBJECT_NAME);
+    PropertyDescriptor schemaType = property(VALUE_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
     schemaType.setValue(DEFAULT, "");
