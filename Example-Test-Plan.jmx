@@ -55,7 +55,7 @@
           </collectionProp>
         </net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
-        <net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement" testname="Value Schema Load Generator Config" enabled="true">
+        <net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="Value Schema Load Generator Config" enabled="true">
           <stringProp name="avroSubject"></stringProp>
           <stringProp name="placeHolder">MESSAGE</stringProp>
           <collectionProp name="schemaProperties">
@@ -189,7 +189,7 @@
               <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
           </collectionProp>
-        </net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement>
+        </net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Producer Properties" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">

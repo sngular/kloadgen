@@ -114,7 +114,7 @@ public class FieldValueMapping extends AbstractTestElement {
 
     public void setFieldValuesList(String fieldValuesList) {
         this.fieldValueList = fieldValuesList;
-        setProperty(FIELD_VALUES_LIST, fieldValuesList.substring(0, fieldValuesList.length()));
+        setProperty(FIELD_VALUES_LIST, fieldValuesList);
     }
 
     public void init() {

@@ -174,7 +174,7 @@
           <stringProp name="classname">net.coru.kloadgen.sampler.KafkaSampler</stringProp>
         </JavaSampler>
         <hashTree/>
-        <net.coru.kloadgen.config.fileserialized.FileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.fileserialized.FileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
+        <net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
           <stringProp name="avroSchema">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;User&quot;,&quot;namespace&quot;:&quot;com.user.details&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;username&quot;,&quot;type&quot;:&quot;string&quot;},{&quot;name&quot;:&quot;blocks&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;UserRule&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;code&quot;,&quot;type&quot;:&quot;int&quot;},{&quot;name&quot;:&quot;override&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;default&quot;:null},{&quot;name&quot;:&quot;value&quot;,&quot;type&quot;:&quot;float&quot;},{&quot;name&quot;:&quot;penalty&quot;,&quot;type&quot;:&quot;float&quot;}]}}],&quot;default&quot;:null}]}</stringProp>
           <stringProp name="avroSubject">User</stringProp>
           <collectionProp name="schemaProperties">
@@ -206,7 +206,7 @@
               <stringProp name="fieldValuesList">8</stringProp>
             </elementProp>
           </collectionProp>
-        </net.coru.kloadgen.config.fileserialized.FileSerializedConfigElement>
+        </net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement>
         <hashTree/>
       </hashTree>
     </hashTree>
