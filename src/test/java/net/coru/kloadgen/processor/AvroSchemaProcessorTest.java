@@ -87,7 +87,47 @@ class AvroSchemaProcessorTest {
         .asList()
         .hasSize(1);
     List<Map<String, Object>> result = (List<Map<String, Object>>) ((GenericRecord) message.getGenericRecord()).get("values");
-    assertThat(result).hasSize(2).contains(Maps.of("n","1","t","2"), Maps.of("n","1","t","2"));
+    assertThat(result).hasSize(2).contains(Maps.of("n", "1", "t", "2"), Maps.of("n", "1", "t", "2"));
+  }
+
+  @Test
+  void textAvroSchemaProcessorArrayRecord() throws KLoadGenException {
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        new FieldValueMapping("values[2].name", "string", 2, "Jose, Andres"),
+        new FieldValueMapping("values[].amount", "float", 2, "0.5, 0.6"));
+
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder
+            .builder()
+            .record("array")
+            .fields()
+            .name("values")
+            .type()
+            .array()
+            .items()
+            .type(SchemaBuilder
+                .builder()
+                .record("test")
+                .fields()
+                .requiredString("name")
+                .requiredFloat("amount")
+                .endRecord())
+            .noDefault()
+            .endRecord(),
+        new SchemaMetadata(1, 1, ""),
+        fieldValueMappingList);
+
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message)
+        .isNotNull()
+        .isInstanceOf(EnrichedRecord.class)
+        .extracting(EnrichedRecord::getGenericRecord)
+        .isNotNull()
+        .hasFieldOrProperty("values")
+        .extracting("values")
+        .extracting(Arrays::asList)
+        .asList()
+        .hasSize(1);
   }
 
   @Test

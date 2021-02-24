@@ -21,6 +21,7 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG_DEF
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KERBEROS_ENABLED;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.LINGER_MS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.RECEIVE_BUFFER_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME;
@@ -31,22 +32,24 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.SEND_BUFFER_CONFIG_DEFAU
 import static net.coru.kloadgen.util.ProducerKeysHelper.SSL_ENABLED;
 import static net.coru.kloadgen.util.ProducerKeysHelper.TOPIC_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
+import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_DEFAULT;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
@@ -137,6 +140,7 @@ public final class SamplerUtil {
 
   public static Properties setupCommonProperties(JavaSamplerContext context) {
     Properties props = new Properties();
+
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
     if (Objects.nonNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG))) {
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
@@ -228,6 +232,9 @@ public final class SamplerUtil {
       generator = new AvroLoadGenerator();
     }
 
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+        Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
+
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
       originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
@@ -244,6 +251,7 @@ public final class SamplerUtil {
           originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
         }
       }
+
       props.putAll(originals);
 
       generator.setUpGenerator(
@@ -275,6 +283,9 @@ public final class SamplerUtil {
       generator = new AvroLoadGenerator();
     }
 
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+        Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
+
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
       originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
@@ -291,6 +302,7 @@ public final class SamplerUtil {
           originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
         }
       }
+
       props.putAll(originals);
 
       generator.setUpGenerator(

@@ -17,13 +17,23 @@ public class PropsKeysHelper {
     public static final String MESSAGE_KEY_KEY_TYPE = "message.key.type";
     public static final String MESSAGE_KEY_KEY_VALUE = "message.key.value";
 
-    public static final String VALUE_SUBJECT_NAME = "value.subject.name";
-    public static final String VALUE_SCHEMA = "value.subject.schema";
-    public static final String VALUE_SCHEMA_PROPERTIES = "value.schema.properties";
-    public static final String VALUE_SCHEMA_TYPE = "value.schema.type";
+  public static final String VALUE_SUBJECT_NAME = "value.subject.name";
 
-    public static final String KEY_SUBJECT_NAME = "key.subject.name";
-    public static final String KEY_SCHEMA = "key.subject.schema";
-    public static final String KEY_SCHEMA_PROPERTIES = "key.schema.properties";
-    public static final String KEY_SCHEMA_TYPE = "key.schema.type";
+  public static final String VALUE_SCHEMA = "value.subject.schema";
+
+  public static final String VALUE_SCHEMA_PROPERTIES = "value.schema.properties";
+
+  public static final String VALUE_SCHEMA_TYPE = "value.schema.type";
+
+  public static final String KEY_SUBJECT_NAME = "key.subject.name";
+
+  public static final String KEY_SCHEMA = "key.subject.schema";
+
+  public static final String KEY_SCHEMA_PROPERTIES = "key.schema.properties";
+
+  public static final String KEY_SCHEMA_TYPE = "key.schema.type";
+
+  public static final String VALUE_SERIALIZER_CLASS_PROPERTY = "value.serializer.class.property";
+
+  public static final String KEY_SERIALIZER_CLASS_PROPERTY = "key.serializer.class.property";
 }
