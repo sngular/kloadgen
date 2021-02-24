@@ -6,7 +6,7 @@
 
 package net.coru.kloadgen.processor;
 
-import static org.apache .avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
@@ -68,7 +68,7 @@ public class AvroSchemaProcessor {
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
       while (!fieldExpMappingsQueue.isEmpty()) {
         String cleanPath = cleanUpPath(fieldValueMapping, "");
-        if (cleanPath.contains("[") && !cleanPath.contains(".")) {
+        if (cleanPath.contains("[")) {
           String fieldName = getCleanMethodName(fieldValueMapping, "");
           if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
             fieldExpMappingsQueue.remove();

@@ -71,8 +71,6 @@ public class ProducerKeysHelper {
 
     public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
 
-    public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT = "true";
-
     public static final String VALUE_NAME_STRATEGY = "value.subject.name.strategy";
 
     public static final String RECORD_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.RecordNameStrategy";

@@ -5,66 +5,6 @@
   <artifactId>kloadgen</artifactId>
 
   <groupId>net.coru</groupId>
-  <version>3.3.1</version>
-  <modelVersion>4.0.0</modelVersion>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <optimize>true</optimize>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-          <source>${jdk.version}</source>
-          <target>${jdk.version}</target>
-        </configuration>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.6.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>coveralls-maven-plugin</artifactId>
-        <groupId>org.eluder.coveralls</groupId>
-        <version>4.3.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <configuration>
-          <check/>
-          <formats>
-            <format>xml</format>
-          </formats>
-          <instrumentation>
-            <ignoreTrivial>true</ignoreTrivial>
-          </instrumentation>
-          <quiet>true</quiet>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>cobertura</goal>
-            </goals>
-          </execution>
-        </executions>
-        <groupId>org.codehaus.mojo</groupId>
-        <version>2.7</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>2.22.2</version>
-      </plugin>
-    </plugins>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.properties</include>
-          <include>**/*.tpl</include>
-        </includes>
-      </resource>
-    </resources>
-  </build>
   <dependencies>
     <dependency>
       <artifactId>jorphan</artifactId>
@@ -169,6 +109,11 @@
       <artifactId>rgxgen</artifactId>
       <version>1.2</version>
     </dependency>
+    <dependency>
+      <artifactId>reflections</artifactId>
+      <groupId>org.reflections</groupId>
+      <version>0.9.12</version>
+    </dependency>
     <!-- Options -->
     <dependency>
       <groupId>org.apache.kafka</groupId>
@@ -262,6 +207,66 @@
       <version>${junit-jupiter-api.version}</version>
     </dependency>
   </dependencies>
+  <modelVersion>4.0.0</modelVersion>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <optimize>true</optimize>
+          <showDeprecation>true</showDeprecation>
+          <showWarnings>true</showWarnings>
+          <source>${jdk.version}</source>
+          <target>${jdk.version}</target>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>3.6.0</version>
+      </plugin>
+      <plugin>
+        <artifactId>coveralls-maven-plugin</artifactId>
+        <groupId>org.eluder.coveralls</groupId>
+        <version>4.3.0</version>
+      </plugin>
+      <plugin>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <configuration>
+          <check/>
+          <formats>
+            <format>xml</format>
+          </formats>
+          <instrumentation>
+            <ignoreTrivial>true</ignoreTrivial>
+          </instrumentation>
+          <quiet>true</quiet>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>cobertura</goal>
+            </goals>
+          </execution>
+        </executions>
+        <groupId>org.codehaus.mojo</groupId>
+        <version>2.7</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>2.22.2</version>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.tpl</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+  <version>3.4.0</version>
 
   <profiles>
     <profile>

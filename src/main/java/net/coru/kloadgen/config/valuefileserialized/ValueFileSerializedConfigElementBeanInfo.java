@@ -12,6 +12,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
+import net.coru.kloadgen.property.editor.ValueSerializerPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
@@ -26,13 +27,21 @@ public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
+  private static final String VALUE_SERIALIZER_PROPERTY = "valueSerializerConfiguration";
+
   public ValueFileSerializedConfigElementBeanInfo() {
 
     super(ValueFileSerializedConfigElement.class);
 
     createPropertyGroup("file_serialized_load_generator", new String[]{
-            VALUE_SUBJECT_NAME, VALUE_SCHEMA_TYPE, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION
+        VALUE_SERIALIZER_PROPERTY, VALUE_SUBJECT_NAME, VALUE_SCHEMA_TYPE, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION
     });
+
+    PropertyDescriptor serializerPropertyProps = property(VALUE_SERIALIZER_PROPERTY);
+    serializerPropertyProps.setPropertyEditorClass(ValueSerializerPropertyEditor.class);
+    serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    serializerPropertyProps.setValue(DEFAULT, "");
+    serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);

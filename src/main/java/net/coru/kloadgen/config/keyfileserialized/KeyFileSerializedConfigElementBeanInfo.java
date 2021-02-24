@@ -10,6 +10,7 @@ import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
+import net.coru.kloadgen.property.editor.KeySerializerPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
@@ -26,13 +27,21 @@ public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String KEY_SCHEMA_TYPE = "keySchemaType";
 
+  private static final String KEY_SERIALIZER_PROPERTY = "keySerializerConfiguration";
+
   public KeyFileSerializedConfigElementBeanInfo() {
 
     super(KeyFileSerializedConfigElement.class);
 
     createPropertyGroup("key_serialized_load_generator", new String[]{
-            KEY_SCHEMA_TYPE, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_DEFINITION, KEY_NAME
+        KEY_SERIALIZER_PROPERTY, KEY_NAME, KEY_SCHEMA_TYPE, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_DEFINITION
     });
+
+    PropertyDescriptor serializerPropertyProps = property(KEY_SERIALIZER_PROPERTY);
+    serializerPropertyProps.setPropertyEditorClass(KeySerializerPropertyEditor.class);
+    serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    serializerPropertyProps.setValue(DEFAULT, "");
+    serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor subjectNameProps = property(KEY_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
