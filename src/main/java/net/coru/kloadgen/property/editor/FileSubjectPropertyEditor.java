@@ -36,6 +36,7 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
+import org.apache.avro.AvroRuntimeException;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -96,6 +97,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     AutoCompletion.enable(subjectNameComboBox);
     this.subjectNameComboBox.addActionListener(this);
   }
+
   public void actionFileChooser(ActionEvent event) {
 
     int returnValue = fileChooser.showDialog(panel, JMeterUtils.getResString("file_visualizer_open"));
@@ -107,6 +109,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         parserSchema = schemaExtractor.schemaTypesList(subjectName, schemaType);
         subjectNameComboBox.removeAllItems();
         subjectNameComboBox.addItem(parserSchema.name());
+        subjectNameComboBox.setSelectedItem(parserSchema.name());
       } catch (IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
             JOptionPane.ERROR_MESSAGE);
@@ -153,9 +156,14 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
           }
         } catch (NoSuchFieldException | IllegalAccessException e) {
           JOptionPane
-              .showMessageDialog(panel, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+              .showMessageDialog(panel, "Failed to retrieve schema : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
                   JOptionPane.ERROR_MESSAGE);
           log.error(e.getMessage(), e);
+        } catch (AvroRuntimeException ex) {
+          JOptionPane
+              .showMessageDialog(panel, "Failed to process schema : " + ex.getMessage(), "ERROR: Failed to retrieve properties!",
+                  JOptionPane.ERROR_MESSAGE);
+          log.error(ex.getMessage(), ex);
         }
       } else {
         JOptionPane

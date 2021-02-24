@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.util.Collections;
 import java.util.Locale;
+import net.coru.kloadgen.serializer.AvroSerializer;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -33,7 +34,8 @@ class KeyFileSerializedConfigElementTest {
 
     KeyFileSerializedConfigElement
         keyFileSerializedConfigElement =
-            new KeyFileSerializedConfigElement("avroSubject", Collections.emptyList(), schemaDefinition, "AVRO");
+        new KeyFileSerializedConfigElement("avroSubject", Collections.emptyList(), schemaDefinition, "AVRO",
+            AvroSerializer.class.getSimpleName());
     keyFileSerializedConfigElement.iterationStart(null);
     assertThat(JMeterContextService.getContext().getVariables().getObject(KEY_SUBJECT_NAME)).isNotNull();
     assertThat(JMeterContextService.getContext().getVariables().getObject(KEY_SCHEMA_PROPERTIES)).isNotNull();
