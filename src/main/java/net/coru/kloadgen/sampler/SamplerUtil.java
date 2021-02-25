@@ -36,26 +36,27 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
+import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
 import java.io.File;
@@ -75,6 +76,7 @@ import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.util.ProducerKeysHelper;
+import net.coru.kloadgen.util.SchemaRegistryKeyHelper;
 import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
@@ -108,9 +110,6 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ProducerConfig.SEND_BUFFER_CONFIG, SEND_BUFFER_CONFIG_DEFAULT);
     defaultParameters.addArgument(ProducerConfig.RECEIVE_BUFFER_CONFIG, RECEIVE_BUFFER_CONFIG_DEFAULT);
     defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
-    defaultParameters.addArgument(KEYED_MESSAGE_KEY, KEYED_MESSAGE_DEFAULT);
-    defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
-    defaultParameters.addArgument(MESSAGE_KEY_KEY_VALUE, MSG_KEY_VALUE);
     defaultParameters.addArgument(KERBEROS_ENABLED, FLAG_NO);
     defaultParameters.addArgument(JAAS_ENABLED, FLAG_NO);
     defaultParameters.addArgument(JAVA_SEC_AUTH_LOGIN_CONFIG, JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT);
@@ -143,9 +142,16 @@ public final class SamplerUtil {
     Properties props = new Properties();
 
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-    if (Objects.nonNull(context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG))) {
-      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
+    if ("true".equals(context.getJMeterVariables().get(SCHEMA_KEYED_MESSAGE_KEY))) {
+      props.put(KEY_SERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_SERIALIZER_CLASS_PROPERTY));
+    } else if ("true".equals(context.getJMeterVariables().get(SIMPLE_KEYED_MESSAGE_KEY))) {
+      props.put(MESSAGE_KEY_KEY_TYPE, context.getJMeterVariables().get(KEY_TYPE));
+      props.put(MESSAGE_KEY_KEY_VALUE, context.getJMeterVariables().get(KEY_VALUE));
+      props.put(KEY_SERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_SERIALIZER_CLASS_PROPERTY));
+    } else {
+      props.put(SCHEMA_KEYED_MESSAGE_KEY, Boolean.FALSE);
     }
+
     if (Objects.nonNull(context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG))) {
       props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
     }
@@ -159,9 +165,9 @@ public final class SamplerUtil {
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
 
-
-    if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
-      props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+    if (Objects.nonNull(context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
+      props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
+          context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
     Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
@@ -245,14 +251,11 @@ public final class SamplerUtil {
       originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
 
       if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-            .equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
-          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
-              jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
+        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
           originals.put(USER_INFO_CONFIG, jMeterVariables.get(USER_INFO_CONFIG));
         } else {
-          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
-              jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
+          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
           originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
         }
       }
@@ -296,14 +299,11 @@ public final class SamplerUtil {
       originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
 
       if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-            .equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
-          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE,
-              jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
+        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
           originals.put(USER_INFO_CONFIG, jMeterVariables.get(USER_INFO_CONFIG));
         } else {
-          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE,
-              jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
+          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
           originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
         }
       }

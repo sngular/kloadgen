@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 class KeyFileSerializedConfigElementBeanInfoTest {
 
-  private static final String KEY_NAME = "keyName";
+  private static final String KEY_SUBJECT_NAME = "keySubjectName";
 
   private static final String KEY_SCHEMA_PROPERTIES = "keySchemaProperties";
 
@@ -32,10 +32,10 @@ class KeyFileSerializedConfigElementBeanInfoTest {
   void shouldGenerateElements() {
     PropertyDescriptor[] propertyDescriptors = keyFileSerializedConfigElementBeanInfo.getPropertyDescriptors();
     assertThat(propertyDescriptors).hasSize(5);
-    assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_NAME);
-    assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_DEFINITION);
-    assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
-    assertThat(propertyDescriptors[3].getName()).isEqualTo(KEY_SCHEMA_TYPE);
-    assertThat(propertyDescriptors[4].getName()).isEqualTo(SERIALIZER_PROPERTY);
+    assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_SCHEMA_DEFINITION);
+    assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
+    assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_TYPE);
+    assertThat(propertyDescriptors[3].getName()).isEqualTo(SERIALIZER_PROPERTY);
+    assertThat(propertyDescriptors[4].getName()).isEqualTo(KEY_SUBJECT_NAME);
   }
 }
