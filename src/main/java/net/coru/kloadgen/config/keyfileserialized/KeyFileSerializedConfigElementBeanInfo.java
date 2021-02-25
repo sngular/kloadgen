@@ -19,7 +19,7 @@ import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String KEY_NAME = "keyName";
+  private static final String KEY_SUBJECT_NAME = "keySubjectName";
 
   private static final String KEY_SCHEMA_PROPERTIES = "keySchemaProperties";
 
@@ -34,7 +34,11 @@ public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     super(KeyFileSerializedConfigElement.class);
 
     createPropertyGroup("key_serialized_load_generator", new String[]{
-        KEY_SERIALIZER_PROPERTY, KEY_NAME, KEY_SCHEMA_TYPE, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_DEFINITION
+        KEY_SERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION
+    });
+
+    createPropertyGroup("key_serialized_load_generator_properties", new String[]{
+        KEY_SCHEMA_PROPERTIES
     });
 
     PropertyDescriptor serializerPropertyProps = property(KEY_SERIALIZER_PROPERTY);
@@ -43,7 +47,7 @@ public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     serializerPropertyProps.setValue(DEFAULT, "");
     serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor subjectNameProps = property(KEY_NAME);
+    PropertyDescriptor subjectNameProps = property(KEY_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "");
