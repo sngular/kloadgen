@@ -55,7 +55,7 @@
           </collectionProp>
         </net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
-        <net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="Value Schema Load Generator Config" enabled="true">
+        <net.coru.kloadgen.config.valueserialized.valueSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="Value Schema Load Generator Config" enabled="true">
           <stringProp name="avroSubject"></stringProp>
           <stringProp name="placeHolder">MESSAGE</stringProp>
           <collectionProp name="schemaProperties">
@@ -189,7 +189,7 @@
               <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
           </collectionProp>
-        </net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement>
+        </net.coru.kloadgen.config.valueserialized.valueSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Producer Properties" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
@@ -334,14 +334,9 @@
                 <stringProp name="Argument.value">true</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="auto.register.schemas" elementType="Argument">
-                <stringProp name="Argument.name">auto.register.schemas</stringProp>
-                <stringProp name="Argument.value">true</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">net.coru.kloadgen.sampler.ConfluentKafkaSampler</stringProp>
+          <stringProp name="classname">net.coru.kloadgen.sampler.KafkaSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
