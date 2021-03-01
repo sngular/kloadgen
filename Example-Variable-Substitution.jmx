@@ -36,10 +36,10 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
           <stringProp name="scriptLanguage">groovy</stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <net.coru.kloadgen.config.fileserialized.FileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.fileserialized.FileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
-          <stringProp name="avroSchema">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;test10&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;mapOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:&quot;string&quot;}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfMap&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}}],&quot;default&quot;:null}]}</stringProp>
-          <stringProp name="avroSubject">test10</stringProp>
-          <collectionProp name="schemaProperties">
+        <net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.fileserialized.FileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
+          <stringProp name="valueSchemaDefinition">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;test10&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;mapOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:&quot;string&quot;}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfMap&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}}],&quot;default&quot;:null}]}</stringProp>
+          <stringProp name="valueSubjectName">test10</stringProp>
+          <collectionProp name="valueSchemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">mapOfString[2]</stringProp>
               <intProp name="valueLength">0</intProp>
@@ -59,7 +59,9 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
               <stringProp name="fieldValuesList">a:b, b:t, h:t</stringProp>
             </elementProp>
           </collectionProp>
-        </net.coru.kloadgen.config.fileserialized.FileSerializedConfigElement>
+          <stringProp name="valueSubjectName">&lt;avro subject&gt;</stringProp>
+          <stringProp name="valueSchemaType">AVRO</stringProp>
+        </net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Java Request" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">

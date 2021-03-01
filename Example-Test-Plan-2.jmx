@@ -175,9 +175,9 @@
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
-          <stringProp name="avroSchema">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;User&quot;,&quot;namespace&quot;:&quot;com.user.details&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;username&quot;,&quot;type&quot;:&quot;string&quot;},{&quot;name&quot;:&quot;blocks&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;UserRule&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;code&quot;,&quot;type&quot;:&quot;int&quot;},{&quot;name&quot;:&quot;override&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;default&quot;:null},{&quot;name&quot;:&quot;value&quot;,&quot;type&quot;:&quot;float&quot;},{&quot;name&quot;:&quot;penalty&quot;,&quot;type&quot;:&quot;float&quot;}]}}],&quot;default&quot;:null}]}</stringProp>
-          <stringProp name="avroSubject">User</stringProp>
-          <collectionProp name="schemaProperties">
+          <stringProp name="valueSchemaDefinition">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;User&quot;,&quot;namespace&quot;:&quot;com.user.details&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;username&quot;,&quot;type&quot;:&quot;string&quot;},{&quot;name&quot;:&quot;blocks&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;UserRule&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;code&quot;,&quot;type&quot;:&quot;int&quot;},{&quot;name&quot;:&quot;override&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;default&quot;:null},{&quot;name&quot;:&quot;value&quot;,&quot;type&quot;:&quot;float&quot;},{&quot;name&quot;:&quot;penalty&quot;,&quot;type&quot;:&quot;float&quot;}]}}],&quot;default&quot;:null}]}</stringProp>
+          <stringProp name="valueSubjectName">User</stringProp>
+          <collectionProp name="valueSchemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">username</stringProp>
               <intProp name="valueLength">0</intProp>
@@ -206,6 +206,8 @@
               <stringProp name="fieldValuesList">8</stringProp>
             </elementProp>
           </collectionProp>
+          <stringProp name="valueSubjectName">&lt;avro subject&gt;</stringProp>
+          <stringProp name="valueSchemaType">AVRO</stringProp>
         </net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement>
         <hashTree/>
       </hashTree>
