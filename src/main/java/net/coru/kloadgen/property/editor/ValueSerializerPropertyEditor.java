@@ -28,13 +28,9 @@ import org.reflections.util.FilterBuilder;
 @Slf4j
 public class ValueSerializerPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private final JPanel panel = new JPanel();
-
   private JComboBox<String> serializerComboBox;
 
-  private PropertyDescriptor propertyDescriptor;
-
-  private int chosen = 0;
+  private final JPanel panel = new JPanel();
 
   public ValueSerializerPropertyEditor() {
     this.init();
@@ -48,7 +44,6 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
 
   public ValueSerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
     this.init();
   }
 
@@ -76,7 +71,7 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    chosen = serializerComboBox.getSelectedIndex();
+    // Not implementation required
   }
 
   @Override
@@ -86,7 +81,7 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
+    super.setSource(descriptor);
   }
 
   @Override
@@ -95,23 +90,23 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
   }
 
   @Override
-  public void setAsText(String text) throws IllegalArgumentException {
-    this.serializerComboBox.setSelectedItem(text);
-  }
-
-  @Override
   public Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public Object getValue() {
-    return this.serializerComboBox.getSelectedItem();
+  public void setAsText(String text) throws IllegalArgumentException {
+    this.serializerComboBox.setSelectedItem(text);
   }
 
   @Override
   public void setValue(Object value) {
     this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
+  }
+
+  @Override
+  public Object getValue() {
+    return this.serializerComboBox.getSelectedItem();
   }
 
   @Override

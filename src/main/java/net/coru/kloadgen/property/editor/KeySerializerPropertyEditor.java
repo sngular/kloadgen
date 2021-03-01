@@ -31,10 +31,6 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
 
   private JComboBox<String> serializerComboBox;
 
-  private PropertyDescriptor propertyDescriptor;
-
-  private int chosen = 0;
-
   public KeySerializerPropertyEditor() {
     this.init();
   }
@@ -47,7 +43,6 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
 
   public KeySerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
     this.init();
   }
 
@@ -69,7 +64,7 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
 
   @Override
   public void actionPerformed(ActionEvent event) {
-    chosen = serializerComboBox.getSelectedIndex();
+    // Not implementation required
   }
 
   @Override
@@ -79,7 +74,7 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
 
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
+    super.setSource(descriptor);
   }
 
   @Override
@@ -88,23 +83,23 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
   }
 
   @Override
-  public void setAsText(String text) throws IllegalArgumentException {
-    this.serializerComboBox.setSelectedItem(text);
-  }
-
-  @Override
   public Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public Object getValue() {
-    return this.serializerComboBox.getSelectedItem();
+  public void setAsText(String text) throws IllegalArgumentException {
+    this.serializerComboBox.setSelectedItem(text);
   }
 
   @Override
   public void setValue(Object value) {
     this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
+  }
+
+  @Override
+  public Object getValue() {
+    return this.serializerComboBox.getSelectedItem();
   }
 
   @Override
