@@ -62,24 +62,29 @@
               <stringProp name="fieldName">metadata.name</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">7</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.domain</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">7</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.version</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.id</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">5</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.timestamp</stringProp>
+              <stringProp name="fieldType">stringTimestamp</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
@@ -87,29 +92,32 @@
               <stringProp name="fieldName">metadata.action</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <stringProp name="fieldValuesList">created</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.name</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.version</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.envelope.classifiers[].name</stringProp>
-              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldName">metadata.classifiers[1].name</stringProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.envelope.classifiers[].values[]</stringProp>
-              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldName">metadata.classifiers[].values</stringProp>
               <stringProp name="fieldType">string-array</stringProp>
+              <intProp name="valueLength">4</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.envelope.context</stringProp>
+              <stringProp name="fieldName">metadata.context</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
@@ -122,6 +130,7 @@
               <stringProp name="fieldName">payload.entity.code</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <stringProp name="fieldValuesList">COD1,COD2,COD3</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.type</stringProp>
@@ -135,23 +144,23 @@
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.address</stringProp>
-              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">20</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.city</stringProp>
-              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">10</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.zip_code</stringProp>
-              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.state</stringProp>
-              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.latitude</stringProp>
@@ -165,13 +174,25 @@
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.time_zone_id</stringProp>
-              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">int</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.country_iso</stringProp>
-              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">3</intProp>
+            </elementProp>
+            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">payload.entity.location_ids</stringProp>
+              <stringProp name="fieldType">int-array</stringProp>
+              <intProp name="valueLength">2</intProp>
+            </elementProp>
+            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">payload.entity.entity_version</stringProp>
+              <stringProp name="fieldType">int</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">payload.entity.last_updated_date_time</stringProp>
+              <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.status</stringProp>
@@ -180,8 +201,7 @@
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.timestamp</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">string</stringProp>
+              <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
           </collectionProp>
           <stringProp name="valueSubjectName">test</stringProp>
