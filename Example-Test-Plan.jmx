@@ -168,19 +168,6 @@
               <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.location_ids</stringProp>
-              <stringProp name="fieldType">int-array</stringProp>
-              <intProp name="valueLength">2</intProp>
-            </elementProp>
-            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.entity_version</stringProp>
-              <stringProp name="fieldType">int</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.last_updated_date_time</stringProp>
-              <stringProp name="fieldType">longTimestamp</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.status</stringProp>
               <stringProp name="fieldType">enum</stringProp>
             </elementProp>
