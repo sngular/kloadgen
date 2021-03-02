@@ -8,6 +8,7 @@ package net.coru.kloadgen.config.keyserialized;
 
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
 
@@ -38,6 +39,8 @@ public class KeySerializedConfigElement extends ConfigTestElement implements Tes
 
   private String keySchemaType;
 
+  private String keySerializerConfiguration;
+
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
@@ -45,6 +48,7 @@ public class KeySerializedConfigElement extends ConfigTestElement implements Tes
     variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
     variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
     variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
+    variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
     variables.putObject(SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 
