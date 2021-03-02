@@ -34,11 +34,7 @@ public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     super(KeyFileSerializedConfigElement.class);
 
     createPropertyGroup("key_serialized_load_generator", new String[]{
-        KEY_SERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION
-    });
-
-    createPropertyGroup("key_serialized_load_generator_properties", new String[]{
-        KEY_SCHEMA_PROPERTIES
+        KEY_SERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION, KEY_SCHEMA_PROPERTIES
     });
 
     PropertyDescriptor serializerPropertyProps = property(KEY_SERIALIZER_PROPERTY);
