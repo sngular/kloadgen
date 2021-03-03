@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.2.1">
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
@@ -31,7 +31,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="bootstrap.servers" elementType="Argument">
                 <stringProp name="Argument.name">bootstrap.servers</stringProp>
-                <stringProp name="Argument.value">localhost:9092</stringProp>
+                <stringProp name="Argument.value">localhost:29092</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="zookeeper.servers" elementType="Argument">
@@ -164,19 +164,74 @@
                 <stringProp name="Argument.value">&lt;Truststore Password&gt;</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="client.id" elementType="Argument">
+                <stringProp name="Argument.name">client.id</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="security.providers" elementType="Argument">
+                <stringProp name="Argument.name">security.providers</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.enabled.protocols" elementType="Argument">
+                <stringProp name="Argument.name">ssl.enabled.protocols</stringProp>
+                <stringProp name="Argument.value">TLSv1.2,TLSv1.3</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.endpoint.identification.algorithm" elementType="Argument">
+                <stringProp name="Argument.name">ssl.endpoint.identification.algorithm</stringProp>
+                <stringProp name="Argument.value">https</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.keymanager.algorithm" elementType="Argument">
+                <stringProp name="Argument.name">ssl.keymanager.algorithm</stringProp>
+                <stringProp name="Argument.value">SunX509</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.protocol" elementType="Argument">
+                <stringProp name="Argument.name">ssl.protocol</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.keystore.type" elementType="Argument">
+                <stringProp name="Argument.name">ssl.keystore.type</stringProp>
+                <stringProp name="Argument.value">JKS</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.provider" elementType="Argument">
+                <stringProp name="Argument.name">ssl.provider</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.protocol" elementType="Argument">
+                <stringProp name="Argument.name">ssl.protocol</stringProp>
+                <stringProp name="Argument.value">TLSv1.3</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="auto.register.schemas" elementType="Argument">
                 <stringProp name="Argument.name">auto.register.schemas</stringProp>
                 <stringProp name="Argument.value">false</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="key.serializer" elementType="Argument">
+                <stringProp name="Argument.name">key.serializer</stringProp>
+                <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="value.serializer" elementType="Argument">
+                <stringProp name="Argument.name">value.serializer</stringProp>
+                <stringProp name="Argument.value">net.coru.kloadgen.serializer.GenericAvroRecordBinarySerializer</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">net.coru.kloadgen.sampler.KafkaSampler</stringProp>
+          <stringProp name="classname">net.coru.kloadgen.sampler.GenericBinaryKafkaSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
           <stringProp name="valueSchemaDefinition">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;User&quot;,&quot;namespace&quot;:&quot;com.user.details&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;username&quot;,&quot;type&quot;:&quot;string&quot;},{&quot;name&quot;:&quot;blocks&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;UserRule&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;code&quot;,&quot;type&quot;:&quot;int&quot;},{&quot;name&quot;:&quot;override&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;default&quot;:null},{&quot;name&quot;:&quot;value&quot;,&quot;type&quot;:&quot;float&quot;},{&quot;name&quot;:&quot;penalty&quot;,&quot;type&quot;:&quot;float&quot;}]}}],&quot;default&quot;:null}]}</stringProp>
-          <stringProp name="valueSubjectName">User</stringProp>
+          <stringProp name="valueSubjectName">&lt;avro subject&gt;</stringProp>
           <collectionProp name="valueSchemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">username</stringProp>
@@ -206,7 +261,6 @@
               <stringProp name="fieldValuesList">8</stringProp>
             </elementProp>
           </collectionProp>
-          <stringProp name="valueSubjectName">&lt;avro subject&gt;</stringProp>
           <stringProp name="valueSchemaType">AVRO</stringProp>
         </net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement>
         <hashTree/>
