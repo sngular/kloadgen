@@ -112,6 +112,7 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **java.security.krb5.conf** : Kerberos server krb5.conf file
 * **sasl.kerberos.service.name** : Kafka Kerberos service name
 * **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing
+* **value.subject.name.strategy<sup>[3](#subjectstrategy)<sup>** : Allows to define the class which contains the Schema Subject name resolution strategy.
 
 ![Kafka Producer Configuration](/Kafka_producer_properties.png)
 
@@ -301,3 +302,4 @@ And some optional ones who will let us configura the JMeter Engine and the test 
 
 ## Notes
 <a name="schematype">1</a>: Selection between AVRO or JSON wil be done by chose the serializer class here or "io.confluent.kafka.serializers.KafkaAvroSerializer" or "io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer" for now. We are working in a better way to identify the schema.
+<a name="subjectstrategy">2</a>: Is the way to resolve the Record Subject Name Strategy 
