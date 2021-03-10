@@ -127,13 +127,13 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
         if (keyMessageFlag) {
             if (Objects.isNull(keyGenerator)) {
                 Object key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
-                producerRecord = new ProducerRecord<>(topic, key, messageVal.getGenericRecord());
+                producerRecord = new ProducerRecord<>(topic, key, getValue(messageVal));
             } else {
                 EnrichedRecord key = keyGenerator.nextMessage();
-                producerRecord = new ProducerRecord<>(topic, key.getGenericRecord(), messageVal.getGenericRecord());
+                producerRecord = new ProducerRecord<>(topic, getValue(key), getValue(messageVal));
             }
         } else {
-            producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
+            producerRecord = new ProducerRecord<>(topic, getValue(messageVal));
         }
         return producerRecord;
     }
@@ -154,6 +154,10 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
     protected abstract Properties properties(JavaSamplerContext context);
 
     protected abstract Logger logger();
+
+    protected Object getValue(EnrichedRecord messageVal) {
+        return messageVal.getGenericRecord();
+    }
 
     private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
         List<HeaderMapping> headerMappingList = new ArrayList<>();
