@@ -13,21 +13,28 @@ ___
 
 KLoadGen includes eight main components
 
-  * **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. It let you configure all the producer properties.
-    
-  * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
-    
-  * **Value Serialized Config** : This jmeter config element generates plaintext messages based on input schema template designed.
+* **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class
+  used:
 
-  * **Value File Serialized Config** : This jmeter config element allows to upload a value schema file instead to get it from the Schema Registry
+    * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer
 
-  * **Schema Registry Config** : This jmeter config element allows to configure the connection to a Schema Registry, security access,....
+    * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer with avro json encode is configure by properties.
 
-  * **Key Serialized Config** : This jmeter config allows to configure a Key Schema from a Schema Registry
+    * **Generic Binary Kafka Sampler** : Simple Kafka Sampler where serializer with avro binary encoder is configure by properties.
 
-  * **Key File Serialized Config** : This jmeter config allows to upload a key schema file instead to get it from the Schema Registry
+* **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property
+  configurations.
 
-  * **Key Plain Load Generator Config** : This jmeter config allows to configure a simple Key value, constant or pass a jmeter variable
+* **Value Serialized Config** : This jmeter config element generates plaintext messages based on input schema template designed.
+
+* **Value File Serialized Config** : This jmeter config element allows to upload a value schema file instead to get it from the Schema
+  Registry
+
+* **Schema Registry Config** : This jmeter config element allows to configure the connection to a Schema Registry, security access,....
+
+* **Key Serialized Config** : This jmeter config allows to configure a Key Schema from a Schema Registry
+
+* **Key File Serialized Config** : This jmeter config allows to upload a key schema file instead to get it from the Schema Registry
 
 ### Setup
 
@@ -92,6 +99,8 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **message.key.type**: Allow to specify the key type, used for random generated keys.
 * **message.key.value**: Allow to specify a fixed value, or a variable, with the key to pass through
 * **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
+* **value.serializer<sup>[1](#schematype)<sup>** : For plaintext config element value can be kept same as default but for serialized config
+  element, value serializer can be "ObjectSerializer"
 * **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
 * **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
 * **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
@@ -134,8 +143,6 @@ A confirmation message will be show with the number of subjects retrieved from t
 ### Value Schema Configuration
 
 This screen will allow to choose a subject and download it schema.
-It let us choose which serializer<sup>[1](#schematype)</sup> will be used to serialize the data.
-
 AVRO structure will be flattened and show in the table.
 We will see 4 columns where we will configure the Random Generator system.
 
