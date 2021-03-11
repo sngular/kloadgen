@@ -4,6 +4,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import java.io.File;
 import java.util.Collections;
 import java.util.Locale;
@@ -35,7 +36,7 @@ class ValueFileSerializedConfigElementTest {
     ValueFileSerializedConfigElement
         valueFileSerializedConfigElement =
         new ValueFileSerializedConfigElement("avroSubject", Collections.emptyList(), definitionSchema, "AVRO",
-            AvroSerializer.class.getSimpleName());
+           AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     valueFileSerializedConfigElement.iterationStart(null);
     assertThat(JMeterContextService.getContext().getVariables().getObject(VALUE_SUBJECT_NAME)).isNotNull();
     assertThat(JMeterContextService.getContext().getVariables().getObject(VALUE_SCHEMA_PROPERTIES)).isNotNull();

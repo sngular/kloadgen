@@ -37,9 +37,9 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
         </JSR223PreProcessor>
         <hashTree/>
         <net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
-          <stringProp name="valueSchemaDefinition">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;test10&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;mapOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:&quot;string&quot;}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfMap&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}}],&quot;default&quot;:null}]}</stringProp>
-          <stringProp name="valueSubjectName">&lt;avro subject&gt;</stringProp>
-          <collectionProp name="valueSchemaProperties">
+          <stringProp name="avroSchema">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;test10&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;mapOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:&quot;string&quot;}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfMap&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}}],&quot;default&quot;:null}]}</stringProp>
+          <stringProp name="avroSubject">test10</stringProp>
+          <collectionProp name="schemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">mapOfString[2]</stringProp>
               <intProp name="valueLength">0</intProp>
@@ -262,7 +262,7 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">net.coru.kloadgen.sampler.GenericBinaryKafkaSampler</stringProp>
+          <stringProp name="classname">net.coru.kloadgen.sampler.KafkaSchemaSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">

@@ -214,25 +214,15 @@
                 <stringProp name="Argument.value">false</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="key.serializer" elementType="Argument">
-                <stringProp name="Argument.name">key.serializer</stringProp>
-                <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
-              <elementProp name="value.serializer" elementType="Argument">
-                <stringProp name="Argument.name">value.serializer</stringProp>
-                <stringProp name="Argument.value">net.coru.kloadgen.serializer.GenericAvroRecordBinarySerializer</stringProp>
-                <stringProp name="Argument.metadata">=</stringProp>
-              </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">net.coru.kloadgen.sampler.GenericBinaryKafkaSampler</stringProp>
+          <stringProp name="classname">net.coru.kloadgen.sampler.KafkaSchemaSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
-          <stringProp name="valueSchemaDefinition">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;User&quot;,&quot;namespace&quot;:&quot;com.user.details&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;username&quot;,&quot;type&quot;:&quot;string&quot;},{&quot;name&quot;:&quot;blocks&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;UserRule&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;code&quot;,&quot;type&quot;:&quot;int&quot;},{&quot;name&quot;:&quot;override&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;default&quot;:null},{&quot;name&quot;:&quot;value&quot;,&quot;type&quot;:&quot;float&quot;},{&quot;name&quot;:&quot;penalty&quot;,&quot;type&quot;:&quot;float&quot;}]}}],&quot;default&quot;:null}]}</stringProp>
-          <stringProp name="valueSubjectName">&lt;avro subject&gt;</stringProp>
-          <collectionProp name="valueSchemaProperties">
+          <stringProp name="avroSchema">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;User&quot;,&quot;namespace&quot;:&quot;com.user.details&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;username&quot;,&quot;type&quot;:&quot;string&quot;},{&quot;name&quot;:&quot;blocks&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;UserRule&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;code&quot;,&quot;type&quot;:&quot;int&quot;},{&quot;name&quot;:&quot;override&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;default&quot;:null},{&quot;name&quot;:&quot;value&quot;,&quot;type&quot;:&quot;float&quot;},{&quot;name&quot;:&quot;penalty&quot;,&quot;type&quot;:&quot;float&quot;}]}}],&quot;default&quot;:null}]}</stringProp>
+          <stringProp name="avroSubject">User</stringProp>
+          <collectionProp name="schemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">username</stringProp>
               <intProp name="valueLength">0</intProp>

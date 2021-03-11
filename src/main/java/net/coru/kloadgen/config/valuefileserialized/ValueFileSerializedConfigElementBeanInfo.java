@@ -29,13 +29,21 @@ public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String VALUE_SERIALIZER_PROPERTY = "valueSerializerConfiguration";
 
+  private static final String VALUE_NAME_STRATEGY = "valueNameStrategy";
+
   public ValueFileSerializedConfigElementBeanInfo() {
 
     super(ValueFileSerializedConfigElement.class);
 
     createPropertyGroup("file_serialized_load_generator", new String[]{
-        VALUE_SERIALIZER_PROPERTY, VALUE_SCHEMA_TYPE, VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION
+        VALUE_NAME_STRATEGY, VALUE_SERIALIZER_PROPERTY, VALUE_SCHEMA_TYPE, VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_DEFINITION
     });
+
+    PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);
+    nameStrategyPropertyProps.setPropertyEditorClass(ValueSerializerPropertyEditor.class);
+    nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    nameStrategyPropertyProps.setValue(DEFAULT, "");
+    nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor serializerPropertyProps = property(VALUE_SERIALIZER_PROPERTY);
     serializerPropertyProps.setPropertyEditorClass(ValueSerializerPropertyEditor.class);

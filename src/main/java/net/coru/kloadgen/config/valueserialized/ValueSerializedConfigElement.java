@@ -6,6 +6,7 @@
 
 package net.coru.kloadgen.config.valueserialized;
 
+import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY;
@@ -40,6 +41,8 @@ public class ValueSerializedConfigElement extends ConfigTestElement implements T
 
   private String valueSerializerConfiguration;
 
+  private String valueNameStrategy;
+
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
@@ -48,6 +51,7 @@ public class ValueSerializedConfigElement extends ConfigTestElement implements T
     variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
     variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
     variables.putObject(VALUE_SERIALIZER_CLASS_PROPERTY, valueSerializerConfiguration);
+    variables.putObject(VALUE_NAME_STRATEGY, valueNameStrategy);
 
   }
 
