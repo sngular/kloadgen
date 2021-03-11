@@ -47,7 +47,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 
-public class KafkaSampler extends AbstractJavaSamplerClient implements Serializable {
+public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

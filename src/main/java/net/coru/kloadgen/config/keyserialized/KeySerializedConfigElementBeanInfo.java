@@ -10,6 +10,7 @@ import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.KeySerializerPropertyEditor;
+import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import net.coru.kloadgen.property.editor.SerialisedSubjectPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
@@ -26,13 +27,21 @@ public class KeySerializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String KEY_SERIALIZER_PROPERTY = "keySerializerConfiguration";
 
+  private static final String KEY_NAME_STRATEGY = "keyNameStrategy";
+
   public KeySerializedConfigElementBeanInfo() {
 
     super(KeySerializedConfigElement.class);
 
     createPropertyGroup("key_serialized_load_generator", new String[] {
-        KEY_SERIALIZER_PROPERTY, KEY_SUBJECT_NAME, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
+        KEY_NAME_STRATEGY, KEY_SERIALIZER_PROPERTY, KEY_SUBJECT_NAME, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
     });
+
+    PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
+    nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
+    nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    nameStrategyPropertyProps.setValue(DEFAULT, "");
+    nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor serializerPropertyProps = property(KEY_SERIALIZER_PROPERTY);
     serializerPropertyProps.setPropertyEditorClass(KeySerializerPropertyEditor.class);

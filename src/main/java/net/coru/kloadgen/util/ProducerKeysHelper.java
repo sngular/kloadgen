@@ -73,6 +73,8 @@ public class ProducerKeysHelper {
 
     public static final String VALUE_NAME_STRATEGY = "value.subject.name.strategy";
 
+    public static final String KEY_NAME_STRATEGY = "key.subject.name.strategy";
+
     public static final String RECORD_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.RecordNameStrategy";
 
     public static final String TOPIC_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.TopicRecordNameStrategy";
