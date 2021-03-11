@@ -8,6 +8,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USE
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Locale;
 import java.util.stream.Stream;
 import net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.serializer.AvroSerializer;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -55,7 +57,8 @@ class SerialisedSubjectPropertyEditorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     ValueSerializedConfigElement
-        valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO");
+        valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
+              AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     valueSerializedConfigElement.iterationStart(null);
 

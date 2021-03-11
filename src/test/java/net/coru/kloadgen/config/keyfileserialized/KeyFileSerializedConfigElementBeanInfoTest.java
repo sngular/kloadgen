@@ -18,6 +18,8 @@ class KeyFileSerializedConfigElementBeanInfoTest {
 
   private static final String KEY_SCHEMA_DEFINITION = "keySchemaDefinition";
 
+  private static final String KEY_NAME_STRATEGY = "keyNameStrategy";
+
   private static final String SERIALIZER_PROPERTY = "keySerializerConfiguration";
 
   private KeyFileSerializedConfigElementBeanInfo keyFileSerializedConfigElementBeanInfo;
@@ -31,11 +33,12 @@ class KeyFileSerializedConfigElementBeanInfoTest {
   @Test
   void shouldGenerateElements() {
     PropertyDescriptor[] propertyDescriptors = keyFileSerializedConfigElementBeanInfo.getPropertyDescriptors();
-    assertThat(propertyDescriptors).hasSize(5);
-    assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_SCHEMA_DEFINITION);
-    assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
-    assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_TYPE);
-    assertThat(propertyDescriptors[3].getName()).isEqualTo(SERIALIZER_PROPERTY);
-    assertThat(propertyDescriptors[4].getName()).isEqualTo(KEY_SUBJECT_NAME);
+    assertThat(propertyDescriptors).hasSize(6);
+    assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_NAME_STRATEGY);
+    assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_DEFINITION);
+    assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
+    assertThat(propertyDescriptors[3].getName()).isEqualTo(KEY_SCHEMA_TYPE);
+    assertThat(propertyDescriptors[4].getName()).isEqualTo(SERIALIZER_PROPERTY);
+    assertThat(propertyDescriptors[5].getName()).isEqualTo(KEY_SUBJECT_NAME);
   }
 }

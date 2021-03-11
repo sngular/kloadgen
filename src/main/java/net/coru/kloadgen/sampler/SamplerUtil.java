@@ -22,6 +22,7 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG_DEF
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KERBEROS_ENABLED;
+import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.LINGER_MS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.RECEIVE_BUFFER_CONFIG_DEFAULT;
@@ -116,7 +117,6 @@ public final class SamplerUtil {
     defaultParameters.addArgument(JAVA_SEC_KRB5_CONFIG, JAVA_SEC_KRB5_CONFIG_DEFAULT);
     defaultParameters.addArgument(SASL_KERBEROS_SERVICE_NAME, SASL_KERBEROS_SERVICE_NAME_DEFAULT);
     defaultParameters.addArgument(SASL_MECHANISM, SASL_MECHANISM_DEFAULT);
-    defaultParameters.addArgument(VALUE_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
     defaultParameters.addArgument(SSL_ENABLED, FLAG_NO);
     defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "<Keystore Location>");
@@ -231,6 +231,14 @@ public final class SamplerUtil {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     BaseLoadGenerator generator;
 
+    String valueNameStrategy = jMeterVariables.get(VALUE_NAME_STRATEGY);
+
+    if (Objects.isNull(valueNameStrategy)) {
+      props.put(VALUE_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
+    } else {
+      props.put(VALUE_NAME_STRATEGY, valueNameStrategy);
+    }
+
     if (Objects.nonNull(jMeterVariables.get(VALUE_SCHEMA_TYPE))) {
       if (JSON_TYPE_SET.contains(jMeterVariables.get(VALUE_SCHEMA_TYPE).toLowerCase())) {
         generator = new JsonLoadGenerator();
@@ -278,6 +286,14 @@ public final class SamplerUtil {
   public static BaseLoadGenerator configureKeyGenerator(Properties props) {
     JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     BaseLoadGenerator generator;
+
+    String keyNameStrategy = jMeterVariables.get(KEY_NAME_STRATEGY);
+
+    if (Objects.isNull(keyNameStrategy)) {
+      props.put(KEY_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
+    } else {
+      props.put(KEY_NAME_STRATEGY, keyNameStrategy);
+    }
 
     if (Objects.nonNull(jMeterVariables.get(KEY_SCHEMA_TYPE))) {
       if (JSON_TYPE_SET.contains(jMeterVariables.get(KEY_SCHEMA_TYPE).toLowerCase())) {

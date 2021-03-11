@@ -6,6 +6,7 @@
 
 package net.coru.kloadgen.config.keyfileserialized;
 
+import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_NAME_STRATEGY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
@@ -44,6 +45,8 @@ public class KeyFileSerializedConfigElement extends ConfigTestElement implements
 
   private String keySerializerConfiguration;
 
+  private String keyNameStrategy;
+
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
@@ -53,6 +56,7 @@ public class KeyFileSerializedConfigElement extends ConfigTestElement implements
     variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
     variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
     variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
+    variables.putObject(KEY_NAME_STRATEGY, keyNameStrategy);
     variables.putObject(SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 
