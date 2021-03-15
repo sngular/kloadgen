@@ -6,13 +6,13 @@
 
 package net.coru.kloadgen.sampler;
 
+import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.slf4j.Logger;
-
-import java.util.Properties;
 
 @Slf4j
 public class KafkaSampler extends AbstractKafkaSampler {
@@ -40,4 +40,8 @@ public class KafkaSampler extends AbstractKafkaSampler {
         return log;
     }
 
+    @Override
+    protected Object getValue(EnrichedRecord messageVal) {
+        return messageVal;
+    }
 }

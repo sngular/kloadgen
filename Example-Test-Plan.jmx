@@ -57,8 +57,7 @@
         <hashTree/>
         <net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="Value Schema Load Generator Config" enabled="true">
           <stringProp name="avroSubject"></stringProp>
-          <stringProp name="placeHolder">MESSAGE</stringProp>
-          <collectionProp name="schemaProperties">
+          <collectionProp name="valueSchemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.name</stringProp>
               <stringProp name="fieldType">string</stringProp>
@@ -81,12 +80,13 @@
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.timestamp</stringProp>
-              <stringProp name="fieldType">stringTimestamp</stringProp>
               <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">string</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.action</stringProp>
-              <stringProp name="fieldType">created</stringProp>
+              <stringProp name="fieldType">string</stringProp>
+              <stringProp name="fieldValuesList">created</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.name</stringProp>
@@ -99,18 +99,19 @@
               <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.classifiers[1].name</stringProp>
+              <stringProp name="fieldName">metadata.envelope.classifiers[].name</stringProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.classifiers[].values</stringProp>
+              <stringProp name="fieldName">metadata.envelope.classifiers[].values[]</stringProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string-array</stringProp>
-              <intProp name="valueLength">4</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.context</stringProp>
-              <stringProp name="fieldType">null</stringProp>
+              <stringProp name="fieldName">metadata.envelope.context</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">string</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.id</stringProp>
@@ -124,7 +125,8 @@
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.type</stringProp>
-              <stringProp name="fieldType">enum</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">string</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.brand_id</stringProp>
@@ -152,11 +154,13 @@
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.latitude</stringProp>
-              <stringProp name="fieldType">0</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">long</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.longitude</stringProp>
-              <stringProp name="fieldType">0</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">long</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.time_zone_id</stringProp>
@@ -168,27 +172,17 @@
               <intProp name="valueLength">3</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.location_ids</stringProp>
-              <stringProp name="fieldType">int-array</stringProp>
-              <intProp name="valueLength">2</intProp>
-            </elementProp>
-            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.entity_version</stringProp>
-              <stringProp name="fieldType">int</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.last_updated_date_time</stringProp>
-              <stringProp name="fieldType">longTimestamp</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.status</stringProp>
               <stringProp name="fieldType">enum</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.timestamp</stringProp>
-              <stringProp name="fieldType">longTimestamp</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">string</stringProp>
             </elementProp>
           </collectionProp>
+          <stringProp name="valueSubjectName">test</stringProp>
+          <stringProp name="valueSchemaType">AVRO</stringProp>
         </net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Producer Properties" enabled="true">
@@ -196,7 +190,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="bootstrap.servers" elementType="Argument">
                 <stringProp name="Argument.name">bootstrap.servers</stringProp>
-                <stringProp name="Argument.value">localhost:9092</stringProp>
+                <stringProp name="Argument.value">localhost:29092</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="zookeeper.servers" elementType="Argument">
@@ -329,19 +323,69 @@
                 <stringProp name="Argument.value">&lt;Truststore Password&gt;</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
-              <elementProp name="auto.register.schemas" elementType="Argument">
-                <stringProp name="Argument.name">auto.register.schemas</stringProp>
-                <stringProp name="Argument.value">true</stringProp>
+              <elementProp name="client.id" elementType="Argument">
+                <stringProp name="Argument.name">client.id</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="security.providers" elementType="Argument">
+                <stringProp name="Argument.name">security.providers</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.enabled.protocols" elementType="Argument">
+                <stringProp name="Argument.name">ssl.enabled.protocols</stringProp>
+                <stringProp name="Argument.value">TLSv1.2,TLSv1.3</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.endpoint.identification.algorithm" elementType="Argument">
+                <stringProp name="Argument.name">ssl.endpoint.identification.algorithm</stringProp>
+                <stringProp name="Argument.value">https</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.keymanager.algorithm" elementType="Argument">
+                <stringProp name="Argument.name">ssl.keymanager.algorithm</stringProp>
+                <stringProp name="Argument.value">SunX509</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.protocol" elementType="Argument">
+                <stringProp name="Argument.name">ssl.protocol</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.keystore.type" elementType="Argument">
+                <stringProp name="Argument.name">ssl.keystore.type</stringProp>
+                <stringProp name="Argument.value">JKS</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.provider" elementType="Argument">
+                <stringProp name="Argument.name">ssl.provider</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="ssl.protocol" elementType="Argument">
+                <stringProp name="Argument.name">ssl.protocol</stringProp>
+                <stringProp name="Argument.value">TLSv1.3</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="auto.register.schemas" elementType="Argument">
                 <stringProp name="Argument.name">auto.register.schemas</stringProp>
                 <stringProp name="Argument.value">true</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="key.serializer" elementType="Argument">
+                <stringProp name="Argument.name">key.serializer</stringProp>
+                <stringProp name="Argument.value">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+              <elementProp name="value.serializer" elementType="Argument">
+                <stringProp name="Argument.name">value.serializer</stringProp>
+                <stringProp name="Argument.value">net.coru.kloadgen.serializer.GenericAvroRecordBinarySerializer</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">net.coru.kloadgen.sampler.ConfluentKafkaSampler</stringProp>
+          <stringProp name="classname">net.coru.kloadgen.sampler.GenericBinaryKafkaSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">

@@ -13,27 +13,29 @@ ___
 
 KLoadGen includes eight main components
 
-  * **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class used:
+* **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class
+  used:
 
     * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer
 
-    * **Kafka Sampler** : Our own and simple Kafka Sampler
-
     * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer with avro json encode is configure by properties.
-    
+
     * **Generic Binary Kafka Sampler** : Simple Kafka Sampler where serializer with avro binary encoder is configure by properties.
 
-  * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
-    
-  * **Value Serialized Config** : This jmeter config element generates plaintext messages based on input schema template designed.
+* **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property
+  configurations.
 
-  * **Value File Serialized Config** : This jmeter config element allows to upload a value schema file instead to get it from the Schema Registry
+* **Value Serialized Config** : This jmeter config element generates plaintext messages based on input schema template designed.
 
-  * **Schema Registry Config** : This jmeter config element allows to configure the connection to a Schema Registry, security access,....
+* **Value File Serialized Config** : This jmeter config element allows to upload a value schema file instead to get it from the Schema
+  Registry
 
-  * **Key Serialized Config** : This jmeter config allows to configure a Key Schema from a Schema Registry
+* **Schema Registry Config** : This jmeter config element allows to configure the connection to a Schema Registry, security access,....
 
-  * **Key File Serialized Config** : This jmeter config allows to upload a key schema file instead to get it from the Schema Registry
+* **Key Serialized Config** : This jmeter config allows to configure a Key Schema from a Schema Registry
+
+* **Key File Serialized Config** : This jmeter config allows to upload a key schema file instead to get it from the Schema Registry
+
 ### Setup
 
 ___
@@ -97,7 +99,8 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **message.key.type**: Allow to specify the key type, used for random generated keys.
 * **message.key.value**: Allow to specify a fixed value, or a variable, with the key to pass through
 * **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
-* **value.serializer<sup>[1](#schematype)<sup>** : For plaintext config element value can be kept same as default but for serialized config element, value serializer can be "ObjectSerializer"
+* **value.serializer<sup>[1](#schematype)<sup>** : For plaintext config element value can be kept same as default but for serialized config
+  element, value serializer can be "ObjectSerializer"
 * **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
 * **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
 * **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
@@ -144,7 +147,7 @@ This screen will allow to choose a subject and download it schema.
 AVRO structure will be flattened and show in the table.
 We will see 4 columns where we will configure the Random Generator system.
 
-  * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
+  * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.PropClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
   * **Field Type** : Field type, like String, Int, Double, Array **Note** : if the field is an array of basic types it will be show as string-array, int-array,...
   * **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
   * **Field Values List** : Field possibles values which will be used by the Random Tool to generate values.

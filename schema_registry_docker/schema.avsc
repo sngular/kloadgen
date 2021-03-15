@@ -1,0 +1,179 @@
+{
+  "type": "record",
+  "name": "test_plan_subject",
+  "fields": [
+    {
+      "name": "metadata",
+      "type": {
+        "type":"record",
+        "name": "Metadata",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "string"
+          },
+          {
+            "name": "action",
+            "type": "string"
+          },
+          {
+            "name": "envelope",
+            "type": {
+              "type": "record",
+              "name": "Envelope",
+              "fields": [
+                {
+                  "name": "name",
+                  "type": "string"
+                },
+                {
+                  "name": "version",
+                  "type": "string"
+                },
+                {
+                  "name": "classifiers",
+                  "type": {
+                    "type": "array",
+                    "items": {
+                      "name": "classifier",
+                      "type": "record",
+                      "fields": [
+                        {
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "name": "values",
+                          "type": {
+                            "type": "array",
+                            "items": "string"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "name": "context",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "payload",
+      "type": {
+        "name": "Payload",
+        "type": "record",
+        "fields": [
+          {
+            "name": "entity",
+            "type": {
+              "type": "record",
+              "name": "Entity",
+              "fields": [
+                {
+                  "name": "id",
+                  "type": "int"
+                },
+                {
+                  "name": "code",
+                  "type": "string"
+                },
+                {
+                  "name": "type",
+                  "type": "string"
+                },
+                {
+                  "name": "brand_id",
+                  "type": "int"
+                },
+                {
+                  "name": "address",
+                  "type": {
+                    "type": "record",
+                    "name": "Address",
+                    "fields": [
+                      {
+                        "name": "address",
+                        "type": "string"
+                      },
+                      {
+                        "name": "city",
+                        "type": "string"
+                      },
+                      {
+                        "name": "zip_code",
+                        "type": "string"
+                      },
+                      {
+                        "name": "state",
+                        "type": "string"
+                      },
+                      {
+                        "name": "latitude",
+                        "type": "long"
+                      },
+                      {
+                        "name": "longitude",
+                        "type": "long"
+                      },
+                      {
+                        "name": "time_zone_id",
+                        "type": "int"
+                      },
+                      {
+                        "name": "country_iso",
+                        "type": "string"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "status",
+                  "type": [
+                    "null",
+                    {
+                      "type": "enum",
+                      "name": "Status",
+                      "symbols": [
+                        "UNKNOWN",
+                        "LIVE",
+                        "PAUSED",
+                        "CANCEL"
+                      ]
+                    }
+                  ],
+                  "default": null
+                }
+              ]
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}
