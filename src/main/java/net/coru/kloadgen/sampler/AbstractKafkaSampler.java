@@ -109,7 +109,9 @@ public abstract class AbstractKafkaSampler extends AbstractJavaSamplerClient imp
             }
         } else {
             logger().error("Failed to Generate message");
-            fillSampleResult(sampleResult,"Failed to Generate message",false);
+            fillSampleResult(sampleResult,
+                    "Failed to Generate message",
+                    false);
         }
         return sampleResult;
     }
