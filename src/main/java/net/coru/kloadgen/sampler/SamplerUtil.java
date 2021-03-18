@@ -58,6 +58,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
+import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
 import java.io.File;
@@ -85,6 +86,7 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.config.SslConfigs;
@@ -178,6 +180,78 @@ public final class SamplerUtil {
 
     verifySecurity(context, props);
 
+    return props;
+  }
+
+
+  public static Arguments getCommonConsumerDefaultParameters() {
+    Arguments defaultParameters = new Arguments();
+    defaultParameters.addArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS_CONFIG_DEFAULT);
+    defaultParameters.addArgument(ZOOKEEPER_SERVERS, ZOOKEEPER_SERVERS_DEFAULT);
+    defaultParameters.addArgument(KAFKA_TOPIC_CONFIG, KAFKA_TOPIC_CONFIG_DEFAULT);
+    defaultParameters.addArgument(ConsumerConfig.SEND_BUFFER_CONFIG, SEND_BUFFER_CONFIG_DEFAULT);
+    defaultParameters.addArgument(ConsumerConfig.RECEIVE_BUFFER_CONFIG, RECEIVE_BUFFER_CONFIG_DEFAULT);
+    defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
+    defaultParameters.addArgument(KEYED_MESSAGE_KEY, KEYED_MESSAGE_DEFAULT);
+    defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
+    defaultParameters.addArgument(MESSAGE_KEY_KEY_VALUE, MSG_KEY_VALUE);
+    defaultParameters.addArgument(KERBEROS_ENABLED, FLAG_NO);
+    defaultParameters.addArgument(JAAS_ENABLED, FLAG_NO);
+    defaultParameters.addArgument(JAVA_SEC_AUTH_LOGIN_CONFIG, JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT);
+    defaultParameters.addArgument(JAVA_SEC_KRB5_CONFIG, JAVA_SEC_KRB5_CONFIG_DEFAULT);
+    defaultParameters.addArgument(SASL_KERBEROS_SERVICE_NAME, SASL_KERBEROS_SERVICE_NAME_DEFAULT);
+    defaultParameters.addArgument(SASL_MECHANISM, SASL_MECHANISM_DEFAULT);
+    defaultParameters.addArgument(VALUE_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
+    defaultParameters.addArgument(SSL_ENABLED, FLAG_NO);
+    defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
+    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "<Keystore Location>");
+    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "<Keystore Password>");
+    defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "<Truststore Location>");
+    defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "<Truststore Password>");
+
+    defaultParameters.addArgument(ConsumerConfig.CLIENT_ID_CONFIG, "");
+    defaultParameters.addArgument(ConsumerConfig.SECURITY_PROVIDERS_CONFIG, "");
+    defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
+    defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
+    defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
+    defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, "");
+    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
+    defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
+    defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
+    defaultParameters.addArgument(ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
+    defaultParameters.addArgument("timeout.millis", "5000");
+    defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
+    return defaultParameters;
+  }
+
+  public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
+    Properties props = new Properties();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
+    if (Objects.nonNull(context.getParameter(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG))) {
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getParameter(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
+    }
+    if (Objects.nonNull(context.getParameter(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG))) {
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
+    }
+
+    props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ProducerConfig.SEND_BUFFER_CONFIG));
+    props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ProducerConfig.RECEIVE_BUFFER_CONFIG));
+    props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
+    props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
+    props.put(KAFKA_TOPIC_CONFIG, context.getParameter(KAFKA_TOPIC_CONFIG));
+    props.put(GROUP_ID_CONFIG, context.getParameter(GROUP_ID_CONFIG));
+    if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
+      props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+    }
+    Iterator<String> parameters = context.getParameterNamesIterator();
+    parameters.forEachRemaining(parameter -> {
+      if (parameter.startsWith("_")) {
+        props.put(parameter.substring(1), context.getParameter(parameter));
+      }
+    });
+
+    verifySecurity(context, props);
+    props.put("timeout.millis", context.getParameter("timeout.millis"));
     return props;
   }
 
