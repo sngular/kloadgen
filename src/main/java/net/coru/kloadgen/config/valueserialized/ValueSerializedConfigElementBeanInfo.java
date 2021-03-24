@@ -9,6 +9,7 @@ package net.coru.kloadgen.config.valueserialized;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import net.coru.kloadgen.property.editor.SerialisedSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.ValueSerializerPropertyEditor;
@@ -37,7 +38,7 @@ public class ValueSerializedConfigElementBeanInfo extends BeanInfoSupport {
     });
 
     PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);
-    nameStrategyPropertyProps.setPropertyEditorClass(ValueSerializerPropertyEditor.class);
+    nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
     nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     nameStrategyPropertyProps.setValue(DEFAULT, "");
     nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);

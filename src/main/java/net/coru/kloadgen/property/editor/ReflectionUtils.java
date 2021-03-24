@@ -8,10 +8,10 @@ import javax.swing.JComboBox;
 import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
 
-class SerializerUtils {
+class ReflectionUtils {
 
-  protected static void extractSerializers(JComboBox<String> serializerComboBox, Reflections reflections) {
-    Set<Class<? extends Serializer>> subTypes = reflections.getSubTypesOf(Serializer.class);
+  protected static void extractSerializers(JComboBox<String> serializerComboBox, Reflections reflections, Class reflectedClass) {
+    Set<Class<? extends Serializer>> subTypes = reflections.getSubTypesOf(reflectedClass);
     List<String> classList = new ArrayList<>();
 
     for (Class serializer : subTypes) {

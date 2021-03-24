@@ -47,7 +47,6 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
   }
 
   private void init() {
-
     fillSerializer(new JComboBox<>());
     panel.setLayout(new BorderLayout());
     panel.add(nameStrategyComboBox);
@@ -60,9 +59,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
             .setScanners(new SubTypesScanner()));
-
-    SerializerUtils.extractSerializers(nameStrategyComboBox, reflections);
-
+    ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
   }
 
   @Override

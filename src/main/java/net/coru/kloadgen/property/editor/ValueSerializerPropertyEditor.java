@@ -65,7 +65,7 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
                     "io.confluent.kafka.serializers"))
             .setScanners(new SubTypesScanner()));
 
-    SerializerUtils.extractSerializers(serializerComboBox, reflections);
+    ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
 
   }
 
