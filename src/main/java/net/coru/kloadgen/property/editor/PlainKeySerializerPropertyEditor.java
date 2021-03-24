@@ -62,7 +62,7 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
             .filterInputsBy(new FilterBuilder()
                 .includePackage("org.apache.kafka.common.serialization"))
             .setScanners(new SubTypesScanner()));
-    SerializerUtils.extractSerializers(serializerComboBox, reflections);
+    ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
   }
 
   @Override

@@ -59,7 +59,7 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
     Reflections reflections = new Reflections(new ConfigurationBuilder()
         .addUrls(ClasspathHelper.forClass(Serializer.class))
         .setScanners(new SubTypesScanner()));
-    SerializerUtils.extractSerializers(serializerComboBox, reflections);
+    ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
   }
 
   @Override
