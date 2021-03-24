@@ -171,12 +171,22 @@ public class AvroSchemaProcessor {
   }
 
   private Object createArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-    if (typesSet.contains(subSchema.getType())) {
-      FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
-      return randomToolAvro.generateRandomList(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(), arraySize);
+    if (ARRAY.equals(subSchema.getType())) {
+      if (typesSet.contains(subSchema.getElementType().getType())) {
+        return createArray(arraySize, fieldExpMappingsQueue);
+      } else {
+        return createObjectArray(subSchema.getElementType(), fieldName, arraySize, fieldExpMappingsQueue);
+      }
+    } else if (typesSet.contains(subSchema.getType())) {
+      return createArray(arraySize, fieldExpMappingsQueue);
     } else {
       return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
     }
+  }
+
+  private Object createArray(Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+      FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
+      return randomToolAvro.generateRandomList(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(), arraySize);
   }
 
   private Schema extractRecordSchema(Field field) {
