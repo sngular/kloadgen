@@ -325,7 +325,7 @@
               </elementProp>
               <elementProp name="ssl.endpoint.identification.algorithm" elementType="Argument">
                 <stringProp name="Argument.name">ssl.endpoint.identification.algorithm</stringProp>
-                <stringProp name="Argument.value">https</stringProp>
+                <stringProp name="Argument.value">&lt;Ssl identification algorithm&gt;</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="ssl.keymanager.algorithm" elementType="Argument">
