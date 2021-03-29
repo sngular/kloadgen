@@ -71,7 +71,7 @@ public class ProducerKeysHelper {
 
     public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
 
-    public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT = "true";
+    public static final String DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM = "<Ssl identification algorithm>";
 
     public static final String VALUE_NAME_STRATEGY = "value.subject.name.strategy";
 
