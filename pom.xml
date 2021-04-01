@@ -5,11 +5,7 @@
   <artifactId>kloadgen</artifactId>
 
   <groupId>net.coru</groupId>
-<<<<<<< HEAD
-  <version>3.3.3</version>
-=======
   <version>3.4.0</version>
->>>>>>> 0517131 (Simplify Samplers. Fix Array Generation Issue.)
   <modelVersion>4.0.0</modelVersion>
 
   <build>
