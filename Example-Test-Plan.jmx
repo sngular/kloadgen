@@ -409,6 +409,12 @@
           </collectionProp>
         </net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
         <hashTree/>
+        <net.coru.kloadgen.config.keysimple.KeySimpleConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.keysimple.KeySimpleConfigElement" testname="Key Plain Load Generator Config" enabled="true">
+          <stringProp name="keySerializerConfiguration">org.apache.kafka.common.serialization.StringSerializer</stringProp>
+          <stringProp name="keyType">string</stringProp>
+          <stringProp name="keyValue">${__RandomString(5,,)}</stringProp>
+        </net.coru.kloadgen.config.keysimple.KeySimpleConfigElement>
+        <hashTree/>
       </hashTree>
     </hashTree>
   </hashTree>
