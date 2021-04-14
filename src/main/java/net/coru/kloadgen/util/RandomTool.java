@@ -7,6 +7,7 @@
 package net.coru.kloadgen.util;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -15,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -26,12 +28,15 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class RandomTool {
 
-  public static final Set<String> VALID_TYPES = SetUtils.hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array", "boolean", "bytes");
+  protected static final Set<String> VALID_TYPES = SetUtils
+      .hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array",
+          "boolean", "bytes");
 
-  private RandomTool() {}
+  private RandomTool() {
+  }
 
   protected static Object generateRandomMap(String fieldType, Integer mapSize, List<String> fieldValueList, Integer arraySize,
-                                            Map<ConstraintTypeEnum, String> constrains) {
+      Map<ConstraintTypeEnum, String> constrains) {
     Object value;
     switch (fieldType) {
       case "int-map":
@@ -96,6 +101,9 @@ public final class RandomTool {
         break;
       case "short-array":
         value = generateShortArray(arraySize, valueLength, fieldValueList, constrains);
+        break;
+      case "float-array":
+        value = generateFloatArray(arraySize, valueLength, fieldValueList, constrains);
         break;
       case "string-array":
         value = generateStringArray(arraySize, valueLength, fieldValueList, constrains);
@@ -238,30 +246,30 @@ public final class RandomTool {
   }
 
   private static List<Short> generateShortArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
-                                                Map<ConstraintTypeEnum, String> constrains) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
+      Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<Short> shortArray = new ArrayList<>();
-    for (int i=0; i<size; i++) {
+    for (int i = 0; i < size; i++) {
       shortArray.add(getShortValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return shortArray;
   }
 
-  private static List<Float> generateFloatArray(Integer valueLength, List<String> fieldValueList, int arraySize,
-                                                Map<ConstraintTypeEnum, String> constrains) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
+  private static List<Float> generateFloatArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<Float> floatArray = new ArrayList<>();
-    for (int i=0; i<size; i++) {
+    for (int i = 0; i < size; i++) {
       floatArray.add(getFloatValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return floatArray;
   }
 
   private static List<String> generateStringArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
-                                                  Map<ConstraintTypeEnum, String> constrains) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
+      Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<String> stringArray = new ArrayList<>();
-    for (int i=0; i<size; i++) {
+    for (int i = 0; i < size; i++) {
       stringArray.add(getStringValueOrRandom(valueLength, fieldValueList, constrains));
     }
     return stringArray;
@@ -478,14 +486,17 @@ public final class RandomTool {
     if (!fieldValueList.isEmpty()) {
       value = Integer.parseInt(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      int minimum = calculateMinimum(constrains);
-      int maximum = calculateMaximum(valueLength, constrains);
+      int minimum = calculateMinimum(valueLength, constrains);
+      long maximum = calculateMaximum(valueLength, constrains);
+      if (Integer.MAX_VALUE < maximum) {
+        maximum = Integer.MAX_VALUE;
+      }
       if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
-        value = RandomUtils.nextInt(minimum, maximum) * multipleOf;
+        value = RandomUtils.nextInt(minimum, (int) maximum) * multipleOf;
       } else {
-        value = RandomUtils.nextInt(minimum, maximum);
+        value = RandomUtils.nextInt(minimum, (int) maximum);
       }
     }
     return value;
@@ -502,8 +513,8 @@ public final class RandomTool {
         value = Integer.parseInt(chosenValue);
       }
     } else {
-      int minimum = calculateMinimum(constrains);
-      int maximum = calculateMaximum(valueLength, constrains);
+      int minimum = calculateMinimum(valueLength, constrains);
+      long maximum = calculateMaximum(valueLength, constrains);
       if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
@@ -521,8 +532,8 @@ public final class RandomTool {
     if (!fieldValueList.isEmpty()) {
       value = Long.parseLong(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      int minimum = calculateMinimum(constrains);
-      int maximum = calculateMaximum(valueLength, constrains);
+      int minimum = calculateMinimum(valueLength, constrains);
+      long maximum = calculateMaximum(valueLength, constrains);
       if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
@@ -540,15 +551,16 @@ public final class RandomTool {
     if (!fieldValueList.isEmpty()) {
       value = Double.parseDouble(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      int minimum = calculateMinimum(constrains);
-      int maximum = calculateMaximum(valueLength, constrains);
+      int minimum = calculateMinimum(valueLength, constrains);
+      long maximum = calculateMaximum(valueLength, constrains);
       if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
         value = RandomUtils.nextDouble(minimum, maximum) * multipleOf;
       } else {
         value = RandomUtils.nextDouble(minimum, maximum);
-      }    }
+      }
+    }
     return value;
   }
 
@@ -558,8 +570,8 @@ public final class RandomTool {
     if (!fieldValuesList.isEmpty()) {
       value = Float.parseFloat(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
     } else {
-      int minimum = calculateMinimum(constrains);
-      int maximum = calculateMaximum(valueLength, constrains);
+      int minimum = calculateMinimum(valueLength, constrains);
+      long maximum = calculateMaximum(valueLength, constrains);
       if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
@@ -571,29 +583,38 @@ public final class RandomTool {
     return value;
   }
 
-
-  private static int calculateMaximum(Integer valueLength, Map<ConstraintTypeEnum, String> constrains) {
-    int maximum;
-    if (constrains.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
-      if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) {
-        maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1;
+  private static long calculateMaximum(Integer valueLength, Map<ConstraintTypeEnum, String> constrains) {
+    long maximum;
+    if (Objects.nonNull(valueLength) && valueLength > 1) {
+      if (constrains.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
+        if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) {
+          maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1L;
+        } else {
+          maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE));
+        }
       } else {
-        maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE));
+        maximum = BigDecimal.valueOf(10).pow(calculateSize(valueLength)).longValue();
       }
     } else {
-      maximum = 9 * (int) Math.pow(10, calculateSize(valueLength));
+      maximum = 10;
     }
     return maximum;
   }
 
-  private static int calculateMinimum(Map<ConstraintTypeEnum, String> constrains) {
-    int minimum = 1;
-    if (constrains.containsKey(ConstraintTypeEnum.MINIMUM_VALUE)) {
-      if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) {
-        minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
+  private static int calculateMinimum(Number valueLength, Map<ConstraintTypeEnum, String> constrains) {
+    int minimum;
+    if (Objects.nonNull(valueLength) && !valueLength.equals(0)) {
+      if (constrains.containsKey(ConstraintTypeEnum.MINIMUM_VALUE)) {
+        if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) {
+          minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
+        } else {
+          minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MINIMUM_VALUE));
+        }
       } else {
-        minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MINIMUM_VALUE));
+        minimum = BigDecimal.valueOf(10).pow(calculateSize(valueLength.intValue() - 1)).intValue();
       }
+    } else {
+      minimum = 0;
     }
     return minimum;
   }
@@ -601,9 +622,9 @@ public final class RandomTool {
   private static ByteBuffer getByteRandom(Integer valueLength) {
     ByteBuffer value;
     if (valueLength == 0) {
-      value =  ByteBuffer.wrap(RandomUtils.nextBytes(4));
+      value = ByteBuffer.wrap(RandomUtils.nextBytes(4));
     } else {
-      value =  ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
+      value = ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
     }
     return value;
   }
@@ -641,14 +662,14 @@ public final class RandomTool {
       value = Short.parseShort(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
       if (valueLength < 5 ) {
-        int minimum = calculateMinimum(constrains);
-        int maximum = calculateMaximum(valueLength, constrains);
+        int minimum = calculateMinimum(valueLength, constrains);
+        long maximum = calculateMaximum(valueLength, constrains);
         if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
           int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
           maximum = maximum > multipleOf ? maximum / multipleOf : maximum;
-          value = (short) (RandomUtils.nextInt(minimum, maximum) * multipleOf);
+          value = (short) (RandomUtils.nextInt(minimum, (short) maximum) * multipleOf);
         } else {
-          value = (short) RandomUtils.nextInt(minimum, maximum);
+          value = (short) RandomUtils.nextInt(minimum, (short) maximum);
         }
       } else {
         value = (short) RandomUtils.nextInt(1, 32767);
@@ -658,7 +679,7 @@ public final class RandomTool {
   }
 
   private static int calculateSize(int valueLength) {
-    return valueLength > 0 ? valueLength -1 : 0;
+    return Math.max(valueLength, 0);
   }
 
   private static Object getTimestampValueOrRandom(String type, List<String> fieldValueList) {

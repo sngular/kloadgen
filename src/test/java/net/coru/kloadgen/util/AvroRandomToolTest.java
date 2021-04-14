@@ -1,5 +1,8 @@
 package net.coru.kloadgen.util;
 
+import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -14,12 +17,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class AvroRandomToolTest {
 
-  private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 06, 12, 00, 00);
+  private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 6, 12, 0, 0);
 
   private static Stream<Arguments> parametersForGenerateRandomValueForField() {
     return Stream.of(
@@ -49,6 +49,31 @@ class AvroRandomToolTest {
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
     assertThat(new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field)).isEqualTo(expected);
+  }
+
+  private static Stream<Arguments> parametersForGenerateRandomValue() {
+    return Stream.of(
+        Arguments.of("int", 11, emptyList(), new Field("name", SchemaBuilder.builder().intType()), Math.pow(10, 9)),
+        Arguments.of("long", 11, emptyList(), new Field("name", SchemaBuilder.builder().longType()), Math.pow(10, 10)),
+        Arguments.of("double", 11, emptyList(), new Field("name", SchemaBuilder.builder().doubleType()), Math.pow(10, 10)),
+        Arguments.of("float", 11, emptyList(), new Field("name", SchemaBuilder.builder().floatType()), Math.pow(10, 10))
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateRandomValue")
+  void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Number expected) {
+    Object number = new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field);
+    assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
+    if (number instanceof Integer) {
+      assertThat((Integer) number).isGreaterThan(expected.intValue());
+    } else if (number instanceof Long) {
+      assertThat((Long) number).isGreaterThan(expected.longValue());
+    } else if (number instanceof Double) {
+      assertThat((Double) number).isGreaterThan(expected.doubleValue());
+    } else if (number instanceof Float) {
+      assertThat((Float) number).isGreaterThan(expected.floatValue());
+    }
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
