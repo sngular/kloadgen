@@ -307,7 +307,7 @@ public final class SamplerUtil {
       generator = new AvroLoadGenerator();
     }
 
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+    props.put(KEY_SERIALIZER_CLASS_CONFIG,
         Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
