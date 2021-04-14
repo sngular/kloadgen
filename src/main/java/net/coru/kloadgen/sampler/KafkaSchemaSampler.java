@@ -102,13 +102,13 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     }
 
     protected Properties properties(JavaSamplerContext context) {
-        Properties props = SamplerUtil.setupCommonProperties(context);
-        props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
+        Properties commonProps = SamplerUtil.setupCommonProperties(context);
+        commonProps.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
             context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false"));
         if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
-            props.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
+            commonProps.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
         }
-        return props;
+        return commonProps;
     }
 
     @Override
