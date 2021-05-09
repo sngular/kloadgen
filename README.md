@@ -13,14 +13,7 @@ ___
 
 KLoadGen includes eight main components
 
-* **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class
-  used:
-
-    * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer
-
-    * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer with avro json encode is configure by properties.
-
-    * **Generic Binary Kafka Sampler** : Simple Kafka Sampler where serializer with avro binary encoder is configure by properties.
+* **Kafka Schema Sampler** : This jmeter java sampler sends messages to kafka, it uses the value and key configuration and generate a data matching that definition. 
 
 * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property
   configurations.
@@ -35,6 +28,8 @@ KLoadGen includes eight main components
 * **Key Serialized Config** : This jmeter config allows to configure a Key Schema from a Schema Registry
 
 * **Key File Serialized Config** : This jmeter config allows to upload a key schema file instead to get it from the Schema Registry
+
+* **Key Simple Config** : This jmeter config allows to define a simple basic key to send into de message.
 
 ### Setup
 
@@ -96,11 +91,6 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
 * **kafka.topic.name** : Topic on which messages will be sent
 * **keyed.message** : Enable adding a Key to the messages
-* **message.key.type**: Allow to specify the key type, used for random generated keys.
-* **message.key.value**: Allow to specify a fixed value, or a variable, with the key to pass through
-* **key.serializer** : Key serializer (This is optional and can be kept as it is as we are not sending keyed messages).
-* **value.serializer<sup>[1](#schematype)<sup>** : For plaintext config element value can be kept same as default but for serialized config
-  element, value serializer can be "ObjectSerializer"
 * **compression.type** : kafka producer compression type(none/gzip/snappy/lz4)
 * **batch.size** : messages batch size(increased batch size with compression like lz4 gives better throughput)
 * **linger.ms** : How much maximum time producer should wait till batch becomes full(should be 5-10 when increased batch size and compression is enabled)
@@ -114,10 +104,20 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **java.security.auth.login.config** : jaas.conf of kafka Kerberos
 * **java.security.krb5.conf** : Kerberos server krb5.conf file
 * **sasl.kerberos.service.name** : Kafka Kerberos service name
+* **sasl.mechanism** : Configure SASL mechanism to use to connect to the kafka cluster. GSSAPI by default
+* **ssl.enabled** : SSL Flag enabled/disabled use of SSL. NO as Default.
+* **ssl.key.password** : SSL password
+* **ssl.keystore.location** : SSL Keystore location
+* **ssl.keystore.password** : SSL Keystore password
+* **ssl.truststore.location** : SSL Trust Store location
+* **ssl.truststore.password** : SSL Trust Store password
+* **client.id** : Kafka producer Client ID 
+* **security.providers** : 
+* **ssl.enabled.protocols** : SSL Enabled protocols TLSv1.2, TLSv1.3
+* **ssl.endpoint.identification.algorithm** : SSL endpoint Identification algorithm. Leave default value is you don't want to sent it.
 * **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing
-* **value.subject.name.strategy<sup>[3](#subjectstrategy)<sup>** : Allows to define the class which contains the Schema Subject name resolution strategy.
 
-![Kafka Producer Configuration](/Kafka_producer_properties.png)
+![Kafka Producer Configuration](/Kafka Producer Properties.png)
 
 ### Schema Registry Configuration
 
@@ -152,18 +152,15 @@ We will see 4 columns where we will configure the Random Generator system.
   * **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
   * **Field Values List** : Field possibles values which will be used by the Random Tool to generate values.
 
-![Load Generator Table](/Kafka_load_generator_Success.png)
+![Load Generator Table](/Value Schema Load Generator Config.png)
 
 ### Value File Load Generator Configuration
 
 This screen will allow to choose a schema from file(.avsc or.json).
 
-![File Generator Table](/Kafka_file_load_generator_config_dialog.png)
+![File Generator Table](/Value Schema File Load Generator Config.png)
 
 AVRO or Json structure will be flattened and show in the table.
-
-![File Generator Table](/Kafka_file_load_generator_config_comboBox.png)
-
 We will see 4 columns where we will configure the Random Generator system.
 
   * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array [] will appear at the end. If you want to define a specific size for the array just type the number.
@@ -174,20 +171,19 @@ We will see 4 columns where we will configure the Random Generator system.
       **Note** In "Field Type" if the field type is an array or a map you can define a specific number of random values(metadata.extensions.flows[].correlation[2]).
               In "Field Values List" if the field type is an array or a map you can define a specific list of values([1,2,3,4,5] or [ key1:value1, key2:value2, key3:value3]).
 
-
-![File Generator Table](/Kafka_file_load_generator_config_success.png)
-
 ### Key Schema Configuration
 
 Similar to the Value Schema configuration element, but focus to configure a Key Schema. Whatever schema define and configure here will be used as a Key Message.
-
-**NOTE**: This component requires the _keyed.message_ configuration variable to _YES_ in the sampler
 
 ### Key File Load Generator Configuration
 
 Similar to the Value File Schema configuration element, but focus to configure a Key Schema. Whatever schema define and configure here will be used as a Key Message.
 
-**NOTE**: This component requires the _keyed.message_ configuration variable to _YES_ in the sampler
+### Key Simple Generator Configuration
+
+Similar to the Value Schema configuration element, but focus to configure a Key Schema. Whatever schema define and configure here will be used as a Key Message.
+
+![Key Plain Load Generator Config](/Key Plain Load Generator Config.png)
 
 ### Schema Template Functions
 
@@ -236,7 +232,7 @@ Example:
 
 * key1:value, key2:value, key3:value -- Will generate a map with data in between (key1:value, key2:value, key3:value)
 
-* key1,key2,key3 -- Will generate a map with keys in between (key1,key2,key3) and value random generated
+* key1, key2, key3 -- Will generate a map with keys in between (key1,key2,key3) and value random generated
 
 #### Special types
 
@@ -302,7 +298,3 @@ And some optional ones who will let us configura the JMeter Engine and the test 
 ## Special Thanks
 
 * We would like to special thanks to [pepper-box](https://github.com/GSLabDev/pepper-box) for give us the base to create this plugin and the main ideas about how to face it.
-
-## Notes
-<a name="schematype">1</a>: Selection between AVRO or JSON wil be done by chose the serializer class here or "io.confluent.kafka.serializers.KafkaAvroSerializer" or "io.confluent.kafka.serializers.json.KafkaJsonSchemaSerializer" for now. We are working in a better way to identify the schema.
-<a name="subjectstrategy">2</a>: Is the way to resolve the Record Subject Name Strategy 

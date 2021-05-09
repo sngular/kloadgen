@@ -16,6 +16,10 @@ class ValueSerializedConfigElementBeanInfoTest {
 
   private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
+  private static final String VALUE_NAME_STRATEGY = "valueNameStrategy";
+
+  private static final String VALUE_SERIALIZER_CONFIGURATION = "valueSerializerConfiguration";
+
   private ValueSerializedConfigElementBeanInfo valueSerializedConfigElementBeanInfo;
 
   @BeforeEach
@@ -27,9 +31,11 @@ class ValueSerializedConfigElementBeanInfoTest {
   @Test
   void shouldGenerateElements() {
     PropertyDescriptor[] propertyDescriptors = valueSerializedConfigElementBeanInfo.getPropertyDescriptors();
-    assertThat(propertyDescriptors).hasSize(3);
-    assertThat(propertyDescriptors[0].getName()).isEqualTo(VALUE_SCHEMA_PROPERTIES);
-    assertThat(propertyDescriptors[1].getName()).isEqualTo(VALUE_SCHEMA_TYPE);
-    assertThat(propertyDescriptors[2].getName()).isEqualTo(VALUE_SUBJECT_NAME);
+    assertThat(propertyDescriptors).hasSize(5);
+    assertThat(propertyDescriptors[0].getName()).isEqualTo(VALUE_NAME_STRATEGY);
+    assertThat(propertyDescriptors[1].getName()).isEqualTo(VALUE_SCHEMA_PROPERTIES);
+    assertThat(propertyDescriptors[2].getName()).isEqualTo(VALUE_SCHEMA_TYPE);
+    assertThat(propertyDescriptors[3].getName()).isEqualTo(VALUE_SERIALIZER_CONFIGURATION);
+    assertThat(propertyDescriptors[4].getName()).isEqualTo(VALUE_SUBJECT_NAME);
   }
 }

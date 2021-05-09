@@ -22,7 +22,7 @@ public class RecordSubjectNameStrategy implements io.confluent.kafka.serializers
       return null;
     }
     return getRecordName(parsedSchema, isKey);
-   }
+  }
 
   protected String getRecordName(ParsedSchema schema, boolean isKey) {
     String name = ((AvroSchema) schema).rawSchema().getObjectProps().get("subject").toString();
@@ -33,12 +33,12 @@ public class RecordSubjectNameStrategy implements io.confluent.kafka.serializers
     // isKey is only used to produce more helpful error messages
     if (isKey) {
       throw new SerializationException("In configuration "
-              + AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY + " = "
-              + getClass().getName() + ", the message key must only be a record schema");
+          + AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY + " = "
+          + getClass().getName() + ", the message key must only be a record schema");
     } else {
       throw new SerializationException("In configuration "
-              + AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY + " = "
-              + getClass().getName() + ", the message value must only be a record schema");
+          + AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY + " = "
+          + getClass().getName() + ", the message value must only be a record schema");
     }
   }
 

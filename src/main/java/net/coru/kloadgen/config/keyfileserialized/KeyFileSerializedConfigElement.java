@@ -6,10 +6,13 @@
 
 package net.coru.kloadgen.config.keyfileserialized;
 
+import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_NAME_STRATEGY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -32,7 +35,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 @NoArgsConstructor
 public class KeyFileSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String keyName;
+  private String keySubjectName;
 
   private List<FieldValueMapping> keySchemaProperties;
 
@@ -40,14 +43,21 @@ public class KeyFileSerializedConfigElement extends ConfigTestElement implements
 
   private String keySchemaType;
 
+  private String keySerializerConfiguration;
+
+  private String keyNameStrategy;
+
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(KEY_SCHEMA, keySchemaDefinition);
     variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
-    variables.putObject(KEY_SUBJECT_NAME, keyName);
+    variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
     variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
+    variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
+    variables.putObject(KEY_NAME_STRATEGY, keyNameStrategy);
+    variables.putObject(SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 
 }

@@ -10,6 +10,8 @@ import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
+import net.coru.kloadgen.property.editor.KeySerializerPropertyEditor;
+import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
@@ -18,7 +20,7 @@ import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String KEY_NAME = "keyName";
+  private static final String KEY_SUBJECT_NAME = "keySubjectName";
 
   private static final String KEY_SCHEMA_PROPERTIES = "keySchemaProperties";
 
@@ -26,15 +28,31 @@ public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String KEY_SCHEMA_TYPE = "keySchemaType";
 
+  private static final String KEY_SERIALIZER_PROPERTY = "keySerializerConfiguration";
+
+  private static final String KEY_NAME_STRATEGY = "keyNameStrategy";
+
   public KeyFileSerializedConfigElementBeanInfo() {
 
     super(KeyFileSerializedConfigElement.class);
 
     createPropertyGroup("key_serialized_load_generator", new String[]{
-            KEY_SCHEMA_TYPE, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_DEFINITION, KEY_NAME
+            KEY_NAME_STRATEGY, KEY_SERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION, KEY_SCHEMA_PROPERTIES
     });
 
-    PropertyDescriptor subjectNameProps = property(KEY_NAME);
+    PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
+    nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
+    nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    nameStrategyPropertyProps.setValue(DEFAULT, "");
+    nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+    PropertyDescriptor serializerPropertyProps = property(KEY_SERIALIZER_PROPERTY);
+    serializerPropertyProps.setPropertyEditorClass(KeySerializerPropertyEditor.class);
+    serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    serializerPropertyProps.setValue(DEFAULT, "");
+    serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+    PropertyDescriptor subjectNameProps = property(KEY_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "");

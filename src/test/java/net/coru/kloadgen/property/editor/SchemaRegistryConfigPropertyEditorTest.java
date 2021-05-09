@@ -38,7 +38,7 @@ class SchemaRegistryConfigPropertyEditorTest {
   }
 
   @Test
-  public void testPropertyEditorInit() {
+  void testPropertyEditorInit() {
     assertThat(propertyEditor.getCustomEditor()).isInstanceOf(JPanel.class);
 
     JPanel panel = (JPanel) propertyEditor.getCustomEditor();
@@ -48,7 +48,7 @@ class SchemaRegistryConfigPropertyEditorTest {
   }
 
   @Test
-  public void testPropertyEditorSetValue() {
+  void testPropertyEditorSetValue() {
     propertyEditor.setValue("http://localhost:8081");
     assertThat(propertyEditor.getValue()).isEqualTo("http://localhost:8081");
   }

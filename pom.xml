@@ -5,7 +5,7 @@
   <artifactId>kloadgen</artifactId>
 
   <groupId>net.coru</groupId>
-  <version>3.3.3</version>
+  <version>3.4.0</version>
   <modelVersion>4.0.0</modelVersion>
 
   <build>
@@ -168,6 +168,11 @@
       <groupId>com.github.curious-odd-man</groupId>
       <artifactId>rgxgen</artifactId>
       <version>1.2</version>
+    </dependency>
+    <dependency>
+      <artifactId>reflections</artifactId>
+      <groupId>org.reflections</groupId>
+      <version>0.9.12</version>
     </dependency>
     <!-- Options -->
     <dependency>
