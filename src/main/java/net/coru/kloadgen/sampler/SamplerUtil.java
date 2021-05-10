@@ -12,6 +12,7 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.BOOTSTRAP_SERVERS_CONFIG
 import static net.coru.kloadgen.util.ProducerKeysHelper.BUFFER_MEMORY_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.COMPRESSION_TYPE_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM;
+import static net.coru.kloadgen.util.ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_NO;
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
 import static net.coru.kloadgen.util.ProducerKeysHelper.JAAS_ENABLED;
@@ -46,6 +47,8 @@ import static net.coru.kloadgen.util.PropsKeysHelper.KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
@@ -57,8 +60,8 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
-import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
 import java.io.File;
@@ -77,7 +80,6 @@ import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
-import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.SchemaRegistryKeyHelper;
 import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
@@ -135,7 +137,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
-    defaultParameters.addArgument(ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
+    defaultParameters.addArgument(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
 
     return defaultParameters;
   }
@@ -192,7 +194,6 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ConsumerConfig.SEND_BUFFER_CONFIG, SEND_BUFFER_CONFIG_DEFAULT);
     defaultParameters.addArgument(ConsumerConfig.RECEIVE_BUFFER_CONFIG, RECEIVE_BUFFER_CONFIG_DEFAULT);
     defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
-    defaultParameters.addArgument(KEYED_MESSAGE_KEY, KEYED_MESSAGE_DEFAULT);
     defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
     defaultParameters.addArgument(MESSAGE_KEY_KEY_VALUE, MSG_KEY_VALUE);
     defaultParameters.addArgument(KERBEROS_ENABLED, FLAG_NO);
@@ -218,7 +219,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
-    defaultParameters.addArgument(ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
+    defaultParameters.addArgument(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
     defaultParameters.addArgument("timeout.millis", "5000");
     defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
     return defaultParameters;

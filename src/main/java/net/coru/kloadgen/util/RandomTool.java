@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Getter;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import org.apache.commons.collections4.SetUtils;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class RandomTool {
 
+  @Getter
   protected static final Set<String> VALID_TYPES = SetUtils
       .hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array",
           "boolean", "bytes");

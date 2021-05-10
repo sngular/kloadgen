@@ -141,7 +141,7 @@ public class AvroExtractor {
     chosenType = extractTypeName(types.get(1)).equalsIgnoreCase("array") ? types.get(1) : chosenType;
     String chosenTypeName = extractTypeName(chosenType);
 
-    if (! RandomTool.VALID_TYPES.contains(chosenTypeName)) {
+    if (!RandomTool.getVALID_TYPES().contains(chosenTypeName)) {
       chosenTypeName = "null";
     } else if ("array".equalsIgnoreCase(chosenTypeName)) {
       chosenTypeName = "int-array";
