@@ -16,6 +16,7 @@ import net.coru.kloadgen.model.json.Schema;
 import net.coru.kloadgen.model.json.StringField;
 import net.coru.kloadgen.model.json.UUIDField;
 import net.coru.kloadgen.testutil.FileHelper;
+import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -57,7 +58,7 @@ class JSONSchemaParserTest {
   }
 
   private boolean multiTypeTestStringOrNumber(Object field) {
-    Set<String> propertyNames = Set.of("id", "version", "dtype", "timestamp", "event_type");
+    Set<String> propertyNames = SetUtils.hashSet("id", "version", "dtype", "timestamp", "event_type");
     return (field instanceof StringField || field instanceof NumberField || field instanceof UUIDField) &&
         propertyNames.contains(((Field)field).getName());
   }

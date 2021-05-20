@@ -32,12 +32,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Stream;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.SchemaExtractor;
@@ -77,7 +72,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     }
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
-    SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
+    SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(Arrays.asList(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000, Arrays.asList(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());

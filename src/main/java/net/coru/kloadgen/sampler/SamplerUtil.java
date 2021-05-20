@@ -73,6 +73,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.StatelessRandomTool;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -88,7 +89,7 @@ public final class SamplerUtil {
 
   private static final StatelessRandomTool statelessRandomTool = new StatelessRandomTool();
 
-  private static final Set<String> JSON_TYPE_SET = Set.of("json-schema", "json");
+  private static final Set<String> JSON_TYPE_SET = SetUtils.hashSet("json-schema", "json");
 
   private SamplerUtil() { }
 

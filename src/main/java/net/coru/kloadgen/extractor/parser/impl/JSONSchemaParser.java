@@ -35,6 +35,7 @@ import net.coru.kloadgen.model.json.UUIDField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -352,7 +353,7 @@ public class JSONSchemaParser implements SchemaParser {
       int maxLength = getSafeInt(jsonNode, "maxLength");
       String format = getSafeText(jsonNode, "format");
       if (Objects.nonNull(format)) {
-        if (Set.of("date-time", "time", "date").contains(format)) {
+        if (SetUtils.hashSet("date-time", "time", "date").contains(format)) {
           result = DateField.builder().name(fieldName).format(format).build();
         } else if ("uuid".equals(format)) {
           result = UUIDField.builder().name(fieldName).build();

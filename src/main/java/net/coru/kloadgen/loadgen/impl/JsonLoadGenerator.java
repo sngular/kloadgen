@@ -15,6 +15,7 @@ import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,7 @@ public class JsonLoadGenerator implements BaseLoadGenerator {
   }
 
   private ParsedSchema retrieveSchema(Map<String, String> originals, String avroSchemaName) throws IOException, RestClientException {
-    schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000, List.of(new JsonSchemaProvider()), originals);
+    schemaRegistryClient = new CachedSchemaRegistryClient(Arrays.asList(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000, Arrays.asList(new JsonSchemaProvider()), originals);
 
     return getSchemaBySubject(avroSchemaName);
   }

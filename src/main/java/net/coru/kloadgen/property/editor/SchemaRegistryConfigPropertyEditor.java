@@ -36,11 +36,7 @@ import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -170,7 +166,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
                     originals.put(USER_INFO_CONFIG,schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
                 }
             }
-            SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
+            SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(Arrays.asList(getAsText()), 1000, Arrays.asList(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
 
             List<String> subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());
             JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, schemaRegistryUrl.getText());

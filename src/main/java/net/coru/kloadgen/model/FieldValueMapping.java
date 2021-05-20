@@ -52,7 +52,7 @@ public class FieldValueMapping extends AbstractTestElement {
 
     public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList) {
         this.setFieldName(fieldName);
-        this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
+        this.setValueLength(Objects.isNull(valueLength)?0:valueLength);
         this.setFieldType(fieldType);
         this.setFieldValuesList(valueList);
     }
@@ -61,9 +61,9 @@ public class FieldValueMapping extends AbstractTestElement {
     public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String fieldValueList,
         Map<ConstraintTypeEnum, String> constrains) {
         this.setFieldName(fieldName);
-        this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
+        this.setValueLength(Objects.isNull(valueLength)?0:valueLength);
         this.setFieldType(fieldType);
-        this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
+        this.setFieldValuesList(Objects.isNull(fieldValueList)?"":fieldValueList);
         this.constrains = constrains;
     }
 
