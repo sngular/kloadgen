@@ -61,6 +61,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
 
@@ -222,6 +223,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
     defaultParameters.addArgument("timeout.millis", "5000");
     defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
+    defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG, "earliest");
     return defaultParameters;
   }
 
