@@ -2,10 +2,12 @@ package net.coru.kloadgen.sampler;
 
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.salesforce.kafka.test.junit5.SharedKafkaTestResource;
 import com.salesforce.kafka.test.listeners.PlainListener;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.jmeter.config.Arguments;
@@ -22,7 +24,7 @@ public class ConsumerTest {
           new SharedKafkaTestResource()
             .registerListener(new PlainListener().onPorts(1234))
             .withBrokers(1)
-            .withBrokerProperty("auto.create.topics.enable", "false");;
+            .withBrokerProperty("auto.create.topics.enable", "false");
 
   private KafkaConsumerSampler consumerSampler;
 
@@ -38,15 +40,19 @@ public class ConsumerTest {
     consumerArguments.addArgument(KAFKA_TOPIC_CONFIG, "testTopic");
     consumerArguments.removeArgument("timeout.millis");
     consumerArguments.addArgument("timeout.millis", "20000");
+    consumerArguments.addArgument(VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
 
     JavaSamplerContext javaSamplerContext = new JavaSamplerContext(consumerArguments);
     sharedKafkaTestResource.getKafkaTestUtils().waitForBrokerToComeOnLine(1, 10, TimeUnit.SECONDS);
     sharedKafkaTestResource.getKafkaTestUtils().createTopic("testTopic", 2, (short) 1);
     consumerSampler.setupTest(javaSamplerContext);
-    var produced = sharedKafkaTestResource.getKafkaTestUtils().produceRecords(1, "testTopic", 1);
+
+    sharedKafkaTestResource.getKafkaTestUtils().produceRecords(Map.of("key".getBytes(), "value".getBytes()), "testTopic", 0);
     SampleResult result = consumerSampler.runTest(javaSamplerContext);
-    assertThat(result).isNotNull().hasFieldOrPropertyWithValue("success", false);
-    assertThat(sharedKafkaTestResource.getKafkaTestUtils().consumeAllRecordsFromTopic("testTopic")).hasSize(1);
+    assertThat(result)
+            .isNotNull()
+            .hasFieldOrPropertyWithValue("success", true);
+    assertThat(result.getResponseDataAsString()).isEqualToIgnoringCase("{ key: key, value: value }");
   }
 }
 

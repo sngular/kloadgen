@@ -6,25 +6,25 @@
 
 package net.coru.kloadgen.sampler;
 
-import static java.util.Collections.singletonList;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Properties;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Transformer;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -32,6 +32,8 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 
 @Slf4j
@@ -49,8 +51,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
   public Properties properties (JavaSamplerContext context) {
     Properties props = SamplerUtil.setupCommonConsumerProperties(context);
-    props.put(KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-    props.put(VALUE_DESERIALIZER_CLASS_CONFIG, "net.coru.kloadgen.serializer.AvroDeserializer");
     props.put(MAX_POLL_RECORDS_CONFIG,"1");
     props.put(ENABLE_AUTO_COMMIT_CONFIG, "false");
     props.put(SESSION_TIMEOUT_MS_CONFIG,"10000");
@@ -69,7 +69,15 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
     String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
     consumer = new KafkaConsumer<>(props);
-    consumer.subscribe(singletonList(topic));
+    Collection<TopicPartition> partitionList = CollectionUtils.collect(
+            consumer.partitionsFor(topic),
+            transform());
+    consumer.assign(partitionList);
+    consumer.seekToBeginning(partitionList);
+  }
+
+  private Transformer<PartitionInfo, TopicPartition> transform() {
+    return partitionInfo -> new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
   }
 
   @Override
@@ -80,7 +88,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
       boolean running = true;
       Instant startTime = Instant.now();
       while (running) {
-        ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(1, ChronoUnit.SECONDS));
+        ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(5, ChronoUnit.SECONDS));
         if (!records.isEmpty()) {
           running=false;
           ConsumerRecord<Object, Object> record = records.iterator().next();
@@ -92,9 +100,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
           throw new KLoadGenException("Time Out in Consumer");
         }
       }
-    } catch (KLoadGenException e) {
-      logger().error("Failed to receive message", e);
-      fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "", false);
     } catch (Exception e) {
       logger().error("Failed to receive message", e);
       fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "", false);
@@ -107,7 +112,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   }
 
   private String prettify(ConsumerRecord<Object, Object> record) {
-    return "{ key:" + record.key() + ", value:" + record.value() +"}";
+    return "{ key: " + record.key() + ", value: " + record.value() +" }";
   }
 
   private void fillSampleResult(SampleResult sampleResult, String responseData, boolean successful) {

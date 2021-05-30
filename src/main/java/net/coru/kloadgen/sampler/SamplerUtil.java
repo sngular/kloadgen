@@ -232,13 +232,17 @@ public final class SamplerUtil {
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
     if (Objects.nonNull(context.getParameter(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG))) {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getParameter(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
+    } else {
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
     if (Objects.nonNull(context.getParameter(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG))) {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getParameter(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
+    } else {
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
 
-    props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ProducerConfig.SEND_BUFFER_CONFIG));
-    props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ProducerConfig.RECEIVE_BUFFER_CONFIG));
+    props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
+    props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
     props.put(KAFKA_TOPIC_CONFIG, context.getParameter(KAFKA_TOPIC_CONFIG));
