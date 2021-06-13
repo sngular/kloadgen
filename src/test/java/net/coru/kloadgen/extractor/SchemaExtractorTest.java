@@ -97,7 +97,7 @@ class SchemaExtractorTest {
         .hasSize(2)
         .containsExactlyInAnyOrder(
         new FieldValueMapping("name", "string"),
-        new FieldValueMapping("values[]", "string-map-array")
+        new FieldValueMapping("values[][]", "string-map-array")
     );
   }
 
@@ -113,7 +113,26 @@ class SchemaExtractorTest {
         .containsExactlyInAnyOrder(
             new FieldValueMapping("mapOfString[]", "string-map"),
             new FieldValueMapping("arrayOfString[]", "string-array"),
-            new FieldValueMapping("arrayOfMap[]", "string-map-array")
+            new FieldValueMapping("arrayOfMap[][]", "string-map-array")
         );
+  }
+
+  @Test
+  void testFlatPropertiesMap() throws IOException {
+
+    File testFile = fileHelper.getFile("/avro-files/testMap.avsc");
+
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
+
+    assertThat(fieldValueMappingList)
+      .hasSize(6)
+      .containsExactlyInAnyOrder(
+              new FieldValueMapping("theMap[][].addType.addTypeId", "string"),
+              new FieldValueMapping("theMap[][].addType.name", "string"),
+              new FieldValueMapping("theMap[][].addType.otherField", "string"),
+              new FieldValueMapping("theMap[][].addAmount", "bytes"),
+              new FieldValueMapping("theMap[][].addCode", "string"),
+              new FieldValueMapping("theMap[][].metadata[]", "string-map")
+      );
   }
 }

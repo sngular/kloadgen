@@ -1,0 +1,74 @@
+{
+  "name": "details",
+  "type" : "record",
+  "fields" :[
+    {
+      "name": "theMap",
+      "type": {
+        "type": "map",
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "AdditionalDetails",
+            "fields": [
+              {
+                "name": "addType",
+                "type": {
+                  "name": "AddType",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "addTypeId",
+                      "type": "string"
+                    },
+                    {
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "name": "otherField",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "default": null
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "addAmount",
+                "type": {
+                  "type": "bytes",
+                  "logicalType": "decimal",
+                  "precision": 15,
+                  "scale": 5
+                }
+              },
+              {
+                "name": "addCode",
+                "type": [
+                  "null",
+                  "string"
+                ],
+                "default": null
+              },
+              {
+                "name": "metadata",
+                "type": [
+                  "null",
+                  {
+                    "type": "map",
+                    "values": "string"
+                  }
+                ],
+                "default": null
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
