@@ -230,13 +230,13 @@ public final class SamplerUtil {
   public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
     Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-    if (Objects.nonNull(context.getParameter(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG))) {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getParameter(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG));
+    if (Objects.nonNull(context.getJMeterVariables().get(KEY_SERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_SERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
-    if (Objects.nonNull(context.getParameter(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG))) {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getParameter(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
+    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_SERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(VALUE_SERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }

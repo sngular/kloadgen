@@ -40,13 +40,17 @@ public class PropsKeysHelper {
 
     public static final String KEY_SCHEMA_PROPERTIES = "key.schema.properties";
 
-    public static final String KEY_SCHEMA_TYPE = "key.schema.type";
+  public static final String KEY_SCHEMA_TYPE = "key.schema.type";
 
-    public static final String KEY_VALUE = "key.value";
+  public static final String KEY_VALUE = "key.value";
 
-    public static final String KEY_TYPE = "key.type";
+  public static final String KEY_TYPE = "key.type";
 
-    public static final String VALUE_SERIALIZER_CLASS_PROPERTY = "value.serializer.class.property";
+  public static final String VALUE_SERIALIZER_CLASS_PROPERTY = "value.serializer.class.property";
 
-    public static final String KEY_SERIALIZER_CLASS_PROPERTY = "key.serializer.class.property";
+  public static final String KEY_SERIALIZER_CLASS_PROPERTY = "key.serializer.class.property";
+
+  public static final String VALUE_DESERIALIZER_CLASS_PROPERTY = "value.deserializer.class.property";
+
+  public static final String KEY_DESERIALIZER_CLASS_PROPERTY = "key.deserializer.class.property";
 }
