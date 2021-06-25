@@ -34,7 +34,7 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
 
   private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
-  private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeSerializerConfiguration";
+  private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeserializerConfiguration";
 
   private static final String VALUE_NAME_STRATEGY = "valueNameStrategy";
 

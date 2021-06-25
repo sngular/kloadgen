@@ -10,24 +10,27 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.keydeserialized;
+package net.coru.kloadgen.config.keyfiledeserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.KeyDeserializerPropertyEditor;
 import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
+import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
-import net.coru.kloadgen.property.editor.SerialisedSubjectPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
-public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
+public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String KEY_SUBJECT_NAME = "keySubjectName";
 
   private static final String KEY_SCHEMA_PROPERTIES = "keySchemaProperties";
+
+  private static final String KEY_SCHEMA_DEFINITION = "keySchemaDefinition";
 
   private static final String KEY_SCHEMA_TYPE = "keySchemaType";
 
@@ -35,12 +38,12 @@ public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String KEY_NAME_STRATEGY = "keyNameStrategy";
 
-  public KeyDeserializedConfigElementBeanInfo() {
+  public KeyFileDeserializedConfigElementBeanInfo() {
 
-    super(KeyDeserializedConfigElement.class);
+    super(KeyFileDeserializedConfigElement.class);
 
     createPropertyGroup("key_deserialized_load_generator", new String[]{
-        KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, KEY_SUBJECT_NAME, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
+        KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION, KEY_SCHEMA_PROPERTIES
     });
 
     PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
@@ -54,6 +57,24 @@ public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     serializerPropertyProps.setValue(DEFAULT, "");
     serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+    PropertyDescriptor subjectNameProps = property(KEY_SUBJECT_NAME);
+    subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
+    subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    subjectNameProps.setValue(DEFAULT, "");
+    subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+    PropertyDescriptor schemaType = property(KEY_SCHEMA_TYPE);
+    schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
+    schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    schemaType.setValue(DEFAULT, "");
+    schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+    PropertyDescriptor avroSchemaProps = property(KEY_SCHEMA_DEFINITION);
+    avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
+    avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    avroSchemaProps.setValue(DEFAULT, "");
+    avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     TypeEditor tableEditor = TypeEditor.TableEditor;
     PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
@@ -74,16 +95,5 @@ public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
         });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
-
-    PropertyDescriptor subjectNameProps = property(KEY_SUBJECT_NAME);
-    subjectNameProps.setPropertyEditorClass(SerialisedSubjectPropertyEditor.class);
-    subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
-
-    PropertyDescriptor schemaType = property(KEY_SCHEMA_TYPE);
-    schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
-    schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    schemaType.setValue(DEFAULT, "<avro subject>");
-    schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
   }
 }

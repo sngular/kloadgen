@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.kafka.common.serialization.Deserializer;
-import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -62,11 +61,11 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Deserializer.class))
             .filterInputsBy(new FilterBuilder()
-                .includePackage("net.coru.kloadgen.deserializer",
-                    "io.confluent.kafka.deserializers"))
+                .includePackage("net.coru.kloadgen.serializer",
+                    "io.confluent.kafka.serializers"))
             .setScanners(new SubTypesScanner()));
 
-    ReflectionUtils.extractSerializers(deserializerComboBox, reflections, Serializer.class);
+    ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
 
   }
 

@@ -10,10 +10,11 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.keydeserialized;
+package net.coru.kloadgen.config.keyfiledeserialized;
 
 import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_NAME_STRATEGY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
@@ -38,11 +39,13 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-public class KeyDeserializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
+public class KeyFileDeserializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String keySubjectName;
 
   private List<FieldValueMapping> keySchemaProperties;
+
+  private String keySchemaDefinition;
 
   private String keySchemaType;
 
@@ -54,8 +57,9 @@ public class KeyDeserializedConfigElement extends ConfigTestElement implements T
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
+    variables.putObject(KEY_SCHEMA, keySchemaDefinition);
     variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
+    variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
     variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
     variables.putObject(KEY_DESERIALIZER_CLASS_PROPERTY, keyDeserializerConfiguration);
     variables.putObject(KEY_NAME_STRATEGY, keyNameStrategy);
