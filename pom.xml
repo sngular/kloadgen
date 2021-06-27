@@ -5,7 +5,7 @@
   <artifactId>kloadgen</artifactId>
 
   <groupId>net.coru</groupId>
-  <version>3.4.0</version>
+  <version>3.5.0</version>
   <modelVersion>4.0.0</modelVersion>
 
   <build>
@@ -66,6 +66,11 @@
     </resources>
   </build>
   <dependencies>
+    <dependency>
+      <groupId>org.conscrypt</groupId>
+      <artifactId>conscrypt-openjdk-uber</artifactId>
+      <version>2.5.2</version>
+    </dependency>
     <dependency>
       <artifactId>jorphan</artifactId>
       <groupId>org.apache.jmeter</groupId>
@@ -281,6 +286,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-shade-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
             <configuration>
               <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
               <filters>
@@ -297,10 +303,51 @@
                   <goal>shade</goal>
                 </goals>
                 <phase>package</phase>
+                <configuration>
+                  <minimizeJar>true</minimizeJar>
+                  <filters>
+                    <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                        <excludeScope>system</excludeScope>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                      </excludes>
+                    </filter>
+                  </filters>
+                  <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                </configuration>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <version>2.4.2</version>
+            <artifactId>maven-jarsigner-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <id>sign</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <keystore>${basedir}/keystore.jks</keystore>
+              <alias>kloadgencert</alias>
+              <storepass>kloadgen2021</storepass>
+              <keypass>kloadgen2021</keypass>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -358,13 +405,16 @@
             <executions>
               <execution>
                 <configuration>
+                  <minimizeJar>true</minimizeJar>
                   <filters>
                     <filter>
                       <artifact>*:*</artifact>
                       <excludes>
+                        <excludeScope>system</excludeScope>
                         <exclude>META-INF/*.SF</exclude>
                         <exclude>META-INF/*.DSA</exclude>
                         <exclude>META-INF/*.RSA</exclude>
+                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
                       </excludes>
                     </filter>
                   </filters>
@@ -488,7 +538,7 @@
   <repositories>
     <repository>
       <id>confluent</id>
-      <url>http://packages.confluent.io/maven/</url>
+      <url>https://packages.confluent.io/maven/</url>
     </repository>
   </repositories>
 </project>

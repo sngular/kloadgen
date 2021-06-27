@@ -68,31 +68,24 @@ public class AvroSchemaProcessor {
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
       while (!fieldExpMappingsQueue.isEmpty()) {
         String cleanPath = cleanUpPath(fieldValueMapping, "");
-        if (cleanPath.contains("[")) {
-          String fieldName = getCleanMethodName(fieldValueMapping, "");
-          if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
-            fieldExpMappingsQueue.remove();
-            entity.put(fieldName, createSimpleTypeMap(fieldValueMapping.getFieldType(),
-                calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getFieldValuesList()));
-            fieldValueMapping = fieldExpMappingsQueue.peek();
-          } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
-            fieldExpMappingsQueue.remove();
-            entity.put(fieldName, createSimpleTypeMapArray(fieldValueMapping.getFieldType(),
-                calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getValueLength(),
-                fieldValueMapping.getFieldValuesList()));
-            fieldValueMapping = fieldExpMappingsQueue.peek();
+        String fieldName = getCleanMethodName(fieldValueMapping, "");
+        if (cleanPath.contains("][")) {
+          if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
+            fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, entity, fieldName);
+          } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
+            fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, entity, fieldName);
           } else {
-            entity.put(fieldName,
-                createArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
-                    fieldName,
-                    calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                    fieldExpMappingsQueue));
-            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, entity, fieldName);
+          }
+        } else if (cleanPath.contains("[")) {
+          if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
+            fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, entity, fieldName);
+          } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
+            fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, entity, fieldName);
+          } else {
+            fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, entity, fieldName);
           }
         } else if (cleanPath.contains(".")) {
-          String fieldName = getCleanMethodName(fieldValueMapping, "");
           entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
@@ -106,6 +99,43 @@ public class AvroSchemaProcessor {
       }
     }
     return new EnrichedRecord(metadata, entity);
+  }
+
+  private boolean checkIfMap(String type) {
+    return type.endsWith("map");
+  }
+
+  private boolean checkIfMapArray(String type) {
+    return type.endsWith("map-array");
+  }
+
+  private FieldValueMapping processFieldValueMappingAsSimpleMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    fieldExpMappingsQueue.remove();
+    entity.put(fieldName, createSimpleTypeMap(fieldValueMapping.getFieldType(),
+                                              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                              fieldValueMapping.getFieldValuesList()));
+    return fieldExpMappingsQueue.peek();
+  }
+
+  private FieldValueMapping processFieldValueMappingAsSimpleMapArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    entity.put(fieldName,
+               createArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
+                           fieldName,
+                           calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                           fieldExpMappingsQueue));
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private FieldValueMapping processFieldValueMappingAsSimpleArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    fieldExpMappingsQueue.remove();
+    entity.put(fieldName, createSimpleTypeMapArray(fieldValueMapping.getFieldType(),
+                                                   calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                                   fieldValueMapping.getValueLength(),
+                                                   fieldValueMapping.getFieldValuesList()));
+    return fieldExpMappingsQueue.peek();
   }
 
   private Schema extractType(Field field, Type typeToMatch) {
