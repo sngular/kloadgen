@@ -1,6 +1,5 @@
 # KLoadGen - Kafka Load Generator
 
-
 ## Value proposition
 
 be able to do performance and business logic test in an easy and maintable way
