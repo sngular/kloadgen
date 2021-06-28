@@ -1,37 +1,41 @@
-## Welcome to GitHub Pages
+# KLoadGen - Kafka Load Generator
 
-You can use the [editor on GitHub](https://github.com/corunet/kloadgen/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Value proposition
 
-### Markdown
+be able to do performance and business logic test in an easy and maintable way
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## About Kloadgen
 
-```markdown
-Syntax highlighted code block
+Kafka Load Generator, from now kloadgen, is a JMeter plugin which allows to generate and inyect synthetic data into a Kafka based Event Architecture.
+Design and develop to be fully integraged with JMeter without the requirement of any external libraries or dependencies.
+It will contain the latest supported version of kafka libraries embedded.
 
-# Header 1
-## Header 2
-### Header 3
+### Main Features
 
-- Bulleted
-- List
+Kloadgen allows to build performance testing with some business flavour due the following features:
 
-1. Numbered
-2. List
+* Support for AVRO Schemas
+* Support for JSON Schemas
+* Support specify schemas for Key and Values
+* Support data generation for Basic types
+* Support data generation for Comples Structures (Array, Map,... )
+* Support specify some Data Sets for generate data with.
 
-**Bold** and _Italic_ and `Code` text
+### Main Benefits/Advantages
 
-[Link](url) and ![Image](src)
-```
+Benefits which are provided by the plugin:
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+* *Easy Schema definition* through the Schema Registry support or specifying a file with the schema.
+* *Easy Data generation* through our Data generator, we can use Schema Constrains(Json Schema) in order to generate matching data.
+* *Easy Key generation* through our Data generator, we can use Schemas in order to generate matching data for the key which will impact in your cluster performance.
 
-### Jekyll Themes
+### Contact data
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/corunet/kloadgen/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+Feel free to contact us by:
 
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+* *Github Issues* [here](https://github.com/corunet/kloadgen/issues)
+* *Email* [email](mailto:admin@cloudhadoop.com)
+* *Web* [web](https://info@corunet.com/)
+* *Twitter* [twitter](https://twitter.com/corunet)
+  
