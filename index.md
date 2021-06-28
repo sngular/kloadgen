@@ -34,7 +34,7 @@ Benefits which are provided by the plugin:
 Feel free to contact us by:
 
 * *Github Issues* [here](https://github.com/corunet/kloadgen/issues)
-* *Email* [email](mailto:admin@cloudhadoop.com)
-* *Web* [web](https://info@corunet.com/)
+* *Email* [email](mailto:info@corunet.com)
+* *Web* [web](https://corunet.com/)
 * *Twitter* [twitter](https://twitter.com/corunet)
   
