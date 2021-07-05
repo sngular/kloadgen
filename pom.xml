@@ -475,7 +475,7 @@
     <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
     <kafka.version>2.6.0</kafka.version>
-    <lombok.version>1.18.16</lombok.version>
+    <lombok.version>1.18.20</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
     <mockito-core.version>3.6.0</mockito-core.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
