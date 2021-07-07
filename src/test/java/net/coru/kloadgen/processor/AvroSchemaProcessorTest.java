@@ -40,7 +40,7 @@ class AvroSchemaProcessorTest {
     List<FieldValueMapping> fieldValueMappingList = asList(
         new FieldValueMapping("name", "string", 0, "Jose"),
         new FieldValueMapping("age", "int", 0, "43"));
-    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    SchemaProcessorLib avroSchemaProcessor = new SchemaProcessorLib();
     avroSchemaProcessor.processSchema(SchemaBuilder.builder().record("testing").fields().requiredString("name").optionalInt("age").endRecord(),
         new SchemaMetadata(1, 1, ""), fieldValueMappingList);
     EnrichedRecord message = avroSchemaProcessor.next();
@@ -53,9 +53,9 @@ class AvroSchemaProcessorTest {
   @Test
   void textAvroSchemaProcessorArrayMap() throws KLoadGenException {
     List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
-        new FieldValueMapping("values[2]", "string-map-array", 2, "n:1, t:2"));
+        new FieldValueMapping("values[2][]", "string-map-array", 2, "n:1, t:2"));
 
-    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    SchemaProcessorLib avroSchemaProcessor = new SchemaProcessorLib();
     avroSchemaProcessor.processSchema(SchemaBuilder
         .builder()
         .record("arrayMap")
@@ -96,7 +96,7 @@ class AvroSchemaProcessorTest {
         new FieldValueMapping("values[2].name", "string", 2, "Jose, Andres"),
         new FieldValueMapping("values[].amount", "float", 2, "0.5, 0.6"));
 
-    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    SchemaProcessorLib avroSchemaProcessor = new SchemaProcessorLib();
     avroSchemaProcessor.processSchema(SchemaBuilder
             .builder()
             .record("array")
@@ -135,7 +135,7 @@ class AvroSchemaProcessorTest {
     List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
         new FieldValueMapping("values[4]", "string-map", 2, "n:1, t:2"));
 
-    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    SchemaProcessorLib avroSchemaProcessor = new SchemaProcessorLib();
     avroSchemaProcessor.processSchema(SchemaBuilder
             .builder()
             .record("arrayMap")

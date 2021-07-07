@@ -287,6 +287,7 @@
           <plugin>
             <artifactId>maven-shade-plugin</artifactId>
             <groupId>org.apache.maven.plugins</groupId>
+            <version>2.4.2</version>
             <configuration>
               <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
               <filters>

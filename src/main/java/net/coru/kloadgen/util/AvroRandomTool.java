@@ -30,31 +30,6 @@ public class AvroRandomTool {
 
   private final Map<String, Object> context = new HashMap<>();
 
-  public Object generateRandomMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
-
-    List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(fieldValue ->
-        fieldValue.matches("\\$\\{\\w*}") ?
-            JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-            fieldValue
-    );
-
-    return RandomTool.generateRandomMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
-
-  }
-
-  public Object generateRandomList(String fieldType, Integer valueLength, List<String> fieldValuesList, int arraySize) {
-
-    List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(fieldValue ->
-        fieldValue.matches("\\$\\{\\w*}") ?
-            JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-            fieldValue
-    );
-
-    return RandomTool.generateRandomArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
-
-  }
 
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
 

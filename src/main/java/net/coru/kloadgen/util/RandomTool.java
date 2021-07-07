@@ -37,57 +37,42 @@ public final class RandomTool {
   public static boolean isTypeValid(String type) {
     return VALID_TYPES.contains(type);
   }
-  protected static Object generateRandomMap(String fieldType, Integer mapSize, List<String> fieldValueList, Integer arraySize,
-      Map<ConstraintTypeEnum, String> constrains) {
-    Object value;
+
+  public static Map<String, Object> generateRandomMap(String fieldType, Integer mapSize, List<String> fieldValueList,
+                                         Map<ConstraintTypeEnum, String> constrains) {
+    Map value = new HashMap(mapSize);
     switch (fieldType) {
       case "int-map":
-        value = generateIntMap(mapSize, fieldValueList, mapSize, constrains);
+        value.putAll(generateIntMap(mapSize, fieldValueList, mapSize, constrains));
         break;
       case "long-map":
-        value = generateLongMap(mapSize, fieldValueList, mapSize, constrains);
+        value.putAll(generateLongMap(mapSize, fieldValueList, mapSize, constrains));
         break;
       case "double-map":
-        value = generateDoubleMap(mapSize, fieldValueList, mapSize, constrains);
+        value.putAll(generateDoubleMap(mapSize, fieldValueList, mapSize, constrains));
         break;
       case "short-map":
-        value = generateShortMap(mapSize, fieldValueList, mapSize, constrains);
+        value.putAll(generateShortMap(mapSize, fieldValueList, mapSize, constrains));
         break;
       case "float-map":
-        value = generateFloatMap(mapSize, fieldValueList, mapSize, constrains);
-        break;
-      case "string-map":
-        value = generateStringMap(mapSize, fieldValueList, mapSize, constrains);
+        value.putAll(generateFloatMap(mapSize, fieldValueList, mapSize, constrains));
         break;
       case "uuid-map":
-        value = generateUuidMap(mapSize, fieldValueList);
+        value.putAll(generateUuidMap(mapSize, fieldValueList));
         break;
       case "boolean-map":
         value = generateBooleanMap(mapSize, fieldValueList);
         break;
       default:
-        value = fieldType;
+        value.putAll(generateStringMap(mapSize, fieldValueList, mapSize, constrains));
         break;
-    }
-    if (fieldType.endsWith("array")) {
-      value = generateRandomMapArray(fieldType, mapSize, fieldValueList, arraySize, constrains);
     }
     return value;
   }
 
-  protected static Object generateRandomMapArray(String type, Integer valueLength, List<String> fieldValueList, Integer arraySize,
-      Map<ConstraintTypeEnum, String> constrains) {
-    List<Map<String, Object>> generatedMapArray = new ArrayList<>(valueLength);
-    for (int i = 0; i < arraySize; i++) {
-      generatedMapArray.add((Map<String, Object>)generateRandomMap(type.substring(0, type.length() - 6), valueLength, fieldValueList, arraySize,
-          constrains));
-    }
-    return generatedMapArray;
-  }
-
-  protected static Object generateRandomArray(String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
-      Map<ConstraintTypeEnum, String> constrains) {
-    Object value;
+  public static List generateRandomArray(String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
+                                           Map<ConstraintTypeEnum, String> constrains) {
+    List value;
     switch (fieldType) {
       case "int-array":
         value = generateIntArray(arraySize, valueLength, fieldValueList, constrains);
@@ -123,8 +108,8 @@ public final class RandomTool {
     return value;
   }
 
-  protected static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
+  public static Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
+                                      Map<ConstraintTypeEnum, String> constrains) {
     Object value;
     switch (fieldType) {
       case "string":

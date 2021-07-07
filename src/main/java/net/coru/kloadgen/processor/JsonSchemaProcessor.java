@@ -6,6 +6,14 @@
 
 package net.coru.kloadgen.processor;
 
+import static net.coru.kloadgen.processor.SchemaProcessorLib.calculateSize;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.cleanUpPath;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.generateRandomList;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.generateRandomMap;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.getCleanMethodName;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.getCleanMethodNameMap;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.getSafeGetElement;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -13,14 +21,15 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.StatelessRandomTool;
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class JsonSchemaProcessor {
 
@@ -46,15 +55,15 @@ public class JsonSchemaProcessor {
         if (cleanUpPath(fieldValueMapping, "").contains("[")) {
           if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
             fieldExpMappingsQueue.poll();
-            entity.putPOJO(fieldName, createBasicMap(fieldValueMapping.getFieldType(),
-                calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getFieldValuesList()));
+            entity.putPOJO(fieldName, createBasicMap(fieldName, fieldValueMapping.getFieldType(),
+                                                     calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                                     fieldValueMapping.getFieldValuesList()));
           } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
             fieldExpMappingsQueue.poll();
-            entity.putPOJO(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
-                calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getValueLength(),
-                fieldValueMapping.getFieldValuesList()));
+            entity.putPOJO(fieldName, createSimpleMapArray(fieldName, fieldValueMapping.getFieldType(),
+                                                           calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                                           mapSize, fieldValueMapping.getValueLength(),
+                                                           fieldValueMapping.getFieldValuesList()));
           } else if (cleanUpPath(fieldValueMapping, "").contains("][]")) {
             entity.putArray(fieldName).addAll(
                     createObjectMap(
@@ -112,16 +121,16 @@ public class JsonSchemaProcessor {
         if (fieldValueMapping.getFieldType().endsWith("map")){
           fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
-          subEntity.putPOJO(fieldNameSubEntity, createBasicMap(fieldValueMapping.getFieldType(),
-                  calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                  fieldValueMapping.getFieldValuesList()));
+          subEntity.putPOJO(fieldNameSubEntity, createBasicMap(fieldName, fieldValueMapping.getFieldType(),
+                                                               calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                                               fieldValueMapping.getFieldValuesList()));
         } else if (fieldValueMapping.getFieldType().endsWith("map-array")){
           fieldExpMappingsQueue.poll();
           String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
-          subEntity.putPOJO(fieldNameSubEntity, createObjectMapArray(fieldValueMapping.getFieldType(),
-                  calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                  fieldValueMapping.getValueLength(),
-                  fieldValueMapping.getFieldValuesList()));
+          subEntity.putPOJO(fieldNameSubEntity, createSimpleMapArray(fieldName, fieldValueMapping.getFieldType(),
+                                                                     calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                                                     mapSize, fieldValueMapping.getValueLength(),
+                                                                     fieldValueMapping.getFieldValuesList()));
         } else if (cleanUpPath(fieldValueMapping, "").contains("][]")) {
           subEntity.putArray(fieldName).addAll(
                   createObjectMap(
@@ -176,11 +185,11 @@ public class JsonSchemaProcessor {
 
   private ArrayNode createBasicArray(String fieldName, String fieldType, Integer calculateSize, Integer valueSize, List<String> fieldValuesList) {
     return mapper.convertValue(
-              randomToolJson.generateRandomArray(fieldName,
-                      fieldType,
-                      calculateSize,
-                      valueSize,
-                      fieldValuesList), ArrayNode.class);
+              generateRandomList(fieldName,
+                                 fieldType,
+                                 calculateSize, valueSize,
+                                 fieldValuesList
+              ), ArrayNode.class);
   }
 
   private boolean isBasicArray(String fieldType) {
@@ -198,55 +207,19 @@ public class JsonSchemaProcessor {
     return objectArray;
   }
 
-  private Object createBasicMap(String fieldType, Integer arraySize, List<String> fieldExpMappings)
+  private Map createBasicMap(String fieldName, String fieldType, Integer mapSize, List<String> fieldExpMappings)
   throws KLoadGenException {
-    return randomToolJson.generateRandomMap(fieldType, arraySize, fieldExpMappings, arraySize);
+    return generateRandomMap(fieldName, fieldType, mapSize, fieldExpMappings);
   }
 
-  private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings)
+  private Map createSimpleMapArray(String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer valueLength, List<String> fieldExpMappings)
       throws KLoadGenException {
-    return randomToolJson.generateRandomMap(fieldType, mapSize, fieldExpMappings, arraySize);
-  }
-
-  private Integer calculateSize(String fieldName, String methodName) {
-    int arrayLength = RandomUtils.nextInt(1, 10);
-    String tempString = fieldName.substring(
-        fieldName.lastIndexOf(methodName));
-    String arrayLengthStr = StringUtils.substringBetween(tempString, "[", "]");
-    if (StringUtils.isNotEmpty(arrayLengthStr) && StringUtils.isNumeric(arrayLengthStr)) {
-      arrayLength = Integer.parseInt(arrayLengthStr);
+    var result = new HashMap<String, Object>();
+    while (mapSize > 0) {
+      result.put((String) randomToolJson.generateRandom(fieldName, "string", valueLength, Collections.emptyList()),
+              generateRandomList(fieldName, fieldType, arraySize, valueLength, fieldExpMappings));
     }
-    return arrayLength;
+    return result;
   }
 
-  private FieldValueMapping getSafeGetElement(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-    return !fieldExpMappingsQueue.isEmpty() ? fieldExpMappingsQueue.element() : null;
-  }
-
-  private String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName) {
-    int startPosition = 0;
-    String cleanPath;
-    if (StringUtils.isNotEmpty(fieldName)) {
-      startPosition = fieldValueMapping.getFieldName().indexOf(fieldName) + fieldName.length() + 1;
-    }
-    cleanPath = fieldValueMapping.getFieldName().substring(startPosition);
-    if (cleanPath.matches("^(\\d*]).*$")) {
-      cleanPath = cleanPath.substring(cleanPath.indexOf(".") + 1);
-    }
-    return cleanPath;
-  }
-
-  private String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
-    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
-    int endOfField = pathToClean.contains(".")?
-        pathToClean.indexOf(".") : pathToClean.contains("[") ? pathToClean.indexOf("[") : pathToClean.length();
-    return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
-  }
-
-  private String getCleanMethodNameMap(FieldValueMapping fieldValueMapping, String fieldName) {
-    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
-    int endOfField = pathToClean.contains("[")?
-        pathToClean.indexOf("[") : 0;
-    return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
-  }
 }

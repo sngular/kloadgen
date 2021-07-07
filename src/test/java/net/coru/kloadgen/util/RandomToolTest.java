@@ -75,7 +75,7 @@ class RandomToolTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapRandomValueFromList")
-  void generateMapRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected,Integer size) {
+  void generateMapRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected, Integer size) {
     Map.Entry<String, Object>[] expectedMap = expected.entrySet().toArray(new Map.Entry[1]);
     assertThat((Map<String, Object>)RandomTool.generateRandomMap(fieldType, valueLength, fieldValuesList, size, Collections.emptyMap()))
         .containsExactly(expectedMap);
