@@ -76,9 +76,9 @@ import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
+import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.SchemaRegistryKeyHelper;
-import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -92,7 +92,7 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 public final class SamplerUtil {
 
-  private static final StatelessRandomTool statelessRandomTool = new StatelessRandomTool();
+  private static final StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
 
   private static final Set<String> JSON_TYPE_SET = Set.of("json-schema", "json");
 
@@ -342,7 +342,7 @@ public final class SamplerUtil {
   public static List<String> populateHeaders(List<HeaderMapping> kafkaHeaders, ProducerRecord<Object, Object> producerRecord) {
     List<String> headersSB = new ArrayList<>();
     for (HeaderMapping kafkaHeader : kafkaHeaders) {
-      String headerValue = statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
+      String headerValue = statelessGeneratorTool.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
           10,
           emptyList()).toString();
       headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
