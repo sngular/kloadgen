@@ -52,9 +52,10 @@ class AvroGeneratorToolTest {
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
     return Stream.of(
-        Arguments.of("int", 10, emptyList(), new Field("name", SchemaBuilder.builder().intType())),
-        Arguments.of("long", 11, emptyList(), new Field("name", SchemaBuilder.builder().longType())),
-        Arguments.of("double", 11, emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
+        Arguments.of("int", 5, emptyList(), new Field("name", SchemaBuilder.builder().intType())),
+        Arguments.of("long", 6, emptyList(), new Field("name", SchemaBuilder.builder().longType())),
+        Arguments.of("float", 5, emptyList(), new Field("name", SchemaBuilder.builder().floatType())),
+        Arguments.of("double", 6, emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
@@ -99,7 +100,7 @@ class AvroGeneratorToolTest {
   void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
     Object number = new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList);
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
-    assertThat(String.valueOf(number)).hasSize(valueLength);
+    assertThat(number.toString()).hasSize(valueLength);
   }
 
   @ParameterizedTest

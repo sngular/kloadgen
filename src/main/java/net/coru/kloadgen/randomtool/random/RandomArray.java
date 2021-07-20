@@ -24,9 +24,6 @@ public class RandomArray {
       case ValidTypes.INT_ARRAY:
         value = generateIntArray(arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.NUMBER_ARRAY:
-        value = generateNumberArray(arraySize, valueLength, fieldValueList, constrains);
-        break;
       case ValidTypes.LONG_ARRAY:
         value = generateLongArray(arraySize, valueLength, fieldValueList, constrains);
         break;
@@ -62,18 +59,6 @@ public class RandomArray {
     for (int i=0; i<size; i++) {
       intArray.add(
           (Integer) randomObject.generateRandom(ValidTypes.INT, valueLength, fieldValueList, constrains)
-      );
-    }
-    return intArray;
-  }
-
-  private List<Number> generateNumberArray(Integer arraySize, Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1,5) : arraySize;
-    List<Number> intArray = new ArrayList<>();
-    for (int i=0; i<size; i++) {
-      intArray.add(
-          (Integer) randomObject.generateRandom(ValidTypes.NUMBER, valueLength, fieldValueList, constrains)
       );
     }
     return intArray;

@@ -2,6 +2,7 @@ package net.coru.kloadgen.randomtool.random;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -10,8 +11,8 @@ import java.util.Map;
 import java.util.UUID;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValidTypes;
 import net.coru.kloadgen.randomtool.util.Utils;
+import net.coru.kloadgen.randomtool.util.ValidTypes;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,23 +37,40 @@ public class RandomObject {
       case ValidTypes.STRING:
         value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.NUMBER:
-        value = getNumberValueOrRandom(valueLength, fieldValueList, constrains);
-        break;
       case ValidTypes.INT:
-        value = getIntValueOrRandom(valueLength, fieldValueList, constrains);
+        try {
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).intValueExact();
+        } catch (ArithmeticException exception) {
+          value = Integer.MAX_VALUE;
+        }
         break;
       case ValidTypes.LONG:
-        value = getLongValueOrRandom(valueLength, fieldValueList, constrains);
+        try {
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).longValueExact();
+        } catch (ArithmeticException exception) {
+          value = Long.MAX_VALUE;
+        }
         break;
       case ValidTypes.SHORT:
-        value = getShortValueOrRandom(valueLength, fieldValueList, constrains);
+        try {
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).shortValueExact();
+        } catch (ArithmeticException exception) {
+          value = Short.MAX_VALUE;
+        }
         break;
       case ValidTypes.DOUBLE:
-        value = getDoubleValueOrRandom(valueLength, fieldValueList, constrains);
+        try {
+          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).doubleValue();
+        } catch (ArithmeticException exception) {
+          value = Double.MAX_VALUE;
+        }
         break;
       case ValidTypes.FLOAT:
-        value = getFloatValueOrRandom(valueLength, fieldValueList, constrains);
+        try {
+          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();
+        } catch (ArithmeticException exception) {
+          value = Float.MAX_VALUE;
+        }
         break;
       case ValidTypes.BYTES:
         value = getByteRandom(valueLength);
@@ -75,6 +93,7 @@ public class RandomObject {
         value = fieldType;
         break;
     }
+
     return value;
   }
 
@@ -82,101 +101,52 @@ public class RandomObject {
     return fieldValueList.isEmpty() ? 1L : Long.parseLong(fieldValueList.get(0));
   }
 
-  private Integer getIntValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
-    int value;
+  private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
+    BigInteger value;
+
     if (!fieldValueList.isEmpty()) {
-      value = Integer.parseInt(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      value = new BigInteger(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+
     } else {
       Number minimum = calculateMinimum(valueLength, constrains);
       Number maximum = calculateMaximum(valueLength, constrains);
-      if (Integer.MAX_VALUE < ((BigDecimal) maximum).longValueExact()) {
-        maximum = Integer.MAX_VALUE;
-      }
-      if (Integer.MAX_VALUE < minimum.longValue()) {
-        minimum = Integer.MIN_VALUE;
-      }
+
       if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
-        value = RandomUtils.nextInt(minimum.intValue(), maximum.intValue()) * multipleOf;
+        value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()) * multipleOf);
       } else {
-        value = RandomUtils.nextInt(minimum.intValue(), maximum.intValue());
+        value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
       }
     }
+
     return value;
   }
 
-  private Number getNumberValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
-    Number value;
+  private BigDecimal getDecimalValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
+    BigDecimal value;
+
     if (!fieldValueList.isEmpty()) {
-      String chosenValue = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
-      if (chosenValue.contains(".")) {
-        value = Float.parseFloat(chosenValue);
-      } else {
-        value = Integer.parseInt(chosenValue);
-      }
+      value = new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      Number minimum = calculateMinimum(valueLength, constrains);
-      Number maximum = calculateMaximum(valueLength, constrains);
+      Number minimum = calculateMinimum(valueLength - 1, constrains);
+      Number maximum = calculateMaximum(valueLength - 1, constrains);
+
       if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
-        value = RandomUtils.nextFloat(minimum.intValue(), maximum.intValue()) * multipleOf;
+        value = BigDecimal.valueOf(RandomUtils.nextDouble(minimum.doubleValue(), maximum.doubleValue()) * multipleOf);
       } else {
-        value = RandomUtils.nextFloat(minimum.intValue(), maximum.intValue());
+        if (valueLength < 3) {
+          value = new BigDecimal(getIntegerValueOrRandom(valueLength, fieldValueList, constrains));
+        } else {
+          BigDecimal aux = BigDecimal.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
+          int decLength = RandomUtils.nextInt(1, valueLength / 2);
+          value = aux.multiply(BigDecimal.valueOf(0.1).pow(decLength));
+        }
       }
     }
-    return value;
-  }
 
-  private Long getLongValueOrRandom(Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
-    long value;
-    if (!fieldValueList.isEmpty()) {
-      value = Long.parseLong(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
-    } else {
-      value = getRandomLongValue(valueLength, constrains);
-    }
-    return value;
-  }
-
-  private long getRandomLongValue(Integer valueLength, Map<ConstraintTypeEnum, String> constrains) {
-    long value;
-    Number minimum = calculateMinimum(valueLength, constrains);
-    Number maximum = calculateMaximum(valueLength, constrains);
-    if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
-      int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
-      maximum = maximum.longValue() > multipleOf ? maximum.longValue() / multipleOf : maximum;
-      value = RandomUtils.nextLong(minimum.longValue(), maximum.longValue()) * multipleOf;
-    } else {
-      value = RandomUtils.nextLong(minimum.longValue(), maximum.longValue());
-    }
-    return value;
-  }
-
-  private Double getDoubleValueOrRandom(Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
-    double value;
-    if (!fieldValueList.isEmpty()) {
-      value = Double.parseDouble(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
-    } else {
-      long intPart = getRandomLongValue(valueLength / 2, constrains);
-      long decPart = getRandomLongValue(valueLength / 2, constrains);
-      value = Double.parseDouble(intPart + "." + decPart);
-    }
-    return value;
-  }
-
-  private Float getFloatValueOrRandom(Integer valueLength, List<String> fieldValuesList,
-      Map<ConstraintTypeEnum, String> constrains) {
-    float value;
-    if (!fieldValuesList.isEmpty()) {
-      value = Float.parseFloat(fieldValuesList.get(RandomUtils.nextInt(0, fieldValuesList.size())).trim());
-    } else {
-      long intPart = getRandomLongValue(valueLength / 2, constrains);
-      long decPart = getRandomLongValue(valueLength / 2, constrains);
-      value = new BigDecimal(intPart + "." + decPart).floatValue();
-    }
     return value;
   }
 
@@ -204,39 +174,17 @@ public class RandomObject {
         }
       } else {
         value = RandomStringUtils.randomAlphabetic(valueLength == 0 ? RandomUtils.nextInt(1, 20) : valueLength);
-      }    }
+      }
+    }
     return value;
   }
 
   private int getMaxLength(Integer valueLength, String maxValueStr) {
     int maxValue = Integer.parseInt(StringUtils.defaultIfEmpty(maxValueStr, "0"));
-    if (valueLength > 0 && maxValue == 0 ) {
+    if (valueLength > 0 && maxValue == 0) {
       maxValue = valueLength;
     }
     return maxValue;
-  }
-
-  private Short getShortValueOrRandom(Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
-    short value;
-    if (!fieldValueList.isEmpty()) {
-      value = Short.parseShort(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
-    } else {
-      if (valueLength < 5 ) {
-        Number minimum = calculateMinimum(valueLength, constrains);
-        Number maximum = calculateMaximum(valueLength, constrains);
-        if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
-          int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
-          maximum = maximum.shortValue() > multipleOf ? maximum.shortValue() / multipleOf : maximum;
-          value = (short) (RandomUtils.nextInt(minimum.shortValue(), maximum.shortValue()) * multipleOf);
-        } else {
-          value = (short) RandomUtils.nextInt(minimum.shortValue(), maximum.shortValue());
-        }
-      } else {
-        value = (short) RandomUtils.nextInt(1, 32767);
-      }
-    }
-    return value;
   }
 
   private Object getTimestampValueOrRandom(String type, List<String> fieldValueList) {
@@ -284,12 +232,12 @@ public class RandomObject {
     Number maximum;
     if (constrains.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
       if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) {
-        maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1L;
+        maximum = Long.parseLong(constrains.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1L;
       } else {
-        maximum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE));
+        maximum = Long.parseLong(constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE));
       }
     } else {
-      maximum = new  BigDecimal(StringUtils.rightPad("1", valueLength + 1, '0'));
+      maximum = new BigDecimal(StringUtils.rightPad("9", valueLength, '0'));
     }
     return maximum;
   }
@@ -298,9 +246,9 @@ public class RandomObject {
     Number minimum;
     if (constrains.containsKey(ConstraintTypeEnum.MINIMUM_VALUE)) {
       if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) {
-        minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
+        minimum = Long.parseLong(constrains.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
       } else {
-        minimum = Integer.parseInt(constrains.get(ConstraintTypeEnum.MINIMUM_VALUE));
+        minimum = Long.parseLong(constrains.get(ConstraintTypeEnum.MINIMUM_VALUE));
       }
     } else {
       minimum = Long.parseLong(StringUtils.rightPad("1", valueLength, '0'));
