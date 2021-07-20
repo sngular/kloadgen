@@ -3,9 +3,9 @@ package net.coru.kloadgen.randomtool.random;
 import com.github.curiousoddman.rgxgen.RgxGen;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -73,7 +73,11 @@ public class RandomObject {
         }
         break;
       case ValidTypes.BYTES:
-        value = getByteRandom(valueLength);
+        try {
+          value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
+        } catch (ArithmeticException exception) {
+          value = Byte.MAX_VALUE;
+        }
         break;
       case ValidTypes.TIMESTAMP:
       case ValidTypes.LONG_TIMESTAMP:
@@ -147,16 +151,6 @@ public class RandomObject {
       }
     }
 
-    return value;
-  }
-
-  private ByteBuffer getByteRandom(Integer valueLength) {
-    ByteBuffer value;
-    if (valueLength == 0) {
-      value = ByteBuffer.wrap(RandomUtils.nextBytes(4));
-    } else {
-      value = ByteBuffer.wrap(RandomUtils.nextBytes(valueLength));
-    }
     return value;
   }
 
