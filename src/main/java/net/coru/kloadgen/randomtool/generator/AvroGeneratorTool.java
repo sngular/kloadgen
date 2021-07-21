@@ -12,7 +12,7 @@ import java.util.Map;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
-import net.coru.kloadgen.randomtool.util.Utils;
+import net.coru.kloadgen.randomtool.util.Util;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
@@ -32,17 +32,17 @@ public class AvroGeneratorTool {
   private final RandomObject randomObject = new RandomObject();
 
   public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
-    List<String> parameterList = Utils.cleanFieldsName(fieldValuesList);
+    List<String> parameterList = Util.cleanFieldsName(fieldValuesList);
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
   public Object generateArray(String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = Utils.cleanFieldsName(fieldValuesList);
+    List<String> parameterList = Util.cleanFieldsName(fieldValuesList);
     return randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
   }
 
   public Object generateObject(Field field, String fieldType, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = Utils.cleanFieldsName(fieldValuesList);
+    List<String> parameterList = Util.cleanFieldsName(fieldValuesList);
 
     Object value;
     if (ENUM == field.schema().getType()) {
@@ -52,7 +52,7 @@ public class AvroGeneratorTool {
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
 
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
-        value = Utils.castValue(value, field.schema().getType().getName());
+        value = Util.castValue(value, field.schema().getType().getName());
       } else if (ENUM == safeSchema.getType()) {
         value = getEnumOrGenerate(fieldType, safeSchema, parameterList);
       } else {
@@ -66,7 +66,7 @@ public class AvroGeneratorTool {
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
 
       value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
-      value = Utils.castValue(value, field.schema().getType().getName());
+      value = Util.castValue(value, field.schema().getType().getName());
     } else if (FIXED == field.schema().getType()) {
       value = getFixedOrGenerate(field.schema());
     } else {

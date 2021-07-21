@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValidTypes;
+import net.coru.kloadgen.randomtool.util.ValidType;
 import org.apache.commons.lang3.RandomUtils;
 
 public class RandomMap {
@@ -23,29 +23,29 @@ public class RandomMap {
     Object value;
 
     switch (fieldType) {
-      case ValidTypes.INT_MAP:
-        value = generate(ValidTypes.INT, mapSize, fieldValueList, mapSize, constrains);
+      case ValidType.INT_MAP:
+        value = generate(ValidType.INT, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidTypes.LONG_MAP:
-        value = generate(ValidTypes.LONG, mapSize, fieldValueList, mapSize, constrains);
+      case ValidType.LONG_MAP:
+        value = generate(ValidType.LONG, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidTypes.DOUBLE_MAP:
-        value = generate(ValidTypes.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
+      case ValidType.DOUBLE_MAP:
+        value = generate(ValidType.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidTypes.SHORT_MAP:
-        value = generate(ValidTypes.SHORT, mapSize, fieldValueList, mapSize, constrains);
+      case ValidType.SHORT_MAP:
+        value = generate(ValidType.SHORT, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidTypes.FLOAT_MAP:
-        value = generate(ValidTypes.FLOAT, mapSize, fieldValueList, mapSize, constrains);
+      case ValidType.FLOAT_MAP:
+        value = generate(ValidType.FLOAT, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidTypes.STRING_MAP:
-        value = generate(ValidTypes.STRING, mapSize, fieldValueList, mapSize, constrains);
+      case ValidType.STRING_MAP:
+        value = generate(ValidType.STRING, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidTypes.UUID_MAP:
-        value = generate(ValidTypes.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+      case ValidType.UUID_MAP:
+        value = generate(ValidType.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
         break;
-      case ValidTypes.BOOLEAN_MAP:
-        value = generate(ValidTypes.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+      case ValidType.BOOLEAN_MAP:
+        value = generate(ValidType.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
         break;
       default:
         value = fieldType;
@@ -81,22 +81,22 @@ public class RandomMap {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
           switch (type) {
-            case ValidTypes.INT:
+            case ValidType.INT:
               map.put(tempValue[0], Integer.parseInt(tempValue[1]));
               break;
-            case ValidTypes.LONG:
+            case ValidType.LONG:
               map.put(tempValue[0], Long.parseLong(tempValue[1]));
               break;
-            case ValidTypes.FLOAT:
+            case ValidType.FLOAT:
               map.put(tempValue[0], Float.parseFloat(tempValue[1]));
               break;
-            case ValidTypes.DOUBLE:
+            case ValidType.DOUBLE:
               map.put(tempValue[0], Double.parseDouble(tempValue[1]));
               break;
-            case ValidTypes.SHORT:
+            case ValidType.SHORT:
               map.put(tempValue[0], Short.parseShort(tempValue[1]));
               break;
-            case ValidTypes.UUID:
+            case ValidType.UUID:
               map.put(tempValue[0], UUID.fromString(tempValue[1]));
               break;
             default:
@@ -116,7 +116,7 @@ public class RandomMap {
     if (map.size() != mapSize) {
       for (int i = 0; i <= Math.abs(map.size() - mapSize); i++) {
         map.put(
-            (String) randomObject.generateRandom(ValidTypes.STRING, valueLength, Collections.emptyList(), constrains),
+            (String) randomObject.generateRandom(ValidType.STRING, valueLength, Collections.emptyList(), constrains),
             randomObject.generateRandom(type, valueLength, Collections.emptyList(), constrains)
         );
       }

@@ -1,13 +1,8 @@
 package net.coru.kloadgen.randomtool.util;
 
 import java.util.Set;
-import org.apache.commons.collections4.SetUtils;
 
-public class ValidTypes {
-
-  private ValidTypes() {
-
-  }
+public class ValidType {
 
   // Map type values
   public static final String INT_ARRAY = "int-array";
@@ -78,7 +73,11 @@ public class ValidTypes {
 
   public static final String BYTES = "bytes";
 
-  public static final Set<String> VALID_OBJECT_TYPES = SetUtils.hashSet(
+  public static final Set<String> VALID_OBJECT_TYPES = Set.of(
       ARRAY, MAP, ENUM, STRING, INT, LONG, TIMESTAMP, STRING_TIMESTAMP, SHORT, DOUBLE, LONG_TIMESTAMP, UUID, BOOLEAN, BYTES
   );
+
+  private ValidType() {
+
+  }
 }

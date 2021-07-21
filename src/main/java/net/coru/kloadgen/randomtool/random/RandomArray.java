@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValidTypes;
+import net.coru.kloadgen.randomtool.util.ValidType;
 import org.apache.commons.lang3.RandomUtils;
 
 public class RandomArray {
@@ -21,29 +21,29 @@ public class RandomArray {
     Object value;
 
     switch (fieldType) {
-      case ValidTypes.INT_ARRAY:
-        value = generate(ValidTypes.INT, arraySize, valueLength, fieldValueList, constrains);
+      case ValidType.INT_ARRAY:
+        value = generate(ValidType.INT, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.LONG_ARRAY:
-        value = generate(ValidTypes.LONG, arraySize, valueLength, fieldValueList, constrains);
+      case ValidType.LONG_ARRAY:
+        value = generate(ValidType.LONG, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.DOUBLE_ARRAY:
-        value = generate(ValidTypes.DOUBLE, arraySize, valueLength, fieldValueList, constrains);
+      case ValidType.DOUBLE_ARRAY:
+        value = generate(ValidType.DOUBLE, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.SHORT_ARRAY:
-        value = generate(ValidTypes.SHORT, arraySize, valueLength, fieldValueList, constrains);
+      case ValidType.SHORT_ARRAY:
+        value = generate(ValidType.SHORT, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.FLOAT_ARRAY:
-        value = generate(ValidTypes.FLOAT, arraySize, valueLength, fieldValueList, constrains);
+      case ValidType.FLOAT_ARRAY:
+        value = generate(ValidType.FLOAT, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.STRING_ARRAY:
-        value = generate(ValidTypes.STRING, arraySize, valueLength, fieldValueList, constrains);
+      case ValidType.STRING_ARRAY:
+        value = generate(ValidType.STRING, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidTypes.UUID_ARRAY:
-        value = generate(ValidTypes.UUID, arraySize, 0, fieldValueList, Collections.emptyMap());
+      case ValidType.UUID_ARRAY:
+        value = generate(ValidType.UUID, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
-      case ValidTypes.BOOLEAN_ARRAY:
-        value = generate(ValidTypes.BOOLEAN, arraySize, 0, fieldValueList, Collections.emptyMap());
+      case ValidType.BOOLEAN_ARRAY:
+        value = generate(ValidType.BOOLEAN, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
       default:
         value = new ArrayList<>();

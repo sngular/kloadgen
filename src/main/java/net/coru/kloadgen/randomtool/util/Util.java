@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public class Utils {
+public class Util {
 
-  private Utils() {
+  private Util() {
 
   }
 
@@ -22,19 +22,19 @@ public class Utils {
   public static Object castValue(Object value, String type) {
     Object castValue;
     switch (type) {
-      case ValidTypes.INT:
+      case ValidType.INT:
         castValue = Integer.valueOf(value.toString());
         break;
-      case ValidTypes.DOUBLE:
+      case ValidType.DOUBLE:
         castValue = Double.valueOf(value.toString());
         break;
-      case ValidTypes.LONG:
+      case ValidType.LONG:
         castValue = Long.valueOf(value.toString());
         break;
-      case ValidTypes.FLOAT:
+      case ValidType.FLOAT:
         castValue = Float.valueOf(value.toString());
         break;
-      case ValidTypes.BOOLEAN:
+      case ValidType.BOOLEAN:
         castValue = Boolean.valueOf(value.toString());
         break;
       default:
