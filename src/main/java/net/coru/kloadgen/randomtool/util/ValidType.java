@@ -7,8 +7,6 @@ public class ValidType {
   // Map type values
   public static final String INT_ARRAY = "int-array";
 
-  public static final String NUMBER_ARRAY = "number-array";
-
   public static final String LONG_ARRAY = "long-array";
 
   public static final String DOUBLE_ARRAY = "double-array";
@@ -42,8 +40,6 @@ public class ValidType {
 
   // Object values
   public static final String FLOAT = "float";
-
-  public static final String NUMBER = "number";
 
   public static final String ARRAY = "array";
 
