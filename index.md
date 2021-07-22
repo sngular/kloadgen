@@ -1,37 +1,33 @@
 # KLoadGen - Kafka Load Generator
 
-## Value proposition
+Generate performance and business-logic tests in an easy and maintainable way
 
-be able to do performance and business logic test in an easy and maintable way
+## What is KLoadGen?
 
-## About Kloadgen
+Kafka Load Generator, aka _KLoadGen_, is a JMeter plugin that **allows generating and injecting synthetic data into a Kafka-based, event architecture**.
 
-Kafka Load Generator, from now kloadgen, is a JMeter plugin which allows to generate and inyect synthetic data into a Kafka based Event Architecture.
-Design and develop to be fully integraged with JMeter without the requirement of any external libraries or dependencies.
-It will contain the latest supported version of kafka libraries embedded.
+Designed and developed to be fully integrated with JMeter without the requirement of any external libraries or dependencies, it will embed the latest supported version of Kafka libraries.
 
-### Main Features
+## Main Features
 
-Kloadgen allows to build performance testing with some business flavour due the following features:
+Best-in-class Kafka performance tests generator, KLoadGen supports:
 
-* Support for AVRO Schemas
-* Support for JSON Schemas
-* Support specify schemas for Key and Values
-* Support data generation for Basic types
-* Support data generation for Comples Structures (Array, Map,... )
-* Support specify some Data Sets for generate data with.
+* Both AVRO and JSON schemas
+* Specifying schemas for Key and Values
+* Data generation for both basic data types AND complex structures (such as arrays or maps)
+* _Specifying some Data Sets for generating data with_.
 
-### Main Benefits/Advantages
+## Why KLoadGen?
 
-Benefits which are provided by the plugin:
+With KLoadGen you'll be able to easily:
 
-* *Easy Schema definition* through the Schema Registry support or specifying a file with the schema.
-* *Easy Data generation* through our Data generator, we can use Schema Constrains(Json Schema) in order to generate matching data.
-* *Easy Key generation* through our Data generator, we can use Schemas in order to generate matching data for the key which will impact in your cluster performance.
+* **Define schemas** through the Schema Registry support or by specifying a file with the schema.
+* **Generate data** through our data generator that can use Schema Constraints (JSON Schema) to generate matching data.
+* **Generate Keys** through our data generator, you can use Schemas to generate matching data for the key while improving your cluster performance.
 
-### Contact data
+## Contact us!
 
-Feel free to contact us by:
+We'll be happy to talk and discuss how KLoadGen can help you :-)
 
 * *Github Issues* [here](https://github.com/corunet/kloadgen/issues)
 * *Email* [email](mailto:info@corunet.com)
