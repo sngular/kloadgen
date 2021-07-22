@@ -12,6 +12,7 @@ import java.util.Set;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
 
 public class AvroExtractor {
 
@@ -67,12 +68,16 @@ public class AvroExtractor {
     if (checkIfUnion(innerField)) {
       completeFieldList.add(new FieldValueMapping(fieldName, getNotNullType(innerField.getTypes()) + MAP_POSTFIX));
     } else if (checkIfRecord(innerField)) {
-      processRecordFieldList(innerField.getName(), ".", extractInternalFields(innerField.getFields().get(0)), completeFieldList);
+      if(innerField.getFields().size() > 1){
+        processRecordFieldList(fieldName, ".", processFieldList(innerField.getFields()), completeFieldList);
+      }else{
+        processRecordFieldList(innerField.getName(), ".", extractInternalFields(innerField.getFields().get(0)), completeFieldList);
+      }
     } else if (checkIfArray(innerField)) {
       List<FieldValueMapping> internalFields = extractArrayInternalFields(fieldName  + "[]", innerField.getElementType());
       completeFieldList.addAll(internalFields);
       //extractedArrayCollection(innerField, completeFieldList, internalFields);
-    } else if (checkIfMap(innerField)) {
+    } else if (checkIfMap(innerField) && !checkIfRecord(innerField.getValueType())) {
       List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.getName() + "[]", innerField.getValueType());
       completeFieldList.addAll(internalFields);
       // extractedMapCollection(innerField, completeFieldList, internalFields);
@@ -93,7 +98,7 @@ public class AvroExtractor {
       completeFieldList.addAll(internalFields);
       //extractedArrayCollection(innerField.schema(), completeFieldList, internalFields);
     } else if (checkIfMap(innerField.schema())) {
-      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name() + "[]", innerField.schema().getValueType());
+      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name() + "[:]", innerField.schema().getValueType());
       completeFieldList.addAll(internalFields);
       //extractedMapCollection(innerField.schema(), completeFieldList, internalFields);
     } else if (checkIfUnion(innerField.schema())) {
@@ -142,11 +147,8 @@ public class AvroExtractor {
     } else if (checkIfArray(recordUnion)) {
       extractArray(innerField, completeFieldList, recordUnion.getElementType());
     } else if (checkIfMap(recordUnion)){
-      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name() + "[]", recordUnion.getValueType());
-      if (checkIfRecord(recordUnion.getValueType())) {
-        processRecordFieldList(innerField.name(), ".", internalFields, completeFieldList);
-      }
-      completeFieldList.addAll(internalFields);
+        List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name() + "[:]", recordUnion.getValueType());
+        completeFieldList.addAll(internalFields);
     } else {
       completeFieldList.add(new FieldValueMapping(innerField.name(), recordUnion.getType().getName()));
     }
@@ -170,10 +172,17 @@ public class AvroExtractor {
   }
 
   private void tweakType(FieldValueMapping internalField, String postfix) {
-    internalField.setFieldType(internalField.getFieldType() + postfix);
+    if(!internalField.getFieldType().contains(postfix)){
+      internalField.setFieldType(internalField.getFieldType() + postfix);
+    }
   }
+
   private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
-    internalFields.forEach(internalField -> internalField.setFieldName(internalField.getFieldName().replace(fieldName, fieldName + "[]")));
+
+    internalFields.forEach(internalField -> {
+              var name = internalField.getFieldName().replace(fieldName, fieldName + "[:]");
+              internalField.setFieldName(name);
+    });
     completeFieldList.addAll(internalFields);
   }
 
@@ -225,7 +234,11 @@ public class AvroExtractor {
 
   private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields, List<FieldValueMapping> completeFieldList) {
     internalFields.forEach(internalField -> {
-      internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
+      if(!internalField.getFieldName().contains(fieldName)){
+        internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
+      }else{
+        internalField.setFieldName(fieldName + internalField.getFieldName().replace(fieldName, splitter.replace(".", "")));
+      }
       completeFieldList.add(internalField);
     });
   }
