@@ -15,11 +15,7 @@ package net.coru.kloadgen.config.valuefiledeserialized;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
-import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
-import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
-import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
-import net.coru.kloadgen.property.editor.ValueDeserializerPropertyEditor;
+import net.coru.kloadgen.property.editor.*;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
@@ -34,7 +30,7 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
 
   private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
-  private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeserializerConfiguration";
+  private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeSerializerConfiguration";
 
   private static final String VALUE_NAME_STRATEGY = "valueNameStrategy";
 
@@ -42,7 +38,7 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
 
     super(ValueFileDeserializedConfigElement.class);
 
-    createPropertyGroup("file_serialized_load_generator", new String[]{
+    createPropertyGroup("file_deserialized_load_generator", new String[]{
         VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_TYPE, VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES,
         VALUE_SCHEMA_DEFINITION
     });
@@ -53,11 +49,11 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
     nameStrategyPropertyProps.setValue(DEFAULT, "");
     nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor serializerPropertyProps = property(VALUE_DESERIALIZER_PROPERTY);
-    serializerPropertyProps.setPropertyEditorClass(ValueDeserializerPropertyEditor.class);
-    serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    serializerPropertyProps.setValue(DEFAULT, "");
-    serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    PropertyDescriptor deserializerPropertyProps = property(VALUE_DESERIALIZER_PROPERTY);
+    deserializerPropertyProps.setPropertyEditorClass(ValueDeserializerPropertyEditor.class);
+    deserializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    deserializerPropertyProps.setValue(DEFAULT, "");
+    deserializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
@@ -83,16 +79,12 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
     tableProperties.setValue(TableEditor.HEADERS,
         new String[]{
             "Field Name",
-            "Field Type",
-            "Field Length",
-            "Field Values List"
+            "Field Type"
         });
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
         new String[]{
             FieldValueMapping.FIELD_NAME,
-            FieldValueMapping.FIELD_TYPE,
-            FieldValueMapping.VALUE_LENGTH,
-            FieldValueMapping.FIELD_VALUES_LIST
+            FieldValueMapping.FIELD_TYPE
         });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);

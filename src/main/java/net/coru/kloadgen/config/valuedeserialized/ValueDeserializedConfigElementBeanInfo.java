@@ -25,13 +25,13 @@ import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String VALUE_SUBJECT_NAME = "valueSubjectName";
+  //private static final String VALUE_SUBJECT_NAME = "valueSubjectName";
 
   private static final String VALUE_SCHEMA_PROPERTIES = "valueSchemaProperties";
 
   private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
-  private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeserializerConfiguration";
+  private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeSerializerConfiguration";
 
   private static final String VALUE_NAME_STRATEGY = "valueNameStrategy";
 
@@ -39,8 +39,12 @@ public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(ValueDeserializedConfigElement.class);
 
-    createPropertyGroup("value_deserialized_load_generator", new String[]{
+    /*createPropertyGroup("value_deserialized_load_generator", new String[]{
         VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
+    });*/
+
+    createPropertyGroup("value_deserialized_load_generator", new String[]{
+            VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
     });
 
     PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);
@@ -55,7 +59,7 @@ public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     serializerPropertyProps.setValue(DEFAULT, "");
     serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    TypeEditor tableEditor = TypeEditor.TableEditor;
+    /*TypeEditor tableEditor = TypeEditor.TableEditor;
     PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
@@ -78,7 +82,7 @@ public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(SerialisedSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);*/
 
     PropertyDescriptor schemaType = property(VALUE_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);

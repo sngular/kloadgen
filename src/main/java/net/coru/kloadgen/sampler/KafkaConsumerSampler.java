@@ -16,19 +16,23 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.util.RebalanceListener;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
+import org.apache.jmeter.threads.JMeterContext;
+import org.apache.jmeter.threads.JMeterThread;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -43,6 +47,9 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
   private Long timeout;
   private KafkaConsumer<Object, Object> consumer;
+  public RebalanceListener rebalanceListener;
+  private int maxIterations = 0;
+  private int countIterations;
 
   @Override
   public Arguments getDefaultParameters() {
@@ -65,15 +72,16 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
   @Override
   public void setupTest(JavaSamplerContext context) {
-    Properties props = properties(context);
 
+    LoopController loopController = (LoopController) context.getJMeterContext().getThreadGroup().getSamplerController();
+    Properties props = properties(context);
     String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
     consumer = new KafkaConsumer<>(props);
-    Collection<TopicPartition> partitionList = CollectionUtils.collect(
-            consumer.partitionsFor(topic),
-            transform());
-    consumer.assign(partitionList);
-    consumer.seekToBeginning(partitionList);
+
+    consumer.subscribe(Collections.singletonList(topic));
+
+    maxIterations = loopController.getLoops();
+    countIterations = 0;
   }
 
   private Transformer<PartitionInfo, TopicPartition> transform() {
@@ -84,40 +92,60 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
     SampleResult sampleResult = new SampleResult();
     sampleResult.sampleStart();
+    JMeterThread thread = javaSamplerContext.getJMeterContext().getThread();
     try {
       boolean running = true;
       Instant startTime = Instant.now();
       while (running) {
         ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(5, ChronoUnit.SECONDS));
+
         if (!records.isEmpty()) {
-          running=false;
+          running = false;
           ConsumerRecord<Object, Object> record = records.iterator().next();
           fillSampleResult(sampleResult, prettify(record), true);
+          consumer.commitAsync();
         }
 
         Instant endTime = Instant.now();
         if ( Duration.between(startTime,endTime).toMillis() > timeout) {
-          throw new KLoadGenException("Time Out in Consumer");
+          running = false;
+          sampleResult = null;
+          if (Objects.nonNull(thread)){thread.stop();}
         }
       }
     } catch (Exception e) {
       logger().error("Failed to receive message", e);
-      fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "", false);
+      fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",
+              false);
     } finally {
-      if (Objects.nonNull(consumer) ) {
-        consumer.close();
+      countIterations ++;
+      if (countIterations >= maxIterations){
+        if (Objects.nonNull(consumer)) {
+          consumer.close();
+        }
       }
     }
     return sampleResult;
   }
 
   private String prettify(ConsumerRecord<Object, Object> record) {
-    return "{ key: " + record.key() + ", value: " + record.value() +" }";
+    return "{ partition: " + record.partition() + ", message: { key: " + record.key() + ", value: " + record.value().toString() +
+            " }}";
   }
 
   private void fillSampleResult(SampleResult sampleResult, String responseData, boolean successful) {
-    sampleResult.setResponseData(responseData, StandardCharsets.UTF_8.name());
-    sampleResult.setSuccessful(successful);
-    sampleResult.sampleEnd();
+    if (Objects.nonNull(sampleResult)){
+      sampleResult.setResponseData(responseData, StandardCharsets.UTF_8.name());
+      sampleResult.setSuccessful(successful);
+      sampleResult.sampleEnd();
+    }
   }
+
+  @Override
+  public void teardownTest(JavaSamplerContext context) {
+    if (Objects.nonNull(consumer)) {
+      consumer.close();
+    }
+  }
+
 }

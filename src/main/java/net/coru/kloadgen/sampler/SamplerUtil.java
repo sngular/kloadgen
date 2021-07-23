@@ -38,24 +38,7 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.*;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
@@ -75,6 +58,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
@@ -194,6 +179,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(KAFKA_TOPIC_CONFIG, KAFKA_TOPIC_CONFIG_DEFAULT);
     defaultParameters.addArgument(ConsumerConfig.SEND_BUFFER_CONFIG, SEND_BUFFER_CONFIG_DEFAULT);
     defaultParameters.addArgument(ConsumerConfig.RECEIVE_BUFFER_CONFIG, RECEIVE_BUFFER_CONFIG_DEFAULT);
+    defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG,"earliest");
     defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
     defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
     defaultParameters.addArgument(MESSAGE_KEY_KEY_VALUE, MSG_KEY_VALUE);
@@ -230,15 +216,18 @@ public final class SamplerUtil {
   public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
     Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-    if (Objects.nonNull(context.getJMeterVariables().get(KEY_SERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_SERIALIZER_CLASS_PROPERTY));
+    if (Objects.nonNull(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_SERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(VALUE_SERIALIZER_CLASS_PROPERTY));
+    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_DESERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(VALUE_DESERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+    }
+    if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
+      props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
     }
 
     props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
@@ -249,6 +238,15 @@ public final class SamplerUtil {
     props.put(GROUP_ID_CONFIG, context.getParameter(GROUP_ID_CONFIG));
     if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+    }
+    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_SCHEMA))) {
+      props.put(VALUE_SCHEMA, context.getJMeterVariables().get(VALUE_SCHEMA));
+    }
+    if (Objects.nonNull(context.getJMeterVariables().get(KEY_SCHEMA))) {
+      props.put(KEY_SCHEMA, context.getJMeterVariables().get(KEY_SCHEMA));
+    }
+    if (Objects.nonNull(context.getParameter(AUTO_OFFSET_RESET_CONFIG))){
+      props.put(AUTO_OFFSET_RESET_CONFIG, context.getParameter(AUTO_OFFSET_RESET_CONFIG));
     }
     Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {

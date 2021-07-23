@@ -60,8 +60,8 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
     Reflections reflections = new Reflections(new ConfigurationBuilder()
         .addUrls(ClasspathHelper.forClass(Deserializer.class))
         .filterInputsBy(new FilterBuilder()
-            .includePackage("net.coru.kloadgen.deserializer",
-                "io.confluent.kafka.deserializers"))
+            .includePackage("net.coru.kloadgen.serializer",
+                "io.confluent.kafka.serializers"))
         .setScanners(new SubTypesScanner()));
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
   }

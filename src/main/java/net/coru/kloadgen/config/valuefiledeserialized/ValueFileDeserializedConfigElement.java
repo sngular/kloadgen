@@ -13,11 +13,7 @@
 package net.coru.kloadgen.config.valuefiledeserialized;
 
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.*;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
