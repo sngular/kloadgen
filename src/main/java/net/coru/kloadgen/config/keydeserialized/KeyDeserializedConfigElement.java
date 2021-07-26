@@ -16,7 +16,6 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_NAME_STRATEGY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
 
 import java.util.List;
@@ -40,8 +39,6 @@ import org.apache.jmeter.threads.JMeterVariables;
 @NoArgsConstructor
 public class KeyDeserializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String keySubjectName;
-
   private List<FieldValueMapping> keySchemaProperties;
 
   private String keySchemaType;
@@ -54,7 +51,6 @@ public class KeyDeserializedConfigElement extends ConfigTestElement implements T
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
     variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
     variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
     variables.putObject(KEY_DESERIALIZER_CLASS_PROPERTY, keyDeserializerConfiguration);

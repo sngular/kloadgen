@@ -51,8 +51,6 @@ public class KeyFileDeserializedConfigElement extends ConfigTestElement implemen
 
   private String keyDeserializerConfiguration;
 
-  private String keyNameStrategy;
-
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
@@ -62,7 +60,6 @@ public class KeyFileDeserializedConfigElement extends ConfigTestElement implemen
     variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
     variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
     variables.putObject(KEY_DESERIALIZER_CLASS_PROPERTY, keyDeserializerConfiguration);
-    variables.putObject(KEY_NAME_STRATEGY, keyNameStrategy);
     variables.putObject(SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 

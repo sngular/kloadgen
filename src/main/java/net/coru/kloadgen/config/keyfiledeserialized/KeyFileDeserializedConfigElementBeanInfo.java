@@ -36,21 +36,14 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
   private static final String KEY_DESERIALIZER_PROPERTY = "keyDeserializerConfiguration";
 
-  private static final String KEY_NAME_STRATEGY = "keyNameStrategy";
-
   public KeyFileDeserializedConfigElementBeanInfo() {
 
     super(KeyFileDeserializedConfigElement.class);
 
     createPropertyGroup("key_deserialized_load_generator", new String[]{
-        KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION, KEY_SCHEMA_PROPERTIES
+        /*KEY_NAME_STRATEGY, */KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION,
+            KEY_SCHEMA_PROPERTIES
     });
-
-    PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
-    nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
-    nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    nameStrategyPropertyProps.setValue(DEFAULT, "");
-    nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor serializerPropertyProps = property(KEY_DESERIALIZER_PROPERTY);
     serializerPropertyProps.setPropertyEditorClass(KeyDeserializerPropertyEditor.class);
@@ -82,16 +75,12 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     tableProperties.setValue(TableEditor.HEADERS,
         new String[]{
             "Field Name",
-            "Field Type",
-            "Field Length",
-            "Field Values List"
+            "Field Type"
         });
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
         new String[]{
             FieldValueMapping.FIELD_NAME,
-            FieldValueMapping.FIELD_TYPE,
-            FieldValueMapping.VALUE_LENGTH,
-            FieldValueMapping.FIELD_VALUES_LIST
+            FieldValueMapping.FIELD_TYPE
         });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);

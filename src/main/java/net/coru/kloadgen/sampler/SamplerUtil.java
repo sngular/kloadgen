@@ -59,7 +59,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
-import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
@@ -190,6 +189,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SASL_KERBEROS_SERVICE_NAME, SASL_KERBEROS_SERVICE_NAME_DEFAULT);
     defaultParameters.addArgument(SASL_MECHANISM, SASL_MECHANISM_DEFAULT);
     defaultParameters.addArgument(VALUE_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
+    defaultParameters.addArgument(KEY_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
     defaultParameters.addArgument(SSL_ENABLED, FLAG_NO);
     defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "<Keystore Location>");
@@ -216,6 +216,7 @@ public final class SamplerUtil {
   public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
     Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
+
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY))) {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY));
     } else {
@@ -228,6 +229,12 @@ public final class SamplerUtil {
     }
     if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
       props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
+    }
+    if(Objects.nonNull(context.getJMeterVariables().get(VALUE_NAME_STRATEGY))){
+      props.put(VALUE_NAME_STRATEGY, context.getJMeterVariables().get(VALUE_NAME_STRATEGY));
+    }
+    if (Objects.nonNull(context.getJMeterVariables().get(KEY_NAME_STRATEGY))) {
+      props.put(KEY_NAME_STRATEGY, context.getJMeterVariables().get(KEY_NAME_STRATEGY));
     }
 
     props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));

@@ -32,22 +32,15 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
 
   private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeSerializerConfiguration";
 
-  private static final String VALUE_NAME_STRATEGY = "valueNameStrategy";
-
   public ValueFileDeserializedConfigElementBeanInfo() {
 
     super(ValueFileDeserializedConfigElement.class);
 
     createPropertyGroup("file_deserialized_load_generator", new String[]{
-        VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_TYPE, VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES,
+        VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_TYPE, VALUE_SUBJECT_NAME,
+            VALUE_SCHEMA_PROPERTIES,
         VALUE_SCHEMA_DEFINITION
     });
-
-    PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);
-    nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
-    nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    nameStrategyPropertyProps.setValue(DEFAULT, "");
-    nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor deserializerPropertyProps = property(VALUE_DESERIALIZER_PROPERTY);
     deserializerPropertyProps.setPropertyEditorClass(ValueDeserializerPropertyEditor.class);

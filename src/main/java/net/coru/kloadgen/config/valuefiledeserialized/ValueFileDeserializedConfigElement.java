@@ -46,8 +46,6 @@ public class ValueFileDeserializedConfigElement extends ConfigTestElement implem
 
   private String valueDeSerializerConfiguration;
 
-  private String valueNameStrategy;
-
   @Override
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
@@ -57,7 +55,6 @@ public class ValueFileDeserializedConfigElement extends ConfigTestElement implem
     variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
     variables.putObject(VALUE_SUBJECT_NAME, valueSubjectName);
     variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY, valueDeSerializerConfiguration);
-    variables.putObject(VALUE_NAME_STRATEGY, valueNameStrategy);
   }
 
 }

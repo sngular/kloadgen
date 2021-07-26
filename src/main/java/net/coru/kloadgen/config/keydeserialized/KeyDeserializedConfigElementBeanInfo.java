@@ -13,19 +13,12 @@
 package net.coru.kloadgen.config.keydeserialized;
 
 import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.KeyDeserializerPropertyEditor;
 import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
-import net.coru.kloadgen.property.editor.SerialisedSubjectPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
-import org.apache.jmeter.testbeans.gui.TableEditor;
-import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
-
-  private static final String KEY_SUBJECT_NAME = "keySubjectName";
 
   private static final String KEY_SCHEMA_PROPERTIES = "keySchemaProperties";
 
@@ -40,7 +33,7 @@ public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     super(KeyDeserializedConfigElement.class);
 
     createPropertyGroup("key_deserialized_load_generator", new String[]{
-        KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, KEY_SUBJECT_NAME, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
+        KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, /*KEY_SUBJECT_NAME,*/ KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
     });
 
     PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
@@ -54,31 +47,6 @@ public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     serializerPropertyProps.setValue(DEFAULT, "");
     serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
-
-    TypeEditor tableEditor = TypeEditor.TableEditor;
-    PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
-    tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
-    tableProperties.setValue(TableEditor.HEADERS,
-        new String[]{
-            "Field Name",
-            "Field Type",
-            "Field Length",
-            "Field Values List"
-        });
-    tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
-        new String[]{
-            FieldValueMapping.FIELD_NAME,
-            FieldValueMapping.FIELD_TYPE,
-            FieldValueMapping.VALUE_LENGTH,
-            FieldValueMapping.FIELD_VALUES_LIST
-        });
-    tableProperties.setValue(DEFAULT, new ArrayList<>());
-    tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
-
-    PropertyDescriptor subjectNameProps = property(KEY_SUBJECT_NAME);
-    subjectNameProps.setPropertyEditorClass(SerialisedSubjectPropertyEditor.class);
-    subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     PropertyDescriptor schemaType = property(KEY_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);

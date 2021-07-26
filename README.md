@@ -249,6 +249,37 @@ In the sequence generator you can specify an starting value just put it in the F
 others will be not consider.
 Other values will be considered Constants for this field and will be converted to the Field Type. Keep that in mind to avoid Cast Exceptions
 
+### Value Schema Deserialization Configuration
+
+This configuration component allows to specify a Name Strategy to get the correct schema from registry and use it to 
+deserialize read messages. It also allows to select a deserializer, if Avro is being used,
+**KafkaAvroDeserializer** must be chosen.
+
+### Value Schema File Deserialization Configuration
+
+This configuration component will allow you to select a schema from a file (.avsc)
+
+AVRO structure will be flattened and shown in the table. You can see 2 columns:
+
+* **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.
+PropClass2.PropClass3 *Note* In case to be an array [] will appear at the end.
+* **Field Type** : Field type, like String, Int, Double, Map, Array... **Note** : if the field is an array of basic 
+  types it will be shown as string-array, int-array...
+  
+In this configuration screen you can also choose a deserializer. Make sure to **chose our custom deserializer** when 
+you 
+are using a schema loaded from a file. (*net.coru.kloadgen.serializer.AvroDeserializer*)
+
+### Key Schema Deserialization Configuration
+
+Similar to Value Schema Deserialization Configuration, but focus to configure Key Schema deserialization. Whatever 
+settings selected here will be used to deserialize message Keys.
+
+### Key Schema File Deserialization Configuration
+
+Similar to Value Schema File Deserialization Configuration, but focus to configure Key Schema deserialization. Whatever
+settings selected here will be used to deserialize message Keys.
+
 ### Kafka Headers Configuration
 
 This configuration component allow to specify a list of header which will be included in the producer. Headers specified here will be included in every message after be serialized.
