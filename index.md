@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # KLoadGen - Kafka Load Generator
 
 Generate performance and business-logic tests in an easy and maintainable way
@@ -33,4 +37,3 @@ We'll be happy to talk and discuss how KLoadGen can help you :-)
 * *Email* [email](mailto:info@corunet.com)
 * *Web* [web](https://corunet.com/)
 * *Twitter* [twitter](https://twitter.com/corunet)
-  
