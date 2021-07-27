@@ -117,7 +117,7 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 * **ssl.endpoint.identification.algorithm** : SSL endpoint Identification algorithm. Leave default value is you don't want to sent it.
 * **auto.register.schemas** : Allow or disallow SchemaRegistry Client to register the schema if missing
 
-![Kafka Producer Configuration](/Kafka Producer Properties.png)
+![Kafka Producer Configuration](/Kafka_Producer_Properties.png)
 
 ### Schema Registry Configuration
 
@@ -152,13 +152,13 @@ We will see 4 columns where we will configure the Random Generator system.
   * **Field Length** : Field length configuration for the Random Tool. In case of an String mean the number of characters, in case of a Number the number of digits.
   * **Field Values List** : Field possibles values which will be used by the Random Tool to generate values.
 
-![Load Generator Table](/Value Schema Load Generator Config.png)
+![Load Generator Table](/Value_Schema_Load_Generator_Config.png)
 
 ### Value File Load Generator Configuration
 
 This screen will allow to choose a schema from file(.avsc or.json).
 
-![File Generator Table](/Value Schema File Load Generator Config.png)
+![File Generator Table](/Value_Schema_File_Load_Generator_Config.png)
 
 AVRO or Json structure will be flattened and show in the table.
 We will see 4 columns where we will configure the Random Generator system.
@@ -183,7 +183,7 @@ Similar to the Value File Schema configuration element, but focus to configure a
 
 Similar to the Value Schema configuration element, but focus to configure a Key Schema. Whatever schema define and configure here will be used as a Key Message.
 
-![Key Plain Load Generator Config](/Key Plain Load Generator Config.png)
+![Key Plain Load Generator Config](/Key_Plain_Load_Generator_Config.png)
 
 ### Schema Template Functions
 
