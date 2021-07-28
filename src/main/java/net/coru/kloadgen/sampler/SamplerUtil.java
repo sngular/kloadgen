@@ -43,6 +43,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
+import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
@@ -181,7 +182,6 @@ public final class SamplerUtil {
     defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG,"earliest");
     defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
     defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
-    defaultParameters.addArgument(MESSAGE_KEY_KEY_VALUE, MSG_KEY_VALUE);
     defaultParameters.addArgument(KERBEROS_ENABLED, FLAG_NO);
     defaultParameters.addArgument(JAAS_ENABLED, FLAG_NO);
     defaultParameters.addArgument(JAVA_SEC_AUTH_LOGIN_CONFIG, JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT);
@@ -202,14 +202,11 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
     defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
     defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
-    defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
-    defaultParameters.addArgument(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false");
-    defaultParameters.addArgument("timeout.millis", "5000");
+    defaultParameters.addArgument(TIMEOUT_MILLIS, "5000");
     defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
-    defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG, "earliest");
     return defaultParameters;
   }
 
@@ -227,6 +224,7 @@ public final class SamplerUtil {
     } else {
       props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
+
     if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
       props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
     }
@@ -241,20 +239,31 @@ public final class SamplerUtil {
     props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
+
     props.put(KAFKA_TOPIC_CONFIG, context.getParameter(KAFKA_TOPIC_CONFIG));
     props.put(GROUP_ID_CONFIG, context.getParameter(GROUP_ID_CONFIG));
     if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
+    if (Objects.nonNull(context.getParameter(CLIENT_ID_CONFIG))){
+      props.put(CLIENT_ID_CONFIG, context.getParameter(CLIENT_ID_CONFIG));
+    }
+
     if (Objects.nonNull(context.getJMeterVariables().get(VALUE_SCHEMA))) {
       props.put(VALUE_SCHEMA, context.getJMeterVariables().get(VALUE_SCHEMA));
     }
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_SCHEMA))) {
       props.put(KEY_SCHEMA, context.getJMeterVariables().get(KEY_SCHEMA));
     }
+
     if (Objects.nonNull(context.getParameter(AUTO_OFFSET_RESET_CONFIG))){
       props.put(AUTO_OFFSET_RESET_CONFIG, context.getParameter(AUTO_OFFSET_RESET_CONFIG));
     }
+    if (Objects.nonNull(context.getParameter(TIMEOUT_MILLIS))){
+      props.put(TIMEOUT_MILLIS, context.getParameter(TIMEOUT_MILLIS));
+    }
+
+
     Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
       if (parameter.startsWith("_")) {

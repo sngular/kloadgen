@@ -7,6 +7,17 @@ ___
 
 KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO and JSON schema. It allows sending kafka messages with a structure defined as an AVRO Schema or a Json Schema. It connects to the Scheme Registry Server, retrieve the subject to send and generate a random message every time.
 
+## Table of contents
+
+---
+
+* [Getting Started](#getting-started)
+* [Producer setup](#producer-setup)
+* [Consumer setup](#consumer-setup)
+* [Example Test Plan](#example-test-plan)
+* [StandAlone execution](#standalone-execution)
+* [Special Thanks](#special-thanks)
+
 ## Getting Started
 
 ___
@@ -15,19 +26,33 @@ KLoadGen includes eight main components
 
 * **Kafka Schema Sampler** : This jmeter java sampler sends messages to kafka, it uses the value and key configuration and generate a data matching that definition. 
 
+* **Kafka Consumer Sampler** : This jmeter java sampler reads messages from kafka, it uses the value and key 
+  configuration to deserialize read messages.
+
 * **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property
   configurations.
 
 * **Value Serialized Config** : This jmeter config element generates plaintext messages based on input schema template designed.
 
 * **Value File Serialized Config** : This jmeter config element allows to upload a value schema file instead to get it from the Schema
-  Registry
+  Registry.
+  
+* **Value Deserialized Config** : This jmeter config element allows you to define how the value of a message is 
+  deserialized.
+
+* **Value Deserialized Config** : This jmeter config element allows to upload a value schema file to deserialize 
+  messages.
 
 * **Schema Registry Config** : This jmeter config element allows to configure the connection to a Schema Registry, security access,....
 
 * **Key Serialized Config** : This jmeter config allows to configure a Key Schema from a Schema Registry
 
 * **Key File Serialized Config** : This jmeter config allows to upload a key schema file instead to get it from the Schema Registry
+
+* **Key Deserialized Config** : This jmeter config element allows you to define how the key of a message is
+  deserialized.
+  
+* **Key File Deserialized Config** : This jmeter config allows to upload a key schema to deserialize message key.
 
 * **Key Simple Config** : This jmeter config allows to define a simple basic key to send into de message.
 
@@ -84,6 +109,10 @@ or just
 ```
 
 Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
+
+## Producer setup
+
+---
 
 ### KLoadGenSampler
 
@@ -249,11 +278,67 @@ In the sequence generator you can specify an starting value just put it in the F
 others will be not consider.
 Other values will be considered Constants for this field and will be converted to the Field Type. Keep that in mind to avoid Cast Exceptions
 
+### Kafka Headers Configuration
+
+This configuration component allow to specify a list of header which will be included in the producer. Headers specified here will be included in every message after be serialized.
+Values will follow the same rules and the message body, if specify a type (basic type) it will generate a random value. If a value is set will be treated as String and serialize in the same way.
+
+[Kafka Header Config](/Kafka_header_config_element.png)
+
+## Consumer setup
+
+---
+
+### KLoadGenConsumerSampler
+
+* **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
+* **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
+* **kafka.topic.name** : Topic on which messages will be sent
+* **send.buffer.bytes** : The size of the TCP send buffer (SO_SNDBUF) to use when sending data. If the value is -1, the OS default will be used.
+* **receive.buffer.bytes** : The size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is -1, the OS default will be used.
+* **auto.offset.reset** : The initial position for each assigned partition when the group is first created before 
+  consuming any message. This value can be: earliest or latest.
+* **security.protocol** : kafka producer protocol. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+* **message.key.type** : Default message key type.
+* **kerberos.auth.enabled** : YES/NO if it is disabled all below properties will be ignored
+* **java.security.auth.login.config** : jaas.conf of kafka Kerberos
+* **java.security.krb5.conf** : Kerberos server krb5.conf file
+* **sasl.kerberos.service.name** : Kafka Kerberos service name
+* **sasl.mechanism** : Configure SASL mechanism to use to connect to the kafka cluster. GSSAPI by default
+* **value.subject.name.strategy** : Default value name strategy.
+* **key.subject.name.strategy** : Default key name strategy.  
+* **ssl.enabled** : SSL Flag enabled/disabled use of SSL. NO as Default.
+* **ssl.key.password** : SSL password
+* **ssl.keystore.location** : SSL Keystore location
+* **ssl.keystore.password** : SSL Keystore password
+* **ssl.truststore.location** : SSL Trust Store location
+* **ssl.truststore.password** : SSL Trust Store password
+* **client.id** : Kafka producer Client ID
+* **security.providers** : 
+* **ssl.enabled.protocols** : SSL Enabled protocols TLSv1.2, TLSv1.3
+* **ssl.endpoint.identification.algorithm** : SSL endpoint Identification algorithm. Leave default value is you don't want to sent it.
+* **ssl.keymanager.algorithm** : The algorithm used by key manager factory for SSL connections.
+* **ssl.protocol** : The SSL protocol used to generate the SSLContext.
+* **ssl.keystore.type** : Type of the repository of security certificates.
+* **ssl.provider** : The name of the security provider used for SSL connections.
+* **timeout.millis** :
+* **group.id** : Specifies the name of the consumer group the consumers will belong to.
+
+![Kafka Consumer Configuration](/Kafka_Consumer_Properties.png)
+
+>KLoadGen Consumer Sampler is compatible with **JSON** and **AVRO** messages. If **JSON** is being used, no extra 
+> configuration is 
+> needed, sampler will work with default deserialization settings. If **AVRO** is being used, some of the following 
+> components must to be configured in order to define how messages will be deserialized.
+
+
 ### Value Schema Deserialization Configuration
 
 This configuration component allows to specify a Name Strategy to get the correct schema from registry and use it to 
 deserialize read messages. It also allows to select a deserializer, if Avro is being used,
-**KafkaAvroDeserializer** must be chosen.
+**KafkaAvroDeserializer** must be chosen. (*io.confluent.kafka.serializers.KafkaAvroDeserializer*)
+
+![Value Schema Deserialization Configuration](/Value_Schema_Deserialization_Config.png)
 
 ### Value Schema File Deserialization Configuration
 
@@ -270,6 +355,8 @@ In this configuration screen you can also choose a deserializer. Make sure to **
 you 
 are using a schema loaded from a file. (*net.coru.kloadgen.serializer.AvroDeserializer*)
 
+![Value Schema File Deserialization Configuration](/Value_Schema_File_Deserialization_Config.png)
+
 ### Key Schema Deserialization Configuration
 
 Similar to Value Schema Deserialization Configuration, but focus to configure Key Schema deserialization. Whatever 
@@ -280,18 +367,15 @@ settings selected here will be used to deserialize message Keys.
 Similar to Value Schema File Deserialization Configuration, but focus to configure Key Schema deserialization. Whatever
 settings selected here will be used to deserialize message Keys.
 
-### Kafka Headers Configuration
+## Example Test Plan
 
-This configuration component allow to specify a list of header which will be included in the producer. Headers specified here will be included in every message after be serialized.
-Values will follow the same rules and the message body, if specify a type (basic type) it will generate a random value. If a value is set will be treated as String and serialize in the same way.
-
-[Kafka Header Config](/Kafka_header_config_element.png)
-
-### Example Test Plan
+---
 
 [Here](/Example-Test-Plan.jmx) you can find an example of a JMeter Test Plan using the elements defined in this plugin. This test plan will only inject messages in a Kafka Cluster. **Before** execute it you should add your Schema Registry to retrieve the Schema in order to extract the Entity structure. In a future we will include support to read AVRO files.
 
 ## StandAlone execution
+
+---
 
 This plugin also support an StandAlone execution. Only requires a JMeter installation in order to read some configuration files:
 * jmeter.properties
@@ -327,5 +411,7 @@ And some optional ones who will let us configura the JMeter Engine and the test 
 - "l" or "logFileName" : Jtl File where logs will be dump
 
 ## Special Thanks
+
+---
 
 * We would like to special thanks to [pepper-box](https://github.com/GSLabDev/pepper-box) for give us the base to create this plugin and the main ideas about how to face it.

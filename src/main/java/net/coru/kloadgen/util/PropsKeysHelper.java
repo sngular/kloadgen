@@ -53,4 +53,6 @@ public class PropsKeysHelper {
   public static final String VALUE_DESERIALIZER_CLASS_PROPERTY = "value.deserializer.class.property";
 
   public static final String KEY_DESERIALIZER_CLASS_PROPERTY = "key.deserializer.class.property";
+
+  public static final String TIMEOUT_MILLIS = "timeout.millis";
 }
