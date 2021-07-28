@@ -9,8 +9,6 @@ KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO an
 
 ## Table of contents
 
----
-
 * [Getting Started](#getting-started)
 * [Producer setup](#producer-setup)
 * [Consumer setup](#consumer-setup)
@@ -19,8 +17,6 @@ KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO an
 * [Special Thanks](#special-thanks)
 
 ## Getting Started
-
-___
 
 KLoadGen includes eight main components
 
@@ -57,8 +53,6 @@ KLoadGen includes eight main components
 * **Key Simple Config** : This jmeter config allows to define a simple basic key to send into de message.
 
 ### Setup
-
-___
 
 #### Requirement
 
@@ -112,8 +106,6 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 
 ## Producer setup
 
----
-
 ### KLoadGenSampler
 
 * **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
@@ -162,6 +154,7 @@ Server URL will be introduced and properties will be set in the table below. Onl
 | schema.registry.bearer | String | The bearer for Token authentication |
 
 The _Test Registry_ button will test the connection properties and **retrieve** the subjects list from the Schema Registry.
+
 ![Schema Registy Config](/Schema_Registry_Config.png)
 
 Subject list will be used when configure the AVRO schema to download.
@@ -287,8 +280,6 @@ Values will follow the same rules and the message body, if specify a type (basic
 
 ## Consumer setup
 
----
-
 ### KLoadGenConsumerSampler
 
 * **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
@@ -331,7 +322,6 @@ Values will follow the same rules and the message body, if specify a type (basic
 > needed, sampler will work with default deserialization settings. If **AVRO** is being used, some of the following 
 > components must to be configured in order to define how messages will be deserialized.
 
-
 ### Value Schema Deserialization Configuration
 
 This configuration component allows to specify a Name Strategy to get the correct schema from registry and use it to 
@@ -369,13 +359,9 @@ settings selected here will be used to deserialize message Keys.
 
 ## Example Test Plan
 
----
-
 [Here](/Example-Test-Plan.jmx) you can find an example of a JMeter Test Plan using the elements defined in this plugin. This test plan will only inject messages in a Kafka Cluster. **Before** execute it you should add your Schema Registry to retrieve the Schema in order to extract the Entity structure. In a future we will include support to read AVRO files.
 
 ## StandAlone execution
-
----
 
 This plugin also support an StandAlone execution. Only requires a JMeter installation in order to read some configuration files:
 * jmeter.properties
