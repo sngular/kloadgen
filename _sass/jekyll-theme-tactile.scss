@@ -15,12 +15,20 @@ body {
   background-color: $white;
 }
 
+.wrapper {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
 .banner {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
   background-color: $purple;
-  padding: 0.25rem 2rem;
+  padding: 0.4rem 1rem;
+
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
 
   .img {
     width: 60px;
@@ -30,24 +38,36 @@ body {
 .header {
   background: $black;
   color: $white;
-  padding: 2rem;
+  padding: 2rem 1rem;
+
+  .wrapper {
+    padding: 0 2rem;
+  }
 
   .title {
-    font-size: clamp(3em, 11.5vw, 9em);
+    font-size: clamp(3em, 11.5vw, 8em);
     font-style: italic;
     font-weight: 500;
     margin-bottom: .5rem;
+    text-align: center;
   }
 
   .description {
-    font-size: clamp(1em, 20vw, 2em);
+    font-size: 1.5rem;
     max-width: 60ch;
     line-height: 1.5;
+    text-align: center;
   }
 }
 
 .content {
-  padding: 2rem;
+  background-color: $white-dark-10;
+  padding: 0 1rem;
+
+  .wrapper {
+    padding: 2rem;
+    background-color: $white;
+  }
 
   h1,
   h2,
@@ -55,7 +75,6 @@ body {
   h4 {
     color: $purple;
     font-weight: 500;
-    font-style: italic;
   }
 
   p,
@@ -97,7 +116,7 @@ body {
 
   ul,
   ol {
-    list-style-type: "☞";
+    list-style-type: square;
     font-size: 3rem;
     margin-left: 2rem;
 
@@ -106,4 +125,31 @@ body {
     }
   }
 
+  em {
+    font-style: italic;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  a {
+    text-decoration: underline;
+    color: $purple;
+  }
+
+}
+
+.footer {
+  background: $black;
+  color: $white;
+  padding: 2rem 1rem;
+
+  a {
+    color: currentColor;
+  }
+
+  .wrapper {
+    padding: 0 2rem;
+  }
 }
