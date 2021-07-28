@@ -398,6 +398,4 @@ And some optional ones who will let us configura the JMeter Engine and the test 
 
 ## Special Thanks
 
----
-
 * We would like to special thanks to [pepper-box](https://github.com/GSLabDev/pepper-box) for give us the base to create this plugin and the main ideas about how to face it.
