@@ -12,7 +12,6 @@
 
 package net.coru.kloadgen.config.keyfiledeserialized;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_NAME_STRATEGY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;

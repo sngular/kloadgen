@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.KeyDeserializerPropertyEditor;
-import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;

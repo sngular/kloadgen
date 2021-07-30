@@ -21,18 +21,13 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.util.RebalanceListener;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterThread;
-import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -48,8 +43,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   private Long timeout;
   private KafkaConsumer<Object, Object> consumer;
   public RebalanceListener rebalanceListener;
-  private int maxIterations = 0;
-  private int countIterations;
 
   @Override
   public Arguments getDefaultParameters() {
@@ -73,15 +66,11 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   @Override
   public void setupTest(JavaSamplerContext context) {
 
-    LoopController loopController = (LoopController) context.getJMeterContext().getThreadGroup().getSamplerController();
     Properties props = properties(context);
     String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
     consumer = new KafkaConsumer<>(props);
 
     consumer.subscribe(Collections.singletonList(topic));
-
-    maxIterations = loopController.getLoops();
-    countIterations = 0;
   }
 
   private Transformer<PartitionInfo, TopicPartition> transform() {
@@ -117,13 +106,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
       logger().error("Failed to receive message", e);
       fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",
               false);
-    } finally {
-      countIterations ++;
-      if (countIterations >= maxIterations){
-        if (Objects.nonNull(consumer)) {
-          consumer.close();
-        }
-      }
     }
     return sampleResult;
   }

@@ -38,13 +38,33 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.*;
+
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY;
+import static net.coru.kloadgen.util.PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.TIMEOUT_MILLIS;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
+
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
-import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
-import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.CommonClientConfigs.*;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
@@ -206,6 +226,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
     defaultParameters.addArgument(TIMEOUT_MILLIS, "5000");
+    defaultParameters.addArgument(MAX_POLL_INTERVAL_MS_CONFIG, "1000");
     defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
     return defaultParameters;
   }
@@ -272,7 +293,8 @@ public final class SamplerUtil {
     });
 
     verifySecurity(context, props);
-    props.put("timeout.millis", context.getParameter("timeout.millis"));
+
+    props.put(MAX_POLL_INTERVAL_MS_CONFIG, context.getParameter(MAX_POLL_INTERVAL_MS_CONFIG));
     return props;
   }
 
