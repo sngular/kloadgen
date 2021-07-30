@@ -64,7 +64,10 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
-import static org.apache.kafka.clients.CommonClientConfigs.*;
+import static org.apache.kafka.clients.CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG;
+import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
+
 import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
@@ -231,10 +234,7 @@ public final class SamplerUtil {
     return defaultParameters;
   }
 
-  public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
-    Properties props = new Properties();
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-
+  public static void setupConsumerDeserializerProperties(JavaSamplerContext context, Properties props){
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY))) {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY));
     } else {
@@ -245,7 +245,9 @@ public final class SamplerUtil {
     } else {
       props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
+  }
 
+  public static void setupConsumerSchemaRegistyProperties(JavaSamplerContext context, Properties props){
     if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
       props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
     }
@@ -255,6 +257,14 @@ public final class SamplerUtil {
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_NAME_STRATEGY))) {
       props.put(KEY_NAME_STRATEGY, context.getJMeterVariables().get(KEY_NAME_STRATEGY));
     }
+  }
+
+  public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
+    Properties props = new Properties();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
+
+    setupConsumerDeserializerProperties(context,props);
+    setupConsumerSchemaRegistyProperties(context,props);
 
     props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
     props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
@@ -263,12 +273,8 @@ public final class SamplerUtil {
 
     props.put(KAFKA_TOPIC_CONFIG, context.getParameter(KAFKA_TOPIC_CONFIG));
     props.put(GROUP_ID_CONFIG, context.getParameter(GROUP_ID_CONFIG));
-    if (Objects.nonNull(context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
-      props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
-    }
-    if (Objects.nonNull(context.getParameter(CLIENT_ID_CONFIG))){
-      props.put(CLIENT_ID_CONFIG, context.getParameter(CLIENT_ID_CONFIG));
-    }
+
+    props.put(CLIENT_ID_CONFIG, context.getParameter(CLIENT_ID_CONFIG));
 
     if (Objects.nonNull(context.getJMeterVariables().get(VALUE_SCHEMA))) {
       props.put(VALUE_SCHEMA, context.getJMeterVariables().get(VALUE_SCHEMA));
@@ -277,13 +283,8 @@ public final class SamplerUtil {
       props.put(KEY_SCHEMA, context.getJMeterVariables().get(KEY_SCHEMA));
     }
 
-    if (Objects.nonNull(context.getParameter(AUTO_OFFSET_RESET_CONFIG))){
-      props.put(AUTO_OFFSET_RESET_CONFIG, context.getParameter(AUTO_OFFSET_RESET_CONFIG));
-    }
-    if (Objects.nonNull(context.getParameter(TIMEOUT_MILLIS))){
-      props.put(TIMEOUT_MILLIS, context.getParameter(TIMEOUT_MILLIS));
-    }
-
+    props.put(AUTO_OFFSET_RESET_CONFIG, context.getParameter(AUTO_OFFSET_RESET_CONFIG));
+    props.put(TIMEOUT_MILLIS, context.getParameter(TIMEOUT_MILLIS));
 
     Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
