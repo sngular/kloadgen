@@ -2,11 +2,7 @@
 layout: default
 ---
 
-# KLoadGen - Kafka Load Generator
-
-Generate performance and business-logic tests in an easy and maintainable way
-
-## What is it?
+## What for?
 
 Kafka Load Generator, aka _KLoadGen_, is a JMeter plugin that **allows generating and injecting synthetic data into a Kafka-based, event architecture**.
 
@@ -21,9 +17,9 @@ Best-in-class Kafka performance tests generator, KLoadGen supports:
 * Data generation for both basic data types AND complex structures (such as arrays or maps)
 * _Specifying some Data Sets for generating data with_.
 
-## Why I need it?
+## Why for?
 
-It will let you easily to:
+It will easily let you:
 
 * **Define schemas for you test** through the Schema Registry support or by specifying a file with the schema.
 * **Generate synthetic data** through our data generator that can use Schema Constraints (JSON Schema) to generate matching data.
@@ -31,9 +27,6 @@ It will let you easily to:
 
 ## Contact us!
 
-We'll be happy to talk and discuss how KLoadGen can help you :-)
+We'll be glad to talk and discuss how KLoadGen can help you :-)
 
-* *Github Issues* [here](https://github.com/corunet/kloadgen/issues)
-* *Email* [email](mailto:info@corunet.com)
-* *Web* [web](https://corunet.com/)
-* *Twitter* [twitter](https://twitter.com/corunet)
+Reach us through [GitHub issues](https://github.com/corunet/kloadgen/issues), [email](mailto:info@corunet.com)  or [twitter](https://twitter.com/corunet)

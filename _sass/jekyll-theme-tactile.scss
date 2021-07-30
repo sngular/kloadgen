@@ -45,16 +45,15 @@ body {
   }
 
   .title {
-    font-size: clamp(3em, 11.5vw, 8em);
+    font-size: clamp(3em, 11.5vw, 6em);
     font-style: italic;
     font-weight: 500;
-    margin-bottom: .5rem;
+    margin-bottom: 2rem;
     text-align: center;
   }
 
   .description {
-    font-size: 1.5rem;
-    max-width: 60ch;
+    font-size: 1.2rem;
     line-height: 1.5;
     text-align: center;
   }
@@ -67,6 +66,20 @@ body {
   .wrapper {
     padding: 2rem;
     background-color: $white;
+  }
+
+  .view-on-github {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 1rem;
+
+    p {
+      font-size: 1rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
   }
 
   h1,
@@ -151,5 +164,11 @@ body {
 
   .wrapper {
     padding: 0 2rem;
+  }
+
+  .copyright {
+    &:not(:last-child) {
+      margin-bottom: 1rem;
+    }
   }
 }

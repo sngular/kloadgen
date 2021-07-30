@@ -1,5 +1,5 @@
 title: KLoadGen
-description: KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO schema Registries.
+description: Generate performance and business-logic tests in an easy and maintainable way.
 # show_downloads: true
 # google_analytics:
 theme: jekyll-theme-tactile
