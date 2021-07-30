@@ -1,5 +1,9 @@
 title: KLoadGen
 description: Generate performance and business-logic tests in an easy and maintainable way.
+twitter:
+  username: corunet
+  card: summary
+image: /assets/corunet-logo.svg
 # show_downloads: true
 # google_analytics:
 theme: jekyll-theme-tactile
