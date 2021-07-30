@@ -4,6 +4,7 @@ twitter:
   username: corunet
   card: summary
 image: /assets/corunet-logo.svg
+logo: /assets/corunet-logo.svg
 # show_downloads: true
 # google_analytics:
 theme: jekyll-theme-tactile
