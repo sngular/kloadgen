@@ -16,7 +16,7 @@ public class Util {
 
   }
 
-  public static List<String> cleanFieldsName(List<String> fieldValuesList) {
+  public static List<String> replaceValuesContext(List<String> fieldValuesList) {
     List<String> parameterList = new ArrayList<>(fieldValuesList);
 
     parameterList.replaceAll(fieldValue ->

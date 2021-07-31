@@ -38,17 +38,17 @@ public class AvroGeneratorTool {
   private final RandomObject randomObject = new RandomObject();
 
   public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
-    List<String> parameterList = Util.cleanFieldsName(fieldValuesList);
+    List<String> parameterList = Util.replaceValuesContext(fieldValuesList);
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
   public Object generateArray(String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = Util.cleanFieldsName(fieldValuesList);
+    List<String> parameterList = Util.replaceValuesContext(fieldValuesList);
     return randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
   }
 
   public Object generateObject(Field field, String fieldType, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = Util.cleanFieldsName(fieldValuesList);
+    List<String> parameterList = Util.replaceValuesContext(fieldValuesList);
 
     Object value;
     if (ENUM == field.schema().getType()) {
