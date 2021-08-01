@@ -15,11 +15,11 @@ Best-in-class Kafka performance tests generator, KLoadGen supports:
 * Both AVRO and JSON schemas
 * Specifying schemas for Key and Values
 * Data generation for both basic data types AND complex structures (such as arrays or maps)
-* _Specifying some Data Sets for generating data with_.
+* Specifying data sets to generate data from them
 
-## Why for?
+## Why KLoadGen?
 
-It will easily let you:
+You'll be able to easily:
 
 * **Define schemas for you test** through the Schema Registry support or by specifying a file with the schema.
 * **Generate synthetic data** through our data generator that can use Schema Constraints (JSON Schema) to generate matching data.
