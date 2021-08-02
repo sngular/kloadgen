@@ -229,7 +229,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
     defaultParameters.addArgument(TIMEOUT_MILLIS, "5000");
-    defaultParameters.addArgument(MAX_POLL_INTERVAL_MS_CONFIG, "1000");
+    defaultParameters.addArgument(MAX_POLL_INTERVAL_MS_CONFIG, "3000");
     defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
     return defaultParameters;
   }
