@@ -92,7 +92,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
           running = false;
           ConsumerRecord<Object, Object> record = records.iterator().next();
           fillSampleResult(sampleResult, prettify(record), true);
-          consumer.commitAsync();
+          consumer.commitSync();
         }
 
         Instant endTime = Instant.now();

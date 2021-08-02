@@ -312,7 +312,10 @@ Values will follow the same rules and the message body, if specify a type (basic
 * **ssl.protocol** : The SSL protocol used to generate the SSLContext.
 * **ssl.keystore.type** : Type of the repository of security certificates.
 * **ssl.provider** : The name of the security provider used for SSL connections.
-* **timeout.millis** :
+* **timeout.millis** : Max time trying to poll before considering current partitions empty.
+* **max.poll.interval.ms** : The maximum delay between invocations of poll(). If poll() is not called before 
+  expiration of this timeout, then the consumer is considered failed and the group will rebalance. This value should 
+  be less than timeout.millis.
 * **group.id** : Specifies the name of the consumer group the consumers will belong to.
 
 ![Kafka Consumer Configuration](/Kafka_Consumer_Properties.png)
