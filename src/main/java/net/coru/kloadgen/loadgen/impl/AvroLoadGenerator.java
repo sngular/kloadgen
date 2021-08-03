@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.processor.AvroSchemaProcessor;
 import net.coru.kloadgen.processor.SchemaProcessorLib;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
@@ -31,10 +32,10 @@ public class AvroLoadGenerator implements BaseLoadGenerator {
 
   private SchemaMetadata metadata;
 
-  private final SchemaProcessorLib avroSchemaProcessor;
+  private final AvroSchemaProcessor avroSchemaProcessor;
 
   public AvroLoadGenerator() {
-    avroSchemaProcessor = new SchemaProcessorLib();
+    avroSchemaProcessor = new AvroSchemaProcessor();
   }
 
   public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {

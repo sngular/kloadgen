@@ -1,5 +1,5 @@
 {
-  "name": "details",
+  "name": "Details",
   "type" : "record",
   "fields" :[
     {
@@ -13,7 +13,7 @@
             "name": "AdditionalDetails",
             "fields": [
               {
-                "name": "addType",
+                "name": "otherType",
                 "type": {
                   "name": "AddType",
                   "type": "record",
