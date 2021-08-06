@@ -54,28 +54,18 @@ class AvroRandomToolTest {
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
     return Stream.of(
-        Arguments.of("int", 11, emptyList(), new Field("name", SchemaBuilder.builder().intType()), Math.pow(10, 9)),
-        Arguments.of("long", 11, emptyList(), new Field("name", SchemaBuilder.builder().longType()), Math.pow(10, 10)),
-        Arguments.of("double", 11, emptyList(), new Field("name", SchemaBuilder.builder().doubleType()), Math.pow(10, 10)),
-        Arguments.of("float", 11, emptyList(), new Field("name", SchemaBuilder.builder().floatType()), Math.pow(10, 10))
-    );
+        Arguments.of("int", 10, emptyList(), new Field("name", SchemaBuilder.builder().intType())),
+        Arguments.of("long", 11, emptyList(), new Field("name", SchemaBuilder.builder().longType())),
+        Arguments.of("double", 11, emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
   }
 
   @ParameterizedTest
   @Disabled
   @MethodSource("parametersForGenerateRandomValue")
-  void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Number expected) {
+  void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
     Object number = new AvroRandomTool().generateRandom(fieldType, valueLength, fieldValuesList, field);
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
-    if (number instanceof Integer) {
-      assertThat((Integer) number).isGreaterThan(expected.intValue());
-    } else if (number instanceof Long) {
-      assertThat((Long) number).isGreaterThan(expected.longValue());
-    } else if (number instanceof Double) {
-      assertThat((Double) number).isGreaterThan(expected.doubleValue());
-    } else if (number instanceof Float) {
-      assertThat((Float) number).isGreaterThan(expected.floatValue());
-    }
+    assertThat(String.valueOf(number)).hasSize(valueLength);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {

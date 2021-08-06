@@ -70,10 +70,10 @@ Install openjdk on Fedora, Oracle Linux, Red Hat Enterprise Linux, etc.,
  su -c "yum install java-1.8.0-openjdk-devel"
 ```
 
-For windows and mac and you can:
+For Windows and Mac you can:
 
-* download oracle JDK 11 setup from [here](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
-* using chocolatey (windows):
+* download Oracle JDK 11 setup from [here](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html)
+* using Chocolatey (windows):
         <https://chocolatey.org/packages?q=java>
    brew (mac):
 
@@ -84,14 +84,14 @@ For windows and mac and you can:
 
 #### Build Project
 
-In order to build the project we have 2 profiles based on how you are gone to use it, as an standalone jar or as a Jmeter library under the lib/ext folder.
-By default the build is go to generate the plugin jar, but to switch for standalone just pass it as parameter
+In order to build the project we have 2 profiles based on how you are going to use it; as a standalone jar or as a JMeter library under the lib/ext folder.
+By default the build process will generate the JMeter plugin jar file; if you want to switch to standalone mode you can pass the `standalone` flag:
 
 ```bash
  mvn clean install -P standalone
 ```
 
-if you want to specify the plugin profile is like
+Specifying the plugin profile would be something like:
 
 ```bash
  mvn clean install -P plugin
@@ -102,7 +102,7 @@ or just
  mvn clean install
 ```
 
-Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
+Once the build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
 
 ## Producer setup
 
@@ -143,7 +143,7 @@ Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to
 ### Schema Registry Configuration
 
 This screen will allow to configure the connection to the Schema Registry and retrieve the list of subjects hold there.
-Server URL will be introduced and properties will be set in the table below. Only he actual set of properties are supported.
+Server URL will be introduced and properties will be set in the table below. Only the actual set of properties are supported.
 
 | Property | Values | Description |
 |----------|--------|-------------|
