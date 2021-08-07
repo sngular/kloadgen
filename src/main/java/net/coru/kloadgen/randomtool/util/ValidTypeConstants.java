@@ -8,7 +8,7 @@ package net.coru.kloadgen.randomtool.util;
 
 import java.util.Set;
 
-public class ValidType {
+public class ValidTypeConstants {
 
   // Map type values
   public static final String INT_ARRAY = "int-array";
@@ -79,7 +79,7 @@ public class ValidType {
       ARRAY, MAP, ENUM, STRING, INT, LONG, TIMESTAMP, STRING_TIMESTAMP, SHORT, DOUBLE, LONG_TIMESTAMP, UUID, BOOLEAN, BYTES
   );
 
-  private ValidType() {
+  private ValidTypeConstants() {
 
   }
 }

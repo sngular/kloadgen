@@ -13,7 +13,7 @@ import java.util.Map;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
-import net.coru.kloadgen.randomtool.util.Util;
+import net.coru.kloadgen.randomtool.util.Utils;
 
 public class StatelessGeneratorTool {
 
@@ -26,7 +26,7 @@ public class StatelessGeneratorTool {
   private final RandomObject randomObject = new RandomObject();
 
   public Object generateObject(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = Util.replaceValuesContext(fieldValuesList);
+    List<String> parameterList = Utils.replaceValuesContext(fieldValuesList);
 
     Object value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
     if ("seq".equals(fieldType)) {
@@ -37,12 +37,12 @@ public class StatelessGeneratorTool {
   }
 
   public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
-    List<String> parameterList = Util.replaceValuesContext(fieldValuesList);
+    List<String> parameterList = Utils.replaceValuesContext(fieldValuesList);
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
   public Object generateArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = Util.replaceValuesContext(fieldValuesList);
+    List<String> parameterList = Utils.replaceValuesContext(fieldValuesList);
 
     Object value = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     if ("seq".equals(fieldType)) {

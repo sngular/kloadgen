@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValidType;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.commons.lang3.RandomUtils;
 
 public class RandomMap {
@@ -29,29 +29,29 @@ public class RandomMap {
     Object value;
 
     switch (fieldType) {
-      case ValidType.INT_MAP:
-        value = generate(ValidType.INT, mapSize, fieldValueList, mapSize, constrains);
+      case ValidTypeConstants.INT_MAP:
+        value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidType.LONG_MAP:
-        value = generate(ValidType.LONG, mapSize, fieldValueList, mapSize, constrains);
+      case ValidTypeConstants.LONG_MAP:
+        value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidType.DOUBLE_MAP:
-        value = generate(ValidType.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
+      case ValidTypeConstants.DOUBLE_MAP:
+        value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidType.SHORT_MAP:
-        value = generate(ValidType.SHORT, mapSize, fieldValueList, mapSize, constrains);
+      case ValidTypeConstants.SHORT_MAP:
+        value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidType.FLOAT_MAP:
-        value = generate(ValidType.FLOAT, mapSize, fieldValueList, mapSize, constrains);
+      case ValidTypeConstants.FLOAT_MAP:
+        value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidType.STRING_MAP:
-        value = generate(ValidType.STRING, mapSize, fieldValueList, mapSize, constrains);
+      case ValidTypeConstants.STRING_MAP:
+        value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, mapSize, constrains);
         break;
-      case ValidType.UUID_MAP:
-        value = generate(ValidType.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+      case ValidTypeConstants.UUID_MAP:
+        value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
         break;
-      case ValidType.BOOLEAN_MAP:
-        value = generate(ValidType.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+      case ValidTypeConstants.BOOLEAN_MAP:
+        value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
         break;
       default:
         value = fieldType;
@@ -87,22 +87,22 @@ public class RandomMap {
         String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
           switch (type) {
-            case ValidType.INT:
+            case ValidTypeConstants.INT:
               map.put(tempValue[0], Integer.parseInt(tempValue[1]));
               break;
-            case ValidType.LONG:
+            case ValidTypeConstants.LONG:
               map.put(tempValue[0], Long.parseLong(tempValue[1]));
               break;
-            case ValidType.FLOAT:
+            case ValidTypeConstants.FLOAT:
               map.put(tempValue[0], Float.parseFloat(tempValue[1]));
               break;
-            case ValidType.DOUBLE:
+            case ValidTypeConstants.DOUBLE:
               map.put(tempValue[0], Double.parseDouble(tempValue[1]));
               break;
-            case ValidType.SHORT:
+            case ValidTypeConstants.SHORT:
               map.put(tempValue[0], Short.parseShort(tempValue[1]));
               break;
-            case ValidType.UUID:
+            case ValidTypeConstants.UUID:
               map.put(tempValue[0], UUID.fromString(tempValue[1]));
               break;
             default:
@@ -122,7 +122,7 @@ public class RandomMap {
     if (map.size() != mapSize) {
       for (int i = 0; i <= Math.abs(map.size() - mapSize); i++) {
         map.put(
-            (String) randomObject.generateRandom(ValidType.STRING, valueLength, Collections.emptyList(), constrains),
+            (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), constrains),
             randomObject.generateRandom(type, valueLength, Collections.emptyList(), constrains)
         );
       }

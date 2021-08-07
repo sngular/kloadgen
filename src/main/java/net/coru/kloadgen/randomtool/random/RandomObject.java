@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.UUID;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.Util;
-import net.coru.kloadgen.randomtool.util.ValidType;
+import net.coru.kloadgen.randomtool.util.Utils;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,11 +26,11 @@ import org.apache.commons.lang3.StringUtils;
 public class RandomObject {
 
   public boolean isTypeValid(String type) {
-    return ValidType.VALID_OBJECT_TYPES.contains(type);
+    return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
   }
 
   public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    return Util.castValue(
+    return Utils.castValue(
         context.compute(fieldName, (fieldNameMap,
             seqObject) -> seqObject == null ? getSafeValue(fieldValueList) : ((Long) seqObject) + 1),
         fieldType);
@@ -40,63 +40,63 @@ public class RandomObject {
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
     switch (fieldType) {
-      case ValidType.STRING:
+      case ValidTypeConstants.STRING:
         value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
         break;
-      case ValidType.INT:
+      case ValidTypeConstants.INT:
         try {
           value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).intValueExact();
         } catch (ArithmeticException exception) {
           value = Integer.MAX_VALUE;
         }
         break;
-      case ValidType.LONG:
+      case ValidTypeConstants.LONG:
         try {
           value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).longValueExact();
         } catch (ArithmeticException exception) {
           value = Long.MAX_VALUE;
         }
         break;
-      case ValidType.SHORT:
+      case ValidTypeConstants.SHORT:
         try {
           value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).shortValueExact();
         } catch (ArithmeticException exception) {
           value = Short.MAX_VALUE;
         }
         break;
-      case ValidType.DOUBLE:
+      case ValidTypeConstants.DOUBLE:
         try {
           value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).doubleValue();
         } catch (ArithmeticException exception) {
           value = Double.MAX_VALUE;
         }
         break;
-      case ValidType.FLOAT:
+      case ValidTypeConstants.FLOAT:
         try {
           value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();
         } catch (ArithmeticException exception) {
           value = Float.MAX_VALUE;
         }
         break;
-      case ValidType.BYTES:
+      case ValidTypeConstants.BYTES:
         try {
           value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
         } catch (ArithmeticException exception) {
           value = Byte.MAX_VALUE;
         }
         break;
-      case ValidType.TIMESTAMP:
-      case ValidType.LONG_TIMESTAMP:
-      case ValidType.STRING_TIMESTAMP:
+      case ValidTypeConstants.TIMESTAMP:
+      case ValidTypeConstants.LONG_TIMESTAMP:
+      case ValidTypeConstants.STRING_TIMESTAMP:
         value = getTimestampValueOrRandom(fieldType, fieldValueList);
         break;
-      case ValidType.UUID:
+      case ValidTypeConstants.UUID:
         value = getUUIDValueOrRandom(fieldValueList);
         break;
-      case ValidType.BOOLEAN:
+      case ValidTypeConstants.BOOLEAN:
         value = getBooleanValueOrRandom(fieldValueList);
         break;
-      case ValidType.ENUM:
+      case ValidTypeConstants.ENUM:
         value = getEnumValueOrRandom(fieldValueList);
         break;
       default:

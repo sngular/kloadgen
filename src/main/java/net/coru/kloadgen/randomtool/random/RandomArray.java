@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValidType;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.commons.lang3.RandomUtils;
 
 public class RandomArray {
@@ -27,29 +27,29 @@ public class RandomArray {
     Object value;
 
     switch (fieldType) {
-      case ValidType.INT_ARRAY:
-        value = generate(ValidType.INT, arraySize, valueLength, fieldValueList, constrains);
+      case ValidTypeConstants.INT_ARRAY:
+        value = generate(ValidTypeConstants.INT, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidType.LONG_ARRAY:
-        value = generate(ValidType.LONG, arraySize, valueLength, fieldValueList, constrains);
+      case ValidTypeConstants.LONG_ARRAY:
+        value = generate(ValidTypeConstants.LONG, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidType.DOUBLE_ARRAY:
-        value = generate(ValidType.DOUBLE, arraySize, valueLength, fieldValueList, constrains);
+      case ValidTypeConstants.DOUBLE_ARRAY:
+        value = generate(ValidTypeConstants.DOUBLE, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidType.SHORT_ARRAY:
-        value = generate(ValidType.SHORT, arraySize, valueLength, fieldValueList, constrains);
+      case ValidTypeConstants.SHORT_ARRAY:
+        value = generate(ValidTypeConstants.SHORT, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidType.FLOAT_ARRAY:
-        value = generate(ValidType.FLOAT, arraySize, valueLength, fieldValueList, constrains);
+      case ValidTypeConstants.FLOAT_ARRAY:
+        value = generate(ValidTypeConstants.FLOAT, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidType.STRING_ARRAY:
-        value = generate(ValidType.STRING, arraySize, valueLength, fieldValueList, constrains);
+      case ValidTypeConstants.STRING_ARRAY:
+        value = generate(ValidTypeConstants.STRING, arraySize, valueLength, fieldValueList, constrains);
         break;
-      case ValidType.UUID_ARRAY:
-        value = generate(ValidType.UUID, arraySize, 0, fieldValueList, Collections.emptyMap());
+      case ValidTypeConstants.UUID_ARRAY:
+        value = generate(ValidTypeConstants.UUID, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
-      case ValidType.BOOLEAN_ARRAY:
-        value = generate(ValidType.BOOLEAN, arraySize, 0, fieldValueList, Collections.emptyMap());
+      case ValidTypeConstants.BOOLEAN_ARRAY:
+        value = generate(ValidTypeConstants.BOOLEAN, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
       default:
         value = new ArrayList<>();
