@@ -5,3 +5,5 @@ sudo: false
 install: true
 script :
   - mvn clean install test
+ 
+if: (type = push AND branch IN (master, dev)) OR (type = pull_request AND NOT branch =~ /no-ci/)
