@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.Utils;
+import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -30,7 +30,7 @@ public class RandomObject {
   }
 
   public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    return Utils.castValue(
+    return ValueUtils.castValue(
         context.compute(fieldName, (fieldNameMap,
             seqObject) -> seqObject == null ? getSafeValue(fieldValueList) : ((Long) seqObject) + 1),
         fieldType);

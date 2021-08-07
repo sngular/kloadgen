@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public class Utils {
+public class ValueUtils {
 
-  private Utils() {
+  private ValueUtils() {
 
   }
 
