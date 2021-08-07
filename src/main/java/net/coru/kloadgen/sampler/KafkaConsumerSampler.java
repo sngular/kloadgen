@@ -21,7 +21,6 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.util.RebalanceListener;
 import org.apache.commons.collections4.Transformer;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -42,7 +41,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
   private Long timeout;
   private KafkaConsumer<Object, Object> consumer;
-  public RebalanceListener rebalanceListener;
 
   @Override
   public Arguments getDefaultParameters() {
