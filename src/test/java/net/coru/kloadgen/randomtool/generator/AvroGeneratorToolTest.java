@@ -50,6 +50,12 @@ class AvroGeneratorToolTest {
             .of("string", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE));
   }
 
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateRandomValueForField")
+  void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
+  }
+
   private static Stream<Arguments> parametersForGenerateRandomValue() {
     return Stream.of(
         Arguments.of("int", 5, emptyList(), new Field("name", SchemaBuilder.builder().intType())),
@@ -58,10 +64,25 @@ class AvroGeneratorToolTest {
         Arguments.of("double", 6, emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
   }
 
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateRandomValue")
+  void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
+    Object number = new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList);
+    assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
+    assertThat(String.valueOf(number)).hasSize(valueLength);
+  }
+
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
     return Stream.of(
         Arguments.of("enum", 1, Collections.singletonList("RED"),
             new Field("name", SchemaBuilder.builder().enumeration("ENUM1").symbols("RED", "BLUE", "GREEN")), "RED"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateRandomValueForEnums")
+  void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList))
+        .hasFieldOrPropertyWithValue("symbol", expected);
   }
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
@@ -69,6 +90,13 @@ class AvroGeneratorToolTest {
         Arguments.of("seq", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), "0"),
         Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
         Arguments.of("seq", 1, Collections.singletonList("2"), new Field("name", SchemaBuilder.builder().intType()), 2));
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateSequenceValueForField")
+  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
+      Object expectedTyped) {
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
@@ -87,34 +115,6 @@ class AvroGeneratorToolTest {
             UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
         Arguments.of("boolean", 1, "true", new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE)
     );
-  }
-
-  @ParameterizedTest
-  @MethodSource("parametersForGenerateRandomValueForField")
-  void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
-  }
-
-  @ParameterizedTest
-  @MethodSource("parametersForGenerateRandomValue")
-  void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
-    Object number = new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList);
-    assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
-    assertThat(number.toString()).hasSize(valueLength);
-  }
-
-  @ParameterizedTest
-  @MethodSource("parametersForGenerateRandomValueForEnums")
-  void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList))
-        .hasFieldOrPropertyWithValue("symbol", expected);
-  }
-
-  @ParameterizedTest
-  @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
-      Object expectedTyped) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
   }
 
   @ParameterizedTest

@@ -1,0 +1,12 @@
+name: Generate changelog
+on:
+  push:
+    branches: [ master ]
+jobs:
+  changelog:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Generate Changelog
+        uses: heinrichreimer/action-github-changelog-generator@v2.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
