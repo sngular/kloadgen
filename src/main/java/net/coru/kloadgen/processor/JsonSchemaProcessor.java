@@ -18,7 +18,7 @@ import java.util.Objects;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.StatelessRandomTool;
+import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,11 +28,11 @@ public class JsonSchemaProcessor {
 
   private List<FieldValueMapping> fieldExprMappings;
 
-  private StatelessRandomTool randomToolJson;
+  private StatelessGeneratorTool statelessGeneratorTool;
 
   public void processSchema(List<FieldValueMapping> fieldExprMappings) {
     this.fieldExprMappings = fieldExprMappings;
-    randomToolJson = new StatelessRandomTool();
+    statelessGeneratorTool = new StatelessGeneratorTool();
   }
 
   @SneakyThrows
@@ -87,7 +87,7 @@ public class JsonSchemaProcessor {
         } else {
           entity.putPOJO(Objects.requireNonNull(fieldValueMapping).getFieldName(),
                  mapper.convertValue(
-                         randomToolJson.generateRandom(fieldName,
+                     statelessGeneratorTool.generateObject(fieldName,
                              fieldValueMapping.getFieldType(),
                              fieldValueMapping.getValueLength(),
                              fieldValueMapping.getFieldValuesList()), JsonNode.class));
@@ -153,7 +153,7 @@ public class JsonSchemaProcessor {
         fieldExpMappingsQueue.poll();
         subEntity.putPOJO(cleanFieldName,
                 mapper.convertValue(
-                        randomToolJson.generateRandom(cleanFieldName,
+                        statelessGeneratorTool.generateObject(cleanFieldName,
                                 fieldValueMapping.getFieldType(),
                                 fieldValueMapping.getValueLength(),
                                 fieldValueMapping.getFieldValuesList()), JsonNode.class));
@@ -176,7 +176,7 @@ public class JsonSchemaProcessor {
 
   private ArrayNode createBasicArray(String fieldName, String fieldType, Integer calculateSize, Integer valueSize, List<String> fieldValuesList) {
     return mapper.convertValue(
-              randomToolJson.generateRandomArray(fieldName,
+              statelessGeneratorTool.generateArray(fieldName,
                       fieldType,
                       calculateSize,
                       valueSize,
@@ -200,12 +200,12 @@ public class JsonSchemaProcessor {
 
   private Object createBasicMap(String fieldType, Integer arraySize, List<String> fieldExpMappings)
   throws KLoadGenException {
-    return randomToolJson.generateRandomMap(fieldType, arraySize, fieldExpMappings, arraySize);
+    return statelessGeneratorTool.generateMap(fieldType, arraySize, fieldExpMappings, arraySize);
   }
 
   private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings)
       throws KLoadGenException {
-    return randomToolJson.generateRandomMap(fieldType, mapSize, fieldExpMappings, arraySize);
+    return statelessGeneratorTool.generateMap(fieldType, mapSize, fieldExpMappings, arraySize);
   }
 
   private Integer calculateSize(String fieldName, String methodName) {

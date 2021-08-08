@@ -12,7 +12,6 @@
 
 package net.coru.kloadgen.config.valuefiledeserialized;
 
-//import static net.coru.kloadgen.util.PropsKeysHelper.*;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;

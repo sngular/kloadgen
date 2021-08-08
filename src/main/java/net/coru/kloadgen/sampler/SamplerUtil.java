@@ -38,36 +38,33 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY;
-import static net.coru.kloadgen.util.PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.KEY_VALUE;
+import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
+import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
+import static net.coru.kloadgen.util.PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY;
 import static net.coru.kloadgen.util.PropsKeysHelper.TIMEOUT_MILLIS;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
-
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
-import static org.apache.kafka.clients.CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG;
-import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
-
+import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.common.config.SaslConfigs.SASL_JAAS_CONFIG;
@@ -82,15 +79,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
+import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import net.coru.kloadgen.util.SchemaRegistryKeyHelper;
-import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -105,11 +101,12 @@ import org.apache.kafka.common.security.auth.SecurityProtocol;
 
 public final class SamplerUtil {
 
-  private static final StatelessRandomTool statelessRandomTool = new StatelessRandomTool();
+  private static final StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
 
   private static final Set<String> JSON_TYPE_SET = Set.of("json-schema", "json");
 
-  private SamplerUtil() { }
+  private SamplerUtil() {
+  }
 
   public static Arguments getCommonDefaultParameters() {
     Arguments defaultParameters = new Arguments();
@@ -194,7 +191,6 @@ public final class SamplerUtil {
     return props;
   }
 
-
   public static Arguments getCommonConsumerDefaultParameters() {
     Arguments defaultParameters = new Arguments();
     defaultParameters.addArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS_CONFIG_DEFAULT);
@@ -202,7 +198,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(KAFKA_TOPIC_CONFIG, KAFKA_TOPIC_CONFIG_DEFAULT);
     defaultParameters.addArgument(ConsumerConfig.SEND_BUFFER_CONFIG, SEND_BUFFER_CONFIG_DEFAULT);
     defaultParameters.addArgument(ConsumerConfig.RECEIVE_BUFFER_CONFIG, RECEIVE_BUFFER_CONFIG_DEFAULT);
-    defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG,"earliest");
+    defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG, "earliest");
     defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
     defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
     defaultParameters.addArgument(KERBEROS_ENABLED, FLAG_NO);
@@ -223,7 +219,8 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ConsumerConfig.CLIENT_ID_CONFIG, "");
     defaultParameters.addArgument(ConsumerConfig.SECURITY_PROVIDERS_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
-    defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
+    defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
+        SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
     defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
@@ -234,7 +231,7 @@ public final class SamplerUtil {
     return defaultParameters;
   }
 
-  public static void setupConsumerDeserializerProperties(JavaSamplerContext context, Properties props){
+  public static void setupConsumerDeserializerProperties(JavaSamplerContext context, Properties props) {
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY))) {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY));
     } else {
@@ -247,11 +244,11 @@ public final class SamplerUtil {
     }
   }
 
-  public static void setupConsumerSchemaRegistyProperties(JavaSamplerContext context, Properties props){
+  public static void setupConsumerSchemaRegistyProperties(JavaSamplerContext context, Properties props) {
     if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
       props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
     }
-    if(Objects.nonNull(context.getJMeterVariables().get(VALUE_NAME_STRATEGY))){
+    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_NAME_STRATEGY))) {
       props.put(VALUE_NAME_STRATEGY, context.getJMeterVariables().get(VALUE_NAME_STRATEGY));
     }
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_NAME_STRATEGY))) {
@@ -263,8 +260,8 @@ public final class SamplerUtil {
     Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
 
-    setupConsumerDeserializerProperties(context,props);
-    setupConsumerSchemaRegistyProperties(context,props);
+    setupConsumerDeserializerProperties(context, props);
+    setupConsumerSchemaRegistyProperties(context, props);
 
     props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
     props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
@@ -328,9 +325,9 @@ public final class SamplerUtil {
     props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
 
     props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-            propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
-                            DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
-                            ""));
+        propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
+            DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
+            ""));
 
     props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
     props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
@@ -460,7 +457,7 @@ public final class SamplerUtil {
   public static List<String> populateHeaders(List<HeaderMapping> kafkaHeaders, ProducerRecord<Object, Object> producerRecord) {
     List<String> headersSB = new ArrayList<>();
     for (HeaderMapping kafkaHeader : kafkaHeaders) {
-      String headerValue = statelessRandomTool.generateRandom(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
+      String headerValue = statelessGeneratorTool.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
           10,
           emptyList()).toString();
       headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
@@ -470,6 +467,6 @@ public final class SamplerUtil {
   }
 
   private static String propertyOrDefault(String property, String defaultToken, String valueToSent) {
-    return defaultToken.equals(property)? valueToSent: property;
+    return defaultToken.equals(property) ? valueToSent : property;
   }
 }

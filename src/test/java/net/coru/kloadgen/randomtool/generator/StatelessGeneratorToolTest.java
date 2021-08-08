@@ -1,4 +1,6 @@
-package net.coru.kloadgen.util;
+package net.coru.kloadgen.randomtool.generator;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -12,17 +14,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+class StatelessGeneratorToolTest {
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class StatelessRandomToolTest {
-
-  private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 06, 12, 00, 00);
+  private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 6, 12, 0, 0);
 
   private static Stream<Arguments> parametersForGenerateRandomValueForField() {
     return Stream.of(
         Arguments.of("name", "string", 1, Collections.singletonList("testString"), "testString"),
-        Arguments.of("name", "int", 1, Collections.singletonList("1"), 1), Arguments.of("name", "long", 1, Collections.singletonList("1"), 1L),
+        Arguments.of("name", "int", 1, Collections.singletonList("1"), 1),
+        Arguments.of("name", "long", 1, Collections.singletonList("1"), 1L),
         Arguments.of("name", "short", 1, Collections.singletonList("1"), (short) 1),
         Arguments.of("name", "double", 1, Collections.singletonList("1.0"), 1.0),
         Arguments.of("name", "timestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), FIXED_DATE),
@@ -34,23 +34,11 @@ class StatelessRandomToolTest {
         Arguments.of("name", "boolean", 1, Collections.singletonList("true"), Boolean.TRUE));
   }
 
-  @ParameterizedTest
-  @MethodSource("parametersForGenerateRandomValueForField")
-  void testGenerateRandomValueForField(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat(new StatelessRandomTool().generateRandom(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
-  }
-
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
     return Stream.of(
-        Arguments.of("name", "seq", 1, Collections.singletonList("0"), "0"), Arguments.of("name", "seq", 1, Collections.singletonList("1"), "1"),
+        Arguments.of("name", "seq", 1, Collections.singletonList("0"), "0"),
+        Arguments.of("name", "seq", 1, Collections.singletonList("1"), "1"),
         Arguments.of("name", "seq", 1, Collections.singletonList("2"), "2"));
-  }
-
-  @ParameterizedTest
-  @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
-      Object expectedTyped) {
-    assertThat(new StatelessRandomTool().generateRandom(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
@@ -69,13 +57,26 @@ class StatelessRandomToolTest {
   }
 
   @ParameterizedTest
+  @MethodSource("parametersForGenerateRandomValueForField")
+  void testGenerateRandomValueForField(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
+      Object expected) {
+    assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateSequenceValueForField")
+  void testGenerateSequenceValueForField(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
+      Object expectedTyped) {
+    assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
+  }
+
+  @ParameterizedTest
   @MethodSource("parametersForShouldRecoverVariableFromContext")
   void shouldRecoverVariableFromContext(String fieldName, String fieldType, Integer valueLength, String value, Object expected) {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    assertThat(new StatelessRandomTool().generateRandom(fieldName, fieldType, valueLength, Collections.singletonList("${VARIABLE}")))
+    assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, Collections.singletonList("${VARIABLE}")))
         .isEqualTo(expected);
   }
-
 }

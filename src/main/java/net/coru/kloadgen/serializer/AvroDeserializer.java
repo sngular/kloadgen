@@ -25,7 +25,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 
 @Slf4j
-public class AvroDeserializer<T extends EnrichedRecord> implements Deserializer<Object> {
+public class AvroDeserializer implements Deserializer<Object> {
 
   private static final byte MAGIC_BYTE = 0x0;
 

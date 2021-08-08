@@ -20,7 +20,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ConsumerTest {
+class ConsumerTest {
 
   @RegisterExtension
   public static final SharedKafkaTestResource sharedKafkaTestResource =

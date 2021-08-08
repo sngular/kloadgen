@@ -16,12 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
-
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Properties;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.Transformer;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -30,8 +30,6 @@ import org.apache.jmeter.threads.JMeterThread;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.PartitionInfo;
-import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 
 @Slf4j
@@ -40,18 +38,19 @@ import org.slf4j.Logger;
 public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements Serializable {
 
   private Long timeout;
-  private KafkaConsumer<Object, Object> consumer;
+
+  private transient KafkaConsumer<Object, Object> consumer;
 
   @Override
   public Arguments getDefaultParameters() {
     return SamplerUtil.getCommonConsumerDefaultParameters();
   }
 
-  public Properties properties (JavaSamplerContext context) {
+  public Properties properties(JavaSamplerContext context) {
     Properties props = SamplerUtil.setupCommonConsumerProperties(context);
-    props.put(MAX_POLL_RECORDS_CONFIG,"1");
+    props.put(MAX_POLL_RECORDS_CONFIG, "1");
     props.put(ENABLE_AUTO_COMMIT_CONFIG, "false");
-    props.put(SESSION_TIMEOUT_MS_CONFIG,"10000");
+    props.put(SESSION_TIMEOUT_MS_CONFIG, "10000");
     timeout = Long.parseLong(props.getProperty("timeout.millis"));
     log.debug("Populated properties: {}", props);
     return props;
@@ -71,10 +70,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     consumer.subscribe(Collections.singletonList(topic));
   }
 
-  private Transformer<PartitionInfo, TopicPartition> transform() {
-    return partitionInfo -> new TopicPartition(partitionInfo.topic(), partitionInfo.partition());
-  }
-
   @Override
   public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
     SampleResult sampleResult = new SampleResult();
@@ -88,33 +83,35 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
         if (!records.isEmpty()) {
           running = false;
-          ConsumerRecord<Object, Object> record = records.iterator().next();
-          fillSampleResult(sampleResult, prettify(record), true);
+          ConsumerRecord<Object, Object> consumerRecord = records.iterator().next();
+          fillSampleResult(sampleResult, prettify(consumerRecord), true);
           consumer.commitSync();
         }
 
         Instant endTime = Instant.now();
-        if ( Duration.between(startTime,endTime).toMillis() > timeout) {
+        if (Duration.between(startTime, endTime).toMillis() > timeout) {
           running = false;
           sampleResult = null;
-          if (Objects.nonNull(thread)){thread.stop();}
+          if (Objects.nonNull(thread)) {
+            thread.stop();
+          }
         }
       }
     } catch (Exception e) {
       logger().error("Failed to receive message", e);
       fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",
-              false);
+          false);
     }
     return sampleResult;
   }
 
-  private String prettify(ConsumerRecord<Object, Object> record) {
-    return "{ partition: " + record.partition() + ", message: { key: " + record.key() + ", value: " + record.value().toString() +
-            " }}";
+  private String prettify(ConsumerRecord<Object, Object> consumerRecord) {
+    return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key() +
+        ", value: " + consumerRecord.value().toString() + " }}";
   }
 
   private void fillSampleResult(SampleResult sampleResult, String responseData, boolean successful) {
-    if (Objects.nonNull(sampleResult)){
+    if (Objects.nonNull(sampleResult)) {
       sampleResult.setResponseData(responseData, StandardCharsets.UTF_8.name());
       sampleResult.setSuccessful(successful);
       sampleResult.sampleEnd();

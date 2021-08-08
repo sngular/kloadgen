@@ -32,9 +32,9 @@ import java.util.concurrent.Future;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
+import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import net.coru.kloadgen.serializer.AvroSerializer;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.StatelessRandomTool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -51,7 +51,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
 
     private static final long serialVersionUID = 1L;
 
-    private final transient StatelessRandomTool statelessRandomTool = new StatelessRandomTool();
+    private final transient StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
 
     private transient KafkaProducer<Object, Object> producer;
 
@@ -172,7 +172,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
         ProducerRecord<Object, Object> producerRecord;
         if (keyMessageFlag) {
             if (Objects.isNull(keyGenerator)) {
-                Object key = statelessRandomTool.generateRandom("key", msgKeyType, 0, msgKeyValue).toString();
+                Object key = statelessGeneratorTool.generateObject("key", msgKeyType, 0, msgKeyValue).toString();
                 producerRecord = new ProducerRecord<>(topic, key, getObject(messageVal, valueFlag));
             } else {
                 EnrichedRecord key = keyGenerator.nextMessage();
