@@ -125,7 +125,7 @@ public abstract class SchemaProcessorLib {
         return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
     }
 
-    static Map generateRandomMap(String fieldName, String fieldType, Integer mapSize, List<String> fieldValuesList) {
+    static Map generateRandomMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldValuesList) {
 
         List<String> parameterList = new ArrayList<>(fieldValuesList);
         parameterList.replaceAll(fieldValue ->
@@ -137,12 +137,12 @@ public abstract class SchemaProcessorLib {
         Map value = new HashMap<>(mapSize);
         if ("seq".equals(fieldType)) {
             while (mapSize > 0) {
-                value.put(RandomTool.generateRandom("String", 4, Collections.emptyList(), Collections.emptyMap()),
+                value.put(generateMapKey(),
                         RandomTool.generateSeq(fieldName, fieldType, parameterList, context));
                 mapSize--;
             }
         } else {
-            value = new HashMap<>(RandomTool.generateRandomMap(fieldType, mapSize, parameterList, Collections.emptyMap()));
+            value = new HashMap<>(RandomTool.generateRandomMap(fieldType, mapSize, fieldValueLength, parameterList, Collections.emptyMap()));
         }
 
         return value;
@@ -179,8 +179,8 @@ public abstract class SchemaProcessorLib {
         return generateRandomList(fieldName, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
     }
 
-    static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, List<String> fieldExpMappings) {
-        return generateRandomMap(fieldName, fieldType, mapSize, fieldExpMappings);
+    static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
+        return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, fieldExpMappings);
     }
 
     static List<Map> createSimpleTypeMapArray(String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
@@ -189,7 +189,7 @@ public abstract class SchemaProcessorLib {
             fieldType = fieldType.replace("-map", "");
         }
         while (arraySize > 0) {
-            result.add(generateRandomMap(fieldName, fieldType, mapSize, fieldExpMappings));
+            result.add(generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, fieldExpMappings));
             arraySize--;
         }
 

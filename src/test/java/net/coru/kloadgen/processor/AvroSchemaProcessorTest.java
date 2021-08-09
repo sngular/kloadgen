@@ -167,5 +167,10 @@ class AvroSchemaProcessorTest {
         assertThat(result).hasSize(2).containsEntry("n", "1").containsEntry("t", "2");
     }
 
+    @Test
+    void simpleRecordTest(){
+
+    }
+
     //Check  what happens if mapSize / arraySize = n & valueList.size = n-2 (for example)
 }

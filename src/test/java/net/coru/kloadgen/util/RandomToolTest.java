@@ -102,15 +102,15 @@ class RandomToolTest {
     @MethodSource("parametersForGenerateMapRandomValueFromList")
     void generateMapRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected, Integer size) {
         Map.Entry<String, Object>[] expectedMap = expected.entrySet().toArray(new Map.Entry[1]);
-        assertThat((Map<String, Object>) RandomTool.generateRandomMap(fieldType, size, fieldValuesList, Collections.emptyMap()))
+        assertThat(RandomTool.generateRandomMap(fieldType, size, valueLength, fieldValuesList, Collections.emptyMap()))
                 .containsExactly(expectedMap);
     }
 
     @ParameterizedTest
     @MethodSource("parametersForGenerateMapArrayRandomValueFromList")
     void generateMapArrayRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, List<Map<String, Object>> expected, Integer size) {
-
-        assertThat((List<Map<String, Object>>) RandomTool.generateRandomMap(fieldType, size, fieldValuesList, Collections.emptyMap()))
+        assertThat(Collections.singletonList(
+                RandomTool.generateRandomMap(fieldType, size, valueLength, fieldValuesList, Collections.emptyMap())))
                 .containsExactly(expected.get(0));
     }
 
@@ -118,7 +118,7 @@ class RandomToolTest {
     @MethodSource("parametersForGenerateMapFixedKeyRandomValue")
     void generateMapFixedKeyRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
         String[] expectedKeys = fieldValuesList.toArray(new String[1]);
-        Map<String, Object> result = (Map<String, Object>) RandomTool.generateRandomMap(fieldType, size, fieldValuesList, Collections.emptyMap());
+        Map<String, Object> result = (Map<String, Object>) RandomTool.generateRandomMap(fieldType, size, valueLength, fieldValuesList, Collections.emptyMap());
         assertThat(result).containsKeys(expectedKeys).doesNotContainValue(null);
     }
 

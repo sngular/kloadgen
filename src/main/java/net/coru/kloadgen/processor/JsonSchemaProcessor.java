@@ -45,6 +45,7 @@ public class JsonSchemaProcessor extends SchemaProcessorLib {
                         fieldExpMappingsQueue.poll();
                         entity.putPOJO(fieldName, createBasicMap(fieldName, fieldValueMapping.getFieldType(),
                                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                fieldValueMapping.getValueLength(),
                                 fieldValueMapping.getFieldValuesList()));
                     } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
                         fieldExpMappingsQueue.poll();
@@ -111,6 +112,7 @@ public class JsonSchemaProcessor extends SchemaProcessorLib {
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
                     subEntity.putPOJO(fieldNameSubEntity, createBasicMap(fieldName, fieldValueMapping.getFieldType(),
                             calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                            fieldValueMapping.getValueLength(),
                             fieldValueMapping.getFieldValuesList()));
                 } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
                     fieldExpMappingsQueue.poll();
@@ -195,9 +197,9 @@ public class JsonSchemaProcessor extends SchemaProcessorLib {
         return objectArray;
     }
 
-    private Map createBasicMap(String fieldName, String fieldType, Integer mapSize, List<String> fieldExpMappings)
+    private Map createBasicMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings)
             throws KLoadGenException {
-        return generateRandomMap(fieldName, fieldType, mapSize, fieldExpMappings);
+        return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, fieldExpMappings);
     }
 
     private Map createSimpleMapArray(String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer valueLength, List<String> fieldExpMappings)

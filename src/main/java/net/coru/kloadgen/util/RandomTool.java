@@ -26,6 +26,8 @@ public final class RandomTool {
             .hashSet("map", "enum", "string", "int", "long", "timestamp", "stringTimestamp", "short", "double", "longTimestamp", "uuid", "array",
                     "boolean", "bytes");
 
+    private static final int MAP_KEY_SIZE = 2;
+
     private RandomTool() {
     }
 
@@ -33,24 +35,25 @@ public final class RandomTool {
         return VALID_TYPES.contains(type);
     }
 
-    public static Map<String, Object> generateRandomMap(String fieldType, Integer mapSize, List<String> fieldValueList,
+    public static Map<String, Object> generateRandomMap(String fieldType, Integer mapSize, Integer valueLength, List<String> fieldValueList,
                                                         Map<ConstraintTypeEnum, String> constrains) {
         Map value = new HashMap(mapSize);
+        fieldType = fieldType.endsWith("-array") ? fieldType.replace("-array", "") : fieldType;
         switch (fieldType) {
             case "int-map":
-                value.putAll(generateIntMap(mapSize, fieldValueList, mapSize, constrains));
+                value.putAll(generateIntMap(mapSize, fieldValueList, valueLength, constrains));
                 break;
             case "long-map":
-                value.putAll(generateLongMap(mapSize, fieldValueList, mapSize, constrains));
+                value.putAll(generateLongMap(mapSize, fieldValueList, valueLength, constrains));
                 break;
             case "double-map":
-                value.putAll(generateDoubleMap(mapSize, fieldValueList, mapSize, constrains));
+                value.putAll(generateDoubleMap(mapSize, fieldValueList, valueLength, constrains));
                 break;
             case "short-map":
-                value.putAll(generateShortMap(mapSize, fieldValueList, mapSize, constrains));
+                value.putAll(generateShortMap(mapSize, fieldValueList, valueLength, constrains));
                 break;
             case "float-map":
-                value.putAll(generateFloatMap(mapSize, fieldValueList, mapSize, constrains));
+                value.putAll(generateFloatMap(mapSize, fieldValueList, valueLength, constrains));
                 break;
             case "uuid-map":
                 value.putAll(generateUuidMap(mapSize, fieldValueList));
@@ -59,7 +62,7 @@ public final class RandomTool {
                 value = generateBooleanMap(mapSize, fieldValueList);
                 break;
             default:
-                value.putAll(generateStringMap(mapSize, fieldValueList, mapSize, constrains));
+                value.putAll(generateStringMap(mapSize, fieldValueList, valueLength, constrains));
                 break;
         }
         return value;
@@ -291,7 +294,7 @@ public final class RandomTool {
         }
         if (intMap.size() != mapSize) {
             for (int i = 0; i < Math.abs(intMap.size() - mapSize); i++) {
-                intMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+                intMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), constrains),
                         getIntValueOrRandom(valueLength, Collections.emptyList(), constrains));
             }
         }
@@ -314,7 +317,7 @@ public final class RandomTool {
         }
         if (longMap.size() != mapSize) {
             for (int i = 0; i <= Math.abs(longMap.size() - mapSize); i++) {
-                longMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+                longMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), constrains),
                         getLongValueOrRandom(valueLength, Collections.emptyList(), constrains));
             }
         }
@@ -337,7 +340,7 @@ public final class RandomTool {
         }
         if (doubleMap.size() != mapSize) {
             for (int i = 0; i <= Math.abs(doubleMap.size() - mapSize); i++) {
-                doubleMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+                doubleMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), constrains),
                         getDoubleValueOrRandom(valueLength, Collections.emptyList(), constrains));
             }
         }
@@ -361,7 +364,7 @@ public final class RandomTool {
         }
         if (floatMap.size() != mapSize) {
             for (int i = 0; i <= Math.abs(floatMap.size() - mapSize); i++) {
-                floatMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+                floatMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), constrains),
                         getFloatValueOrRandom(valueLength, Collections.emptyList(), constrains));
             }
         }
@@ -384,7 +387,7 @@ public final class RandomTool {
         }
         if (shortMap.size() != mapSize) {
             for (int i = 0; i <= Math.abs(shortMap.size() - mapSize); i++) {
-                shortMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+                shortMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), constrains),
                         getShortValueOrRandom(valueLength, Collections.emptyList(), constrains));
             }
         }
@@ -408,7 +411,7 @@ public final class RandomTool {
         if (stringMap.size() != mapSize) {
             //Math.abs(stringMap.size() - mapSize)
             for (int i = 0; i < mapSize; i++) {
-                stringMap.put(getStringValueOrRandom(valueLength, Collections.emptyList(), constrains),
+                stringMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), constrains),
                         getStringValueOrRandom(valueLength, Collections.emptyList(), constrains));
             }
         }
@@ -430,7 +433,7 @@ public final class RandomTool {
         }
         if (uuidMap.size() != mapSize) {
             for (int i = 0; i <= Math.abs(uuidMap.size() - mapSize); i++) {
-                uuidMap.put(getStringValueOrRandom(0, Collections.emptyList(), Collections.emptyMap()),
+                uuidMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), Collections.emptyMap()),
                         getUUIDValueOrRandom(Collections.emptyList()));
             }
         }
@@ -452,7 +455,7 @@ public final class RandomTool {
         }
         if (booleanMap.size() != mapSize) {
             for (int i = 0; i <= Math.abs(booleanMap.size() - mapSize); i++) {
-                booleanMap.put(getStringValueOrRandom(0, Collections.emptyList(), Collections.emptyMap()),
+                booleanMap.put(getStringValueOrRandom(MAP_KEY_SIZE, Collections.emptyList(), Collections.emptyMap()),
                         getBooleanValueOrRandom(Collections.emptyList()));
             }
         }

@@ -55,7 +55,7 @@
                 "default": null
               },
               {
-                "name": "metadata",
+                "name": "metadataMap",
                 "type": [
                   "null",
                   {
@@ -64,6 +64,14 @@
                   }
                 ],
                 "default": null
+              },{
+                "name": "metadataArray",
+                "type": [{
+                  "type": "array",
+                  "items": "string"
+                },
+                  "null"
+                ]
               }
             ]
           }

@@ -130,6 +130,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         fieldExpMappingsQueue.remove();
         entity.put(fieldName, createSimpleTypeMap(fieldName, fieldValueMapping.getFieldType(),
                 calculateMapSize(fieldValueMapping.getFieldName(), fieldName),
+                fieldValueMapping.getValueLength(),
                 fieldValueMapping.getFieldValuesList()));
         return fieldExpMappingsQueue.peek();
     }
@@ -239,13 +240,17 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                 } else if (checkIfMap(fieldValueMapping.getFieldType())) {
                     fieldExpMappingsQueue.poll();
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                    subEntity.put(fieldNameSubEntity, createSimpleTypeMap(fieldName, fieldValueMapping.getFieldType(), calculateMapSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
+                    subEntity.put(fieldNameSubEntity, createSimpleTypeMap(fieldName,
+                            fieldValueMapping.getFieldType(),
+                            calculateMapSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
+                            fieldValueMapping.getValueLength(),
                             fieldValueMapping.getFieldValuesList()));
                 } else {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     subEntity.put(fieldNameSubEntity, createArray(Objects.requireNonNull(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity))),
                             fieldNameSubEntity,
                             calculateSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
+                            fieldValueMapping.getValueLength(),
                             fieldExpMappingsQueue));
                 }
             } else if (cleanFieldName.contains(".")) {
@@ -270,7 +275,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         if (ARRAY == field.schema().getType()) {
             return field.schema().getElementType();
         } else if (MAP == field.schema().getType()) {
-            return field.schema().getElementType();
+            return field.schema().getValueType();
         } else if (UNION == field.schema().getType()) {
             return getRecordUnion(field.schema().getTypes());
         } else if (typesSet.contains(field.schema().getType())) {
@@ -302,13 +307,13 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return isRecord;
     }
 
-    private Object createArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    private Object createArray(Schema subSchema, String fieldName, Integer arraySize, Integer fieldValueLength, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
         if (ARRAY.equals(subSchema.getType())) {
             if (typesSet.contains(subSchema.getElementType().getType())) {
                 return createArray(fieldName, arraySize, fieldExpMappingsQueue);
             } else if (MAP.equals(subSchema.getElementType().getType())) {
                 fieldExpMappingsQueue.remove();
-                return createSimpleTypeMap(fieldName, subSchema.getElementType().getValueType().getType().getName(), arraySize, Collections.emptyList());
+                return createSimpleTypeMap(fieldName, subSchema.getElementType().getValueType().getType().getName(), arraySize, fieldValueLength, Collections.emptyList());
             } else {
                 return createObjectArray(subSchema.getElementType(), fieldName, arraySize, fieldExpMappingsQueue);
             }

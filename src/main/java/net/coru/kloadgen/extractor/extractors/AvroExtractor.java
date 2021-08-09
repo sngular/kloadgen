@@ -71,7 +71,7 @@ public class AvroExtractor {
         } else if (checkIfArray(innerField)) {
             List<FieldValueMapping> internalFields = extractArrayInternalFields(fieldName + "[]", innerField.getElementType());
             internalFields.forEach(field -> {
-                if (field.getFieldType().endsWith(ARRAY_POSTFIX)) {
+                if (field.getFieldType().endsWith(ARRAY_POSTFIX) && field.getFieldName().endsWith("[:][]") ) {
                     tweakType(field, MAP_POSTFIX);
                 }
             });
@@ -246,10 +246,10 @@ public class AvroExtractor {
 
     private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields, List<FieldValueMapping> completeFieldList) {
         internalFields.forEach(internalField -> {
-            if (!internalField.getFieldName().contains(fieldName)) {
-                internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
-            } else {
+            if(internalField.getFieldName().startsWith(fieldName + ".")){
                 internalField.setFieldName(fieldName + internalField.getFieldName().replace(fieldName, splitter.replace(".", "")));
+            }else{
+                internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
             }
             completeFieldList.add(internalField);
         });
