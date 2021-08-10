@@ -5,10 +5,8 @@ import static org.apache.avro.Schema.Type.MAP;
 import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.UNION;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.avro.Schema;
@@ -91,8 +89,23 @@ public class AvroExtractor {
     } else if (UNION.equals(innerField.schema().getType())) {
       extractUnionRecord(innerField, completeFieldList);
     } else {
-      completeFieldList.add(new FieldValueMapping(innerField.name(),innerField.schema().getType().getName()));
+      //completeFieldList.add(new FieldValueMapping(innerField.name(),innerField.schema().getType().getName()));
+      addFieldToList(innerField, completeFieldList);
     }
+  }
+
+  public void addFieldToList(Schema.Field innerField, List<FieldValueMapping> completeFieldList){
+    String typeName = innerField.schema().getType().getName();
+
+    if (checkIfLogicalType(innerField.schema())){
+      typeName += "_" + innerField.schema().getLogicalType().getName();
+    }
+
+    completeFieldList.add(new FieldValueMapping(innerField.name(), typeName));
+  }
+
+  private boolean checkIfLogicalType(Schema innerSchema){
+    return Objects.nonNull(innerSchema.getLogicalType());
   }
 
   private void extractUnionRecord(Schema.Field innerField, List<FieldValueMapping> completeFieldList) {

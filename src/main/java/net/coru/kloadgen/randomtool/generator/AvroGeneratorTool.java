@@ -118,7 +118,7 @@ public class AvroGeneratorTool {
       case "int":
         return false;
       default:
-        return !Type.INT.getName().equals(fieldType);
+        return !Type.INT.getName().equals(fieldType.split("_")[0]);
     }
   }
 
