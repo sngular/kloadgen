@@ -1,7 +1,7 @@
 {
   "name": "Details",
-  "type" : "record",
-  "fields" :[
+  "type": "record",
+  "fields": [
     {
       "name": "theMap",
       "type": {
@@ -64,16 +64,42 @@
                   }
                 ],
                 "default": null
-              },{
+              },
+              {
                 "name": "metadataArray",
-                "type": [{
-                  "type": "array",
-                  "items": "string"
-                },
+                "type": [
+                  {
+                    "type": "array",
+                    "items": "string"
+                  },
                   "null"
                 ]
+              },
+              {
+                "name": "metadataMapMap",
+                "type": [
+                  "null",
+                  {
+                    "type": "map",
+                    "values": {
+                      "type": "map",
+                      "values": "string"
+                    }
+                  }
+                ],
+                "default": null
+              },
+              {
+                "name": "metadataArrayArray",
+                "type": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                }
               }
-            ]
+            ],"default": "null"
           }
         }
       }

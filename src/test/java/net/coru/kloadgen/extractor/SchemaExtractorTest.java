@@ -126,7 +126,7 @@ class SchemaExtractorTest {
         File testFile = fileHelper.getFile("/avro-files/testMap.avsc");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
         assertThat(fieldValueMappingList)
-                .hasSize(7)
+                .hasSize(9)
                 .containsExactlyInAnyOrder(
                         new FieldValueMapping("theMap[:][].otherType.addTypeId", "string"),
                         new FieldValueMapping("theMap[:][].otherType.name", "string"),
@@ -134,7 +134,9 @@ class SchemaExtractorTest {
                         new FieldValueMapping("theMap[:][].addAmount", "bytes"),
                         new FieldValueMapping("theMap[:][].addCode", "string"),
                         new FieldValueMapping("theMap[:][].metadataMap[:]", "string-map"),
-                        new FieldValueMapping("theMap[:][].metadataArray[]", "string-array")
+                        new FieldValueMapping("theMap[:][].metadataArray[]", "string-array"),
+                        new FieldValueMapping("theMap[:][].metadataMapMap[:][:]", "string-map-map"),
+                        new FieldValueMapping("theMap[:][].metadataArrayArray[][]", "string-array-array")
                 );
     }
 }

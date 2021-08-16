@@ -78,7 +78,7 @@ public class AvroExtractor {
             completeFieldList.addAll(internalFields);
             //extractedArrayCollection(innerField, completeFieldList, internalFields);
         } else if (checkIfMap(innerField) && !checkIfRecord(innerField.getValueType())) {
-            List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.getName() + "[]", innerField.getValueType());
+            List<FieldValueMapping> internalFields = extractMapInternalFields(fieldName + "[:]", innerField.getValueType());
             completeFieldList.addAll(internalFields);
             // extractedMapCollection(innerField, completeFieldList, internalFields);
         } else {
@@ -93,7 +93,10 @@ public class AvroExtractor {
         } else if (checkIfArray(innerField.schema())) {
             List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField);
             if (internalFields.size() == 1) {
-                tweakType(internalFields.get(0), ARRAY_POSTFIX);
+                if(internalFields.get(0).getFieldName().endsWith("[][:]") || internalFields.get(0).getFieldName().endsWith("[][]")){
+                    tweakType(internalFields.get(0), ARRAY_POSTFIX);
+                }
+
             }
             completeFieldList.addAll(internalFields);
             //extractedArrayCollection(innerField.schema(), completeFieldList, internalFields);
@@ -150,6 +153,7 @@ public class AvroExtractor {
         } else if (checkIfMap(recordUnion)) {
             List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name() + "[:]", recordUnion.getValueType());
             if (internalFields.size() == 1) {
+                if(internalFields.get(0).getFieldName().endsWith("[:][:]"))
                 tweakType(internalFields.get(0), MAP_POSTFIX);
             }
             completeFieldList.addAll(internalFields);
@@ -183,9 +187,7 @@ public class AvroExtractor {
     }
 
     private void tweakType(FieldValueMapping internalField, String postfix) {
-        if (!internalField.getFieldType().contains(postfix)) {
             internalField.setFieldType(internalField.getFieldType() + postfix);
-        }
     }
 
     private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
@@ -256,9 +258,7 @@ public class AvroExtractor {
     }
 
     private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields) {
-        internalFields.forEach(internalField -> {
-            internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
-        });
+        internalFields.forEach(internalField -> internalField.setFieldName(fieldName + splitter + internalField.getFieldName()));
     }
 
     private String extractTypeName(Schema schema) {
