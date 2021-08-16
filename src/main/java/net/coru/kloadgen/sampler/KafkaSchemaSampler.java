@@ -35,6 +35,9 @@ import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import net.coru.kloadgen.serializer.AvroSerializer;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.avro.Conversions;
+import org.apache.avro.data.TimeConversions;
+import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -69,10 +72,27 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
 
     private transient Properties props;
 
+
+    private void configGenericData(){
+        GenericData genericData = GenericData.get();
+
+        genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
+        genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
+        genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
+        genericData.addLogicalTypeConversion(new TimeConversions.TimeMicrosConversion());
+        genericData.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
+        genericData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
+        genericData.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
+        genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
+        genericData.addLogicalTypeConversion(new Conversions.UUIDConversion());
+    }
+
     @Override
     public void setupTest(JavaSamplerContext context) {
         props = properties(context);
         generator = SamplerUtil.configureValueGenerator(props);
+
+        configGenericData();
 
         if ("true".equals(context.getJMeterVariables().get(SCHEMA_KEYED_MESSAGE_KEY)) ||
             "true".equals(context.getJMeterVariables().get(SIMPLE_KEYED_MESSAGE_KEY))) {

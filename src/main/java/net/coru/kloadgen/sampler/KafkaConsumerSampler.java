@@ -63,7 +63,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     return KafkaConsumerSampler.log;
   }
 
-  private void configGenericDate(){
+  private void configGenericData(){
     GenericData genericData = GenericData.get();
 
     genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
@@ -83,7 +83,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     Properties props = properties(context);
     String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
     consumer = new KafkaConsumer<>(props);
-    configGenericDate();
+    configGenericData();
 
     consumer.subscribe(Collections.singletonList(topic));
   }
