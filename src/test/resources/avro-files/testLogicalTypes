@@ -51,6 +51,33 @@
                 "type": "long",
                 "logicalType": "local-timestamp-micros"
             }
+        },
+        {
+            "name": "UUID",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            }
+        },
+        {
+            "name": "Decimal",
+            "type": {
+                "type": "bytes",
+                "logicalType": "decimal",
+                "precision": 2,
+                "scale": 1
+            }
+        },
+        {
+            "name": "DecimalFixed",
+            "type": {
+                "type": "fixed",
+                "name": "decimalTest",
+                "size": 4,
+                "logicalType": "decimal",
+                "precision": 3,
+                "scale": 2
+            }
         }
     ]
 }

@@ -126,7 +126,7 @@ class SchemaExtractorTest {
             schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
 
     assertThat(fieldValueMappingList)
-            .hasSize(7)
+            .hasSize(10)
             .containsExactlyInAnyOrder(
                     new FieldValueMapping("Date", "int_date"),
                     new FieldValueMapping("TimeMillis", "int_time-millis"),
@@ -134,7 +134,10 @@ class SchemaExtractorTest {
                     new FieldValueMapping("TimestampMillis", "long_timestamp-millis"),
                     new FieldValueMapping("TimestampMicros", "long_timestamp-micros"),
                     new FieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
-                    new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros")
+                    new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
+                    new FieldValueMapping("UUID","string_uuid"),
+                    new FieldValueMapping("Decimal","bytes_decimal"),
+                    new FieldValueMapping("DecimalFixed","fixed_decimal")
             );
   }
 

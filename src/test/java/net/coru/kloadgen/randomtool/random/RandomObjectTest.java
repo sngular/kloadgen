@@ -2,6 +2,7 @@ package net.coru.kloadgen.randomtool.random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import org.apache.groovy.util.Maps;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -59,20 +62,30 @@ class RandomObjectTest {
   }
 
   private static Stream<Arguments> parametersForGenerateSingleLogicalTypeRandomValue(){
+    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
+    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
     return Stream.of(
-            Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), (int) FIXED_DATE.toEpochDay()),
-            Arguments.of("int_time-millis", 1, Collections.singletonList(TIME_STRING),
-                    (int) TimeUnit.MILLISECONDS.convert(FIXED_TIME.toNanoOfDay(), TimeUnit.NANOSECONDS)),
-            Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING),
-                    TimeUnit.MICROSECONDS.convert(FIXED_TIME.toNanoOfDay(), TimeUnit.NANOSECONDS)),
+            Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), FIXED_DATE, Collections.emptyMap()),
+            Arguments.of("int_time-millis", 1, Collections.singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
+            Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
             Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    getMillisFromDate(FIXED_TIMESTAMP)),
+                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
             Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    getMicrosFromDate(FIXED_TIMESTAMP)),
+                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
             Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    getMillisFromDate(FIXED_TIMESTAMP)),
+                    FIXED_TIMESTAMP, Collections.emptyMap()),
             Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    getMicrosFromDate(FIXED_TIMESTAMP))
+                    FIXED_TIMESTAMP, Collections.emptyMap()),
+            Arguments.of(
+                    "string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
+                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"), Collections.emptyMap()
+            ),
+            Arguments.of("bytes_decimal", 1, Collections.singletonList("55.555"), new BigDecimal("55.555"),
+                    decimalConstrains),
+            Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new BigDecimal("55.555"),
+                    decimalConstrains)
+
     );
   }
 
@@ -90,8 +103,9 @@ class RandomObjectTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSingleLogicalTypeRandomValue")
-  void generateSingleLogicalTypeRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat(new RandomObject().generateRandom(fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expected);
+  void generateSingleLogicalTypeRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList,
+                                            Object expected, Map<ConstraintTypeEnum,String> constrains) {
+    assertThat(new RandomObject().generateRandom(fieldType, valueLength, fieldValuesList, constrains)).isEqualTo(expected);
   }
 
   @ParameterizedTest

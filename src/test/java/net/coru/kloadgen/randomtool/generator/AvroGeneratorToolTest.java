@@ -1,6 +1,7 @@
 package net.coru.kloadgen.randomtool.generator;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
@@ -53,7 +54,7 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
@@ -67,7 +68,7 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValue")
   void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
-    Object number = new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList);
+    Object number = new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap());
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
     assertThat(String.valueOf(number)).hasSize(valueLength);
   }
@@ -81,7 +82,7 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForEnums")
   void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList))
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap()))
         .hasFieldOrPropertyWithValue("symbol", expected);
   }
 
@@ -96,7 +97,7 @@ class AvroGeneratorToolTest {
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
       Object expectedTyped) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expectedTyped);
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
@@ -123,7 +124,8 @@ class AvroGeneratorToolTest {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, Collections.singletonList("${VARIABLE}")))
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, Collections.singletonList("$" +
+            "{VARIABLE}"),Collections.emptyMap()))
         .isEqualTo(expected);
   }
 }
