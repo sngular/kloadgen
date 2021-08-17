@@ -1,0 +1,23 @@
+<section class="why">
+  <div class="wrapper">
+    <div class="title">
+      {{ site.data.sitetext.why.title }}
+    </div>
+    <div class="description">
+      {{ site.data.sitetext.why.description }}
+    </div>
+
+    <div class="whys">
+      {% for item in site.data.sitetext.why.whys %}
+      <div class="item">
+        <div class="icon">
+          <img class="img" src="{{item.icon}}" />
+        </div>
+        <div class="text">
+          {{item.text | markdownify }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

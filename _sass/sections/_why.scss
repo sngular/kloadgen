@@ -1,0 +1,52 @@
+.why {
+  .wrapper {
+    padding: 110px 0;
+  }
+
+  .title {
+    font-size: 36px;
+    text-align: center;
+    color: $green;
+    margin-bottom: 30px;
+    font-weight: 500;
+  }
+
+  .description {
+    font-size: 20px;
+    color: $purple-dark-10;
+    text-align: center;
+    margin-bottom: 130px;
+    font-family: $sans;
+  }
+
+  .whys {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 96px;
+  }
+
+  .item {
+    display: grid;
+    justify-items: center;
+    font-family: $sans;
+    text-align: center;
+    align-content: start;
+  }
+
+  .icon {
+    width: 86px;
+    height: 86px;
+    background-color: $green;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    margin-bottom: 42px;
+  }
+
+  .text {
+    font-size: 21px;
+    line-height: 40px;
+    color: $purple-dark-10;
+    text-align: center;
+  }
+}

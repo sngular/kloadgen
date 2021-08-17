@@ -1,0 +1,32 @@
+.contact {
+  background-color: $purple-dark-10;
+  color: $white;
+
+  .wrapper {
+    padding: 254px 0 280px;
+  }
+
+  h2 {
+    font-size: 36px;
+    font-weight: 500;
+    color: $green;
+    margin-bottom: 36px;
+  }
+
+  strong {
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 20px;
+    line-height: 2;
+
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+  }
+
+  a {
+    color: $green;
+  }
+}

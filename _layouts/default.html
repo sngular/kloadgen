@@ -28,14 +28,9 @@
     </div>
     {% include header.html %}
     {% include whatfor.html %}
-    <section class="content">
-      <div class="wrapper">
-        {{ content }}
-      </div>
-    </section>
-
-    {{ site.data.sitetext.title | markdownify }}
-
+    {% include mainfeatures.html %}
+    {% include why.html %}
+    {% include contact.html %}
     <footer class="footer">
       <div class="wrapper">
         {% if site.github.is_project_page %}

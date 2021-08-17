@@ -1,11 +1,15 @@
-.whatfor {
+.mainfeatures {
+  background-color: $purple-dark-10;
+  color: $white;
+
   .wrapper {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 94px 0 72px;
+    padding: 254px 0 324px;
 
     .text {
+      width: 646px;
       margin-right: 118px;
 
       .title {
@@ -16,26 +20,43 @@
       }
 
       .description {
-        p {
+        p,
+        ul {
           font-family: $sans;
-          color: $purple-dark-10;
           font-size: 20px;
           line-height: 2;
 
           strong {
             font-weight: 500;
           }
+        }
 
+        p {
           &:not(:last-child) {
             margin-bottom: 20px;
+          }
+        }
+
+        ul {
+          margin-left: 20px;
+
+          li {
+            list-style-type: disc;
+
+            &:not(:last-child) {
+              margin-bottom: 20px;
+            }
           }
         }
       }
     }
 
     .image {
+      display: flex;
+      justify-content: center;
+      
       .img {
-        width: 400px;
+        width: 240px;
       }
     }
   }

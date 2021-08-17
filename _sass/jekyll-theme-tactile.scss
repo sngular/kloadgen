@@ -1,5 +1,8 @@
 @import 'sections/header';
 @import 'sections/whatfor';
+@import 'sections/mainfeatures';
+@import 'sections/why';
+@import 'sections/contact';
 
 :root,
 body,
@@ -17,12 +20,12 @@ body {
 }
 
 .wrapper {
-  max-width: 980px;
+  max-width: 1080px;
   margin: 0 auto;
 }
 
 .banner {
-  background-color: $purple;
+  background-color: $purple-dark-10;
   padding: 0.4rem 1rem;
 
   .wrapper {
@@ -137,10 +140,6 @@ body {
 
   a {
     color: currentColor;
-  }
-
-  .wrapper {
-    padding: 0 2rem;
   }
 
   .copyright {
