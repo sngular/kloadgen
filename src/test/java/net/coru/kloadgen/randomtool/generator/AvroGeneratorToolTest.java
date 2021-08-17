@@ -4,12 +4,17 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
+
+import net.coru.kloadgen.model.ConstraintTypeEnum;
+import org.apache.avro.LogicalTypes;
+import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -20,7 +25,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class AvroGeneratorToolTest {
 
-  private static final LocalDateTime FIXED_DATE = LocalDateTime.of(2019, 12, 6, 12, 0, 0);
+  private static final LocalDateTime FIXED_TIMESTAMP = LocalDateTime.of(2019, 12, 6, 10, 15, 30);
+  private static final LocalDate FIXED_DATE = LocalDate.of(2019,12,6);
+  private static final LocalTime FIXED_TIME = LocalTime.of(10,15,30);
+  private static final String TIMESTAMP_STRING = "2019-12-06T10:15:30";
+  private static final String DATE_STRING = "2019-12-06";
+  private static final String TIME_STRING = "10:15:30";
 
   private static Stream<Arguments> parametersForGenerateRandomValueForField() {
     return Stream.of(
@@ -34,11 +44,11 @@ class AvroGeneratorToolTest {
         Arguments.of("double", 1, Collections.singletonList("1.0"), new Field("name", SchemaBuilder.builder().doubleType()), 1.0),
         Arguments.of("float", 1, Collections.singletonList("1.0"), new Field("name", SchemaBuilder.builder().floatType()), 1.0f),
         Arguments
-            .of("timestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), new Field("name", SchemaBuilder.builder().stringType()),
-                FIXED_DATE),
+            .of("timestamp", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name", SchemaBuilder.builder().stringType()),
+                FIXED_TIMESTAMP),
         Arguments
-            .of("longTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), new Field("name", SchemaBuilder.builder().longType()),
-                FIXED_DATE.toInstant(ZoneOffset.UTC).toEpochMilli()),
+            .of("longTimestamp", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name", SchemaBuilder.builder().longType()),
+                FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC).toEpochMilli()),
         Arguments.of("stringTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"),
             new Field("name", SchemaBuilder.builder().stringType()),
             "2019-12-06T12:00"),
@@ -48,13 +58,58 @@ class AvroGeneratorToolTest {
             .of("boolean", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE),
         Arguments.of("boolean", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().stringType()), "true"),
         Arguments
-            .of("string", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE));
+            .of("string", 1, Collections.singletonList("true"), new Field("name",
+                    SchemaBuilder.builder().booleanType()), Boolean.TRUE)
+    );
+  }
+
+  private static Stream<Arguments> parametersForGenerateRandomValueForFieldLogicalTypes() {
+    Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
+    Schema decimalSchemaFixed = SchemaBuilder.builder().fixed("decimal").size(5);
+    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
+    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
+
+    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
+    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+
+    return Stream.of(
+            Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), new Field("name",
+                    SchemaBuilder.builder().intType()), FIXED_DATE, Collections.emptyMap()),
+            Arguments.of("int_time-millis", 1, Collections.singletonList(TIME_STRING), new Field("name",
+                    SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
+            Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING), new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
+            Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+            Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+            Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+            Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+            Arguments.of("string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"), new Field("name",
+                    SchemaBuilder.builder().stringType()),
+                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
+            Arguments.of("bytes_decimal", 1, Collections.singletonList("44.444"), new Field(
+                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
+            Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new Field(
+                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
+    );
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
     assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expected);
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
+  void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
+                                                   Field field, Object expected,
+                                                   Map<ConstraintTypeEnum, String> constrains) {
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, constrains)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
@@ -108,13 +163,49 @@ class AvroGeneratorToolTest {
         Arguments.of("short", 1, "1", new Field("name", SchemaBuilder.builder().intType()), (short) 1),
         Arguments.of("double", 1, "1.0", new Field("name", SchemaBuilder.builder().doubleType()), 1.0),
         Arguments.of("float", 1, "1.0", new Field("name", SchemaBuilder.builder().floatType()), 1.0f),
-        Arguments.of("timestamp", 1, "2019-12-06T12:00:00", new Field("name", SchemaBuilder.builder().stringType()), FIXED_DATE),
-        Arguments.of("longTimestamp", 1, "2019-12-06T12:00:00", new Field("name", SchemaBuilder.builder().longType()),
-            FIXED_DATE.toInstant(ZoneOffset.UTC).toEpochMilli()),
+        Arguments.of("timestamp", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().stringType()),
+                FIXED_TIMESTAMP),
+        Arguments.of("longTimestamp", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().longType()),
+            FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC).toEpochMilli()),
         Arguments.of("stringTimestamp", 1, "2019-12-06T12:00", new Field("name", SchemaBuilder.builder().stringType()), "2019-12-06T12:00"),
         Arguments.of("uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name", SchemaBuilder.builder().stringType()),
             UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
         Arguments.of("boolean", 1, "true", new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE)
+    );
+  }
+
+  private static Stream<Arguments> parametersForShouldRecoverVariableFromContextLogicalTypes() {
+    Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
+    Schema decimalSchemaFixed = SchemaBuilder.builder().fixed("decimal").size(5);
+    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
+    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
+
+    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
+    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+
+    return Stream.of(
+            Arguments.of("int_date", 1, DATE_STRING, new Field("name",
+                    SchemaBuilder.builder().intType()), FIXED_DATE, Collections.emptyMap()),
+            Arguments.of("int_time-millis", 1, TIME_STRING, new Field("name",
+                    SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
+            Arguments.of("long_time-micros", 1, TIME_STRING, new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
+            Arguments.of("long_timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+            Arguments.of("long_timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+            Arguments.of("long_local-timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+            Arguments.of("long_local-timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
+                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+            Arguments.of("string_uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name",
+                            SchemaBuilder.builder().stringType()),
+                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
+            Arguments.of("bytes_decimal", 1, "44.444", new Field(
+                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
+            Arguments.of("fixed_decimal", 1, "55.555", new Field(
+                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
     );
   }
 
@@ -128,4 +219,18 @@ class AvroGeneratorToolTest {
             "{VARIABLE}"),Collections.emptyMap()))
         .isEqualTo(expected);
   }
+
+  @ParameterizedTest
+  @MethodSource("parametersForShouldRecoverVariableFromContextLogicalTypes")
+  void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field,
+                                        Object expected, Map<ConstraintTypeEnum, String> constrains) {
+    JMeterVariables variables = new JMeterVariables();
+    variables.put("VARIABLE", value);
+    JMeterContextService.getContext().setVariables(variables);
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, Collections.singletonList("$" +
+            "{VARIABLE}"),constrains))
+            .isEqualTo(expected);
+  }
+
+
 }
