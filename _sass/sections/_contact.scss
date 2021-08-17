@@ -18,8 +18,13 @@
   }
 
   p {
+    font-family: $sans;
     font-size: 20px;
     line-height: 2;
+
+    strong {
+      font-weight: 500;
+    }
 
     &:not(:last-child) {
       margin-bottom: 20px;

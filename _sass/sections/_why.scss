@@ -22,7 +22,7 @@
   .whys {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-column-gap: 96px;
+    grid-column-gap: 50px;
   }
 
   .item {
@@ -44,9 +44,13 @@
   }
 
   .text {
-    font-size: 21px;
-    line-height: 40px;
+    font-size: 18px;
+    line-height: 2;
     color: $purple-dark-10;
     text-align: center;
+
+    strong {
+      font-weight: 500;
+    }
   }
 }
