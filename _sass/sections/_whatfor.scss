@@ -1,0 +1,38 @@
+.whatfor {
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 94px 0 72px;
+
+    .text {
+      margin-right: 118px;
+
+      .title {
+        font-size: 36px;
+        font-weight: 500;
+        color: $green;
+        margin-bottom: 40px;
+      }
+
+      .description {
+        p {
+          font-family: $sans;
+          color: $purple;
+          font-size: 20px;
+          line-height: 2;
+
+          &:not(:last-child) {
+            margin-bottom: 20px;
+          }
+        }
+      }
+    }
+
+    .image {
+      .img {
+        width: 480px;
+      }
+    }
+  }
+}

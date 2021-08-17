@@ -1,0 +1,12 @@
+<header class="header">
+    <div class="wrapper">
+      <h1 class="title">{{ site.title }}</h1>
+      <h2 class="description">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
+      <div class="view-on-github">
+        <a class="button" href="{{ site.github.repository_url }}">
+          <img class="img" src="{{site.baseurl}}/assets/images/ico-github.svg" alt="GitHub" />
+          {{ site.data.sitetext.header.button | markdownify }}
+        </a>
+      </div>
+    </div>
+  </header>

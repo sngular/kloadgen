@@ -26,24 +26,15 @@
         </a>
       </div>
     </div>
-
-    <header class="header">
-      <div class="wrapper">
-        <h1 class="title">{{ site.title }}</h1>
-        <h2 class="description">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
-      </div>
-    </header>
+    {% include header.html %}
+    {% include whatfor.html %}
     <section class="content">
       <div class="wrapper">
-        <div class="view-on-github">
-          <img class="img" src="{{site.baseurl}}/assets/images/GitHub-Mark-64px.png" alt="GitHub" />
-          <p>
-            <a href="{{ site.github.repository_url }}">View project on GitHub</a>
-          </p>
-        </div>
         {{ content }}
       </div>
     </section>
+
+    {{ site.data.sitetext.title | markdownify }}
 
     <footer class="footer">
       <div class="wrapper">

@@ -1,9 +1,10 @@
-@import "rouge-base16-dark";
+@import 'sections/header';
+@import 'sections/whatfor';
 
 :root,
 body,
 html {
-  font-family: 'IBM Plex Mono',monospace;
+  font-family: "IBM Plex Mono", monospace;
   font-size: 100%;
   line-height: 1;
   font-style: normal;
@@ -27,7 +28,7 @@ body {
   .wrapper {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 
   .img {
@@ -35,32 +36,9 @@ body {
   }
 }
 
-.header {
-  background: $black;
-  color: $white;
-  padding: 2rem 1rem;
 
-  .wrapper {
-    padding: 0 2rem;
-  }
-
-  .title {
-    font-size: clamp(3em, 11.5vw, 6em);
-    font-style: italic;
-    font-weight: 500;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  .description {
-    font-size: 1.2rem;
-    line-height: 1.5;
-    text-align: center;
-  }
-}
 
 .content {
-  background-color: $white-dark-10;
   padding: 0 1rem;
 
   .wrapper {
@@ -93,7 +71,7 @@ body {
   p,
   ul,
   ol {
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: "IBM Plex Sans", sans-serif;
     line-height: 1.5;
   }
 
@@ -116,12 +94,12 @@ body {
     --fluid-type-max: 3rem;
     --fluid-type-target: 5vw;
   }
-  
+
   h2 {
     --fluid-type-min: 1.5rem;
     --fluid-type-max: 2.25rem;
   }
-  
+
   h3 {
     --fluid-type-min: 1.5rem;
     --fluid-type-max: 2.25rem;
@@ -150,7 +128,6 @@ body {
     text-decoration: underline;
     color: $purple;
   }
-
 }
 
 .footer {

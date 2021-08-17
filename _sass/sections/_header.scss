@@ -1,0 +1,43 @@
+.header {
+    background: $black;
+    color: $white;
+    padding: 64px 0;
+  
+    .title {
+      font-size: clamp(3em, 11.5vw, 96px);
+      font-style: italic;
+      font-weight: 500;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+  
+    .description {
+      font-size: 20px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .view-on-github {
+      margin-top: 64px;
+      text-align: center;
+    }
+
+    .button {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: $purple;
+        color: $white;
+        text-decoration: none;
+        text-transform: uppercase;
+        height: 50px;
+        border-radius: 30px;
+        font-size: 20px;
+        font-weight: 500;
+        padding: 0 24px;
+
+        .img {
+          margin-right: 24px;
+        }
+    }
+  }
