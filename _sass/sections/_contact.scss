@@ -1,6 +1,8 @@
 .contact {
   background-color: $purple-dark-10;
   color: $white;
+  position: relative;
+  overflow-x: hidden;
 
   .wrapper {
     padding: 254px 0 280px;
@@ -33,5 +35,17 @@
 
   a {
     color: $green;
+  }
+
+  .kloads {
+    width: 700px;
+    position: absolute;
+    top: 50%;
+    right: -240px;
+    transform: translateY(-50%);
+
+    .img {
+      width: 100%;
+    }
   }
 }
