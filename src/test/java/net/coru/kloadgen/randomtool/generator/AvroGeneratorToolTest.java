@@ -1,7 +1,6 @@
 package net.coru.kloadgen.randomtool.generator;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;

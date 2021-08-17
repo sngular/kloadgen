@@ -349,7 +349,8 @@ public class RandomObject {
 
    private static BigDecimal getDecimalValueOrRandom(List<String> fieldValueList,
                                                      Map<ConstraintTypeEnum, String> constrains){
-    int scale, precision;
+    int scale;
+    int precision;
 
     if (Objects.nonNull(constrains.get(ConstraintTypeEnum.PRECISION))){
       precision = Integer.parseInt(constrains.get(ConstraintTypeEnum.PRECISION));
