@@ -1,99 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>kloadgen</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <groupId>net.coru</groupId>
-  <version>3.5.1</version>
   <modelVersion>4.0.0</modelVersion>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <optimize>true</optimize>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-          <source>${jdk.version}</source>
-          <target>${jdk.version}</target>
-        </configuration>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.6.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>coveralls-maven-plugin</artifactId>
-        <groupId>org.eluder.coveralls</groupId>
-        <version>4.3.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <configuration>
-          <check/>
-          <formats>
-            <format>xml</format>
-          </formats>
-          <instrumentation>
-            <ignoreTrivial>true</ignoreTrivial>
-          </instrumentation>
-          <quiet>true</quiet>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>cobertura</goal>
-            </goals>
-          </execution>
-        </executions>
-        <groupId>org.codehaus.mojo</groupId>
-        <version>2.7</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>2.22.2</version>
-      </plugin>
-    </plugins>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.properties</include>
-          <include>**/*.tpl</include>
-        </includes>
-      </resource>
-    </resources>
-  </build>
+  <groupId>net.coru</groupId>
+
+  <artifactId>kloadgen</artifactId>
+  <version>3.5.0</version>
+
+  <properties>
+    <assertj-core.version>3.18.1</assertj-core.version>
+    <assertj-json.version>1.2.0</assertj-json.version>
+    <avro.version>1.10.0</avro.version>
+    <commons-beanutils.version>1.9.4</commons-beanutils.version>
+    <commons-collections4.version>4.4</commons-collections4.version>
+    <commons-lang3.version>3.11</commons-lang3.version>
+    <gson.version>2.8.6</gson.version>
+    <guava.version>30.0-jre</guava.version>
+    <jaxb-api.version>2.3.1</jaxb-api.version>
+    <jdk.version>11</jdk.version>
+    <jmeter.lib.scope>provided</jmeter.lib.scope>
+    <jmeter.version>5.3</jmeter.version>
+    <json-path.version>2.4.0</json-path.version>
+    <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
+    <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
+    <kafka.version>2.6.0</kafka.version>
+    <lombok.version>1.18.20</lombok.version>
+    <minimal-json.version>0.9.5</minimal-json.version>
+    <mockito-core.version>3.6.0</mockito-core.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <rest-assured.version>4.3.2</rest-assured.version>
+    <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
+    <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
+    <wiremock.version>2.27.2</wiremock.version>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.conscrypt</groupId>
-      <artifactId>conscrypt-openjdk-uber</artifactId>
-      <version>2.5.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>jorphan</artifactId>
       <groupId>org.apache.jmeter</groupId>
+      <artifactId>jorphan</artifactId>
       <version>${jmeter.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>slf4j-api</artifactId>
           <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
-      <artifactId>kafka_2.13</artifactId>
       <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka_2.13</artifactId>
       <version>${kafka.version}</version>
       <exclusions>
         <exclusion>
-          <artifactId>slf4j-log4j12</artifactId>
           <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>slf4j-api</artifactId>
           <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -126,8 +90,8 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <scope>provided</scope>
       <version>${lombok.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -175,72 +139,78 @@
       <version>1.2</version>
     </dependency>
     <dependency>
-      <artifactId>reflections</artifactId>
       <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
       <version>0.9.12</version>
     </dependency>
     <!-- Options -->
     <dependency>
+      <groupId>com.salesforce.kafka.test</groupId>
+      <artifactId>kafka-junit5</artifactId>
+      <version>3.2.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.13</artifactId>
+      <version>${kafka.version}</version>
       <classifier>test</classifier>
       <scope>test</scope>
-      <version>${kafka.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
+      <version>${kafka.version}</version>
       <classifier>test</classifier>
       <scope>test</scope>
-      <version>${kafka.version}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
       <version>${junit-jupiter-api.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
       <version>${assertj-core.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.revinate</groupId>
       <artifactId>assertj-json</artifactId>
-      <scope>test</scope>
       <version>${assertj-json.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.jayway.jsonpath</groupId>
       <artifactId>json-path</artifactId>
-      <scope>compile</scope>
       <version>${json-path.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
       <version>${mockito-core.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <scope>test</scope>
       <version>${mockito-core.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <scope>test</scope>
       <version>${commons-beanutils.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock</artifactId>
-      <scope>test</scope>
       <version>${wiremock.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>ru.lanwen.wiremock</groupId>
@@ -250,46 +220,157 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <scope>test</scope>
       <version>${rest-assured.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
-      <scope>compile</scope>
       <version>${jaxb-api.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <scope>test</scope>
       <version>${junit-jupiter-api.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <scope>test</scope>
       <version>${junit-jupiter-api.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <id>confluent</id>
+      <url>https://packages.confluent.io/maven/</url>
+    </repository>
+  </repositories>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.tpl</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <optimize>true</optimize>
+          <showDeprecation>true</showDeprecation>
+          <showWarnings>true</showWarnings>
+          <source>${jdk.version}</source>
+          <target>${jdk.version}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eluder.coveralls</groupId>
+        <artifactId>coveralls-maven-plugin</artifactId>
+        <version>4.3.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <check></check>
+          <formats>
+            <format>xml</format>
+          </formats>
+          <instrumentation>
+            <ignoreTrivial>true</ignoreTrivial>
+          </instrumentation>
+          <quiet>true</quiet>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>cobertura</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.2</version>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
     <profile>
       <id>plugin</id>
-      <properties>
-        <lane>plugin</lane>
-      </properties>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <lane>plugin</lane>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.jmeter</groupId>
+          <artifactId>ApacheJMeter_java</artifactId>
+          <version>${jmeter.version}</version>
+          <scope>provided</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.jmeter</groupId>
+              <artifactId>jorphan</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.logging.log4j</groupId>
+              <artifactId>log4j-slf4j-impl</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.logging.log4j</groupId>
+              <artifactId>log4j-api</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.logging.log4j</groupId>
+              <artifactId>log4j-core</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.apache.logging.log4j</groupId>
+              <artifactId>log4j-1.2-api</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-jdk14</artifactId>
+          <version>${slf4j-api.version}</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
       <build>
         <plugins>
           <plugin>
-            <artifactId>maven-shade-plugin</artifactId>
             <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
             <version>2.4.2</version>
             <configuration>
-              <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
               <filters>
                 <filter>
                   <excludes>
@@ -297,6 +378,7 @@
                   </excludes>
                 </filter>
               </filters>
+              <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
             </configuration>
             <executions>
               <execution>
@@ -304,166 +386,44 @@
                   <goal>shade</goal>
                 </goals>
                 <phase>package</phase>
-                <configuration>
-                  <minimizeJar>true</minimizeJar>
-                  <filters>
-                    <filter>
-                      <artifact>*:*</artifact>
-                      <excludes>
-                        <excludeScope>system</excludeScope>
-                        <exclude>META-INF/*.SF</exclude>
-                        <exclude>META-INF/*.DSA</exclude>
-                        <exclude>META-INF/*.RSA</exclude>
-                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                      </excludes>
-                    </filter>
-                  </filters>
-                  <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
-                  <shadedArtifactAttached>true</shadedArtifactAttached>
-                </configuration>
               </execution>
             </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jarsigner-plugin</artifactId>
-            <version>3.0.0</version>
-            <executions>
-              <execution>
-                <id>sign</id>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>verify</id>
-                <goals>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <keystore>${basedir}/keystore.jks</keystore>
-              <alias>kloadgencert</alias>
-              <storepass>kloadgen2021</storepass>
-              <keypass>kloadgen2021</keypass>
-            </configuration>
           </plugin>
         </plugins>
       </build>
-      <dependencies>
-        <dependency>
-          <artifactId>ApacheJMeter_java</artifactId>
-          <exclusions>
-            <exclusion>
-              <artifactId>jorphan</artifactId>
-              <groupId>org.apache.jmeter</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>log4j-slf4j-impl</artifactId>
-              <groupId>org.apache.logging.log4j</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>log4j-api</artifactId>
-              <groupId>org.apache.logging.log4j</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>log4j-core</artifactId>
-              <groupId>org.apache.logging.log4j</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>log4j-1.2-api</artifactId>
-              <groupId>org.apache.logging.log4j</groupId>
-            </exclusion>
-          </exclusions>
-          <groupId>org.apache.jmeter</groupId>
-          <scope>provided</scope>
-          <version>${jmeter.version}</version>
-        </dependency>
-        <dependency>
-          <artifactId>slf4j-jdk14</artifactId>
-          <groupId>org.slf4j</groupId>
-          <scope>provided</scope>
-          <version>${slf4j-api.version}</version>
-        </dependency>
-      </dependencies>
     </profile>
     <profile>
       <id>standalone</id>
       <properties>
         <lane>standalone</lane>
       </properties>
-      <build>
-        <resources>
-          <resource>
-            <directory>src/main/resources</directory>
-          </resource>
-        </resources>
-        <plugins>
-          <plugin>
-            <artifactId>maven-shade-plugin</artifactId>
-            <executions>
-              <execution>
-                <configuration>
-                  <minimizeJar>true</minimizeJar>
-                  <filters>
-                    <filter>
-                      <artifact>*:*</artifact>
-                      <excludes>
-                        <excludeScope>system</excludeScope>
-                        <exclude>META-INF/*.SF</exclude>
-                        <exclude>META-INF/*.DSA</exclude>
-                        <exclude>META-INF/*.RSA</exclude>
-                        <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                      </excludes>
-                    </filter>
-                  </filters>
-                  <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
-                  <shadedArtifactAttached>true</shadedArtifactAttached>
-                  <transformers>
-                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                      <mainClass>net.coru.kloadgen.KLoadGenStandalone</mainClass>
-                    </transformer>
-                  </transformers>
-                </configuration>
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-                <phase>package</phase>
-              </execution>
-            </executions>
-            <groupId>org.apache.maven.plugins</groupId>
-          </plugin>
-        </plugins>
-      </build>
       <dependencies>
         <dependency>
+          <groupId>org.apache.jmeter</groupId>
           <artifactId>ApacheJMeter_java</artifactId>
+          <version>${jmeter.version}</version>
           <exclusions>
             <exclusion>
-              <artifactId>jorphan</artifactId>
               <groupId>org.apache.jmeter</groupId>
+              <artifactId>jorphan</artifactId>
             </exclusion>
             <exclusion>
+              <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-slf4j-impl</artifactId>
-              <groupId>org.apache.logging.log4j</groupId>
             </exclusion>
             <exclusion>
+              <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-api</artifactId>
-              <groupId>org.apache.logging.log4j</groupId>
             </exclusion>
             <exclusion>
+              <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-core</artifactId>
-              <groupId>org.apache.logging.log4j</groupId>
             </exclusion>
             <exclusion>
-              <artifactId>log4j-1.2-api</artifactId>
               <groupId>org.apache.logging.log4j</groupId>
+              <artifactId>log4j-1.2-api</artifactId>
             </exclusion>
           </exclusions>
-          <groupId>org.apache.jmeter</groupId>
-          <version>${jmeter.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.jmeter</groupId>
@@ -496,8 +456,8 @@
           <version>${jmeter.version}</version>
         </dependency>
         <dependency>
-          <artifactId>slf4j-jdk14</artifactId>
           <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-jdk14</artifactId>
           <version>${slf4j-api.version}</version>
         </dependency>
         <dependency>
@@ -506,40 +466,47 @@
           <version>${slf4j-api.version}</version>
         </dependency>
       </dependencies>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <filters>
+                    <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                      </excludes>
+                    </filter>
+                  </filters>
+                  <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
+                  <shadedArtifactAttached>true</shadedArtifactAttached>
+                  <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <mainClass>net.coru.kloadgen.KLoadGenStandalone</mainClass>
+                    </transformer>
+                  </transformers>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
-  <properties>
-    <assertj-core.version>3.18.1</assertj-core.version>
-    <assertj-json.version>1.2.0</assertj-json.version>
-    <avro.version>1.10.0</avro.version>
-    <commons-beanutils.version>1.9.4</commons-beanutils.version>
-    <commons-collections4.version>4.4</commons-collections4.version>
-    <commons-lang3.version>3.11</commons-lang3.version>
-    <gson.version>2.8.6</gson.version>
-    <guava.version>30.0-jre</guava.version>
-    <jaxb-api.version>2.3.1</jaxb-api.version>
-    <jdk.version>11</jdk.version>
-    <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.3</jmeter.version>
-    <json-path.version>2.4.0</json-path.version>
-    <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
-    <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
-    <kafka.version>2.6.0</kafka.version>
-    <lombok.version>1.18.20</lombok.version>
-    <minimal-json.version>0.9.5</minimal-json.version>
-    <mockito-core.version>3.6.0</mockito-core.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <rest-assured.version>4.3.2</rest-assured.version>
-    <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
-    <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
-    <wiremock.version>2.27.2</wiremock.version>
-  </properties>
-
-  <repositories>
-    <repository>
-      <id>confluent</id>
-      <url>https://packages.confluent.io/maven/</url>
-    </repository>
-  </repositories>
 </project>

@@ -10,9 +10,10 @@ import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.random.RandomArray;
+import net.coru.kloadgen.randomtool.random.RandomMap;
+import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.AvroRandomTool;
-import net.coru.kloadgen.util.RandomTool;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
@@ -31,20 +32,26 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
     private Schema schema;
     private SchemaMetadata metadata;
     private List<FieldValueMapping> fieldExprMappings;
-    private AvroRandomTool randomToolAvro;
+    private RandomObject randomObject;
+    private RandomMap randomMap;
+    private RandomArray randomArray;
 
     public void processSchema(ParsedSchema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
         this.schema = (Schema) schema.rawSchema();
         this.fieldExprMappings = fieldExprMappings;
         this.metadata = metadata;
-        randomToolAvro = new AvroRandomTool();
+        randomObject = new RandomObject();
+        randomMap = new RandomMap();
+        randomArray = new RandomArray();
     }
 
     public void processSchema(Schema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
         this.schema = schema;
         this.fieldExprMappings = fieldExprMappings;
         this.metadata = metadata;
-        randomToolAvro = new AvroRandomTool();
+        randomObject = new RandomObject();
+        randomMap = new RandomMap();
+        randomArray = new RandomArray();
     }
 
     public EnrichedRecord next() {
@@ -84,9 +91,9 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
                 } else {
                     entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
-                            randomToolAvro.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
+                            randomObject.generateRandom(fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
                                     fieldValueMapping.getFieldValuesList(),
-                                    schema.getField(fieldValueMapping.getFieldName())));
+                                    fieldValueMapping.getConstrains()));
                     fieldExpMappingsQueue.remove();
                     fieldValueMapping = fieldExpMappingsQueue.peek();
                 }
@@ -150,13 +157,9 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
         Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
 
-        var simpleTypeArrayMap = createSimpleTypeMapArray(fieldName,
-                extractType(entity.getSchema().getField(fieldName), ARRAY).getName(),
-                arraySize, mapSize,
-                fieldValueMapping.getValueLength(),
-                fieldValueMapping.getFieldValuesList());
+        var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), arraySize, fieldValueMapping.getConstrains() );
 
-        entity.put(fieldName, simpleTypeArrayMap);
+        entity.put(fieldName, mapArray);
         return getSafeGetElement(fieldExpMappingsQueue);
     }
 
@@ -168,10 +171,10 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         Map<String, List> recordMapArray = new HashMap<>(mapSize);
         for (int i = 0; i < mapSize - 1; i++) {
             ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-            recordMapArray.put((String) RandomTool.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
+            recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
                     createObjectArray(extractType(entity.getSchema().getField(fieldName), MAP).getValueType().getElementType(), fieldName, arraySize, temporalQueue));
         }
-        recordMapArray.put((String) RandomTool.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
+        recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
                 createObjectArray(extractType(entity.getSchema().getField(fieldName), MAP).getValueType().getElementType(), fieldName, arraySize, fieldExpMappingsQueue));
         entity.put(fieldName, recordMapArray);
         return getSafeGetElement(fieldExpMappingsQueue);
@@ -260,11 +263,11 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                         fieldExpMappingsQueue));
             } else {
                 fieldExpMappingsQueue.poll();
-                subEntity.put(cleanFieldName, randomToolAvro.generateRandom(
+                subEntity.put(cleanFieldName, randomObject.generateRandom(
                         fieldValueMapping.getFieldType(),
                         fieldValueMapping.getValueLength(),
                         fieldValueMapping.getFieldValuesList(),
-                        innerSchema.getField(cleanFieldName)));
+                        fieldValueMapping.getConstrains()));
             }
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         }

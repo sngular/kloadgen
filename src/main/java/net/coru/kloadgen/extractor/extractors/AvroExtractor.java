@@ -1,7 +1,7 @@
 package net.coru.kloadgen.extractor.extractors;
 
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.RandomTool;
+import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.avro.Schema;
 
 import java.util.*;
@@ -17,6 +17,8 @@ public class AvroExtractor {
 
     private final Set<Schema.Type> typesSet = EnumSet.of(Schema.Type.INT, Schema.Type.DOUBLE, Schema.Type.FLOAT, Schema.Type.BOOLEAN, Schema.Type.STRING,
             Schema.Type.LONG, Schema.Type.BYTES, Schema.Type.FIXED);
+
+    private final RandomObject randomObject = new RandomObject();
 
     public List<FieldValueMapping> processSchema(Schema schema) {
         List<FieldValueMapping> attributeList = new ArrayList<>();
@@ -226,7 +228,7 @@ public class AvroExtractor {
         chosenType = extractTypeName(types.get(1)).equalsIgnoreCase("array") ? types.get(1) : chosenType;
         String chosenTypeName = extractTypeName(chosenType);
 
-        if (!RandomTool.isTypeValid(chosenTypeName)) {
+        if (!randomObject.isTypeValid(chosenTypeName)) {
             chosenTypeName = "null";
         } else if ("array".equalsIgnoreCase(chosenTypeName)) {
             chosenTypeName = "int-array";

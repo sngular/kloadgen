@@ -5,10 +5,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JComboBox;
+import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
 
-class ReflectionUtils {
+final class ReflectionUtils {
+
+  private ReflectionUtils() {
+  }
 
   protected static void extractSerializers(JComboBox<String> serializerComboBox, Reflections reflections, Class reflectedClass) {
     Set<Class<? extends Serializer>> subTypes = reflections.getSubTypesOf(reflectedClass);
@@ -23,5 +27,20 @@ class ReflectionUtils {
       serializerComboBox.addItem(serializer);
     }
     serializerComboBox.setSelectedItem(0);
+  }
+
+  protected static void extractDeserializers(JComboBox<String> deserializerComboBox, Reflections reflections, Class reflectedClass) {
+    Set<Class<? extends Deserializer>> subTypes = reflections.getSubTypesOf(reflectedClass);
+    List<String> classList = new ArrayList<>();
+
+    for (Class deserializer : subTypes) {
+      classList.add(deserializer.getName());
+    }
+
+    classList.sort(Comparator.naturalOrder());
+    for (String deserializer : classList) {
+      deserializerComboBox.addItem(deserializer);
+    }
+    deserializerComboBox.setSelectedItem(0);
   }
 }

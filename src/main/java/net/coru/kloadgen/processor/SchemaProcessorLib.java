@@ -7,7 +7,9 @@
 package net.coru.kloadgen.processor;
 
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.util.RandomTool;
+import net.coru.kloadgen.randomtool.random.RandomArray;
+import net.coru.kloadgen.randomtool.random.RandomMap;
+import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -19,6 +21,9 @@ import java.util.regex.Pattern;
 public abstract class SchemaProcessorLib {
 
     private static final Map<String, Object> context = new HashMap<>();
+    private static final RandomObject randomObject = new RandomObject();
+    private static final RandomMap randomMap = new RandomMap();
+    private static final RandomArray randomArray = new RandomArray();
 
     static boolean checkIfIsRecordMapArray(String cleanPath) {
         var indexOfArrayIdentifier = StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]"));
@@ -125,7 +130,7 @@ public abstract class SchemaProcessorLib {
         return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
     }
 
-    static Map generateRandomMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldValuesList) {
+    static Object generateRandomMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldValuesList) {
 
         List<String> parameterList = new ArrayList<>(fieldValuesList);
         parameterList.replaceAll(fieldValue ->
@@ -138,11 +143,12 @@ public abstract class SchemaProcessorLib {
         if ("seq".equals(fieldType)) {
             while (mapSize > 0) {
                 value.put(generateMapKey(),
-                        RandomTool.generateSeq(fieldName, fieldType, parameterList, context));
+                        randomObject.generateSeq(fieldName, fieldType, parameterList, context));
                 mapSize--;
             }
         } else {
-            value = new HashMap<>(RandomTool.generateRandomMap(fieldType, mapSize, fieldValueLength, parameterList, Collections.emptyMap()));
+            var map = randomMap.generateMap(fieldType, fieldValueLength, parameterList,  mapSize, Collections.emptyMap());
+            value = (Map) map;
         }
 
         return value;
@@ -160,18 +166,18 @@ public abstract class SchemaProcessorLib {
         List value = new ArrayList<>(arraySize);
         if ("seq".equals(fieldType)) {
             while (arraySize > 0) {
-                value.add(RandomTool.generateSeq(fieldName, fieldType, parameterList, context));
+                value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
                 arraySize--;
             }
         } else {
-            value = new ArrayList<>(RandomTool.generateRandomArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap()));
+            value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize,  Collections.emptyMap());
         }
 
         return value;
     }
 
     static String generateMapKey() {
-        return (String) RandomTool.generateRandom("string", 2, Collections.emptyList(), Collections.emptyMap());
+        return (String) randomObject.generateRandom("string", 2, Collections.emptyList(), Collections.emptyMap());
     }
 
     static Object createArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
@@ -184,12 +190,9 @@ public abstract class SchemaProcessorLib {
     }
 
     static List<Map> createSimpleTypeMapArray(String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
-        List<Map> result = new ArrayList(arraySize);
-        if (fieldType.endsWith("map-array")) {
-            fieldType = fieldType.replace("-map", "");
-        }
+        List<Map> result = new ArrayList<>(arraySize);
         while (arraySize > 0) {
-            result.add(generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, fieldExpMappings));
+            result.add((Map)generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, fieldExpMappings));
             arraySize--;
         }
 
