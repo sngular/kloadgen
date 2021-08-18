@@ -39,4 +39,30 @@
       }
     }
   }
-}
+
+  @media #{$desktop-sm} {
+    .wrapper {
+      padding: 94px 1rem 72px;
+    }
+  }
+
+  @media #{$tablet-md} {
+    .wrapper {
+      flex-direction: column-reverse;
+      padding: 42px 1rem;
+
+      .text {
+        margin-right: 0;
+      }
+
+      .image {
+        margin-bottom: 40px;
+  
+        .img {
+          width: 224px;
+        }
+      }
+    }
+  }
+ 
+ }

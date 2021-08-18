@@ -48,4 +48,25 @@
       width: 100%;
     }
   }
+
+  @media #{$desktop-sm} {
+    .wrapper {
+      padding: 34px 1rem;
+    }
+
+    .kloads {
+      display: flex;
+      justify-content: flex-end;
+      position: relative;
+      top: 0;
+      right: -90px;
+      transform: none;
+      width: 100%;
+      margin-bottom: 20px;
+
+      .img {
+        max-width: 600px;
+      }
+    }
+  }
 }

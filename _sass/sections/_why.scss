@@ -53,4 +53,32 @@
       font-weight: 500;
     }
   }
+
+  @media #{$desktop-sm} {
+    .wrapper {
+      padding: 54px 1rem;
+    }
+
+    .title,
+    .description {
+      text-align: left;
+    }
+
+    .description {
+      margin-bottom: 54px;
+    }
+
+    .whys {
+      grid-template-columns: initial;
+      grid-template-rows: repeat(3, 1fr);
+      grid-column-gap: initial;
+      grid-row-gap: 36px;
+      justify-content: center;
+    }
+
+    .item {
+      max-width: 310px;
+      width: auto;
+    }
+  }
 }

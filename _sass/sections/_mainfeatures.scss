@@ -60,4 +60,29 @@
       }
     }
   }
+
+  @media #{$desktop-sm} {
+    .wrapper {
+      padding: 48px 1rem;
+    }
+  }
+
+  @media #{$tablet-md} {
+    .wrapper {
+      flex-direction: column-reverse;
+
+      .text {
+        width: auto;
+        margin-right: 0;
+      }
+
+      .image {
+        margin-bottom: 54px;
+
+        .img {
+          width: 68px;
+        }
+      }
+    }
+  }
 }
