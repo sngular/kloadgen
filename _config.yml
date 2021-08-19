@@ -1,5 +1,5 @@
-title: KLoadGen
-description: Generate performance and business-logic tests in an easy and maintainable way.
+title: KLoadGen - Generate performance and business-logic tests in an easy and maintainable way.
+description: Built by Corunet, Kloadgen is an open-source, JMeter plugin that allows generating and injecting synthetic data into a Kafka-based, event architecture.
 twitter:
   username: corunet
   card: summary
