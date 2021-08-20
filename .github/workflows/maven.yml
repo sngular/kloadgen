@@ -24,6 +24,6 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Publish to GitHub Packages
-      run: mvn --batch-mode deploy
+      run: mvn --file pom-github.xml --batch-mode deploy
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
