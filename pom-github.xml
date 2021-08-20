@@ -6,7 +6,7 @@
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
-  <version>3.5.0</version>
+  <version>3.5.1</version>
 
   <distributionManagement>
     <repository>
@@ -386,7 +386,8 @@
                   </excludes>
                 </filter>
               </filters>
-              <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
+              <shadedClassifierName>${project.artifactId}-${lane}-${project.version}</shadedClassifierName>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
             </configuration>
             <executions>
               <execution>
