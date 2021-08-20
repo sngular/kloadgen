@@ -8,6 +8,14 @@
   <artifactId>kloadgen</artifactId>
   <version>3.5.0</version>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/corunet/kloadgen</url>
+    </repository>
+  </distributionManagement>
+
   <properties>
     <assertj-core.version>3.18.1</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
@@ -493,7 +501,7 @@
                       </excludes>
                     </filter>
                   </filters>
-                  <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
+                  <shadedClassifierName>${project.artifactId}-${lane}-${project.version}</shadedClassifierName>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -508,12 +516,4 @@
       </build>
     </profile>
   </profiles>
-
-  <distributionManagement>
-    <repository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/corunet/kloadgen</url>
-    </repository>
-  </distributionManagement>
 </project>
