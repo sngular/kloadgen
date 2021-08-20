@@ -13,14 +13,12 @@ import static org.apache.avro.Schema.Type.UNION;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
+
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -101,7 +99,8 @@ public class AvroSchemaProcessor {
                   schema.getField(fieldValueMapping.getFieldName()),
                   fieldValueMapping.getFieldType(),
                   fieldValueMapping.getValueLength(),
-                  fieldValueMapping.getFieldValuesList()
+                  fieldValueMapping.getFieldValuesList(),
+                  extractConstrains(schema.getField(fieldValueMapping.getFieldName()))
                   )
           );
           fieldExpMappingsQueue.remove();
@@ -110,6 +109,18 @@ public class AvroSchemaProcessor {
       }
     }
     return new EnrichedRecord(metadata, entity);
+  }
+
+  private Map<ConstraintTypeEnum, String> extractConstrains (Schema.Field field){
+    Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
+
+    if (Objects.nonNull(field.schema().getObjectProp("precision")))
+        constrains.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
+
+    if (Objects.nonNull(field.schema().getObjectProp("scale")))
+      constrains.put(ConstraintTypeEnum.SCALE, field.schema().getObjectProp("scale").toString());
+
+    return constrains;
   }
 
   private Schema extractType(Field field, Type typeToMatch) {
@@ -168,7 +179,8 @@ public class AvroSchemaProcessor {
                 innerSchema.getField(cleanFieldName),
                 fieldValueMapping.getFieldType(),
                 fieldValueMapping.getValueLength(),
-                fieldValueMapping.getFieldValuesList()
+                fieldValueMapping.getFieldValuesList(),
+                extractConstrains(innerSchema.getField(cleanFieldName))
             )
         );
       }

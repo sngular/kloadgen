@@ -14,6 +14,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
@@ -65,7 +66,7 @@ public class AvroDeserializer implements Deserializer<Object> {
       Schema avroSchema = parser.parse(schemaString);
 
       ByteBuffer buffer = getByteBuffer(data);
-      DatumReader<?> reader = new GenericDatumReader<>(avroSchema);
+      DatumReader<?> reader = new GenericDatumReader<GenericRecord>(avroSchema);
 
       int length = buffer.limit() - 1 - 4;
       int start = buffer.position() + buffer.arrayOffset();

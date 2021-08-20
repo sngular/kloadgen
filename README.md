@@ -226,6 +226,20 @@ KLoadGen provides an easy way for random data generation base on the field type.
 | longTimestmap | Field of type Long but coding a Timestmap | Localdatetime.now formatted as long |
 | boolean | Field of Boolean type | Ramdon bool value |
 
+#### Logical Types
+| Type | Details |  Returns |
+|----------|:-------:|:--------:|
+| bytes_decimal | Field of bytes type | Random decimal with given precision and scale
+| fixed_decimal | Field of fixed type | Random decimal with given precision and scale
+| string_uuid | Field of string type | Random UUID string
+| int_date | Field of int type | Random number of days representing a date between 1-1-1900 and 1-1-2100
+| int_time-millis | Field of int type | Random number of milliseconds representing an hour
+| long_time-micros | Field of type long | Random number of microseconds representing an hour
+| long_timestamp-millis | Field of type long | Random number of milliseconds representing a timestamp between 1-1-1900 and 1-1-2100 
+| long_timestamp-micros | Field of type long | Random number of microseconds representing a timestamp between 1-1-1900 and 1-1-2100
+| long_local-timestamp-millis | Field of type long | Random number of milliseconds representing a timestamp between 1-1-1900 and 1-1-2100 in a local timezone
+| long_local-timestamp-micros | Field fo type long | Random number of microseconds representing a timestamp between 1-1-1900 and 1-1-2100 in a local timezone
+
 #### Special Data Types
 
 | Type | Details |  Returns |

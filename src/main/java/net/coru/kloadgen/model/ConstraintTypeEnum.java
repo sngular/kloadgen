@@ -14,5 +14,7 @@ public enum ConstraintTypeEnum {
   EXCLUDED_MAXIMUM_VALUE,
   MULTIPLE_OF,
   REGEX,
-  FORMAT
+  FORMAT,
+  PRECISION,
+  SCALE
 }

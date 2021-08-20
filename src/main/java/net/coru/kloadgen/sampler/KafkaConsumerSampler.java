@@ -22,6 +22,9 @@ import java.util.Properties;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.Conversions;
+import org.apache.avro.data.TimeConversions;
+import org.apache.avro.generic.GenericData;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -60,12 +63,27 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     return KafkaConsumerSampler.log;
   }
 
+  private void configGenericData(){
+    GenericData genericData = GenericData.get();
+
+    genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimeMicrosConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
+    genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
+    genericData.addLogicalTypeConversion(new Conversions.UUIDConversion());
+  }
+
   @Override
   public void setupTest(JavaSamplerContext context) {
 
     Properties props = properties(context);
     String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
     consumer = new KafkaConsumer<>(props);
+    configGenericData();
 
     consumer.subscribe(Collections.singletonList(topic));
   }
