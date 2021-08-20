@@ -5,9 +5,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ 114-Add-deliverable-configuration ]
+    branches: [ master ]
   pull_request:
-    branches: [ 114-Add-deliverable-configuration ]
+    branches: [ master ]
 
 jobs:
   build:
