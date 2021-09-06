@@ -56,7 +56,23 @@ public class RandomArray {
         break;
     }
 
+    if(fieldType.endsWith("-array-array")){
+      fieldType = fieldType.replace("-array-array", "-array");
+      value = generateArrayOfArray(fieldType, valueLength,fieldValueList, arraySize, arraySize,
+              constrains );
+    }
+
     return value;
+  }
+
+  private Object generateArrayOfArray(String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize, Integer innerArraySize, Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
+    List<Object> array = new ArrayList<>(size);
+
+    for (int i = 0; i < size; i++) {
+      array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize,constrains ));
+    }
+    return  array;
   }
 
   private List<Object> generate(String type, Integer arraySize, Integer valueLength, List<String> fieldValueList,
