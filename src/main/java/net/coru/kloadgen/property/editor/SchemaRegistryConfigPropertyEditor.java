@@ -97,7 +97,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
     @Override
     public String getAsText() {
-        return this.schemaRegistryUrl.getText();
+        return checkProperty(this.schemaRegistryUrl.getText());
     }
 
     @Override
@@ -159,11 +159,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
                 }
             }
             Map<String, String> originals = new HashMap<>();
-            if(this.schemaRegistryUrl.getText().matches("\\$\\{__P\\(.*\\)}")){
-                String urlProperty = JMeterContextService.getContext().getProperties().getProperty(schemaRegistryUrl.getText().substring(6, schemaRegistryUrl.getText().toString().length()-2));
-                this.schemaRegistryUrl.setText(urlProperty);
-            }
-            originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl.getText());
+
+            originals.put(SCHEMA_REGISTRY_URL_CONFIG, checkProperty(schemaRegistryUrl.getText()));
             if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
                 if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
@@ -177,7 +174,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
             SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
 
             List<String> subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());
-            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, schemaRegistryUrl.getText());
+            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, checkProperty(schemaRegistryUrl.getText()));
             JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
             if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
@@ -223,5 +220,12 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
             propertiesMap.put(property.getPropertyName(), property.getPropertyValue());
         }
         return propertiesMap;
+    }
+
+    private String checkProperty(String textToCheck) {
+         return textToCheck.matches("\\$\\{__P\\(.*\\)}") ?
+                JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length()-2)) :
+                textToCheck;
+
     }
 }

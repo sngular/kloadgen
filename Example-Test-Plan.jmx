@@ -377,7 +377,7 @@
         </JavaSampler>
         <hashTree/>
         <net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
-          <stringProp name="schemaRegistryUrl"> ${__P(peterparker)}</stringProp>
+          <stringProp name="schemaRegistryUrl">${__P(schemaregistryurl)}</stringProp>
           <collectionProp name="schemaRegistryProperties">
             <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>
