@@ -1,0 +1,83 @@
+{
+    "type": "record",
+    "namespace": "com.mypackage",
+    "name": "AccountEvent",
+    "fields": [
+        {
+            "name": "Date",
+            "type": {
+                "type": "int",
+                "logicalType": "date"
+            }
+        },
+        {
+            "name": "TimeMillis",
+            "type": {
+                "type": "int",
+                "logicalType": "time-millis"
+            }
+        },
+        {
+            "name": "TimeMicros",
+            "type": {
+                "type": "long",
+                "logicalType": "time-micros"
+            }
+        },
+        {
+            "name": "TimestampMillis",
+            "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+            }
+        },
+        {
+            "name": "TimestampMicros",
+            "type": {
+                "type": "long",
+                "logicalType": "timestamp-micros"
+            }
+        },
+        {
+            "name": "LocalTimestampMillis",
+            "type": {
+                "type": "long",
+                "logicalType": "local-timestamp-millis"
+            }
+        },
+        {
+            "name": "LocalTimestampMicros",
+            "type": {
+                "type": "long",
+                "logicalType": "local-timestamp-micros"
+            }
+        },
+        {
+            "name": "UUID",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            }
+        },
+        {
+            "name": "Decimal",
+            "type": {
+                "type": "bytes",
+                "logicalType": "decimal",
+                "precision": 2,
+                "scale": 1
+            }
+        },
+        {
+            "name": "DecimalFixed",
+            "type": {
+                "type": "fixed",
+                "name": "decimalTest",
+                "size": 4,
+                "logicalType": "decimal",
+                "precision": 3,
+                "scale": 2
+            }
+        }
+    ]
+}

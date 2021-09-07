@@ -1,13 +1,15 @@
 package net.coru.kloadgen.extractor.extractors;
 
-import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.random.RandomObject;
-import org.apache.avro.Schema;
+import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.MAP;
+import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.UNION;
 
 import java.util.*;
 
-import static org.apache.avro.Schema.Type.*;
-
+import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.random.RandomObject;
+import org.apache.avro.Schema;
 
 public class AvroExtractor {
 
@@ -109,35 +111,26 @@ public class AvroExtractor {
         } else if (checkIfUnion(innerField.schema())) {
             extractUnionRecord(innerField, completeFieldList);
         } else {
-            completeFieldList.add(new FieldValueMapping(innerField.name(), innerField.schema().getType().getName()));
-        }
+      //completeFieldList.add(new FieldValueMapping(innerField.name(),innerField.schema().getType().getName()));
+      addFieldToList(innerField, completeFieldList);
+    }
+  }
+
+
+  public void addFieldToList(Schema.Field innerField, List<FieldValueMapping> completeFieldList){
+    String typeName = innerField.schema().getType().getName();
+
+    if (checkIfLogicalType(innerField.schema())){
+      typeName += "_" + innerField.schema().getLogicalType().getName();
     }
 
-    /*
+    completeFieldList.add(new FieldValueMapping(innerField.name(), typeName));
+  }
 
-      private void extractedMapCollection(Schema innerField, List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields) {
-        if (checkIfRecord(innerField.getValueType())) {
-          processRecordFieldList(innerField.getName(), "[].", internalFields, completeFieldList);
-        } else if (checkIfMap(innerField.getValueType())) {
-          internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat(ARRAY_POSTFIX));
-          createArrayType(completeFieldList, internalFields, innerField.getName() + "[]");
-        } else {
-          createArrayType(completeFieldList, internalFields, innerField.getName() + "[]");
-        }
-      }
+  private boolean checkIfLogicalType(Schema innerSchema){
+    return Objects.nonNull(innerSchema.getLogicalType());
+    }
 
-      private void extractedArrayCollection(Schema innerField, List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields) {
-        if (checkIfRecord(innerField.getElementType())) {
-          processRecordFieldList(innerField.getName(), "[].", internalFields, completeFieldList);
-        } else if (checkIfMap(innerField.getElementType())) {
-          internalFields.get(0).setFieldType(internalFields.get(0).getFieldType().concat(ARRAY_POSTFIX));
-          createArrayType(completeFieldList, internalFields, innerField.getName() + "[]");
-        } else {
-          createArrayType(completeFieldList, internalFields, innerField.getName() + "[]");
-        }
-      }
-
-    */
     private void extractUnionRecord(Schema.Field innerField, List<FieldValueMapping> completeFieldList) {
         Schema recordUnion = getRecordUnion(innerField.schema().getTypes());
         if (null != recordUnion) {

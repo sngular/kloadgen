@@ -1,9 +1,18 @@
 package net.coru.kloadgen.processor;
 
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.avro.LogicalTypes;
+import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.groovy.util.Maps;
@@ -44,7 +53,26 @@ class AvroSchemaProcessorTest {
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
         assertThat(message.getGenericRecord()).hasFieldOrPropertyWithValue("values", asList("Jose", 43).toArray());
+  }
 
+  @Test
+  void textAvroSchemaProcessorLogicalType() throws KLoadGenException {
+    Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
+    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
+
+    List<FieldValueMapping> fieldValueMappingList = asList(
+            new FieldValueMapping("name", "string", 0, "Jose"),
+            new FieldValueMapping("decimal", "bytes_decimal", 0, "44.444"));
+
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder.builder().record("testing").fields().requiredString("name").name(
+            "decimal").type(decimalSchemaBytes).noDefault().endRecord(),
+            new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord()).hasFieldOrPropertyWithValue("values",
+            asList("Jose", new BigDecimal("44.444")).toArray());
     }
 
     @Test

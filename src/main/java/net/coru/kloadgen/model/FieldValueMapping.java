@@ -97,17 +97,27 @@ public class FieldValueMapping extends AbstractTestElement {
     public List<String> getFieldValuesList() {
         List<String> result = new ArrayList<>();
         String inputFieldValueList = getPropertyAsString(FIELD_VALUES_LIST);
+        String inputFieldValueAux;
         if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
             try {
-                JsonNode nodes = mapper.readTree("[" + inputFieldValueList + "]");
+                inputFieldValueAux = inputFieldValueList;
+                if (inputFieldValueAux.charAt(0) != "[".charAt(0))
+                    inputFieldValueAux = "[" + inputFieldValueAux;
+                if (inputFieldValueAux.charAt(inputFieldValueAux.length()-1) != "]".charAt(0))
+                    inputFieldValueAux += "]";
+                JsonNode nodes = mapper.readTree(inputFieldValueAux);
                 Iterator<JsonNode> nodeElements = nodes.elements();
                 while (nodeElements.hasNext()) {
                     result.add(nodeElements.next().toString());
                 }
             } catch (JsonProcessingException e) {
-                result.addAll(asList(inputFieldValueList.split(",", - 1)));
+                inputFieldValueAux = inputFieldValueList;
+                if (inputFieldValueAux.charAt(0) == "[".charAt(0))
+                    inputFieldValueAux = inputFieldValueAux.substring(1);
+                if (inputFieldValueAux.charAt(inputFieldValueAux.length()-1) == "]".charAt(0))
+                    inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
+                result.addAll(asList(inputFieldValueAux.trim().split("\\s*,\\s*", - 1)));
             }
-
         }
         return result;
     }
