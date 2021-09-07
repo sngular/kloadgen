@@ -131,7 +131,7 @@ class SchemaExtractorTest {
                         new FieldValueMapping("theMap[:][].otherType.addTypeId", "string"),
                         new FieldValueMapping("theMap[:][].otherType.name", "string"),
                         new FieldValueMapping("theMap[:][].otherType.otherField", "string"),
-                        new FieldValueMapping("theMap[:][].addAmount", "bytes"),
+                        new FieldValueMapping("theMap[:][].addAmount", "bytes_decimal"),
                         new FieldValueMapping("theMap[:][].addCode", "string"),
                         new FieldValueMapping("theMap[:][].metadataMap[:]", "string-map"),
                         new FieldValueMapping("theMap[:][].metadataArray[]", "string-array"),
