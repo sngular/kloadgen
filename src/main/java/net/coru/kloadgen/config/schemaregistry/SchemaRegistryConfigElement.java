@@ -36,6 +36,7 @@ import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testelement.property.TestElementProperty;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
 @Getter
@@ -98,6 +99,12 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     Map<String, String> propertiesMap = new HashMap<>();
     for (TestElementProperty property : schemaProperties) {
       PropertyMapping propertyMapping = (PropertyMapping) property.getObjectValue();
+
+      /*if (propertyMapping.getPropertyValue().matches("\\$\\{\\w*}")) {
+        propertyMapping.setPropertyValue(JMeterContextService.getContext().getProperties().getProperty(property.getStringValue()));
+      }
+       */
+
       propertiesMap.put(propertyMapping.getPropertyName(), propertyMapping.getPropertyValue());
     }
     return propertiesMap;

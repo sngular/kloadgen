@@ -114,9 +114,9 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     @Override
     public void setValue(Object value) {
         if (Objects.nonNull(value)) {
-            this.schemaRegistryUrl.setText(value.toString());
-            propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
-        }
+                this.schemaRegistryUrl.setText(value.toString());
+                propertyDescriptor.setValue("schemaRegistryUrl", value.toString());}
+
     }
 
     public void setSchemaRegistryUrl(String schemaUrl) {
@@ -159,6 +159,10 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
                 }
             }
             Map<String, String> originals = new HashMap<>();
+            if(this.schemaRegistryUrl.getText().matches("\\$\\{__P\\(.*\\)}")){
+                String urlProperty = JMeterContextService.getContext().getProperties().getProperty(schemaRegistryUrl.getText().substring(6, schemaRegistryUrl.getText().toString().length()-2));
+                this.schemaRegistryUrl.setText(urlProperty);
+            }
             originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl.getText());
             if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
