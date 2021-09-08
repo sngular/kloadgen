@@ -217,7 +217,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     private Map<String, String> fromListToPropertiesMap(List<PropertyMapping> schemaProperties) {
         Map<String, String> propertiesMap = new HashMap<>();
         for (PropertyMapping property : schemaProperties) {
-            propertiesMap.put(property.getPropertyName(), property.getPropertyValue());
+            propertiesMap.put(property.getPropertyName(), checkProperty(property.getPropertyValue()));
         }
         return propertiesMap;
     }
