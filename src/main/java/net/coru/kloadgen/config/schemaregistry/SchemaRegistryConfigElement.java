@@ -36,7 +36,6 @@ import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testelement.property.TestElementProperty;
-import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
 @Getter
