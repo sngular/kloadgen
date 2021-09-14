@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.4.1">
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
@@ -60,28 +60,33 @@
           <collectionProp name="valueSchemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.name</stringProp>
-              <intProp name="valueLength">7</intProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">7</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.domain</stringProp>
-              <intProp name="valueLength">7</intProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">7</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.version</stringProp>
-              <intProp name="valueLength">2</intProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.id</stringProp>
-              <intProp name="valueLength">5</intProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">5</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.timestamp</stringProp>
-              <stringProp name="fieldType">string</stringProp>
+              <stringProp name="fieldType">stringTimestamp</stringProp>
               <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">string</stringProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.action</stringProp>
@@ -91,13 +96,15 @@
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.name</stringProp>
-              <intProp name="valueLength">2</intProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.version</stringProp>
-              <intProp name="valueLength">2</intProp>
+              <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
+              <intProp name="valueLength">2</intProp>
             </elementProp>
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.classifiers[1].name</stringProp>
@@ -389,7 +396,7 @@
             </elementProp>
             <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.username</stringProp>
-              <stringProp name="propertyValue">${__P(username)}</stringProp>
+              <stringProp name="propertyValue">&lt;username&gt;</stringProp>
             </elementProp>
             <elementProp name="Config properties" elementType="net.coru.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.password</stringProp>
