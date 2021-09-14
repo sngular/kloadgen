@@ -141,13 +141,12 @@ public abstract class SchemaProcessorLib {
 
         var value = new HashMap<>(mapSize);
         if ("seq".equals(fieldType)) {
-            while (mapSize > 0) {
+            for (int i = mapSize; i > 0; i--) {
                 value.put(generateMapKey(),
                         randomObject.generateSeq(fieldName, fieldType, parameterList, context));
-                mapSize--;
             }
         } else {
-            return randomMap.generateMap(fieldType, mapSize, parameterList,  arraySize, Collections.emptyMap());
+            return randomMap.generateMap(fieldType, mapSize, parameterList, arraySize, Collections.emptyMap());
         }
 
         return value;
@@ -164,12 +163,11 @@ public abstract class SchemaProcessorLib {
 
         List value = new ArrayList<>(arraySize);
         if ("seq".equals(fieldType)) {
-            while (arraySize > 0) {
+            for (int i = arraySize; i > 0 ; i--) {
                 value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
-                arraySize--;
             }
         } else {
-            value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize,  Collections.emptyMap());
+            value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
         }
 
         return value;
@@ -189,17 +187,17 @@ public abstract class SchemaProcessorLib {
     }
 
     static List<Map> createSimpleTypeMapArray(String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
-        List<Map> result = (List<Map>)generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength,  arraySize, fieldExpMappings);
-        return result;
+        return (List<Map>) generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, arraySize, fieldExpMappings);
     }
 
     static Map<String, Object> createSimpleTypeArrayMap(String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
         Map<String, Object> result = new HashMap<>(mapSize);
-        if (fieldType.endsWith("array-map")) {
-            fieldType = fieldType.replace("-map", "");
+        String type = fieldType;
+        if (type.endsWith("array-map")) {
+            type = fieldType.replace("-map", "");
         }
         for (int i = 0; i < mapSize; i++) {
-            var list = generateRandomList(fieldName, fieldType, arraySize, fieldValueLength, fieldExpMappings);
+            var list = generateRandomList(fieldName, type, arraySize, fieldValueLength, fieldExpMappings);
             result.put(generateMapKey(), list);
         }
         return result;

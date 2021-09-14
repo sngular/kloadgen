@@ -10,12 +10,7 @@ import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.commons.lang3.RandomUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 public class RandomMap {
 
@@ -66,8 +61,7 @@ public class RandomMap {
         if (fieldType.endsWith("array")) {
             value = generateRandomMapArray(fieldType, mapSize, fieldValueList, arraySize, constrains);
         } else if (fieldType.endsWith("map-map")) {
-            fieldType = fieldType.replace("-map-map", "-map");
-            value = generateMapOfMap(fieldType, mapSize, mapSize, fieldValueList, arraySize, constrains);
+            value = generateMapOfMap(fieldType.replace("-map-map", "-map"), mapSize, mapSize, fieldValueList, arraySize, constrains);
         }
 
         return value;

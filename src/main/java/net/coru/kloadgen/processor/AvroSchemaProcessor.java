@@ -11,7 +11,6 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -28,14 +27,13 @@ import static org.apache.avro.Schema.Type.*;
 
 public class AvroSchemaProcessor extends SchemaProcessorLib {
 
-    private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING,
-            Type.LONG, Type.BYTES, Type.FIXED);
+    private final Set<Type> typesSet = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
     private Schema schema;
     private SchemaMetadata metadata;
     private List<FieldValueMapping> fieldExprMappings;
     private RandomObject randomObject;
     private RandomMap randomMap;
-    private RandomArray randomArray;
+
 
     public void processSchema(ParsedSchema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
         this.schema = (Schema) schema.rawSchema();
@@ -43,7 +41,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         this.metadata = metadata;
         randomObject = new RandomObject();
         randomMap = new RandomMap();
-        randomArray = new RandomArray();
+
     }
 
     public void processSchema(Schema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
@@ -52,7 +50,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         this.metadata = metadata;
         randomObject = new RandomObject();
         randomMap = new RandomMap();
-        randomArray = new RandomArray();
+
     }
 
     public EnrichedRecord next() {
@@ -92,13 +90,13 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
                 } else {
                     entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
-              randomObject.generateRandom(
-                  fieldValueMapping.getFieldType(),
-                  fieldValueMapping.getValueLength(),
-                  fieldValueMapping.getFieldValuesList(),
-                  extractConstrains(schema.getField(fieldValueMapping.getFieldName()))
-                  )
-          );
+                            randomObject.generateRandom(
+                                    fieldValueMapping.getFieldType(),
+                                    fieldValueMapping.getValueLength(),
+                                    fieldValueMapping.getFieldValuesList(),
+                                    extractConstrains(schema.getField(fieldValueMapping.getFieldName()))
+                            )
+                    );
                     fieldExpMappingsQueue.remove();
                     fieldValueMapping = fieldExpMappingsQueue.peek();
                 }
@@ -107,17 +105,17 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return new EnrichedRecord(metadata, entity);
     }
 
-  private Map<ConstraintTypeEnum, String> extractConstrains (Schema.Field field){
-    Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
+    private Map<ConstraintTypeEnum, String> extractConstrains(Schema.Field field) {
+        Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
 
-    if (Objects.nonNull(field.schema().getObjectProp("precision")))
-        constrains.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
+        if (Objects.nonNull(field.schema().getObjectProp("precision")))
+            constrains.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
 
-    if (Objects.nonNull(field.schema().getObjectProp("scale")))
-      constrains.put(ConstraintTypeEnum.SCALE, field.schema().getObjectProp("scale").toString());
+        if (Objects.nonNull(field.schema().getObjectProp("scale")))
+            constrains.put(ConstraintTypeEnum.SCALE, field.schema().getObjectProp("scale").toString());
 
-    return constrains;
-  }
+        return constrains;
+    }
 
     private FieldValueMapping processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
@@ -174,7 +172,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
         Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
 
-        var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), arraySize, fieldValueMapping.getConstrains() );
+        var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), arraySize, fieldValueMapping.getConstrains());
 
         entity.put(fieldName, mapArray);
         return getSafeGetElement(fieldExpMappingsQueue);
@@ -201,7 +199,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
         Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
         Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
-        var recordArrayMap = new ArrayList<Object>(arraySize);
+        var recordArrayMap = new ArrayList<>(arraySize);
         for (int i = 0; i < arraySize - 1; i++) {
             ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
             recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(), fieldName, mapSize, temporalQueue));
