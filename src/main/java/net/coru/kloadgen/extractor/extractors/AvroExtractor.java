@@ -14,8 +14,7 @@ public class AvroExtractor {
 
     public static final String MAP_POSTFIX = "-map";
 
-    private final Set<Schema.Type> typesSet = EnumSet.of(Schema.Type.INT, Schema.Type.DOUBLE, Schema.Type.FLOAT, Schema.Type.BOOLEAN, Schema.Type.STRING,
-            Schema.Type.LONG, Schema.Type.BYTES, Schema.Type.FIXED);
+    private final Set<Schema.Type> typesSet = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
 
     private final RandomObject randomObject = new RandomObject();
 
