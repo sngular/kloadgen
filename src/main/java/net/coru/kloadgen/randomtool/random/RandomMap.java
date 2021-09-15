@@ -67,13 +67,60 @@ public class RandomMap {
         return value;
     }
 
+    public Object generateMap(String fieldType, Integer mapSize, List<String> fieldValueList, Integer valueLength, Integer arraySize,
+                              Map<ConstraintTypeEnum, String> constrains) {
+        Object value;
+
+        switch (fieldType) {
+            case ValidTypeConstants.INT_MAP:
+                value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, valueLength, constrains);
+                break;
+            case ValidTypeConstants.LONG_MAP:
+                value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, valueLength, constrains);
+                break;
+            case ValidTypeConstants.DOUBLE_MAP:
+                value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, valueLength, constrains);
+                break;
+            case ValidTypeConstants.SHORT_MAP:
+                value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, valueLength, constrains);
+                break;
+            case ValidTypeConstants.FLOAT_MAP:
+                value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, valueLength, constrains);
+                break;
+            case ValidTypeConstants.STRING_MAP:
+                value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, valueLength, constrains);
+                break;
+            case ValidTypeConstants.UUID_MAP:
+                value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, valueLength, Collections.emptyMap());
+                break;
+            case ValidTypeConstants.BOOLEAN_MAP:
+                value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, valueLength, Collections.emptyMap());
+                break;
+            default:
+                value = fieldType;
+                break;
+        }
+
+        if (fieldType.endsWith("array")) {
+            value = generateRandomMapArray(fieldType, valueLength, fieldValueList, arraySize, constrains);
+        } else if (fieldType.endsWith("map-map")) {
+            fieldType = fieldType.replace("-map-map", "-map");
+            value = generateMapOfMap(fieldType, mapSize, mapSize, fieldValueList, valueLength, constrains);
+        }
+
+        return value;
+    }
+
+
     private Object generateRandomMapArray(String type, Integer valueLength, List<String> fieldValueList, Integer arraySize,
                                           Map<ConstraintTypeEnum, String> constrains) {
         List<Map<String, Object>> generatedMapArray = new ArrayList<>(valueLength);
-
+        if (valueLength == 0){
+            valueLength = (int)Math.floor(Math.random()*(9-1+1)+1);
+        }
         for (int i = 0; i < arraySize; i++) {
             String newType = type.substring(0, type.length() - 6);
-            generatedMapArray.add((Map<String, Object>) generateMap(newType, valueLength, fieldValueList, arraySize, constrains));
+            generatedMapArray.add((Map<String, Object>) generateMap(newType, valueLength, fieldValueList, valueLength, arraySize, constrains));
         }
 
         return generatedMapArray;
@@ -83,7 +130,6 @@ public class RandomMap {
                                          Map<ConstraintTypeEnum, String> constrains) {
         int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1, 5);
         Map<String, Object> map = new HashMap<>(size);
-
         if (!fieldValueList.isEmpty()) {
             while (map.size() < Math.min(size, fieldValueList.size())) {
                 String[] tempValue = getMapEntryValue(fieldValueList);
@@ -140,7 +186,7 @@ public class RandomMap {
         for (int i = 0; i <= size; i++) {
             map.put(
                     (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), constrains),
-                    generateMap(type, innerMapSize, fieldValueList, 0, constrains)
+                    generateMap(type, innerMapSize, fieldValueList, valueLength, 0, constrains)
             );
         }
         return map;

@@ -146,7 +146,7 @@ public abstract class SchemaProcessorLib {
                         randomObject.generateSeq(fieldName, fieldType, parameterList, context));
             }
         } else {
-            return randomMap.generateMap(fieldType, mapSize, parameterList, arraySize, Collections.emptyMap());
+            return randomMap.generateMap(fieldType, mapSize, parameterList, fieldValueLength, arraySize, Collections.emptyMap());
         }
 
         return value;
