@@ -150,6 +150,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
     private FieldValueMapping processFieldValueMappingAsSimpleMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
         fieldExpMappingsQueue.remove();
+        // Add condition that checks (][)
         entity.put(fieldName, createSimpleTypeMap(fieldName, fieldValueMapping.getFieldType(),
                 calculateMapSize(fieldValueMapping.getFieldName(), fieldName),
                 fieldValueMapping.getValueLength(),
@@ -240,36 +241,22 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
                 if (checkIfMapArray(fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    fieldExpMappingsQueue.poll();
-                    subEntity.put(fieldNameSubEntity, createSimpleTypeMapArray(fieldName, fieldValueMapping.getFieldType(),
-                            calculateSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
-                            calculateMapSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
-                            fieldValueMapping.getValueLength(),
-                            fieldValueMapping.getFieldValuesList()));
-
+                   processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                    fieldExpMappingsQueue.poll();
-                    subEntity.put(fieldNameSubEntity, createSimpleTypeArrayMap(fieldName, fieldValueMapping.getFieldType(),
-                            calculateSize(cleanFieldName, fieldNameSubEntity),
-                            calculateMapSize(cleanFieldName, fieldNameSubEntity),
-                            fieldValueMapping.getValueLength(),
-                            fieldValueMapping.getFieldValuesList()));
+                    processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfMap(fieldValueMapping.getFieldType())) {
-                    fieldExpMappingsQueue.poll();
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                    subEntity.put(fieldNameSubEntity, createSimpleTypeMap(fieldName,
-                            fieldValueMapping.getFieldType(),
-                            calculateMapSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
-                            fieldValueMapping.getValueLength(),
-                            fieldValueMapping.getFieldValuesList()));
-                } else {
+                     processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                } else if(checkIfArray(fieldValueMapping.getFieldType())){
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    subEntity.put(fieldNameSubEntity, createArray(Objects.requireNonNull(extractRecordSchema(subEntity.getSchema().getField(fieldNameSubEntity))),
-                            fieldNameSubEntity,
-                            calculateSize(fieldValueMapping.getFieldName(), fieldNameSubEntity),
-                            fieldValueMapping.getValueLength(),
-                            fieldExpMappingsQueue));
+                     processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                }else if(checkIfIsRecordMapArray(cleanFieldName)){
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
+                }else if(checkIfIsRecordArrayMap(cleanFieldName)){
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                     processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
                 }
             } else if (cleanFieldName.contains(".")) {
                 String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
