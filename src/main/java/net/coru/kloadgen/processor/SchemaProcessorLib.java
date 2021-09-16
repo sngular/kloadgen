@@ -66,8 +66,8 @@ public abstract class SchemaProcessorLib {
 
     static Integer calculateSize(String fieldName, String methodName) {
         int arrayLength = RandomUtils.nextInt(1, 10);
-
-        String tempString = fieldName.substring(0,
+        int start = fieldName.contains(methodName) ? fieldName.indexOf(methodName) : 0;
+        String tempString = fieldName.substring(start,
                 fieldName.lastIndexOf(methodName));
 
         tempString = tempString.isEmpty() ? fieldName.replace(methodName, "") : !tempString.contains("[") ? StringUtils.substringAfterLast(fieldName, methodName) : tempString;
@@ -78,7 +78,6 @@ public abstract class SchemaProcessorLib {
             arrayStringSize = matcher.group();
         }
         arrayStringSize = StringUtils.isNotEmpty(arrayStringSize) ? StringUtils.substringBetween(arrayStringSize, "[", "]") : "";
-
         if (StringUtils.isNotEmpty(arrayStringSize) && StringUtils.isNumeric(arrayStringSize)) {
             arrayLength = Integer.parseInt(arrayStringSize);
         }
@@ -87,7 +86,8 @@ public abstract class SchemaProcessorLib {
 
     static Integer calculateMapSize(String fieldName, String methodName) {
         int mapSize = RandomUtils.nextInt(1, 10);
-        String tempString = fieldName.substring(0,
+        int start = fieldName.contains(methodName) ? fieldName.indexOf(methodName) : 0;
+        String tempString = fieldName.substring(start,
                 fieldName.lastIndexOf(methodName));
         tempString = tempString.isEmpty() ? fieldName.replace(methodName, "") : tempString;
         String mapStringSize = "";
@@ -102,6 +102,7 @@ public abstract class SchemaProcessorLib {
             mapSize = Integer.parseInt(mapStringSize);
         }
         return mapSize;
+
     }
 
     static String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName) {

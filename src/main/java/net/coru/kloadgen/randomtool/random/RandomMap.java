@@ -104,8 +104,7 @@ public class RandomMap {
         if (fieldType.endsWith("array")) {
             value = generateRandomMapArray(fieldType, valueLength, fieldValueList, arraySize, constrains);
         } else if (fieldType.endsWith("map-map")) {
-            fieldType = fieldType.replace("-map-map", "-map");
-            value = generateMapOfMap(fieldType, mapSize, mapSize, fieldValueList, valueLength, constrains);
+            value = generateMapOfMap(fieldType.replace("-map-map", "-map"), mapSize, mapSize, fieldValueList, valueLength, constrains);
         }
 
         return value;
@@ -115,12 +114,13 @@ public class RandomMap {
     private Object generateRandomMapArray(String type, Integer valueLength, List<String> fieldValueList, Integer arraySize,
                                           Map<ConstraintTypeEnum, String> constrains) {
         List<Map<String, Object>> generatedMapArray = new ArrayList<>(valueLength);
+        int mapLength = valueLength;
         if (valueLength == 0){
-            valueLength = (int)Math.floor(Math.random()*(9-1+1)+1);
+            mapLength = (int)Math.floor(Math.random()*(9-1+1)+1);
         }
         for (int i = 0; i < arraySize; i++) {
             String newType = type.substring(0, type.length() - 6);
-            generatedMapArray.add((Map<String, Object>) generateMap(newType, valueLength, fieldValueList, valueLength, arraySize, constrains));
+            generatedMapArray.add((Map<String, Object>) generateMap(newType, valueLength, fieldValueList, mapLength, arraySize, constrains));
         }
 
         return generatedMapArray;
