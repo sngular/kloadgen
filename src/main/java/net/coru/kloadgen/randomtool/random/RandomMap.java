@@ -59,7 +59,7 @@ public class RandomMap {
         }
 
         if (fieldType.endsWith("array")) {
-            value = generateRandomMapArray(fieldType, mapSize, fieldValueList, arraySize, constrains);
+            value = generateRandomMapArray(fieldType, mapSize, fieldValueList, mapSize, arraySize, constrains);
         } else if (fieldType.endsWith("map-map")) {
             value = generateMapOfMap(fieldType.replace("-map-map", "-map"), mapSize, mapSize, fieldValueList, arraySize, constrains);
         }
@@ -102,7 +102,7 @@ public class RandomMap {
         }
 
         if (fieldType.endsWith("array")) {
-            value = generateRandomMapArray(fieldType, valueLength, fieldValueList, arraySize, constrains);
+            value = generateRandomMapArray(fieldType, mapSize, fieldValueList, valueLength, arraySize, constrains);
         } else if (fieldType.endsWith("map-map")) {
             value = generateMapOfMap(fieldType.replace("-map-map", "-map"), mapSize, mapSize, fieldValueList, valueLength, constrains);
         }
@@ -111,16 +111,16 @@ public class RandomMap {
     }
 
 
-    private Object generateRandomMapArray(String type, Integer valueLength, List<String> fieldValueList, Integer arraySize,
+    private Object generateRandomMapArray(String type, Integer mapSize, List<String> fieldValueList, Integer valueLength, Integer arraySize,
                                           Map<ConstraintTypeEnum, String> constrains) {
-        List<Map<String, Object>> generatedMapArray = new ArrayList<>(valueLength);
-        int mapLength = valueLength;
+        List<Map<String, Object>> generatedMapArray = new ArrayList<>(arraySize);
+        int tempValueLength = valueLength;
         if (valueLength == 0){
-            mapLength = (int)Math.floor(Math.random()*(9-1+1)+1);
+            tempValueLength = (int)Math.floor(Math.random()*(9-1+1)+1);
         }
         for (int i = 0; i < arraySize; i++) {
             String newType = type.substring(0, type.length() - 6);
-            generatedMapArray.add((Map<String, Object>) generateMap(newType, valueLength, fieldValueList, mapLength, arraySize, constrains));
+            generatedMapArray.add((Map<String, Object>) generateMap(newType, mapSize, fieldValueList, tempValueLength, arraySize, constrains));
         }
 
         return generatedMapArray;
@@ -183,7 +183,7 @@ public class RandomMap {
         int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1, 5);
         Map<String, Object> map = new HashMap<>(size);
 
-        for (int i = 0; i <= size; i++) {
+        for (int i = 0; i <= Math.abs(map.size() - mapSize); i++) {
             map.put(
                     (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), constrains),
                     generateMap(type, innerMapSize, fieldValueList, valueLength, 0, constrains)
