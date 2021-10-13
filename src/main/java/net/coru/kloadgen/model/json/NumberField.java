@@ -4,11 +4,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 
 @Value
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class NumberField extends Field {
 
 	String defaultValue;
@@ -30,7 +32,7 @@ public class NumberField extends Field {
 
 	@Builder(toBuilder = true)
 	public NumberField(String name, String defaultValue, Number minimum, Number maximum, Number exclusiveMinimum,
-			Number exclusiveMaximum, Number multipleOf) {
+	                   Number exclusiveMaximum, Number multipleOf) {
 		super(name, "number");
 		this.defaultValue = defaultValue;
 		this.maximum = maximum;
@@ -58,13 +60,13 @@ public class NumberField extends Field {
 		}
 		NumberField that = (NumberField) o;
 		return Objects.equals(defaultValue, that.defaultValue) &&
-				compare(minimum, that.minimum) &&
-				compare(maximum, that.maximum) &&
-				compare(exclusiveMinimum, that.exclusiveMinimum) &&
-				compare(exclusiveMaximum, that.exclusiveMaximum) &&
-				compare(multipleOf, that.multipleOf) &&
-				Objects.equals(super.getName(), ((NumberField) o).getName()) &&
-				Objects.equals(super.getType(), ((NumberField) o).getType());
+						compare(minimum, that.minimum) &&
+						compare(maximum, that.maximum) &&
+						compare(exclusiveMinimum, that.exclusiveMinimum) &&
+						compare(exclusiveMaximum, that.exclusiveMaximum) &&
+						compare(multipleOf, that.multipleOf) &&
+						Objects.equals(super.getName(), ((NumberField) o).getName()) &&
+						Objects.equals(super.getType(), ((NumberField) o).getType());
 	}
 
 	@Override
@@ -74,11 +76,12 @@ public class NumberField extends Field {
 
 	public boolean compare(Number a, Number b){
 		boolean equals = false;
-		  if (Objects.equals(a, b)) {
-		  	equals = true;
-			} else if (Objects.nonNull(a)) {
-		  	equals = a.toString().equalsIgnoreCase(b.toString());
-			}
-			return equals;
+		if (Objects.equals(a, b)) {
+			equals = true;
+		} else if (Objects.nonNull(a)) {
+			equals = a.toString().equalsIgnoreCase(b.toString());
+		}
+		return equals;
 	}
 }
+

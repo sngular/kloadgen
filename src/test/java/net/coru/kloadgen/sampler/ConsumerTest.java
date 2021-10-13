@@ -6,10 +6,11 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.salesforce.kafka.test.junit5.SharedKafkaTestResource;
-import com.salesforce.kafka.test.listeners.PlainListener;
+import com.github.charithe.kafka.KafkaHelper;
+import com.github.charithe.kafka.KafkaJunitExtension;
+import com.github.charithe.kafka.KafkaJunitExtensionConfig;
+import com.github.charithe.kafka.StartupMode;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.LoopController;
@@ -17,27 +18,23 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(KafkaJunitExtension.class)
+@KafkaJunitExtensionConfig(startupMode = StartupMode.WAIT_FOR_STARTUP)
 class ConsumerTest {
 
-  @RegisterExtension
-  public static final SharedKafkaTestResource sharedKafkaTestResource =
-          new SharedKafkaTestResource()
-            .registerListener(new PlainListener().onPorts(1234))
-            .withBrokers(1)
-            .withBrokerProperty("auto.create.topics.enable", "false");
-
   @Test
-  void testConsumer() throws TimeoutException {
+  void testConsumer(KafkaHelper kafkaHelper) throws TimeoutException {
     KafkaConsumerSampler consumerSampler;
 
     consumerSampler = new KafkaConsumerSampler();
     Arguments consumerArguments = consumerSampler.getDefaultParameters();
     consumerArguments.removeArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG);
     consumerArguments.addArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                                  sharedKafkaTestResource.getKafkaBrokers().asList().get(0).getConnectString());
+                                  kafkaHelper.producerConfig().get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG).toString());
     consumerArguments.addArgument(GROUP_ID_CONFIG, "anonymous");
     consumerArguments.removeArgument(KAFKA_TOPIC_CONFIG);
     consumerArguments.addArgument(KAFKA_TOPIC_CONFIG, "testTopic");
@@ -57,12 +54,9 @@ class ConsumerTest {
     tg.setSamplerController(loopController);
     javaSamplerContext.getJMeterContext().setThreadGroup(tg);
 
-    sharedKafkaTestResource.getKafkaTestUtils().waitForBrokerToComeOnLine(1, 10, TimeUnit.SECONDS);
-    sharedKafkaTestResource.getKafkaTestUtils().createTopic("testTopic", 2, (short) 1);
     consumerSampler.setupTest(javaSamplerContext);
 
-    sharedKafkaTestResource.getKafkaTestUtils().produceRecords(Map.of("key".getBytes(), "value".getBytes()),
-            "testTopic", 0);
+    kafkaHelper.produce("testTopic", kafkaHelper.createStringProducer(), Map.of("key", "value"));
     SampleResult result = consumerSampler.runTest(javaSamplerContext);
 
     assertThat(result)

@@ -7,10 +7,8 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import java.util.Map;
 import org.apache.kafka.common.errors.SerializationException;
 
-public class RecordSubjectNameStrategy implements io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy,
-    io.confluent.kafka.serializers.subject.SubjectNameStrategy {
+public class RecordSubjectNameStrategy implements io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy {
 
-  @Override
   @Deprecated
   public String getSubjectName(String topic, boolean isKey, Object value) {
     return subjectName(topic, isKey, new AvroSchema(AvroSchemaUtils.getSchema(value)));

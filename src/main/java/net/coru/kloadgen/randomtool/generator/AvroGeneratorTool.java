@@ -11,7 +11,11 @@ import static org.apache.avro.Schema.Type.FIXED;
 import static org.apache.avro.Schema.Type.NULL;
 import static org.apache.avro.Schema.Type.UNION;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.random.RandomArray;

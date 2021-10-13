@@ -1,0 +1,108 @@
+{
+  "name": "Details",
+  "type": "record",
+  "fields": [
+    {
+      "name": "theMap",
+      "type": {
+        "type": "map",
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "record",
+            "name": "AdditionalDetails",
+            "fields": [
+              {
+                "name": "otherType",
+                "type": {
+                  "name": "AddType",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "addTypeId",
+                      "type": "string"
+                    },
+                    {
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "name": "otherField",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "default": null
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "addAmount",
+                "type": {
+                  "type": "bytes",
+                  "logicalType": "decimal",
+                  "precision": 15,
+                  "scale": 5
+                }
+              },
+              {
+                "name": "addCode",
+                "type": [
+                  "null",
+                  "string"
+                ],
+                "default": null
+              },
+              {
+                "name": "metadataMap",
+                "type": [
+                  "null",
+                  {
+                    "type": "map",
+                    "values": "string"
+                  }
+                ],
+                "default": null
+              },
+              {
+                "name": "metadataArray",
+                "type": [
+                  {
+                    "type": "array",
+                    "items": "string"
+                  },
+                  "null"
+                ]
+              },
+              {
+                "name": "metadataMapMap",
+                "type": [
+                  "null",
+                  {
+                    "type": "map",
+                    "values": {
+                      "type": "map",
+                      "values": "string"
+                    }
+                  }
+                ],
+                "default": null
+              },
+              {
+                "name": "metadataArrayArray",
+                "type": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                }
+              }
+            ],"default": "null"
+          }
+        }
+      }
+    }
+  ]
+}
