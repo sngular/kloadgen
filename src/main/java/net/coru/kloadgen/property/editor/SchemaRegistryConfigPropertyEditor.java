@@ -97,7 +97,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
     @Override
     public String getAsText() {
-        return this.schemaRegistryUrl.getText();
+        return checkPropertyOrVariable(this.schemaRegistryUrl.getText());
     }
 
     @Override
@@ -114,9 +114,9 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     @Override
     public void setValue(Object value) {
         if (Objects.nonNull(value)) {
-            this.schemaRegistryUrl.setText(value.toString());
-            propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
-        }
+                this.schemaRegistryUrl.setText(value.toString());
+                propertyDescriptor.setValue("schemaRegistryUrl", value.toString());}
+
     }
 
     public void setSchemaRegistryUrl(String schemaUrl) {
@@ -159,7 +159,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
                 }
             }
             Map<String, String> originals = new HashMap<>();
-            originals.put(SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl.getText());
+
+            originals.put(SCHEMA_REGISTRY_URL_CONFIG, checkPropertyOrVariable(schemaRegistryUrl.getText()));
             if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
                 if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
@@ -173,7 +174,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
             SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
 
             List<String> subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());
-            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, schemaRegistryUrl.getText());
+            JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, checkPropertyOrVariable(schemaRegistryUrl.getText()));
             JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
             if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
@@ -191,12 +192,12 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
                         .setProperty(BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SCHEMA_REGISTRY_AUTH_BEARER_KEY));
                 }
             }
-            JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + schemaRegistryUrl.getText() +
+            JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + checkPropertyOrVariable(schemaRegistryUrl.getText()) +
                     "\n Number of subjects in the Registry : " + subjects.size(), "Successful connection to Schema Registry",
                 JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException | NullPointerException e) {
             JOptionPane
-                .showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
+                .showMessageDialog(null, "Failed retrieve schema properties: " + e.getMessage(), "ERROR: Failed to retrieve properties!",
                     JOptionPane.ERROR_MESSAGE);
             log.error(e.getMessage(), e);
         }
@@ -216,8 +217,18 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     private Map<String, String> fromListToPropertiesMap(List<PropertyMapping> schemaProperties) {
         Map<String, String> propertiesMap = new HashMap<>();
         for (PropertyMapping property : schemaProperties) {
-            propertiesMap.put(property.getPropertyName(), property.getPropertyValue());
+            propertiesMap.put(property.getPropertyName(), checkPropertyOrVariable(property.getPropertyValue()));
         }
         return propertiesMap;
+    }
+
+    private String checkPropertyOrVariable(String textToCheck) {
+         if (textToCheck.matches("\\$\\{__P\\(.*\\)}")){
+             return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length()-2));
+         } else if (textToCheck.matches("\\$\\{\\w*}")){
+             return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
+         } else {
+             return textToCheck;
+         }
     }
 }

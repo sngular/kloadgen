@@ -36,6 +36,7 @@ import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testelement.property.TestElementProperty;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
 @Getter
@@ -59,7 +60,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
     Map<String, String> schemaProperties = getProperties();
 
-    jMeterVariables.put(SCHEMA_REGISTRY_URL, getRegistryUrl());
+    jMeterVariables.put(SCHEMA_REGISTRY_URL, checkPropertyOrVariable(getRegistryUrl()));
     if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
       jMeterVariables.put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
       if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
@@ -98,7 +99,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     Map<String, String> propertiesMap = new HashMap<>();
     for (TestElementProperty property : schemaProperties) {
       PropertyMapping propertyMapping = (PropertyMapping) property.getObjectValue();
-      propertiesMap.put(propertyMapping.getPropertyName(), propertyMapping.getPropertyValue());
+      propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
   }
@@ -106,8 +107,18 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   private Map<String, String> fromPropertyMappingToPropertiesMap(List<PropertyMapping> schemaProperties) {
     Map<String, String> propertiesMap = new HashMap<>();
     for (PropertyMapping propertyMapping : schemaProperties) {
-      propertiesMap.put(propertyMapping.getPropertyName(), propertyMapping.getPropertyValue());
+      propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
+  }
+
+  private String checkPropertyOrVariable(String textToCheck) {
+    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")){
+      return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length()-2));
+    } else if (textToCheck.matches("\\$\\{\\w*}")){
+      return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
+    } else {
+      return textToCheck;
+    }
   }
 }
