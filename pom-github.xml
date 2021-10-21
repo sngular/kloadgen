@@ -6,7 +6,7 @@
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
-  <version>3.5.2</version>
+  <version>3.5.3</version>
 
   <distributionManagement>
     <repository>
@@ -32,7 +32,7 @@
     <json-path.version>2.4.0</json-path.version>
     <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
-    <kafka.version>2.6.0</kafka.version>
+    <kafka.version>2.8.0</kafka.version>
     <lombok.version>1.18.20</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
     <mockito-core.version>3.6.0</mockito-core.version>
@@ -56,7 +56,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
-      <artifactId>kafka_2.13</artifactId>
+      <artifactId>kafka-clients</artifactId>
       <version>${kafka.version}</version>
       <exclusions>
         <exclusion>
@@ -153,9 +153,9 @@
     </dependency>
     <!-- Options -->
     <dependency>
-      <groupId>com.salesforce.kafka.test</groupId>
-      <artifactId>kafka-junit5</artifactId>
-      <version>3.2.2</version>
+      <groupId>com.github.charithe</groupId>
+      <artifactId>kafka-junit</artifactId>
+      <version>4.2.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -386,7 +386,7 @@
                   </excludes>
                 </filter>
               </filters>
-              <shadedClassifierName>-${lane}</shadedClassifierName>
+              <shadedClassifierName>${project.artifactId}-${lane}-${project.version}</shadedClassifierName>
               <shadedArtifactAttached>true</shadedArtifactAttached>
             </configuration>
             <executions>
@@ -502,7 +502,7 @@
                       </excludes>
                     </filter>
                   </filters>
-                  <shadedClassifierName>-${lane}</shadedClassifierName>
+                  <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
