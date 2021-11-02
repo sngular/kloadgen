@@ -120,7 +120,7 @@ public class AvroExtractor {
 
         if (checkIfEnumField(innerField.schema().getType())) {
             String fieldValueList = String.join(",", innerField.schema().getEnumSymbols());
-            completeFieldList.add(new FieldValueMapping(innerField.name(), typeName,0, fieldValueList));
+            completeFieldList.add(new FieldValueMapping(innerField.name(), typeName, 0, fieldValueList));
         }else{
         completeFieldList.add(new FieldValueMapping(innerField.name(), typeName));}
     }
