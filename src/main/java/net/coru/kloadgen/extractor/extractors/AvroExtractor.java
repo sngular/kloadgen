@@ -122,7 +122,8 @@ public class AvroExtractor {
             String fieldValueList = String.join(",", innerField.schema().getEnumSymbols());
             completeFieldList.add(new FieldValueMapping(innerField.name(), typeName, 0, fieldValueList));
         }else{
-        completeFieldList.add(new FieldValueMapping(innerField.name(), typeName));}
+        completeFieldList.add(new FieldValueMapping(innerField.name(), typeName));
+        }
     }
 
     private boolean checkIfLogicalType(Schema innerSchema) {
