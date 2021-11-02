@@ -118,7 +118,11 @@ public class AvroExtractor {
             typeName += "_" + innerField.schema().getLogicalType().getName();
         }
 
-        completeFieldList.add(new FieldValueMapping(innerField.name(), typeName));
+        if (checkIfEnumField(innerField.schema().getType())) {
+            String fieldValueList = String.join(",", innerField.schema().getEnumSymbols());
+            completeFieldList.add(new FieldValueMapping(innerField.name(), typeName,0, fieldValueList));
+        }else{
+        completeFieldList.add(new FieldValueMapping(innerField.name(), typeName));}
     }
 
     private boolean checkIfLogicalType(Schema innerSchema) {
@@ -251,5 +255,9 @@ public class AvroExtractor {
 
     private String extractTypeName(Schema schema) {
         return schema.getType().getName();
+    }
+
+    private boolean checkIfEnumField(Schema.Type type){
+        return type.equals(ENUM);
     }
 }
