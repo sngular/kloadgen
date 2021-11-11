@@ -11,6 +11,7 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -41,7 +42,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
     private List<FieldValueMapping> fieldExprMappings;
     private RandomObject randomObject;
     private RandomMap randomMap;
-
+    private AvroGeneratorTool avroGeneratorTool;
 
     public void processSchema(ParsedSchema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
         this.schema = (Schema) schema.rawSchema();
@@ -49,6 +50,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         this.metadata = metadata;
         randomObject = new RandomObject();
         randomMap = new RandomMap();
+        avroGeneratorTool = new AvroGeneratorTool();
 
     }
 
@@ -58,7 +60,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         this.metadata = metadata;
         randomObject = new RandomObject();
         randomMap = new RandomMap();
-
+        avroGeneratorTool = new AvroGeneratorTool();
     }
 
     public EnrichedRecord next() {
@@ -98,7 +100,8 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
                 } else {
                     entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
-                            randomObject.generateRandom(
+                            avroGeneratorTool.generateObject(
+                                    entity.getSchema().getField(fieldName),
                                     fieldValueMapping.getFieldType(),
                                     fieldValueMapping.getValueLength(),
                                     fieldValueMapping.getFieldValuesList(),
