@@ -151,7 +151,11 @@ public abstract class SchemaProcessorLib {
                 value.put(generateMapKey(),
                         randomObject.generateSeq(fieldName, fieldType, parameterList, context));
             }
-        } else {
+        } else  if (!parameterList.isEmpty() && parameterList.get(0).charAt(0) == "{".charAt(0)){
+            parameterList.set(0, parameterList.get(0).substring(1));
+            value.put(generateMapKey(),randomObject.generateSequenceForFieldValueList(parameterList.get(0), fieldType, parameterList, context ));
+        }
+        else {
             return randomMap.generateMap(fieldType, mapSize, parameterList, fieldValueLength, arraySize, Collections.emptyMap());
         }
 
