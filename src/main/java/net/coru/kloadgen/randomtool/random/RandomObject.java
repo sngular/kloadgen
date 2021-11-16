@@ -25,6 +25,8 @@ import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
+import org.apache.avro.generic.GenericData;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -254,14 +256,14 @@ public class RandomObject {
     return value;
   }
 
-  private String getEnumValueOrRandom(List<String> fieldValueList) {
+  private GenericData.EnumSymbol getEnumValueOrRandom(List<String> fieldValueList) {
     String value;
     if (!fieldValueList.isEmpty()) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
       throw new KLoadGenException("Wrong enums values, problem in the parsing process");
     }
-    return value;
+    return new GenericData.EnumSymbol(null, value);
   }
 
   private Number calculateMaximum(int valueLength, Map<ConstraintTypeEnum, String> constrains) {
