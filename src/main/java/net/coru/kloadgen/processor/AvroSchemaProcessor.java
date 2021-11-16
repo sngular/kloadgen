@@ -285,11 +285,12 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                         fieldExpMappingsQueue));
             } else {
                 fieldExpMappingsQueue.poll();
-                subEntity.put(cleanFieldName, randomObject.generateRandom(
+                subEntity.put(cleanFieldName, avroGeneratorTool.generateObject(
+                        subEntity.getSchema().getField(cleanFieldName),
                         fieldValueMapping.getFieldType(),
                         fieldValueMapping.getValueLength(),
                         fieldValueMapping.getFieldValuesList(),
-                        extractConstrains(innerSchema.getField(cleanFieldName))
+                        extractConstrains(subEntity.getSchema().getField(cleanFieldName))
                         )
                 );
             }
