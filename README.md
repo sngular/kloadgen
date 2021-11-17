@@ -283,6 +283,13 @@ In the sequence generator you can specify an starting value just put it in the F
 others will be not consider.
 Other values will be considered Constants for this field and will be converted to the Field Type. Keep that in mind to avoid Cast Exceptions
 
+## Generation of sequences
+Since 3.5.4 version KloadGen has added support for sequences. Type **"{"** in the FieldValueList to get the data processed as a sequence. For example in this picture:
+
+[Sequence Generator](/Sequence_Generator.png)
+
+The field id will be generated as sequences from 1 to 5. 
+
 ### Kafka Headers Configuration
 
 This configuration component allow to specify a list of header which will be included in the producer. Headers specified here will be included in every message after be serialized.
