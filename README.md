@@ -286,7 +286,7 @@ Other values will be considered Constants for this field and will be converted t
 ## Generation of sequences
 Since 3.5.4 version KloadGen has added support for sequences. Type **"{"** in the FieldValueList to get the data processed as a sequence. For example in this picture:
 
-[Sequence Generator](/Sequence_Generator.png)
+![Sequence Generator](/Sequence_Generator.png)
 
 The field id will be generated as sequences from 1 to 5. 
 
@@ -295,7 +295,7 @@ The field id will be generated as sequences from 1 to 5.
 This configuration component allow to specify a list of header which will be included in the producer. Headers specified here will be included in every message after be serialized.
 Values will follow the same rules and the message body, if specify a type (basic type) it will generate a random value. If a value is set will be treated as String and serialize in the same way.
 
-[Kafka Header Config](/Kafka_header_config_element.png)
+![Kafka Header Config](/Kafka_header_config_element.png)
 
 ## Consumer setup
 
