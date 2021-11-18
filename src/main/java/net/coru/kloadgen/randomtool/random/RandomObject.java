@@ -54,7 +54,7 @@ public class RandomObject {
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
-    if (!fieldValueList.isEmpty() && !fieldValueList.get(0).equals("") && fieldValueList.get(0).charAt(0) == "{".charAt(0)){
+    if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0)) && fieldValueList.get(0).charAt(0) == "{".charAt(0)){
       fieldValueList.set(0, fieldValueList.get(0).substring(1));
       return generateSequenceForFieldValueList(fieldValueList.get(0), fieldType, fieldValueList, context );
     }
@@ -212,7 +212,7 @@ public class RandomObject {
   private String getStringValueOrRandom(Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     String value;
-    if (!fieldValueList.isEmpty() && !fieldValueList.get(0).equals("")) {
+    if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0))) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
       if (constrains.containsKey(ConstraintTypeEnum.REGEX)) {
