@@ -30,6 +30,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
+
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
@@ -37,6 +39,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.avro.AvroRuntimeException;
+import org.apache.avro.Schema;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -129,7 +132,11 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
       String schemaType =  schemaTypeComboBox.getSelectedItem().toString();
       String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
-
+      Schema schemaObj = (Schema) selectedSchema.rawSchema();
+      if(schemaObj.getType().equals(Schema.Type.UNION) && selectedSchema.schemaType().equalsIgnoreCase("AVRO")) {
+        Schema lastElement = schemaObj.getTypes().get(schemaObj.getTypes().size() -1);
+        selectedSchema = new AvroSchema(lastElement.toString());
+      }
       if (Objects.nonNull(selectedSchema)) {
         try {
           List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(selectedSchema);
