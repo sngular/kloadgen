@@ -50,6 +50,15 @@ public class AvroGeneratorTool {
     return randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
   }
 
+  public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
+    return ValueUtils.castValue(
+            context.compute(fieldName, (fieldNameMap,
+                                        seqObject) -> seqObject == null ? fieldValueList.get(0)
+                    : seqObject.toString().equals(fieldValueList.get(fieldValueList.size()-1)) ? fieldValueList.get(0) : fieldValueList.get(fieldValueList.indexOf(seqObject)+1)),
+            fieldType);
+  }
+
+
   public Object generateObject(Field field, String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constrains) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     boolean logicalType = Objects.nonNull(field.schema().getLogicalType());
@@ -57,7 +66,10 @@ public class AvroGeneratorTool {
     Object value;
     if (ENUM == field.schema().getType()) {
       value = getEnumOrGenerate(fieldType, field.schema(), parameterList);
-    } else if (UNION == field.schema().getType()) {
+    }else if (!fieldValuesList.isEmpty() && fieldValuesList.get(0).charAt(0) == "{".charAt(0) ) {
+      fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
+      return generateSequenceForFieldValueList(fieldValuesList.get(0), fieldType, fieldValuesList, context);
+    }else if (UNION == field.schema().getType()) {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
 
@@ -143,7 +155,12 @@ public class AvroGeneratorTool {
         List<String> enumValueList = schema.getEnumSymbols();
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
       } else {
-        value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
+        if (parameterList.get(0).charAt(0) == "{".charAt(0)) {
+          parameterList.set(0, parameterList.get(0).substring(1));
+          value = new GenericData.EnumSymbol(schema, generateSequenceForFieldValueList(parameterList.get(0),fieldType,parameterList,context));
+        } else {
+          value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
+        }
       }
     } else {
       value = new GenericData.EnumSymbol(schema, fieldType);

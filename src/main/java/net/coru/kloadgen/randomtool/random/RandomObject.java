@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class RandomObject {
 
+  private static final Map<String, Object> context = new HashMap<>();
+
   public boolean isTypeValid(String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
   }
@@ -44,9 +47,22 @@ public class RandomObject {
         fieldType);
   }
 
+  public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
+    return ValueUtils.castValue(
+            context.compute(fieldName, (fieldNameMap,
+                                        seqObject) -> seqObject == null ? fieldValueList.get(0)
+                    : seqObject.toString().equals(fieldValueList.get(fieldValueList.size()-1)) ? fieldValueList.get(0) : fieldValueList.get(fieldValueList.indexOf(seqObject)+1)),
+            fieldType);
+  }
+
+
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
+    if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0)) && fieldValueList.get(0).charAt(0) == "{".charAt(0)){
+      fieldValueList.set(0, fieldValueList.get(0).substring(1));
+      return generateSequenceForFieldValueList(fieldValueList.get(0), fieldType, fieldValueList, context );
+    }
     switch (fieldType) {
       case ValidTypeConstants.STRING:
         value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
@@ -201,7 +217,7 @@ public class RandomObject {
   private String getStringValueOrRandom(Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     String value;
-    if (!fieldValueList.isEmpty()) {
+    if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0))) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
       if (constrains.containsKey(ConstraintTypeEnum.REGEX)) {
@@ -256,14 +272,14 @@ public class RandomObject {
     return value;
   }
 
-  private GenericData.EnumSymbol getEnumValueOrRandom(List<String> fieldValueList) {
+  private String getEnumValueOrRandom(List<String> fieldValueList) {
     String value;
     if (!fieldValueList.isEmpty()) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
       throw new KLoadGenException("Wrong enums values, problem in the parsing process");
     }
-    return new GenericData.EnumSymbol(null, value);
+    return value;
   }
 
   private Number calculateMaximum(int valueLength, Map<ConstraintTypeEnum, String> constrains) {
