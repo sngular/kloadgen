@@ -183,6 +183,9 @@ This screen will allow to choose a schema from file(.avsc or.json).
 ![File Generator Table](/Value_Schema_File_Load_Generator_Config.png)
 
 AVRO or Json structure will be flattened and show in the table.
+
+**Note**: If there are embedded schemas, then the last of the schema's definition will be taken as the main one, and it'll be expected than the uppers are related to it. If there are unrelated schemas, they will be ignored.
+
 We will see 4 columns where we will configure the Random Generator system.
 
   * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array "[]" will appear at the end. If you want to define a specific size for the array just type the number inside "[5]".

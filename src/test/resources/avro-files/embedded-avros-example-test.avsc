@@ -1,0 +1,38 @@
+[
+  {
+    "name": "EmbeddedSchema",
+    "namespace": "com.corunet.test",
+    "type": "record",
+    "fields":
+      [
+        {
+          "name": "testInt_id",
+          "type": "int"
+        },
+        {
+          "name": "testLong",
+          "type": "long"
+        },
+        {
+          "name": "fieldString",
+          "type": "string"
+        }
+      ]
+  },
+  {
+    "name": "PrincipalSchema",
+     "namespace": "com.corunet.test",
+     "type": "record",
+     "fields":
+       [
+         {
+           "name": "fieldMySchema",
+           "type": "EmbeddedSchema"
+         },
+         {
+           "name": "timestamp",
+           "type": "long"
+         }
+       ]
+  }
+]

@@ -21,6 +21,7 @@ import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.DefaultComboBoxModel;
@@ -122,8 +123,18 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public ParsedSchema getSelectedSchema(String name) {
-    return parserSchema;
+  public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
+
+  public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
+    Schema schemaObj = (Schema) selectedSchema.rawSchema();
+    if(schemaObj.getType().equals(Schema.Type.UNION) && selectedSchema.schemaType().equalsIgnoreCase("AVRO")) {
+      Schema lastElement = schemaObj.getTypes().get(schemaObj.getTypes().size() -1);
+      selectedSchema = new AvroSchema(lastElement.toString());
+    }
+    if(Objects.nonNull(selectedSchema)) {
+      return schemaExtractor.flatPropertiesList(selectedSchema);
+    }
+    return new ArrayList<>();
   }
 
   @Override
@@ -132,14 +143,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
       String schemaType =  schemaTypeComboBox.getSelectedItem().toString();
       String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
-      Schema schemaObj = (Schema) selectedSchema.rawSchema();
-      if(schemaObj.getType().equals(Schema.Type.UNION) && selectedSchema.schemaType().equalsIgnoreCase("AVRO")) {
-        Schema lastElement = schemaObj.getTypes().get(schemaObj.getTypes().size() -1);
-        selectedSchema = new AvroSchema(lastElement.toString());
-      }
-      if (Objects.nonNull(selectedSchema)) {
+      List<FieldValueMapping> attributeList = getAttributeList(selectedSchema);
+
+      if (!attributeList.isEmpty()) {
         try {
-          List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(selectedSchema);
           //Get current test GUI component
           TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
           Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
