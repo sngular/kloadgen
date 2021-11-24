@@ -20,7 +20,7 @@
     <jaxb-api.version>2.3.1</jaxb-api.version>
     <jdk.version>11</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.3</jmeter.version>
+    <jmeter.version>5.4.1</jmeter.version>
     <json-path.version>2.4.0</json-path.version>
     <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
@@ -247,6 +247,10 @@
     <repository>
       <id>confluent</id>
       <url>https://packages.confluent.io/maven/</url>
+    </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
   </repositories>
   <build>
