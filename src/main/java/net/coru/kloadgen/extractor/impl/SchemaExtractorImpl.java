@@ -20,6 +20,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchemaProvider;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -43,6 +44,7 @@ import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.extractors.AvroExtractor;
 import net.coru.kloadgen.extractor.extractors.JsonExtractor;
+import net.coru.kloadgen.extractor.extractors.ProtoBufExtractor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -52,6 +54,8 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   private final AvroExtractor avroExtractor = new AvroExtractor();
 
   private final JsonExtractor jsonExtractor = new JsonExtractor();
+
+  private final ProtoBufExtractor protoBufExtractor = new ProtoBufExtractor();
 
   @Override
   public Pair<String, List<FieldValueMapping>> flatPropertiesList(String subjectName) throws IOException, RestClientException {
@@ -101,8 +105,10 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     ParsedSchema parsedSchema;
     if ("AVRO".equalsIgnoreCase(schemaType)) {
       parsedSchema = new AvroSchema(readLineByLine(schemaFile.getPath()));
-    } else {
+    } else if ("JSON".equalsIgnoreCase(schemaType)) {
       parsedSchema = new JsonSchema(readLineByLine(schemaFile.getPath()));
+    } else{
+      parsedSchema = new ProtobufSchema(readLineByLine(schemaFile.getPath()));
     }
     return parsedSchema;
   }
@@ -112,7 +118,11 @@ public class SchemaExtractorImpl implements SchemaExtractor {
       return avroExtractor.processSchema(((AvroSchema)schema).rawSchema());
     } else if ("JSON".equalsIgnoreCase(schema.schemaType())) {
       return jsonExtractor.processSchema(((JsonSchema)schema).toJsonNode());
-    } else {
+
+    } else if ("PROTOBUF".equalsIgnoreCase(schema.schemaType())) {
+      return protoBufExtractor.processSchema(((ProtobufSchema) schema).rawSchema());
+    }
+    else {
       throw new KLoadGenException("Unsupported Schema Type");
     }
   }

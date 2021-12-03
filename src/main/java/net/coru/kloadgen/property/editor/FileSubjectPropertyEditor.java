@@ -86,6 +86,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     schemaTypeComboBox.setEditable(false);
     schemaTypeComboBox.insertItemAt("AVRO", 0);
     schemaTypeComboBox.insertItemAt("JSON-Schema", 1);
+    schemaTypeComboBox.insertItemAt("PROTOBUF", 2);
     schemaTypeComboBox.setSelectedIndex(0);
     subjectNameComboBox = new JComboBox<>();
     subjectNameComboBox.setEditable(true);

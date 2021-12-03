@@ -6,7 +6,7 @@
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
-  <version>3.5.5</version>
+  <version>3.6.1</version>
 
   <properties>
     <assertj-core.version>3.18.1</assertj-core.version>
@@ -117,6 +117,16 @@
       <groupId>io.confluent</groupId>
       <artifactId>kafka-json-schema-provider</artifactId>
       <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-protobuf-serializer</artifactId>
+      <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro-protobuf</artifactId>
+      <version>1.11.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
