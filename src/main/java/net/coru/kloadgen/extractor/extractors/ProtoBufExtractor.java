@@ -6,12 +6,12 @@ import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
 import net.coru.kloadgen.model.FieldValueMapping;
-import org.apache.avro.Schema;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static net.coru.kloadgen.util.ProtobufHelper.*;
 
@@ -31,7 +31,7 @@ public class ProtoBufExtractor {
     }
 
 
-    private List<FieldValueMapping> processField(TypeElement field, List<FieldValueMapping> completeFieldList) {
+    private void processField(TypeElement field, List<FieldValueMapping> completeFieldList) {
         HashMap<String, TypeElement> nestedTypes = new HashMap<>();
         String fieldValueList;
         if (!field.getNestedTypes().isEmpty()) {
@@ -44,17 +44,28 @@ public class ProtoBufExtractor {
                     .forEach(
                             subfield -> {
                                 if (protobufTypes.containsKey(subfield.getType())) {
-                                    completeFieldList
-                                            .add(new FieldValueMapping(field.getName() + "." + subfield.getName(), subfield.getType().replace(subfield.getType(),
-                                                    protobufTypes.get(subfield.getType())), 0, ""));
-                                } else {
+                                    if ("repeated".equalsIgnoreCase(Objects.requireNonNull(subfield.getLabel()).toString())) {
+                                        completeFieldList
+                                                .add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", subfield.getType().replace(subfield.getType(),
+                                                        protobufTypes.get(subfield.getType())), 0, ""));
+                                    } else {
+                                        completeFieldList
+                                                .add(new FieldValueMapping(field.getName() + "." + subfield.getName(), subfield.getType().replace(subfield.getType(),
+                                                        protobufTypes.get(subfield.getType())), 0, ""));
+                                    }
+                                }
+                                else {
                                     if (nestedTypes.containsKey(subfield.getType())) {
-                                        List <FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(subfield.getType()));
-                                        for(FieldValueMapping fieldValueMapping : fieldValueMappingList  ) {
-                                            //subfield.getName() == addresses
-                                            //field.getname() == Address
-                                            //fieldValueMapping() == Address.idAddress
-                                            completeFieldList.add(new FieldValueMapping(field.getName() + "." + fieldValueMapping.getFieldName() , fieldValueMapping.getFieldType(), 0, ""));
+                                        List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(subfield.getType()));
+                                        for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
+                                            String[] splitText = fieldValueMapping.getFieldName().split("\\.");
+                                            List<String> preparedField = Arrays.asList((Arrays.copyOfRange(splitText, 1, splitText.length)));
+                                            String fieldValueMappingPrepared = String.join(".", preparedField);
+                                            if ("repeated".equalsIgnoreCase(Objects.requireNonNull(subfield.getLabel()).toString())) {
+                                                completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+                                            } else {
+                                                completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+                                            }
                                         }
                                     }
                                 }
@@ -71,6 +82,5 @@ public class ProtoBufExtractor {
             completeFieldList.add(new FieldValueMapping(fieldEnum.getName(), "enum", 0, fieldValueList));
 
         }
-        return completeFieldList;
     }
 }
