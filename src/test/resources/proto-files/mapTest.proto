@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package tutorial;
 
@@ -8,11 +8,14 @@ option java_outer_classname = "AddressBookProtos";
 
 
 message Person {
-  map<string,Address> address = 1;
-
+  map<string, string> name = 1;
+  map<string, .tutorial.Address> addresses = 2;
+  map<string, Address> addressesNoDot = 3;
+  
   message Address{
     optional string street = 1;
     optional int32 number = 2;
     optional int32 zipcode = 3;
   }
 }
+

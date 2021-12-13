@@ -79,11 +79,80 @@ class ProtobufExtractorTest {
         File testFile = fileHelper.getFile("/proto-files/providedTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         assertThat(fieldValueMappingList)
-                .hasSize(1)
+                .hasSize(32)
                 .containsExactlyInAnyOrder(
-                        new FieldValueMapping("Person.phoneTypes", "enum", 0, "[MOBILE, HOME, WORK]")
+                        new FieldValueMapping("IncidentEvent.id", "int", 0, ""),
+                        new FieldValueMapping("IncidentEvent.occurrence_id", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.load_number", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.claim_type.code", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.claim_type.description", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.collision_type.code", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.collision_type.description", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_cause_type.code", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_cause_type.description", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_type.code", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_type.description", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.review_status_type.code", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.review_status_type.description", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_latitude", "double", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_longitude", "double", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_date", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_time", "Timestamp", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_city", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_state", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.location_description", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_number", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_type", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_prefix", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.driver.driver_id", "int", 0, ""),
+                        new FieldValueMapping("IncidentEvent.driver.driver_first_name", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.driver.driver_last_name", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.dot_accident_indicator", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.drug_test_required_indicator", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.hazardous_material_indicator", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.preventable_indicator", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.report_by_name", "string", 0, ""),
+                        new FieldValueMapping("IncidentEvent.create_user_id", "string", 0, "")
 
                 );
     }
 
+    @Test
+    void testMap() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        assertThat(fieldValueMappingList)
+                .hasSize(7)
+                .containsExactlyInAnyOrder(
+                        new FieldValueMapping("Person.name[:]", "string", 0, ""),
+                        new FieldValueMapping("Person.addresses[:].street", "string", 0, ""),
+                        new FieldValueMapping("Person.addresses[:].number", "int", 0, ""),
+                        new FieldValueMapping("Person.addresses[:].zipcode", "int", 0, ""),
+                        new FieldValueMapping("Person.addressesNoDot[:].street", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesNoDot[:].number", "int", 0, ""),
+                        new FieldValueMapping("Person.addressesNoDot[:].zipcode", "int", 0, "")
+                );
+    }
+
+    @Test
+    void completeTest() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/completeProto.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        assertThat(fieldValueMappingList)
+                .hasSize(12)
+                .containsExactlyInAnyOrder(
+                        new FieldValueMapping("Person.name", "string", 0, ""),
+                        new FieldValueMapping("Person.id", "int", 0, ""),
+                        new FieldValueMapping("Person.addressesArray[].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesArray[].zipcode", "long", 0, ""),
+                        new FieldValueMapping("Person.addressesDot[].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesDot[].zipcode", "long", 0, ""),
+                        new FieldValueMapping("Person.addressesMap[:].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesMap[:].zipcode", "long", 0, ""),
+                        new FieldValueMapping("Person.addressesNoDotMap[:].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesNoDotMap[:].zipcode", "long", 0, ""),
+                        new FieldValueMapping("Person.phones[]", "enum", 0, "[MOBILE, HOME, WORK]"),
+                        new FieldValueMapping("Pet.name[]", "string", 0, "")
+                );
+    }
 }
