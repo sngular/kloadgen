@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package tutorial;
+
+option java_multiple_files = true;
+option java_package = "com.example.tutorial.protos";
+option java_outer_classname = "AddressBookProtos";
+
+message Person {
+  optional string name = 1;
+  optional int32 id = 2;
+  optional string email = 3;
+
+  message PhoneNumber {
+    optional string number = 1;
+
+    message Address{
+      optional string id = 1;
+    }
+    repeated Address addresses = 3;
+  }
+  
+  message Address{
+    optional string id = 1;
+  }
+
+  repeated .tutorial.Person.Address addresses = 5;
+  repeated PhoneNumber phones = 6;
+
+}
+
+
+
+message Book {
+  repeated string name = 1;
+}
+
+
+

@@ -20,7 +20,7 @@ public class ProtobufHelper {
         put("sfixed32", "int");
         put("sfixed64", "long");
         put("bool", "boolean");
-        put("string", "String");
+        put("string", "string");
         put("bytes", "ByteString");
     }};
 
