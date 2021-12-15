@@ -17,11 +17,12 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 
-public class ProtobufSchemaProcessor{
+public class ProtobufSchemaProcessor extends SchemaProcessorLib{
 
     private ProtoFileElement schema;
     private SchemaMetadata metadata;
@@ -47,24 +48,29 @@ public class ProtobufSchemaProcessor{
     }
 
     public EnrichedRecord next()  {
-        Object a = null;
-        String b = schema.toSchema();
-        System.out.println(b);
-        ProtobufSchema protobufSchema = new ProtobufSchema(b);
-        System.out.println(protobufSchema);
-        DynamicMessage message = DynamicMessage.newBuilder(protobufSchema.toDescriptor()).build();
-        System.out.println(message);
-        message.toBuilder().setField(message.getDescriptorForType().findFieldByName("fieldXyz"), "a") ;
-
-
+        String schemaToString = schema.toSchema();
+        ProtobufSchema protobufSchema = new ProtobufSchema(schemaToString);
+        DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(protobufSchema.toDescriptor());
+        DynamicMessage message;
         if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
             ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
             FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
             while (!fieldExpMappingsQueue.isEmpty()) {
-
+                String cleanPath = cleanUpPath(fieldValueMapping, "");
+                String[] cleanPathSplitted = cleanPath.split("\\.");
+                String fieldName = getCleanMethodName(fieldValueMapping, "");
+                //TODO messageBuilder.getDescriptorForType().findFieldByName("addressesArray").getMessageType().getFields() PARA OBJETOS ENDEBIDOS USAMOS ESTO. IMPORTANTE!!!!!!!!!
+                messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanPathSplitted[cleanPathSplitted.length -1]),
+                        randomObject.generateRandom(
+                                fieldValueMapping.getFieldType(),
+                                fieldValueMapping.getValueLength(),
+                                fieldValueMapping.getFieldValuesList(),
+                                fieldValueMapping.getConstrains()));
+                fieldExpMappingsQueue.remove();
+                fieldValueMapping = fieldExpMappingsQueue.peek();
             }
         }
-
+        message = messageBuilder.build();
         return new EnrichedRecord(metadata, message.getAllFields());
     }
 

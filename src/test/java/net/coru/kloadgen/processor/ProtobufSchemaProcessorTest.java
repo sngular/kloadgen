@@ -40,13 +40,13 @@ public class ProtobufSchemaProcessorTest {
 
     @Test
     void textProtoBufSchemaProcessor() throws KLoadGenException, Descriptors.DescriptorValidationException, IOException {
-        File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
+        File testFile = fileHelper.getFile("/proto-files/completeProto.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
         protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
         EnrichedRecord message = protobufSchemaProcessor.next();
+        System.out.println(message);
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(message.getGenericRecord()).hasFieldOrPropertyWithValue("values", asList("Jose", 43).toArray());
     }
 }

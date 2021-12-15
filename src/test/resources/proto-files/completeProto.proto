@@ -9,15 +9,15 @@ option java_outer_classname = "AddressBookProtos";
 message Person {
   optional string name = 1;
   optional int32 id = 2;
-  repeated Address addressesArray = 3;
-  repeated .tutorial.Person.Address addressesDot = 4;
+  optional Address addressesArray = 3;
+  optional .tutorial.Person.Address addressesDot = 4;
   map<string, .tutorial.Address> addressesMap = 5;
   map<string, Address> addressesNoDotMap = 6;
-  repeated PhoneTypes phones = 7;
+  optional PhoneTypes phones = 7;
 
     message Address{
-      repeated string id = 1;
-      optional int64 zipcode = 3;
+      optional string id = 1;
+      optional int64 zipcode = 2;
     }
 
     message Book{
@@ -35,6 +35,6 @@ message Person {
 }
 
 message Pet {
-  repeated string name = 1;
+  optional string name = 1;
 }
 
