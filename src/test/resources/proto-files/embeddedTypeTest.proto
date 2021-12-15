@@ -24,8 +24,8 @@ message Person {
     optional string id = 1;
   }
 
-  repeated .tutorial.Person.Address addresses = 5;
-  repeated PhoneNumber phones = 6;
+  repeated .tutorial.Person.Address addresses = 4;
+  repeated PhoneNumber phones = 5;
 
 }
 

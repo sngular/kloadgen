@@ -83,6 +83,7 @@ import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.ProtobufLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
@@ -359,6 +360,8 @@ public final class SamplerUtil {
         generator = new JsonLoadGenerator();
       } else if (jMeterVariables.get(VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroLoadGenerator();
+      } else if (jMeterVariables.get(VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+        generator = new ProtobufLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");
       }
@@ -415,6 +418,8 @@ public final class SamplerUtil {
         generator = new JsonLoadGenerator();
       } else if (jMeterVariables.get(KEY_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroLoadGenerator();
+      } else if (jMeterVariables.get(VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+        generator = new ProtobufLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");
       }

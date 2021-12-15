@@ -8,6 +8,9 @@ package net.coru.kloadgen.loadgen;
 
 import java.util.List;
 import java.util.Map;
+
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.TextFormat;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 

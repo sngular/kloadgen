@@ -105,7 +105,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     ParsedSchema parsedSchema;
     if ("AVRO".equalsIgnoreCase(schemaType)) {
       parsedSchema = new AvroSchema(readLineByLine(schemaFile.getPath()));
-    } else if ("JSON".equalsIgnoreCase(schemaType)) {
+    } else if ("Json-schema".equalsIgnoreCase(schemaType)) {
       parsedSchema = new JsonSchema(readLineByLine(schemaFile.getPath()));
     } else{
       parsedSchema = new ProtobufSchema(readLineByLine(schemaFile.getPath()));

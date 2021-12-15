@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Future;
+
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.TextFormat;
+import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
@@ -131,6 +135,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
         return commonProps;
     }
 
+    @SneakyThrows
     @Override
     public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
 
@@ -188,7 +193,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
         }
     }
 
-    private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal, boolean keyFlag, boolean valueFlag) {
+    private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal, boolean keyFlag, boolean valueFlag)  {
         ProducerRecord<Object, Object> producerRecord;
         if (keyMessageFlag) {
             if (Objects.isNull(keyGenerator)) {
