@@ -239,9 +239,8 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         GenericRecord subEntity = createRecord(innerSchema);
         if (null == subEntity) {
             throw new KLoadGenException("Something Odd just happened");
-        } else {
-            innerSchema = subEntity.getSchema();
         }
+
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
         while (!fieldExpMappingsQueue.isEmpty()
                 && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
@@ -258,7 +257,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 }else if(checkIfIsRecordMapArray(cleanFieldName)){
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
+                    processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
                 }else if(checkIfIsRecordArrayMap(cleanFieldName)){
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                      processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
@@ -299,18 +298,6 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return subEntity;
     }
 
-    private Schema extractRecordSchema(Field field) {
-        if (ARRAY == field.schema().getType()) {
-            return field.schema().getElementType();
-        } else if (MAP == field.schema().getType()) {
-            return field.schema().getValueType();
-        } else if (UNION == field.schema().getType()) {
-            return getRecordUnion(field.schema().getTypes());
-        } else if (typesSet.contains(field.schema().getType())) {
-            return getRecordUnion(field.schema().getTypes());
-        } else return null;
-    }
-
     private GenericRecord createRecord(Schema schema) {
         if (RECORD == schema.getType()) {
             return new GenericData.Record(schema);
@@ -333,29 +320,6 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             }
         }
         return isRecord;
-    }
-
-    private Object createArray(Schema subSchema, String fieldName, Integer arraySize, Integer fieldValueLength, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-        if (ARRAY.equals(subSchema.getType())) {
-            if (typesSet.contains(subSchema.getElementType().getType())) {
-                return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-            } else if (MAP.equals(subSchema.getElementType().getType())) {
-                fieldExpMappingsQueue.remove();
-                return createSimpleTypeMap(fieldName, subSchema.getElementType().getValueType().getType().getName(), arraySize, fieldValueLength, Collections.emptyList());
-            } else {
-                return createObjectArray(subSchema.getElementType(), fieldName, arraySize, fieldExpMappingsQueue);
-            }
-        } else if (MAP.equals(subSchema.getType())) {
-            if (ARRAY.equals(subSchema.getValueType().getType())) {
-                return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-            } else {
-                return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-            }
-        } else if (typesSet.contains(subSchema.getType())) {
-            return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-        } else {
-            return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-        }
     }
 
     private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
