@@ -155,4 +155,11 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("Pet.name[]", "string", 0, "")
                 );
     }
+
+    @Test
+    void qwhuiEF() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/simpleProcessor.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        System.out.println(fieldValueMappingList);
+    }
 }

@@ -38,7 +38,7 @@ public class ProtoBufExtractor {
 
     private void processField(TypeElement field, List<FieldValueMapping> completeFieldList) {
         HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-        fieldNestedTypes(field, nestedTypes);
+        fillNestedTypes(field, nestedTypes);
         if (field instanceof MessageElement) {
             ((MessageElement) field).getFields()
                     .forEach(
@@ -210,7 +210,7 @@ public class ProtoBufExtractor {
         return label;
     }
 
-    private void fieldNestedTypes(TypeElement field, HashMap<String, TypeElement> nestedTypes) {
+    private void fillNestedTypes(TypeElement field, HashMap<String, TypeElement> nestedTypes) {
         if (!field.getNestedTypes().isEmpty()) {
             field.getNestedTypes().forEach(nestedType ->
                     nestedTypes.put(nestedType.getName(), nestedType)

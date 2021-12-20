@@ -39,8 +39,8 @@ public class ProtobufSchemaProcessorTest {
     }
 
     @Test
-    void textProtoBufSchemaProcessor() throws KLoadGenException, Descriptors.DescriptorValidationException, IOException {
-        File testFile = fileHelper.getFile("/proto-files/completeProto.proto");
+    void textProtoBufSchemaProcessor() throws KLoadGenException, IOException {
+        File testFile = fileHelper.getFile("/proto-files/simpleProcessor.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
         protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
