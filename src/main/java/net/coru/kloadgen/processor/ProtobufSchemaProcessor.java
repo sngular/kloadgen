@@ -111,8 +111,6 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                 } else {
                     processSimpleTypes(messageBuilder, fieldValueMapping, fieldName);
                 }*/
-                fieldExpMappingsQueue.remove();
-                fieldValueMapping = fieldExpMappingsQueue.peek();
             }
         }
 
