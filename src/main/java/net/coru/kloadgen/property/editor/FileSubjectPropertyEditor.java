@@ -126,11 +126,6 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
 
   public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
-    Schema schemaObj = (Schema) selectedSchema.rawSchema();
-    if(schemaObj.getType().equals(Schema.Type.UNION) && selectedSchema.schemaType().equalsIgnoreCase("AVRO")) {
-      Schema lastElement = schemaObj.getTypes().get(schemaObj.getTypes().size() -1);
-      selectedSchema = new AvroSchema(lastElement.toString());
-    }
     if(Objects.nonNull(selectedSchema)) {
       return schemaExtractor.flatPropertiesList(selectedSchema);
     }
