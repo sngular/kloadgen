@@ -22,6 +22,7 @@ import static net.coru.kloadgen.util.ProtobufHelper.*;
 
 public class ProtoBufExtractor {
 
+    public static final String ARRAY_POSTFIX = "-array";
 
     public List<FieldValueMapping> processSchema(ProtoFileElement schema) {
         List<FieldValueMapping> attributeList = new ArrayList<>();
@@ -74,7 +75,7 @@ public class ProtoBufExtractor {
     private void extractDotTypeWhenNotNestedType(TypeElement field, List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray, String dotType) {
         if (isArray) {
             completeFieldList
-                    .add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", dotType, 0, ""));
+                    .add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", dotType + ARRAY_POSTFIX, 0, ""));
         } else {
             completeFieldList
                     .add(new FieldValueMapping(field.getName() + "." + subfield.getName(), dotType, 0, ""));
@@ -107,7 +108,7 @@ public class ProtoBufExtractor {
         if (isArray) {
             completeFieldList
                     .add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", subfield.getType().replace(subfield.getType(),
-                            protobufTypes.get(subfield.getType())), 0, ""));
+                            protobufTypes.get(subfield.getType()))+ ARRAY_POSTFIX, 0, ""));
         } else {
             completeFieldList
                     .add(new FieldValueMapping(field.getName() + "." + subfield.getName(), subfield.getType().replace(subfield.getType(),
@@ -121,13 +122,13 @@ public class ProtoBufExtractor {
             String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
             if ("enum".equals(fieldValueMapping.getFieldType())) {
                 if (isArray) {
-                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", fieldValueMapping.getFieldType(), 0, fieldValueMapping.getFieldValuesList().toString()));
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", fieldValueMapping.getFieldType()+ARRAY_POSTFIX, 0, fieldValueMapping.getFieldValuesList().toString()));
                 } else {
                     completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName(), fieldValueMapping.getFieldType(), 0, fieldValueMapping.getFieldValuesList().toString()));
                 }
             } else {
                 if (isArray) {
-                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType()+ARRAY_POSTFIX, 0, ""));
                 } else {
                     completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
                 }
@@ -140,14 +141,14 @@ public class ProtoBufExtractor {
         for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
             if ("enum".equals(fieldValueMapping.getFieldType())) {
                 if (isArray) {
-                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", fieldValueMapping.getFieldType(), 0, fieldValueMapping.getFieldValuesList().toString()));
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", fieldValueMapping.getFieldType()+ARRAY_POSTFIX, 0, fieldValueMapping.getFieldValuesList().toString()));
                 } else {
                     completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName(), fieldValueMapping.getFieldType(), 0, fieldValueMapping.getFieldValuesList().toString()));
                 }
             } else {
                 String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
                 if (isArray) {
-                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType()+ARRAY_POSTFIX, 0, ""));
                 } else {
                     completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
                 }

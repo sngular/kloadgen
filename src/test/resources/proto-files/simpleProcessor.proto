@@ -9,21 +9,23 @@ option java_outer_classname = "AddressBookProtos";
 
 message Address{
     optional Person persona = 1;
-    optional string algo = 2;
+    repeated string algo = 2;
     optional int32 otro = 3;
     optional Person amante = 4;
     
     message Person {
-      optional string id = 1;
+      repeated string id = 1;
       optional string prueba= 2;
       
       optional Bandido superamante = 3;
 
-    }
-
+      
     message Bandido {
       optional string id = 1;
       optional string prueba= 2;
       
     }
+    
+  }
+
 }
