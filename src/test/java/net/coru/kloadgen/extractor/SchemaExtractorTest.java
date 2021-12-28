@@ -101,6 +101,20 @@ class SchemaExtractorTest {
     }
 
     @Test
+    void testFlatPropertiesEmbeddedAvros() throws IOException {
+        File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
+        assertThat(fieldValueMappingList)
+                .hasSize(4)
+                .containsExactlyInAnyOrder(
+                        new FieldValueMapping("fieldMySchema.testInt_id", "int"),
+                        new FieldValueMapping("fieldMySchema.testLong", "long"),
+                        new FieldValueMapping("fieldMySchema.fieldString", "string"),
+                        new FieldValueMapping("timestamp", "long")
+                );
+    }
+
+    @Test
     void testFlatPropertiesOptionalMapArray() throws IOException {
 
         File testFile = fileHelper.getFile("/avro-files/testOptionalMap.avsc");
