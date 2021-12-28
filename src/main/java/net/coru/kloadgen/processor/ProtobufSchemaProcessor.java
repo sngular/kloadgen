@@ -87,7 +87,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
                 } else if (cleanPath.contains(".")) {
-                    fieldValueMapping = proccessFieldValueMapping(messageBuilder, fieldExpMappingsQueue, fieldValueMapping, cleanPath, typeName);
+                    fieldValueMapping = proccessFieldValueMapping(messageBuilder, fieldExpMappingsQueue, fieldValueMapping, cleanPath, typeName, fieldName);
                 } else {
                     throw new KLoadGenException("Something Odd just happened");
                 }
@@ -98,12 +98,12 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         return new EnrichedRecord(metadata, message.getAllFields());
     }
 
-    private FieldValueMapping proccessFieldValueMapping(DynamicMessage.Builder messageBuilder, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, FieldValueMapping fieldValueMapping,String cleanPath, String typeName) {
-        if(checkComplexObject(cleanPath)){
+    private FieldValueMapping proccessFieldValueMapping(DynamicMessage.Builder messageBuilder, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, FieldValueMapping fieldValueMapping, String cleanPath, String typeName, String fieldName) {
+        if (checkComplexObject(cleanPath)) {
             messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName), createObject(getDescriptorForField(messageBuilder, typeName), typeName, fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-        } else{
-            messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
+        } else {
+            messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
                     randomObject.generateRandom(
                             fieldValueMapping.getFieldType(),
                             fieldValueMapping.getValueLength(),
@@ -121,11 +121,10 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     private String createTypeName(String cleanPath) {
         String[] cleanPathSplitted = cleanPath.split("\\.");
         String typeName;
-        if (cleanPathSplitted.length>2){
-            typeName = cleanPathSplitted[cleanPathSplitted.length - (cleanPathSplitted.length-1)];
-        } else{
-
-            typeName = cleanPathSplitted[cleanPathSplitted.length - (cleanPathSplitted.length-1)];;
+        if (cleanPathSplitted.length > 2) {
+            typeName = cleanPathSplitted[cleanPathSplitted.length - (cleanPathSplitted.length - 1)];
+        } else {
+            typeName = cleanPathSplitted[0];
         }
         return typeName;
     }
@@ -133,17 +132,17 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     private String createFieldName(String cleanPath) {
         String[] cleanPathSplitted = cleanPath.split("\\.");
         String fieldName;
-        if (cleanPathSplitted.length>2){
-            fieldName = cleanPathSplitted[cleanPathSplitted.length - (cleanPathSplitted.length-2)];
-        } else{
-            fieldName = cleanPathSplitted[0];
+        if (cleanPathSplitted.length > 2) {
+            fieldName = cleanPathSplitted[cleanPathSplitted.length - (cleanPathSplitted.length - 2)];
+        } else {
+            fieldName = cleanPathSplitted[1];
         }
         return fieldName;
     }
 
-    public boolean checkComplexObject(String cleanPath){
+    public boolean checkComplexObject(String cleanPath) {
         String[] cleanPathSplitted = cleanPath.split("\\.");
-        return cleanPathSplitted.length>2;
+        return cleanPathSplitted.length > 2;
     }
 
     private DynamicMessage createObject(final Descriptors.Descriptor subMessageDescriptor, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
@@ -235,19 +234,21 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
     private FieldValueMapping processFieldValueMappingAsSimpleArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String typeName) {
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        String cleanPath = cleanUpPath(fieldValueMapping, typeName.substring(0,typeName.indexOf("[")));
+        String cleanPath = cleanUpPath(fieldValueMapping, "");
         Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), typeName);
-        if(cleanPath.contains(".")){
-        String cleanTypeName = createTypeName(cleanPath);
+        String createdTypeName = createTypeName(cleanPath);
         String fieldName = createFieldName(cleanPath);
+        if(createdTypeName.contains("[")){
+            createdTypeName = createdTypeName.substring(0, createdTypeName.indexOf("["));
+        }
         String cleanFieldName = fieldName.substring(0, fieldName.indexOf("["));
-            messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName), createObject(getDescriptorForField(messageBuilder, typeName), cleanFieldName, fieldExpMappingsQueue));
+        if (Objects.nonNull(messageBuilder.getDescriptorForType().findFieldByName(createdTypeName)) && messageBuilder.getDescriptorForType().findFieldByName(createdTypeName).getType().equals(Descriptors.FieldDescriptor.Type.MESSAGE)) {
+            messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(createdTypeName), createObject(messageBuilder.getDescriptorForType().findFieldByName(createdTypeName).getMessageType(), createdTypeName, fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
-            String arrayCleanPath = typeName.substring(0, typeName.indexOf("["));
-            messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(arrayCleanPath),
-                    createArray(arrayCleanPath, arraySize, fieldExpMappingsQueue));
-        }
+            messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName),
+                    createArray(cleanFieldName, arraySize, fieldExpMappingsQueue));
+            }
         return getSafeGetElement(fieldExpMappingsQueue);
     }
 

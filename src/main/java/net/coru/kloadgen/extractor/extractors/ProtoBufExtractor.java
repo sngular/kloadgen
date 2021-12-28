@@ -66,7 +66,7 @@ public class ProtoBufExtractor {
                             }
                     );
         } else if (field instanceof EnumElement) {
-            extractEnums((EnumElement) field, completeFieldList, nestedTypes);
+            extractEnums((EnumElement) field, completeFieldList);
         } else {
             throw new KLoadGenException("Something Odd Just Happened: Unsupported type of value");
         }
@@ -128,7 +128,7 @@ public class ProtoBufExtractor {
                 }
             } else {
                 if (isArray) {
-                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType()+ARRAY_POSTFIX, 0, ""));
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
                 } else {
                     completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
                 }
@@ -148,7 +148,7 @@ public class ProtoBufExtractor {
             } else {
                 String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
                 if (isArray) {
-                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType()+ARRAY_POSTFIX, 0, ""));
+                        completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
                 } else {
                     completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
                 }
@@ -173,7 +173,7 @@ public class ProtoBufExtractor {
         }
     }
 
-    private void extractEnums(EnumElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes) {
+    private void extractEnums(EnumElement field, List<FieldValueMapping> completeFieldList) {
         String fieldValueList;
         List<String> EnumConstantList = new ArrayList<>();
         {

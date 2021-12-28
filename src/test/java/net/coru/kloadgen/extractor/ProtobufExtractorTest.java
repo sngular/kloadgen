@@ -40,7 +40,7 @@ class ProtobufExtractorTest {
                 .hasSize(3)
                 .containsExactlyInAnyOrder(
                         new FieldValueMapping("Address.street", "string", 0, ""),
-                        new FieldValueMapping("Address.number[]", "int", 0, ""),
+                        new FieldValueMapping("Address.number[]", "int-array", 0, ""),
                         new FieldValueMapping("Address.zipcode", "long", 0, "")
                 );
     }
@@ -58,7 +58,7 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("Person.addresses[].id", "string", 0, ""),
                         new FieldValueMapping("Person.phones[].number", "string", 0, ""),
                         new FieldValueMapping("Person.phones[].addresses[].id", "string", 0, ""),
-                        new FieldValueMapping("Book.name[]","string", 0, "")
+                        new FieldValueMapping("Book.name[]","string-array", 0, "")
                 );
     }
 
@@ -143,23 +143,17 @@ class ProtobufExtractorTest {
                 .containsExactlyInAnyOrder(
                         new FieldValueMapping("Person.name", "string", 0, ""),
                         new FieldValueMapping("Person.id", "int", 0, ""),
-                        new FieldValueMapping("Person.addressesArray[].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesArray[].id[]", "string-array", 0, ""),
                         new FieldValueMapping("Person.addressesArray[].zipcode", "long", 0, ""),
-                        new FieldValueMapping("Person.addressesDot[].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesDot[].id[]", "string-array", 0, ""),
                         new FieldValueMapping("Person.addressesDot[].zipcode", "long", 0, ""),
-                        new FieldValueMapping("Person.addressesMap[:].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesMap[:].id[]", "string-array", 0, ""),
                         new FieldValueMapping("Person.addressesMap[:].zipcode", "long", 0, ""),
-                        new FieldValueMapping("Person.addressesNoDotMap[:].id[]", "string", 0, ""),
+                        new FieldValueMapping("Person.addressesNoDotMap[:].id[]", "string-array", 0, ""),
                         new FieldValueMapping("Person.addressesNoDotMap[:].zipcode", "long", 0, ""),
-                        new FieldValueMapping("Person.phones[]", "enum", 0, "[MOBILE, HOME, WORK]"),
-                        new FieldValueMapping("Pet.name[]", "string", 0, "")
+                        new FieldValueMapping("Person.phones[]", "enum-array", 0, "[MOBILE, HOME, WORK]"),
+                        new FieldValueMapping("Pet.name[]", "string-array", 0, "")
                 );
     }
 
-    @Test
-    void qwhuiEF() throws IOException {
-        File testFile = fileHelper.getFile("/proto-files/simpleProcessor.proto");
-        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-        System.out.println(fieldValueMappingList);
-    }
 }
