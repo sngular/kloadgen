@@ -21,6 +21,7 @@ import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.DefaultComboBoxModel;
@@ -30,6 +31,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
+
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
@@ -37,6 +40,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.avro.AvroRuntimeException;
+import org.apache.avro.Schema;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -119,8 +123,13 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public ParsedSchema getSelectedSchema(String name) {
-    return parserSchema;
+  public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
+
+  public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
+    if(Objects.nonNull(selectedSchema)) {
+      return schemaExtractor.flatPropertiesList(selectedSchema);
+    }
+    return new ArrayList<>();
   }
 
   @Override
@@ -129,10 +138,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
       String schemaType =  schemaTypeComboBox.getSelectedItem().toString();
       String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
+      List<FieldValueMapping> attributeList = getAttributeList(selectedSchema);
 
-      if (Objects.nonNull(selectedSchema)) {
+      if (!attributeList.isEmpty()) {
         try {
-          List<FieldValueMapping> attributeList = schemaExtractor.flatPropertiesList(selectedSchema);
           //Get current test GUI component
           TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
           Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
