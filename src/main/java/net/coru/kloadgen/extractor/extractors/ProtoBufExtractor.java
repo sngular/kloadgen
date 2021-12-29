@@ -23,6 +23,7 @@ import static net.coru.kloadgen.util.ProtobufHelper.*;
 public class ProtoBufExtractor {
 
     public static final String ARRAY_POSTFIX = "-array";
+    public static final String MAP_POSTFIX = "-map";
 
     public List<FieldValueMapping> processSchema(ProtoFileElement schema) {
         List<FieldValueMapping> attributeList = new ArrayList<>();
@@ -87,7 +88,7 @@ public class ProtoBufExtractor {
         String dotTypeMap = checkDotType(subFieldType);
         if (protobufTypes.containsKey(subFieldType)) {
             completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]", subFieldType.replace(subFieldType,
-                    protobufTypes.get(subFieldType)), 0, ""));
+                    protobufTypes.get(subFieldType)) + MAP_POSTFIX, 0, ""));
         } else if (nestedTypes.containsKey(subFieldType)) {
             extractNestedTypesMap(field, completeFieldList, nestedTypes, subfield);
         } else if (nestedTypes.containsKey(dotTypeMap)) {

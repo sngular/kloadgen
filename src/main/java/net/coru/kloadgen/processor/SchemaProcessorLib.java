@@ -41,8 +41,7 @@ public abstract class SchemaProcessorLib {
     }
 
     static boolean checkIfRecordArray(String cleanPath) {
-        var substring = StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]"));
-        return substring.contains("].");
+        return cleanPath.contains("].");
     }
 
     static boolean checkIfIsRecordArrayMap(String cleanPath) {
@@ -72,8 +71,7 @@ public abstract class SchemaProcessorLib {
     static Integer calculateSize(String fieldName, String methodName) {
         int arrayLength = RandomUtils.nextInt(1, 10);
         int start = fieldName.contains(methodName) ? fieldName.indexOf(methodName) : 0;
-        String tempString = fieldName.substring(start,
-                fieldName.lastIndexOf(methodName));
+        String tempString = fieldName.substring(fieldName.lastIndexOf(methodName));
 
         tempString = tempString.isEmpty() ? fieldName.replace(methodName, "") : !tempString.contains("[") ? StringUtils.substringAfterLast(fieldName, methodName) : tempString;
         String arrayStringSize = "";
@@ -117,8 +115,8 @@ public abstract class SchemaProcessorLib {
             startPosition = fieldValueMapping.getFieldName().indexOf(fieldName) + fieldName.length() + 1;
         }
         cleanPath = fieldValueMapping.getFieldName().substring(startPosition);
-        if (cleanPath.matches("^(\\d*:*]).*$")) {
-            cleanPath = cleanPath.substring(cleanPath.indexOf(".") + 1);
+        if (cleanPath.matches("^(\\d*:?]).*$")) {
+            cleanPath = cleanPath.substring(cleanPath.indexOf(".") +1);
         }
         return cleanPath;
     }

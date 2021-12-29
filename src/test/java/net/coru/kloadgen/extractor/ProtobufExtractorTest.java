@@ -50,15 +50,14 @@ class ProtobufExtractorTest {
         File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         assertThat(fieldValueMappingList)
-                .hasSize(7)
+                .hasSize(6)
                 .containsExactlyInAnyOrder(
                         new FieldValueMapping("Person.name", "string", 0, ""),
                         new FieldValueMapping("Person.id", "int", 0, ""),
                         new FieldValueMapping("Person.email", "string", 0, ""),
                         new FieldValueMapping("Person.addresses[].id", "string", 0, ""),
                         new FieldValueMapping("Person.phones[].number", "string", 0, ""),
-                        new FieldValueMapping("Person.phones[].addresses[].id", "string", 0, ""),
-                        new FieldValueMapping("Book.name[]","string-array", 0, "")
+                        new FieldValueMapping("Person.phones[].addressesPhone[].id", "string", 0, "")
                 );
     }
 
@@ -124,7 +123,7 @@ class ProtobufExtractorTest {
         assertThat(fieldValueMappingList)
                 .hasSize(7)
                 .containsExactlyInAnyOrder(
-                        new FieldValueMapping("Person.name[:]", "string", 0, ""),
+                        new FieldValueMapping("Person.name[:]", "string-map", 0, ""),
                         new FieldValueMapping("Person.addresses[:].street", "string", 0, ""),
                         new FieldValueMapping("Person.addresses[:].number", "int", 0, ""),
                         new FieldValueMapping("Person.addresses[:].zipcode", "int", 0, ""),
@@ -154,6 +153,15 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("Person.phones[]", "enum-array", 0, "[MOBILE, HOME, WORK]"),
                         new FieldValueMapping("Pet.name[]", "string-array", 0, "")
                 );
+    }
+
+    @Test
+    void protoProcessorHelperTest() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/simpleProcessor.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        for( FieldValueMapping fieldValueMapping : fieldValueMappingList){
+            System.out.println(fieldValueMapping + "\r" +"\n");
+        }
     }
 
 }

@@ -130,7 +130,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
 
     private FieldValueMapping processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), getCleanMethodName(fieldValueMapping, fieldName));
+        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
 
         entity.put(fieldName, createObjectArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
                 fieldName,
@@ -262,7 +262,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                      processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
                 }
-            }else if(cleanFieldName.endsWith("]")){
+            }else if(cleanFieldName.contains("]")){
                     if (checkIfMap(fieldValueMapping.getFieldType())) {
                         String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
                         processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
