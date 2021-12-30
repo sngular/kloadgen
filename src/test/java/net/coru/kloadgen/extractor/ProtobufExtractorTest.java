@@ -75,6 +75,18 @@ class ProtobufExtractorTest {
     }
 
     @Test
+    void testExternalTypesImports() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/externalTypesTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        assertThat(fieldValueMappingList)
+                .hasSize(3)
+                .containsExactlyInAnyOrder(
+                        new FieldValueMapping("Test.time", ".google.protobuf.Timestamp", 0, ""),
+                        new FieldValueMapping("Test.imported_descriptor", ".google.protobuf.DescriptorProto", 0, ""),
+                        new FieldValueMapping("Test.normal_string", "string", 0, ""));
+    }
+
+    @Test
     void testProvided() throws IOException {
         File testFile = fileHelper.getFile("/proto-files/providedTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
@@ -97,7 +109,7 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("IncidentEvent.incident_latitude", "double", 0, ""),
                         new FieldValueMapping("IncidentEvent.incident_longitude", "double", 0, ""),
                         new FieldValueMapping("IncidentEvent.incident_date", "string", 0, ""),
-                        new FieldValueMapping("IncidentEvent.incident_time", "Timestamp", 0, ""),
+                        new FieldValueMapping("IncidentEvent.incident_time", ".google.protobuf.Timestamp", 0, ""),
                         new FieldValueMapping("IncidentEvent.incident_city", "string", 0, ""),
                         new FieldValueMapping("IncidentEvent.incident_state", "string", 0, ""),
                         new FieldValueMapping("IncidentEvent.location_description", "string", 0, ""),
