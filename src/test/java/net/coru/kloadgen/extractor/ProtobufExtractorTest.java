@@ -50,14 +50,9 @@ class ProtobufExtractorTest {
         File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         assertThat(fieldValueMappingList)
-                .hasSize(6)
+                .hasSize(1)
                 .containsExactlyInAnyOrder(
-                        new FieldValueMapping("Person.name", "string", 0, ""),
-                        new FieldValueMapping("Person.id", "int", 0, ""),
-                        new FieldValueMapping("Person.email", "string", 0, ""),
-                        new FieldValueMapping("Person.addresses[].id", "string", 0, ""),
-                        new FieldValueMapping("Person.phones[].number", "string", 0, ""),
-                        new FieldValueMapping("Person.phones[].addressesPhone[].id", "string", 0, "")
+                        new FieldValueMapping("Person.phones[:].addressesPhone[:].id[]", "string-array", 0, "")
                 );
     }
 
@@ -83,6 +78,29 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("Test.time", ".google.protobuf.Timestamp", 0, ""),
                         new FieldValueMapping("Test.imported_descriptor", ".google.protobuf.DescriptorProto", 0, ""),
                         new FieldValueMapping("Test.normal_string", "string", 0, ""));
+    }
+
+    @Test
+    void testComplexProto() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUFF"));
+        assertThat(fieldValueMappingList)
+                .hasSize(13)
+                .containsExactlyInAnyOrder(
+                        new FieldValueMapping("Test.phone_types[].phone", "long", 0, ""),
+                        new FieldValueMapping("Test.phone_types[].principal", "boolean", 0, ""),
+                        new FieldValueMapping("Test.name", "string", 0, ""),
+                        new FieldValueMapping("Test.age", "int", 0, ""),
+                        new FieldValueMapping("Test.address[].street[]", "string-array", 0, ""),
+                        new FieldValueMapping("Test.address[].number_street", "int", 0, ""),
+                        new FieldValueMapping("Test.pets[:].pet_name", "string", 0, ""),
+                        new FieldValueMapping("Test.pets[:].pet_age", "int", 0, ""),
+                        new FieldValueMapping("Test.pets[:].owner", "string", 0, ""),
+                        new FieldValueMapping("Test.descriptors[:]", "string-map", 0, ""),
+                        new FieldValueMapping("Test.dates[]", "google.protobuf.Timestamp-array", 0, ""),
+                        new FieldValueMapping("Test.response", "google.protobuf.compiler.CodeGeneratorResponse", 0, ""),
+                        new FieldValueMapping("Test.presents[:].options[]", "string-array", 0, "")
+                );
     }
 
     @Test

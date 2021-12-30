@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package tutorial;
+
+option java_multiple_files = true;
+option java_package = "com.example.tutorial.protos";
+option java_outer_classname = "Protos";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/compiler/plugin.proto";
+
+message Test {
+    repeated PhoneTypes phone_types = 1;
+    optional string name = 2;
+    optional int32 age = 3;
+    repeated .tutorial.Address address = 4;
+    map<string, Test.Pet> pets = 5;
+    map<string, google.protobuf.DescriptorProto> descriptors = 6;
+    repeated google.protobuf.Timestamp dates = 7;
+    optional google.protobuf.compiler.CodeGeneratorResponse response = 8;
+    map<string, Present> presents = 9;
+
+    message Present {
+        repeated string options = 1;
+    }
+
+    message PhoneTypes {
+        optional int64 phone = 1;
+        optional bool principal = 2;
+    }
+
+    message Address {
+        repeated string street = 1;
+        optional int32 number_street = 2;
+    }
+
+    message Pet {
+        optional string pet_name = 1;
+        optional int32 pet_age = 2;
+        optional string owner = 3;
+    }
+}

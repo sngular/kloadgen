@@ -9,6 +9,7 @@ import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.sf.saxon.trans.SymbolicName;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -56,6 +57,9 @@ public class ProtoBufExtractor {
                                         extractNestedTypes(field, completeFieldList, nestedTypes, subfield, isArray, imports);
                                     } else if (nestedTypes.containsKey(dotType)) {
                                         extractDotTypesWhenIsInNestedType(field, completeFieldList, nestedTypes, subfield, isArray, dotType, imports);
+                                    } else if (!imports.isEmpty() && isExternalType(imports, subfield.getType())) {
+                                        String externalType = getExternalType(imports, subfield.getType());
+                                        extractDotTypeWhenNotNestedType(field, completeFieldList, subfield, isArray, externalType);
                                     } else {
                                         extractDotTypeWhenNotNestedType(field, completeFieldList, subfield, isArray, dotType);
                                     }
@@ -91,6 +95,8 @@ public class ProtoBufExtractor {
             extractNestedTypesMap(field, completeFieldList, nestedTypes, subfield, imports);
         } else if (nestedTypes.containsKey(dotTypeMap)) {
             extractDotTypesMap(field, completeFieldList, nestedTypes, subfield, dotTypeMap, imports);
+        } else if (!imports.isEmpty() && isExternalType(imports, dotTypeMap)) {
+            completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]", protobufTypes.get("string") + MAP_POSTFIX, 0, ""));
         } else {
             throw new KLoadGenException("Something Odd Just Happened: Unsupported type of value");
         }
@@ -193,7 +199,7 @@ public class ProtoBufExtractor {
 
     private String checkDotType(String subfieldType, List<String> imports) {
         String dotType = "";
-        if (subfieldType.startsWith(".")) {
+        if (subfieldType.startsWith(".") || subfieldType.contains(".")) {
             String[] typeSplit = subfieldType.split("\\.");
             dotType = typeSplit[typeSplit.length - 1];
             dotType = !isExternalType(imports, dotType) ? dotType : subfieldType;
@@ -201,8 +207,26 @@ public class ProtoBufExtractor {
         return dotType;
     }
 
+    private String getExternalType(List<String> imports, String fieldType) {
+        for(String importType: imports) {
+            Pattern pattern = Pattern.compile("(/([^/]+)\\.)");
+            Matcher matcher = pattern.matcher(importType);
+            if(matcher.find()) {
+                String extractedImportType = matcher.group(2);
+                if(extractedImportType != null) {
+                    if(extractedImportType.toLowerCase().contains(fieldType.toLowerCase())
+                            || fieldType.toLowerCase().contains(extractedImportType.toLowerCase())) {
+                        return fieldType;
+                    }else{
+                        if(isExternalTypeByURL(importType, fieldType)) { return fieldType; }
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
     private boolean isExternalType(List<String> imports, String fieldType) {
-        boolean externalType = false;
         for(String importType: imports) {
                 Pattern pattern = Pattern.compile("(/([^/]+)\\.)");
                 Matcher matcher = pattern.matcher(importType);
@@ -211,12 +235,25 @@ public class ProtoBufExtractor {
                     if(extractedImportType != null) {
                         if(extractedImportType.toLowerCase().contains(fieldType.toLowerCase())
                                 || fieldType.toLowerCase().contains(extractedImportType.toLowerCase())) {
-                            externalType = true;
+                            return true;
+                        }else{
+                            if(isExternalTypeByURL(importType, fieldType)) { return true; }
                         }
                     }
                 }
             }
-        return externalType;
+        return false;
+    }
+
+    private boolean isExternalTypeByURL(String importType, String fieldType) {
+        String[] importTypeSplitted = importType.split("/");
+        importTypeSplitted = Arrays.copyOf(importTypeSplitted, importTypeSplitted.length -1);
+        String[] fieldTypeSplitted = fieldType.split("\\.");
+        fieldTypeSplitted = Arrays.copyOf(fieldTypeSplitted, fieldTypeSplitted.length -1);
+        String stringImportSplitted = String.join(".", importTypeSplitted);
+        String stringFieldSplitted = String.join(".", fieldTypeSplitted);
+
+        return stringFieldSplitted.equals(stringImportSplitted);
     }
 
     private Field.Label checkNullLabel(FieldElement subfield) {
