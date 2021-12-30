@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package company;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/descriptor.proto";
+
+option java_package = "com.company.finance.proto";
+option java_multiple_files = true;
+
+message Test {
+    .google.protobuf.Timestamp time = 1;
+    .google.protobuf.DescriptorProto imported_descriptor = 2;
+    string normal_string = 3;
+}
