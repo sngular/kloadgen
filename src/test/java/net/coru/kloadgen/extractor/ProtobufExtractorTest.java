@@ -167,13 +167,4 @@ class ProtobufExtractorTest {
                 );
     }
 
-    @Test
-    void protoProcessorHelperTest() throws IOException {
-        File testFile = fileHelper.getFile("/proto-files/simpleProcessor.proto");
-        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-        for( FieldValueMapping fieldValueMapping : fieldValueMappingList){
-            System.out.println(fieldValueMapping + "\r" +"\n");
-        }
-    }
-
 }

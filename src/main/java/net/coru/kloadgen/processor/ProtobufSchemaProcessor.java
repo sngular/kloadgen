@@ -12,13 +12,15 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import org.apache.avro.Schema;
-import org.apache.commons.collections4.IteratorUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
-
-import static org.apache.avro.Schema.Type.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 public class ProtobufSchemaProcessor extends SchemaProcessorLib {
@@ -59,7 +61,8 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                 String cleanPath = cleanUpPath(fieldValueMapping, "");
                 String typeName = getCleanMethodName(fieldValueMapping, "");
                 String fieldName = fieldValueMapping.getFieldName().substring(fieldValueMapping.getFieldName().lastIndexOf(".") + 1);
-                if (cleanPath.contains("][")) {
+                String typeFilter = cleanPath.replaceAll(typeName, "");
+                if (typeFilter.matches("\\[.*]\\[.*")) {
                     if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, messageBuilder, typeName);
                     } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
@@ -71,20 +74,20 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                     } else {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
-                } else if (cleanPath.contains("[")) {
+                } else if (typeFilter.startsWith("[")) {
                     if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, typeName);
                     } else if (checkIfArray(fieldValueMapping.getFieldType())) {
                         String cleanFieldName = fieldName.substring(0, fieldName.indexOf("["));
                         fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, typeName, cleanFieldName);
-                    } else if (checkIfRecordMap(cleanPath)) {
+                    } else if (checkIfRecordMap(typeFilter)) {
                         fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, typeName);
-                    } else if (checkIfRecordArray(cleanPath)) {
+                    } else if (checkIfRecordArray(typeFilter)) {
                         fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, typeName);
                     } else {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
-                } else if (cleanPath.contains(".")) {
+                } else if (typeFilter.startsWith(".")) {
                     messageBuilder.setField(getFieldDescriptorForField(messageBuilder, typeName), createObject(getDescriptorForField(messageBuilder, typeName), typeName, fieldExpMappingsQueue));
                     fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
                 } else {
@@ -111,13 +114,16 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
         DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(subMessageDescriptor);
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+
         while (!fieldExpMappingsQueue.isEmpty()
                 && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
                 || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
                 || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
                 || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
             String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
-            if (cleanFieldName.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
+            String typeName = getCleanMethodName(fieldValueMapping, fieldName);
+            String typeFilter = cleanFieldName.replaceAll(typeName, "");
+            if (typeFilter.matches("\\[.]\\[.*") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
                 if (checkIfMapArray(fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
@@ -131,26 +137,26 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
                 }
-            } else if (cleanFieldName.contains("]")) {
-                if (checkIfMap(fieldValueMapping.getFieldType())) {
+            } else if (typeFilter.startsWith("[")) {
+                if (checkIfRecordMap(typeFilter)) {
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
+                } else if (checkIfRecordArray(typeFilter)) {
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
+                } else if (checkIfMap(fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
                 } else if (checkIfArray(fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, fieldName, fieldNameSubEntity);
-                }else if (checkIfRecordMap(cleanFieldName)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
-                } else if (checkIfRecordArray(cleanFieldName)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
                 }
-            } else if (cleanFieldName.contains(".")) {
+            } else if (typeFilter.startsWith(".")) {
                 String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName),
-                            createObject(getDescriptorForField(messageBuilder, fieldNameSubEntity),
-                                    fieldNameSubEntity,
-                                    fieldExpMappingsQueue));
+                messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName),
+                        createObject(getDescriptorForField(messageBuilder, fieldNameSubEntity),
+                                fieldNameSubEntity,
+                                fieldExpMappingsQueue));
 
             } else {
                 fieldExpMappingsQueue.poll();
@@ -271,7 +277,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
     private void createObjectArray(DynamicMessage.Builder messageBuilder, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
 
-        for (int i = 0; i < arraySize-1; i++) {
+        for (int i = 0; i < arraySize - 1; i++) {
             messageBuilder.addRepeatedField(getFieldDescriptorForField(messageBuilder, fieldName),
                     createObject(getDescriptorForField(messageBuilder, fieldName), fieldName, fieldExpMappingsQueue.clone()));
         }

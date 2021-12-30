@@ -40,8 +40,9 @@ public class ProtobufSchemaProcessorTest {
 
     @Test
     void textProtoBufSchemaProcessor() throws KLoadGenException, IOException {
-        File testFile = fileHelper.getFile("/proto-files/simpleProcessor.proto");
+        File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        fieldValueMappingList.forEach(field -> System.out.println(field +"\r\n"));
         ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
         protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
         EnrichedRecord message = protobufSchemaProcessor.next();

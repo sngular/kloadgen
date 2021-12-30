@@ -37,7 +37,7 @@ public abstract class SchemaProcessorLib {
     }
 
     static boolean checkIfRecordMap(String cleanPath) {
-        return cleanPath.contains(":].");
+        return cleanPath.startsWith("[:");
     }
 
     static boolean checkIfRecordArray(String cleanPath) {

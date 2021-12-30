@@ -1,16 +1,12 @@
 package net.coru.kloadgen.processor;
 
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.extractor.SchemaExtractor;
+import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -24,12 +20,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AvroSchemaProcessorTest {
+
+    private final FileHelper fileHelper = new FileHelper();
+    private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
+
 
     @BeforeEach
     public void setUp() {
@@ -153,6 +160,19 @@ class AvroSchemaProcessorTest {
                 .extracting(Arrays::asList)
                 .asList()
                 .hasSize(1);
+    }
+
+    @Test
+    void textAvroSchemaProcessorRecordArray() throws KLoadGenException, IOException {
+        File testFile = fileHelper.getFile("/avro-files/userTest.avsc");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
+        fieldValueMappingList.forEach(field -> System.out.println(field +"\r\n"));
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"AVRO"), new SchemaMetadata(1,1,""), fieldValueMappingList);
+        EnrichedRecord message = avroSchemaProcessor.next();
+        System.out.println(message);
+        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+        assertThat(message.getGenericRecord()).isNotNull();
     }
 
     @Test

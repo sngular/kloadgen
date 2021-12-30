@@ -9,30 +9,27 @@ option java_outer_classname = "AddressBookProtos";
 message Person {
   optional string name = 1;
   optional int32 id = 2;
-  optional string email = 3;
+  optional string email =3;
+
+  repeated Address addresses = 4;
+
+  message Address {
+    optional string id = 1;
+  }
+
+  repeated PhoneNumber phones = 5;
 
   message PhoneNumber {
-    optional string number = 1;
+
+    optional string number =1;
+
+    repeated Address addressesPhone = 2;
 
     message Address{
       optional string id = 1;
     }
-    repeated Address addresses = 3;
+    
   }
-  
-  message Address{
-    optional string id = 1;
-  }
-
-  repeated .tutorial.Person.Address addresses = 4;
-  repeated PhoneNumber phones = 5;
-
-}
-
-
-
-message Book {
-  repeated string name = 1;
 }
 
 
