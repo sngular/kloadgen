@@ -37,7 +37,7 @@ public abstract class SchemaProcessorLib {
     }
 
     static boolean checkIfRecordMap(String cleanPath) {
-        return cleanPath.startsWith("[:");
+        return cleanPath.contains(":].");
     }
 
     static boolean checkIfRecordArray(String cleanPath) {
@@ -48,12 +48,13 @@ public abstract class SchemaProcessorLib {
         return !StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]")).contains("][");
     }
 
-    static boolean checkIfMap(String type) {
-        return type.endsWith("map");
+    static boolean checkIfMap(String typeFilter) {
+
+        return typeFilter.matches("\\[\\d?:]");
     }
 
-    static boolean checkIfArray(String type) {
-        return type.endsWith("array");
+    static boolean checkIfArray(String typeFilter) {
+        return typeFilter.matches("\\[\\d?]");
     }
 
     static boolean checkIfArrayMap(String type) {

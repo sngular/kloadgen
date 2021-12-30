@@ -7,26 +7,12 @@ option java_package = "com.example.tutorial.protos";
 option java_outer_classname = "AddressBookProtos";
 
 message Person {
-  optional string name = 1;
-  optional int32 id = 2;
-  optional string email =3;
-
-  repeated Address addresses = 4;
-
-  message Address {
-    optional string id = 1;
-  }
-
-  repeated PhoneNumber phones = 5;
-
+  map<string,PhoneNumber> phones = 1;
   message PhoneNumber {
 
-    optional string number =1;
-
-    repeated Address addressesPhone = 2;
-
+    map<string,Address> addressesPhone = 1;
     message Address{
-      optional string id = 1;
+      repeated string id = 1;
     }
     
   }

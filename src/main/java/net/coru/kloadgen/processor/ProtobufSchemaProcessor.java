@@ -75,9 +75,9 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
                 } else if (typeFilter.startsWith("[")) {
-                    if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
+                    if (checkIfMap(typeFilter)) {
                         fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, typeName);
-                    } else if (checkIfArray(fieldValueMapping.getFieldType())) {
+                    } else if (checkIfArray(typeFilter)) {
                         String cleanFieldName = fieldName.substring(0, fieldName.indexOf("["));
                         fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, typeName, cleanFieldName);
                     } else if (checkIfRecordMap(typeFilter)) {
@@ -138,18 +138,19 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                     processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
                 }
             } else if (typeFilter.startsWith("[")) {
-                if (checkIfRecordMap(typeFilter)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
-                } else if (checkIfRecordArray(typeFilter)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
-                } else if (checkIfMap(fieldValueMapping.getFieldType())) {
+                if (checkIfMap(typeFilter)) {
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
-                } else if (checkIfArray(fieldValueMapping.getFieldType())) {
+                } else if (checkIfArray(typeFilter)) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, fieldName, fieldNameSubEntity);
+                } else if (checkIfRecordMap(typeFilter)) {
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
+                }
+                else if (checkIfRecordArray(typeFilter)) {
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
                 }
             } else if (typeFilter.startsWith(".")) {
                 String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);

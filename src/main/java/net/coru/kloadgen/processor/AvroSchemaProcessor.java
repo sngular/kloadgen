@@ -85,9 +85,9 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
                 } else if (typeFilter.startsWith("[")) {
-                    if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
+                    if (checkIfMap(typeFilter)) {
                         fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfArray(fieldValueMapping.getFieldType())) {
+                    } else if (checkIfArray(typeFilter)) {
                         fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, entity, fieldName);
                     } else if (checkIfRecordMap(typeFilter)) {
                         fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, entity, fieldName);
@@ -266,10 +266,10 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 }
             } else if (typeFilter.startsWith("[")) {
-                if (checkIfMap(fieldValueMapping.getFieldType())) {
+                if (checkIfMap(typeFilter)) {
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfArray(fieldValueMapping.getFieldType())) {
+                } else if (checkIfArray(typeFilter)) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfRecordMap(typeFilter)) {
