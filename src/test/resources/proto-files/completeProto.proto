@@ -11,7 +11,7 @@ message Person {
   optional int32 id = 2;
   repeated Address addressesArray = 3;
   repeated .tutorial.Person.Address addressesDot = 4;
-  map<string, .tutorial.Address> addressesMap = 5;
+  map<string, .tutorial.Person.Address> addressesMap = 5;
   map<string, Address> addressesNoDotMap = 6;
   repeated PhoneTypes phones = 7;
 

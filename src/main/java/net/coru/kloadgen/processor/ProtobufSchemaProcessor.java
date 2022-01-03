@@ -3,12 +3,14 @@ package net.coru.kloadgen.processor;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
+import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -30,6 +32,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     private RandomObject randomObject;
     private RandomMap randomMap;
     private List<FieldValueMapping> fieldExprMappings;
+    private ProtoBufGeneratorTool generatorTool;
 
 
     public void processSchema(ProtoFileElement schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
@@ -37,7 +40,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         this.fieldExprMappings = fieldExprMappings;
         this.metadata = metadata;
         randomObject = new RandomObject();
-
+        generatorTool = new ProtoBufGeneratorTool();
     }
 
     public void processSchema(ParsedSchema parsedSchema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
@@ -45,6 +48,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         this.fieldExprMappings = fieldExprMappings;
         this.metadata = metadata;
         randomObject = new RandomObject();
+        generatorTool = new ProtoBufGeneratorTool();
         randomMap = new RandomMap();
     }
 
@@ -91,23 +95,32 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                     messageBuilder.setField(getFieldDescriptorForField(messageBuilder, typeName), createObject(getDescriptorForField(messageBuilder, typeName), typeName, fieldExpMappingsQueue));
                     fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
                 } else {
-                    messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
-                            randomObject.generateRandom(
-                                    fieldValueMapping.getFieldType(),
-                                    fieldValueMapping.getValueLength(),
-                                    fieldValueMapping.getFieldValuesList(),
-                                    fieldValueMapping.getConstrains()
-                            )
-                    );
-                    fieldExpMappingsQueue.remove();
-                    fieldValueMapping = fieldExpMappingsQueue.peek();
+                    if(fieldValueMapping.getFieldType().equals("enum")) {
+                        processFieldValueMappingAsEnum(messageBuilder, fieldValueMapping, typeName, fieldName);
+                    }else{
+                        messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
+                                randomObject.generateRandom(
+                                        fieldValueMapping.getFieldType(),
+                                        fieldValueMapping.getValueLength(),
+                                        fieldValueMapping.getFieldValuesList(),
+                                        fieldValueMapping.getConstrains()
+                                )
+                        );
+                    }
                 }
-
+                fieldExpMappingsQueue.remove();
+                fieldValueMapping = fieldExpMappingsQueue.peek();
             }
         }
 
         message = messageBuilder.build();
         return new EnrichedRecord(metadata, message.getAllFields());
+    }
+
+    private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder, FieldValueMapping fieldValueMapping, String typeName, String fieldName) {
+        Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
+        messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
+                generatorTool.generateObject(enumDescriptor, fieldValueMapping.getFieldType(), fieldValueMapping.getFieldValuesList()));
     }
 
     private DynamicMessage createObject(final Descriptors.Descriptor subMessageDescriptor, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
@@ -162,13 +175,13 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             } else {
                 fieldExpMappingsQueue.poll();
                 messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName),
-                        randomObject.generateRandom(
-                                fieldValueMapping.getFieldType(),
-                                fieldValueMapping.getValueLength(),
-                                fieldValueMapping.getFieldValuesList(),
-                                fieldValueMapping.getConstrains()
-                        )
-                );
+                            randomObject.generateRandom(
+                                    fieldValueMapping.getFieldType(),
+                                    fieldValueMapping.getValueLength(),
+                                    fieldValueMapping.getFieldValuesList(),
+                                    fieldValueMapping.getConstrains()
+                            )
+                    );
             }
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         }
@@ -206,6 +219,11 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
         if (Objects.nonNull(messageBuilder.getDescriptorForType().findFieldByName(typeName)) && messageBuilder.getDescriptorForType().findFieldByName(typeName).getType().equals(Descriptors.FieldDescriptor.Type.MESSAGE)) {
             messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName), createObject(messageBuilder.getDescriptorForType().findFieldByName(typeName).getMessageType(), typeName, fieldExpMappingsQueue));
+        } else if(Objects.nonNull(messageBuilder.getDescriptorForType().findFieldByName(typeName)) && messageBuilder.getDescriptorForType().findFieldByName(typeName).getType().equals(Descriptors.FieldDescriptor.Type.ENUM)) {
+            Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
+            messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
+                    generatorTool.generateObject(enumDescriptor, fieldValueMapping.getFieldType(), fieldValueMapping.getFieldValuesList()));
+
         } else {
             Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
             messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),

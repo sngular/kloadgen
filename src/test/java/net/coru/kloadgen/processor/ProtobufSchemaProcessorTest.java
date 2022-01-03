@@ -50,4 +50,16 @@ public class ProtobufSchemaProcessorTest {
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
     }
+
+    @Test
+    void testProtoBufEnumSchemaProcessor() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
+        EnrichedRecord message = protobufSchemaProcessor.next();
+        System.out.println(message);
+        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+        assertThat(message.getGenericRecord()).isNotNull();
+    }
 }

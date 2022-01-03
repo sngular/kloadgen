@@ -172,7 +172,7 @@ public abstract class SchemaProcessorLib {
 
         List value = new ArrayList<>(arraySize);
         if ("seq".equals(fieldType)) {
-            for (int i = arraySize; i > 0 ; i--) {
+            for (int i = arraySize; i > 0; i--) {
                 value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
             }
         } else {
