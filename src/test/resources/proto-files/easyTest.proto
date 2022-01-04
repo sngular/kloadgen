@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package tutorial;
 
@@ -11,10 +11,5 @@ message Address{
     optional string street = 1;
     repeated int32 number = 2;
     optional int64 zipcode = 3;
-    repeated TypeAddress type = 4;
 
-    enum TypeAddress {
-        RESIDENTIAL = 1;
-        COMMERCIAL = 2;
-    }
   }
