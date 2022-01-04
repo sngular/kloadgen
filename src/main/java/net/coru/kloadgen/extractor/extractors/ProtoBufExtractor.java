@@ -165,7 +165,13 @@ public class ProtoBufExtractor {
         List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(extractInternalMapFields(subfield)), imports);
         for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
             String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
-            completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));        }
+            if("enum".equals(fieldValueMapping.getFieldType())) {
+                completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]"
+                        + fieldValueMappingPrepared, fieldValueMapping.getFieldType() + MAP_POSTFIX, 0, fieldValueMapping.getFieldValuesList().toString()));
+            }else{
+                completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+            }
+        }
     }
 
 

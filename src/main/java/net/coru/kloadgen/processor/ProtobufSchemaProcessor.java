@@ -201,6 +201,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                 fieldName,
                 arraySize,
                 fieldExpMappingsQueue);
+        fieldExpMappingsQueue.remove();
         return getSafeGetElement(fieldExpMappingsQueue);
     }
 
@@ -224,13 +225,13 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
             messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
                     generatorTool.generateObject(enumDescriptor, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getFieldValuesList()));
-
+            fieldExpMappingsQueue.remove();
         } else {
             Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
             messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
                     createArray(fieldName, arraySize, fieldExpMappingsQueue));
         }
-        fieldExpMappingsQueue.remove();
+
         return getSafeGetElement(fieldExpMappingsQueue);
     }
 
@@ -368,12 +369,21 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         builder.setField(keyFieldDescriptor,
                 randomObject.generateRandom("string", 10, Collections.emptyList(), Collections.emptyMap()));
         Descriptors.FieldDescriptor valueFieldDescriptor = descriptor.getMessageType().findFieldByName("value");
-        builder.setField(valueFieldDescriptor,
-                randomObject.generateRandom(
-                        fieldValueMappingCleanType,
-                        fieldValueMapping.getValueLength(),
-                        fieldValueMapping.getFieldValuesList(),
-                        fieldValueMapping.getConstrains()));
+        if(valueFieldDescriptor.getType().equals(Descriptors.FieldDescriptor.Type.ENUM)) {
+            List<String> fieldValueMappings = new ArrayList<>();
+            for(Descriptors.EnumValueDescriptor value: valueFieldDescriptor.getEnumType().getValues()) {
+                fieldValueMappings.add(value.getName());
+            }
+            builder.setField(valueFieldDescriptor, generatorTool.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
+        }else{
+            builder.setField(valueFieldDescriptor,
+                    randomObject.generateRandom(
+                            fieldValueMappingCleanType,
+                            fieldValueMapping.getValueLength(),
+                            fieldValueMapping.getFieldValuesList(),
+                            fieldValueMapping.getConstrains()));
+        }
+
         return builder.build();
     }
 
