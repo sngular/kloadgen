@@ -244,7 +244,7 @@ public final class SamplerUtil {
     }
   }
 
-  public static void setupConsumerSchemaRegistyProperties(JavaSamplerContext context, Properties props) {
+  public static void setupConsumerSchemaRegistryProperties(JavaSamplerContext context, Properties props) {
     if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
       props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
     }
@@ -261,7 +261,7 @@ public final class SamplerUtil {
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
 
     setupConsumerDeserializerProperties(context, props);
-    setupConsumerSchemaRegistyProperties(context, props);
+    setupConsumerSchemaRegistryProperties(context, props);
 
     props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
     props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
@@ -385,10 +385,20 @@ public final class SamplerUtil {
 
       props.putAll(originals);
 
-      generator.setUpGenerator(
-          originals,
-          jMeterVariables.get(VALUE_SUBJECT_NAME),
-          (List<FieldValueMapping>) jMeterVariables.getObject(VALUE_SCHEMA_PROPERTIES));
+      try {
+        generator.setUpGenerator(
+            originals,
+            jMeterVariables.get(VALUE_SUBJECT_NAME),
+            (List<FieldValueMapping>) jMeterVariables.getObject(VALUE_SCHEMA_PROPERTIES));
+      } catch (KLoadGenException exc) {
+        if (Objects.nonNull(props.get(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
+          generator.setUpGenerator(
+              jMeterVariables.get(VALUE_SCHEMA),
+              (List<FieldValueMapping>) jMeterVariables.getObject(VALUE_SCHEMA_PROPERTIES));
+        } else {
+          throw exc;
+        }
+      }
     } else {
       generator.setUpGenerator(
           jMeterVariables.get(VALUE_SCHEMA),
