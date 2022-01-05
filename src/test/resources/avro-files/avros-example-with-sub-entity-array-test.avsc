@@ -1,0 +1,56 @@
+{
+  "name": "Root",
+  "type": "record",
+  "fields": [
+    {
+      "name": "subEntity",
+      "type": {
+        "name": "SubEntity",
+        "type": "record",
+        "fields": [
+          {
+            "name": "anotherLevel",
+            "type": {
+              "name": "AnotherLevel",
+              "type": "record",
+              "fields": [
+                {
+                  "name": "subEntityRecordArray",
+                  "type": {
+                    "type": "array",
+                    "items": {
+                      "type": "record",
+                      "name": "SubEntityRecordArrayItems",
+                      "fields": [
+                        {
+                          "name": "name",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "topLevelRecordArray",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "TopLevelRecordArrayItems",
+          "type": "record",
+          "fields": [
+            {
+              "name": "name",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

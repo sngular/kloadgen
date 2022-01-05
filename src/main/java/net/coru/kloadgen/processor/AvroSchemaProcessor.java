@@ -73,6 +73,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             while (!fieldExpMappingsQueue.isEmpty()) {
                 String cleanPath = cleanUpPath(fieldValueMapping, "");
                 String fieldName = getCleanMethodName(fieldValueMapping, "");
+                String fullFieldName = getFullMethodName(fieldValueMapping, fieldName);
                 if (cleanPath.contains("][")) {
                     if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, entity, fieldName);
@@ -85,7 +86,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     } else {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
-                } else if (cleanPath.contains("[")) {
+                } else if (fullFieldName.endsWith("[")) {
                     if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, entity, fieldName);
                     } else if (checkIfArray(fieldValueMapping.getFieldType())) {
@@ -186,7 +187,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
         Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
 
-        var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(),fieldValueMapping.getValueLength(), arraySize, fieldValueMapping.getConstrains());
+        var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), fieldValueMapping.getValueLength(), arraySize, fieldValueMapping.getConstrains());
 
         entity.put(fieldName, mapArray);
         return getSafeGetElement(fieldExpMappingsQueue);
@@ -250,49 +251,51 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                 || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
                 || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
                 || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
-            String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
-            if (cleanFieldName.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array") ) {
+            String cleanPath = cleanUpPath(fieldValueMapping, fieldName);
+            String fullFieldName = getFullMethodName(fieldValueMapping, fieldName);
+            if (cleanPath.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
                 if (checkIfMapArray(fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                   processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                }else if(checkIfIsRecordMapArray(cleanFieldName)){
+                } else if (checkIfIsRecordMapArray(cleanPath)) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
-                }else if(checkIfIsRecordArrayMap(cleanFieldName)){
+                    fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                } else if (checkIfIsRecordArrayMap(cleanPath)) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                     processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , subEntity, fieldNameSubEntity );
+                    processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 }
-            }else if(cleanFieldName.endsWith("]")){
-                    if (checkIfMap(fieldValueMapping.getFieldType())) {
-                        String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                        processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                    } else if(checkIfArray(fieldValueMapping.getFieldType())){
-                        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                        processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                    } else if(checkIfRecordMap(cleanFieldName)){
-                        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                        processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                    }else if(checkIfRecordArray(cleanFieldName)){
-                        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                        processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                    }
+            } else if (fullFieldName.endsWith("]")) {
+                if (checkIfMap(fieldValueMapping.getFieldType())) {
+                    String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                } else if (checkIfArray(fieldValueMapping.getFieldType())) {
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                } else if (checkIfRecordMap(cleanPath)) {
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                } else if (checkIfRecordArray(cleanPath)) {
+                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+                    processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                } else {
+                    throw new KLoadGenException("Wrong configuration Map - Array");
                 }
-             else if (cleanFieldName.contains(".")) {
+            } else if (cleanPath.contains(".")) {
                 String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                 subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
                         fieldNameSubEntity,
                         fieldExpMappingsQueue));
             } else {
                 fieldExpMappingsQueue.poll();
-                subEntity.put(cleanFieldName, avroGeneratorTool.generateObject(
-                        subEntity.getSchema().getField(cleanFieldName),
-                        fieldValueMapping.getFieldType(),
-                        fieldValueMapping.getValueLength(),
-                        fieldValueMapping.getFieldValuesList(),
-                        extractConstrains(subEntity.getSchema().getField(cleanFieldName))
+                subEntity.put(cleanPath, avroGeneratorTool.generateObject(
+                                subEntity.getSchema().getField(cleanPath),
+                                fieldValueMapping.getFieldType(),
+                                fieldValueMapping.getValueLength(),
+                                fieldValueMapping.getFieldValuesList(),
+                                extractConstrains(subEntity.getSchema().getField(cleanPath))
                         )
                 );
             }

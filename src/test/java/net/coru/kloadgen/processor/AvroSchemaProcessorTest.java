@@ -1,12 +1,10 @@
 package net.coru.kloadgen.processor;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -15,7 +13,6 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.testutil.FileHelper;
-import net.sf.saxon.trans.SymbolicName;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -26,13 +23,11 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
-import org.apache.kafka.common.record.TimestampType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 
-
+import static freemarker.template.utility.Collections12.singletonList;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,6 +44,46 @@ class AvroSchemaProcessorTest {
         JMeterContext jmcx = JMeterContextService.getContext();
         jmcx.setVariables(new JMeterVariables());
         JMeterUtils.setLocale(Locale.ENGLISH);
+    }
+
+    private GenericRecord setUpEntityForAvroTestWithSubEntityArray(ParsedSchema parsedSchema) {
+        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+        Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
+        GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
+        Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
+        Schema subEntityRecordArraySchema = anotherLevelSchema.getField("subEntityRecordArray").schema().getElementType();
+        GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
+        GenericRecord subEntityItemsRecord = new GenericData.Record(subEntityRecordArraySchema);
+        subEntityItemsRecord.put("name", "second");
+        anotherLevelRecord.put("subEntityRecordArray", asList(subEntityItemsRecord, subEntityItemsRecord));
+
+        subEntityRecord.put("anotherLevel", anotherLevelRecord);
+        entity.put("subEntity", subEntityRecord);
+
+        GenericRecord topLevelRecordArray = new GenericData.Record(entity.getSchema().getField("topLevelRecordArray").schema().getElementType());
+        topLevelRecordArray.put("name", "third");
+        entity.put("topLevelRecordArray", singletonList(topLevelRecordArray));
+
+        return entity;
+    }
+
+    @Test
+    void testAvroSchemaProcessorWithSubEntityArray() throws IOException {
+        List<FieldValueMapping> fieldValueMappings = asList(
+                new FieldValueMapping("subEntity.anotherLevel.subEntityRecordArray[2].name", "string", 0, "second"),
+                new FieldValueMapping("topLevelRecordArray[1].name", "string", 0, "third")
+        );
+
+        File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+        GenericRecord entity = setUpEntityForAvroTestWithSubEntityArray(parsedSchema);
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+        assertThat(message.getGenericRecord()).isNotNull();
+        assertThat(message.getGenericRecord()).isEqualTo(entity);
     }
 
     private GenericRecord setUpEntityForEmbeddedAvroTest(ParsedSchema parsedSchema) {
@@ -79,6 +114,7 @@ class AvroSchemaProcessorTest {
         avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
         EnrichedRecord message = avroSchemaProcessor.next();
         GenericRecord entity = setUpEntityForEmbeddedAvroTest(parsedSchema);
+
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
         assertThat(message.getGenericRecord()).isEqualTo(entity);

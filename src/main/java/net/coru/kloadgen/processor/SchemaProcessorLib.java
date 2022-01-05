@@ -124,10 +124,14 @@ public abstract class SchemaProcessorLib {
     }
 
     static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
+        return getFullMethodName(fieldValueMapping, fieldName).replaceAll("\\[[0-9]*:?]", "");
+    }
+
+    static String getFullMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
         String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
         int endOfField = pathToClean.contains(".") ?
                 pathToClean.indexOf(".") : pathToClean.contains("[") ? pathToClean.indexOf("[") : pathToClean.length();
-        return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*:?]", "");
+        return pathToClean.substring(0, endOfField);
     }
 
     static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
