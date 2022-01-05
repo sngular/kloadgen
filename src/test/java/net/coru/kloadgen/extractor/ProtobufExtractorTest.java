@@ -3,6 +3,7 @@ package net.coru.kloadgen.extractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
+import net.sf.saxon.trans.SymbolicName;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -66,6 +67,24 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("Person.phoneTypes", "enum", 0, "[MOBILE, HOME, WORK]"),
                         new FieldValueMapping("Person.phoneTypesArray[]", "enum-array", 0, "[MOBILE, HOME, WORK]"),
                         new FieldValueMapping("Person.phoneTypesMap[:]", "enum-map", 0, "[MOBILE, HOME, WORK]")
+                );
+    }
+
+    @Test
+    void testOneOfsType() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/oneOfTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        assertThat(fieldValueMappingList)
+                .hasSize(4)
+                .contains(
+                        new FieldValueMapping("Address.type.street", "string", 0, ""),
+                        new FieldValueMapping("Address.type.number", "int", 0, ""),
+                        new FieldValueMapping("Address.type.test", "string", 0, "")
+                )
+                .containsAnyOf(
+                        new FieldValueMapping("Address.optionString", "string", 0, ""),
+                        new FieldValueMapping("Address.optionLong", "long", 0, ""),
+                        new FieldValueMapping("Address.optionInt", "int", 0, "")
                 );
     }
 

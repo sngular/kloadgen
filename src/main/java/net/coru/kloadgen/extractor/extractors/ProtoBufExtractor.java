@@ -2,14 +2,12 @@ package net.coru.kloadgen.extractor.extractors;
 
 
 import com.squareup.wire.schema.Field;
-import com.squareup.wire.schema.internal.parser.EnumElement;
-import com.squareup.wire.schema.internal.parser.FieldElement;
-import com.squareup.wire.schema.internal.parser.MessageElement;
-import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import com.squareup.wire.schema.internal.parser.TypeElement;
+import com.squareup.wire.schema.OneOf;
+import com.squareup.wire.schema.internal.parser.*;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.sf.saxon.trans.SymbolicName;
+import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -41,6 +39,9 @@ public class ProtoBufExtractor {
         HashMap<String, TypeElement> nestedTypes = new HashMap<>();
         fillNestedTypes(field, nestedTypes);
         if (field instanceof MessageElement) {
+            if(!((MessageElement) field).getOneOfs().isEmpty()) {
+                extractOneOfs((MessageElement) field, completeFieldList, nestedTypes);
+            }
             ((MessageElement) field).getFields()
                     .forEach(
                             subfield -> {
@@ -72,6 +73,25 @@ public class ProtoBufExtractor {
             extractEnums((EnumElement) field, completeFieldList);
         } else {
             throw new KLoadGenException("Something Odd Just Happened: Unsupported type of value");
+        }
+    }
+
+    private void extractOneOfs(MessageElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes) {
+        List<OneOfElement> oneOfs = new ArrayList<>(field.getOneOfs());
+        for(OneOfElement oneOfElement: oneOfs) {
+            if(!oneOfElement.getFields().isEmpty()) {
+                FieldElement subField = oneOfElement.getFields().get(RandomUtils.nextInt(0, oneOfElement.getFields().size()));
+                if(protobufTypes.containsKey(subField.getType())) {
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subField.getName(), protobufTypes.get(subField.getType()), 0, ""));
+                }else if(nestedTypes.containsKey(subField.getType())) {
+                    MessageElement clonedField = new MessageElement(field.getLocation(), field.getName(), field.getDocumentation(),
+                            field.getNestedTypes(), field.getOptions(), field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(), field.getExtensions(), field.getGroups());
+                    processField(clonedField, completeFieldList, Collections.emptyList());
+                }else{
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subField.getName(), subField.getType(), 0, ""));
+                }
+
+            }
         }
     }
 

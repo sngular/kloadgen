@@ -47,7 +47,6 @@ public class ProtobufSchemaProcessorTest {
         ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
         protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
         EnrichedRecord message = protobufSchemaProcessor.next();
-        System.out.println(message);
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
     }
@@ -68,4 +67,5 @@ public class ProtobufSchemaProcessorTest {
         assertThat(message.getGenericRecord()).isNotNull();
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.phoneTypes", "tutorial.Person.phoneTypesArray", "tutorial.Person.phoneTypesMap");
     }
+
 }
