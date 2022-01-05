@@ -7,7 +7,6 @@
 package net.coru.kloadgen.processor;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
@@ -73,7 +72,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             while (!fieldExpMappingsQueue.isEmpty()) {
                 String cleanPath = cleanUpPath(fieldValueMapping, "");
                 String fieldName = getCleanMethodName(fieldValueMapping, "");
-                String fullFieldName = getFullMethodName(fieldValueMapping, fieldName);
+                String fullFieldName = getFullMethodName(fieldValueMapping, "");
                 if (cleanPath.contains("][")) {
                     if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, entity, fieldName);
@@ -86,7 +85,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     } else {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
-                } else if (fullFieldName.endsWith("[")) {
+                } else if (fullFieldName.endsWith("]")) {
                     if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, entity, fieldName);
                     } else if (checkIfArray(fieldValueMapping.getFieldType())) {
@@ -108,7 +107,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                                     fieldValueMapping.getFieldType(),
                                     fieldValueMapping.getValueLength(),
                                     fieldValueMapping.getFieldValuesList(),
-                                    extractConstrains(schema.getField(fieldValueMapping.getFieldName()))
+                                    extractConstraints(schema.getField(fieldValueMapping.getFieldName()))
                             )
                     );
                     fieldExpMappingsQueue.remove();
@@ -119,7 +118,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return new EnrichedRecord(metadata, entity);
     }
 
-    private Map<ConstraintTypeEnum, String> extractConstrains(Schema.Field field) {
+    private Map<ConstraintTypeEnum, String> extractConstraints(Schema.Field field) {
         Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
 
         if (Objects.nonNull(field.schema().getObjectProp("precision")))
@@ -232,7 +231,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return realField;
     }
 
-    private GenericRecord createObject(final Schema subSchema, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    private GenericRecord createObject(final Schema subSchema, final String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
         Schema innerSchema = subSchema;
         if (subSchema.getType().equals(MAP)) {
             innerSchema = subSchema.getValueType();
@@ -243,59 +242,53 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         if (null == subEntity) {
             throw new KLoadGenException("Something Odd just happened");
         } else {
-            innerSchema = subEntity.getSchema();
+            subEntity.getSchema();
         }
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
         while (!fieldExpMappingsQueue.isEmpty()
-                && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
-                || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
-                || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
-                || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
-            String cleanPath = cleanUpPath(fieldValueMapping, fieldName);
-            String fullFieldName = getFullMethodName(fieldValueMapping, fieldName);
+                && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + rootFieldName + "$")
+                || fieldValueMapping.getFieldName().matches(rootFieldName + "\\..*")
+                || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\[.*")
+                || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\..*"))) {
+            String cleanPath = cleanUpPath(fieldValueMapping, rootFieldName);
+            String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, rootFieldName);
+            String fullFieldName = getFullMethodName(fieldValueMapping, rootFieldName);
             if (cleanPath.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
                 if (checkIfMapArray(fieldValueMapping.getFieldType())) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
-                    String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    String mapFieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, rootFieldName);
+                    processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
                 } else if (checkIfIsRecordMapArray(cleanPath)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfIsRecordArrayMap(cleanPath)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 }
             } else if (fullFieldName.endsWith("]")) {
                 if (checkIfMap(fieldValueMapping.getFieldType())) {
-                    String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    String mapFieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, rootFieldName);
+                    processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
                 } else if (checkIfArray(fieldValueMapping.getFieldType())) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfRecordMap(cleanPath)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfRecordArray(cleanPath)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else {
                     throw new KLoadGenException("Wrong configuration Map - Array");
                 }
             } else if (cleanPath.contains(".")) {
-                String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                 subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
                         fieldNameSubEntity,
                         fieldExpMappingsQueue));
             } else {
                 fieldExpMappingsQueue.poll();
-                subEntity.put(cleanPath, avroGeneratorTool.generateObject(
-                                subEntity.getSchema().getField(cleanPath),
+                subEntity.put(fieldNameSubEntity, avroGeneratorTool.generateObject(
+                                subEntity.getSchema().getField(fieldNameSubEntity),
                                 fieldValueMapping.getFieldType(),
                                 fieldValueMapping.getValueLength(),
                                 fieldValueMapping.getFieldValuesList(),
-                                extractConstrains(subEntity.getSchema().getField(cleanPath))
+                                extractConstraints(subEntity.getSchema().getField(fieldNameSubEntity))
                         )
                 );
             }

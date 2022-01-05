@@ -46,6 +46,40 @@ class AvroSchemaProcessorTest {
         JMeterUtils.setLocale(Locale.ENGLISH);
     }
 
+    private GenericRecord setUpEntityForAvroTestWithSubEntitySimpleArray(ParsedSchema parsedSchema) {
+        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+        Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
+        GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
+        Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
+        GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
+        anotherLevelRecord.put("subEntityIntArray", asList(1, 1));
+        subEntityRecord.put("anotherLevel", anotherLevelRecord);
+
+        entity.put("subEntity", subEntityRecord);
+        entity.put("topLevelIntArray", asList(2, 2, 2));
+
+        return entity;
+    }
+
+    @Test
+    void testAvroSchemaProcessorWithSubEntitySimpleArray() throws IOException {
+        List<FieldValueMapping> fieldValueMappings = asList(
+                new FieldValueMapping("subEntity.anotherLevel.subEntityIntArray[2]", "int-array", 0, "[1]"),
+                new FieldValueMapping("topLevelIntArray[3]", "int-array", 0, "[2]")
+        );
+
+        File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+        GenericRecord entity = setUpEntityForAvroTestWithSubEntitySimpleArray(parsedSchema);
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+        assertThat(message.getGenericRecord()).isNotNull();
+        assertThat(message.getGenericRecord()).isEqualTo(entity);
+    }
+
     private GenericRecord setUpEntityForAvroTestWithSubEntityArray(ParsedSchema parsedSchema) {
         GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
         Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();

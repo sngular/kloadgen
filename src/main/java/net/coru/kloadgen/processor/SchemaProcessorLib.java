@@ -129,8 +129,7 @@ public abstract class SchemaProcessorLib {
 
     static String getFullMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
         String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
-        int endOfField = pathToClean.contains(".") ?
-                pathToClean.indexOf(".") : pathToClean.contains("[") ? pathToClean.indexOf("[") : pathToClean.length();
+        int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
         return pathToClean.substring(0, endOfField);
     }
 
