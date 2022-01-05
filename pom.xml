@@ -143,6 +143,11 @@
       <artifactId>reflections</artifactId>
       <version>0.9.12</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.everit-org.json-schema</groupId>
+      <artifactId>org.everit.json.schema</artifactId>
+      <version>1.14.0</version>
+    </dependency>
     <!-- Options -->
     <dependency>
       <groupId>com.github.charithe</groupId>
