@@ -9,7 +9,6 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.testutil.FileHelper;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -66,6 +65,72 @@ public class ProtobufSchemaProcessorTest {
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.phoneTypes", "tutorial.Person.phoneTypesArray", "tutorial.Person.phoneTypesMap");
+    }
+    @Test
+    void testProtoBufEasyTestProcessor() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+        EnrichedRecord message = protobufSchemaProcessor.next();
+        DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+        List<String> assertKeys = new ArrayList<>();
+        List<Object> assertValues = new ArrayList<>();
+        Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+        map.forEach((key, value) ->
+                {
+                    assertKeys.add(key.getFullName());
+                    assertValues.add(value);
+                }
+        );
+        assertThat(message).isNotNull()
+                .isInstanceOf(EnrichedRecord.class)
+                .extracting(EnrichedRecord::getGenericRecord)
+                .isNotNull();
+        assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Address.street", "tutorial.Address.number", "tutorial.Address.zipcode");
+        assertThat(assertValues).hasSize(3);
+        assertThat(assertValues.get(0)).isInstanceOf(String.class);
+        List<Object> integerList = (List<Object>) assertValues.get(1);
+        assertThat(integerList.get(0)).isInstanceOf(Integer.class);
+        assertThat(assertValues.get(2)).isInstanceOf(Long.class);
+
+    }
+
+    @Test
+    void testProtoBufMapTestProcessor() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = asList(
+                new FieldValueMapping("Person.name[:]", "string-map", 0, "Pablo"),
+                new FieldValueMapping("Person.addresses[:].street", "string", 0, "Sor Joaquina"),
+                new FieldValueMapping("Person.addresses[:].number", "int", 0, "2"),
+                new FieldValueMapping("Person.addresses[:].zipcode", "int", 0, "15011"),
+                new FieldValueMapping("Person.addressesNoDot[:].street", "string", 0, "Sor Joaquina"),
+                new FieldValueMapping("Person.addressesNoDot[:].number", "int", 0, "6"),
+                new FieldValueMapping("Person.addressesNoDot[:].zipcode", "int", 0, "15011"));
+        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+        EnrichedRecord message = protobufSchemaProcessor.next();
+        DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+        List<String> assertKeys = new ArrayList<>();
+        List<Object> assertValues = new ArrayList<>();
+        Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+        map.forEach((key, value) ->
+                {
+                    assertKeys.add(key.getFullName());
+                    assertValues.add(value);
+                }
+        );
+
+        assertThat(message).isNotNull()
+                .isInstanceOf(EnrichedRecord.class)
+                .extracting(EnrichedRecord::getGenericRecord)
+                .isNotNull();
+        assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.name","tutorial.Person.addresses","tutorial.Person.addressesNoDot");
+        assertThat(assertValues).hasSize(3);
+        List<Object> objectList = (List<Object>) assertValues.get(0);
+        DynamicMessage dynamicMessage = (DynamicMessage) objectList.get(0);
+        String personName = (String) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
+        assertThat(personName).isEqualTo("Pablo");
     }
     
 }
