@@ -26,9 +26,8 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-
-import static freemarker.template.utility.Collections12.singletonList;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AvroSchemaProcessorTest {
@@ -190,7 +189,7 @@ class AvroSchemaProcessorTest {
 
     @Test
     void textAvroSchemaProcessorArrayMap() throws KLoadGenException {
-        List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
+        List<FieldValueMapping> fieldValueMappingList = singletonList(
                 new FieldValueMapping("values[2][2:]", "string-map-array", 2, "n:1, t:2"));
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
@@ -270,7 +269,7 @@ class AvroSchemaProcessorTest {
 
     @Test
     void textAvroSchemaProcessorMap() throws KLoadGenException {
-        List<FieldValueMapping> fieldValueMappingList = Collections.singletonList(
+        List<FieldValueMapping> fieldValueMappingList = singletonList(
                 new FieldValueMapping("values[2:]", "string-map", 2, "n:1, t:2"));
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
