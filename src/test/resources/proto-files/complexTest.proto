@@ -16,9 +16,9 @@ message Test {
     optional int32 age = 3;
     repeated .tutorial.Address address = 4;
     map<string, Test.Pet> pets = 5;
-    map<string, google.protobuf.DescriptorProto> descriptors = 6;
-    repeated google.protobuf.Timestamp dates = 7;
-    optional google.protobuf.compiler.CodeGeneratorResponse response = 8;
+    map<string, string> descriptors = 6;
+    repeated string dates = 7;
+    optional string response = 8;
     map<string, Present> presents = 9;
 
     message Present {

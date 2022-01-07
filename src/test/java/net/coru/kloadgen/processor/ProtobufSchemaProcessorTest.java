@@ -67,14 +67,5 @@ public class ProtobufSchemaProcessorTest {
         assertThat(message.getGenericRecord()).isNotNull();
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.phoneTypes", "tutorial.Person.phoneTypesArray", "tutorial.Person.phoneTypesMap");
     }
-
-    @Test
-    void testExternalImportsProcessor() throws IOException {
-        File testFile = fileHelper.getFile("/proto-files/externalTypesTest.proto");
-        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
-        EnrichedRecord message = protobufSchemaProcessor.next();
-        System.out.println(message);
-    }
+    
 }
