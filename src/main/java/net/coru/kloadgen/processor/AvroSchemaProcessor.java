@@ -73,7 +73,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                 String cleanPath = cleanUpPath(fieldValueMapping, "");
                 String fieldName = getCleanMethodName(fieldValueMapping, "");
                 String fullFieldName = getFullMethodName(fieldValueMapping, "");
-                if (cleanPath.contains("][")) {
+                if (fullFieldName.contains("][")) {
                     if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, entity, fieldName);
                     } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
@@ -253,7 +253,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             String cleanPath = cleanUpPath(fieldValueMapping, rootFieldName);
             String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, rootFieldName);
             String fullFieldName = getFullMethodName(fieldValueMapping, rootFieldName);
-            if (cleanPath.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
+            if (fullFieldName.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
                 if (checkIfMapArray(fieldValueMapping.getFieldType())) {
                     processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
                 } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
