@@ -37,18 +37,34 @@ public class ProtobufSchemaProcessorTest {
         jmcx.setVariables(new JMeterVariables());
         JMeterUtils.setLocale(Locale.ENGLISH);
     }
-
+    
     @Test
-    void textProtoBufSchemaProcessor() throws KLoadGenException, IOException {
+    void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException {
         File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
-        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-        fieldValueMappingList.forEach(field -> System.out.println(field +"\r\n"));
+        List<FieldValueMapping> fieldValueMappingList = asList(
+                new FieldValueMapping("Person.phones[1:].addressesPhone[1:].id[1]", "string-array", 0, "Pablo"));
         ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
         protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
         EnrichedRecord message = protobufSchemaProcessor.next();
+        DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+        Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+        List<String> assertKeys = new ArrayList<>();
+        List<Object> assertValues = new ArrayList<>();
+        map.forEach((key, value) ->
+                {
+                    assertKeys.add(key.getFullName());
+                    assertValues.add(value);
+                }
+        );
+        String idField = getIdFieldForEmbeddedTypeTest(assertValues);
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
+        assertThat(assertKeys).hasSize(1).containsExactlyInAnyOrder( "tutorial.Person.phones");
+        assertThat(idField).isEqualTo("[Pablo]");
     }
+
+
+
 
     @Test
     void testProtoBufEnumSchemaProcessor() throws IOException {
@@ -61,9 +77,29 @@ public class ProtobufSchemaProcessorTest {
         DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
         Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
         List<String> assertKeys = new ArrayList<>();
-        map.forEach((key, value) -> assertKeys.add(key.getFullName()));
+        List<Object> assertValues = new ArrayList<>();
+        map.forEach((key, value) ->
+                {
+                    assertKeys.add(key.getFullName());
+                    assertValues.add(value);
+                }
+        );
+        String firstValue = assertValues.get(0).toString();
+        List<Object> secondValue = (List<Object>) assertValues.get(1);
+        List<Object> thirdValueMap = (List<Object>) assertValues.get(2);
+        DynamicMessage dynamicMessage = (DynamicMessage) thirdValueMap.get(0);
+        Object thirdValue = dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
+        assertThat(firstValue)
+                .isNotNull()
+                .isIn("HOME", "WORK", "MOBILE");
+        assertThat(secondValue.get(0).toString())
+                .isNotNull()
+                .isIn("HOME", "WORK", "MOBILE");
+        assertThat(thirdValue.toString())
+                .isNotNull()
+                .isIn("HOME", "WORK", "MOBILE");
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.phoneTypes", "tutorial.Person.phoneTypesArray", "tutorial.Person.phoneTypesMap");
     }
     @Test
@@ -83,6 +119,7 @@ public class ProtobufSchemaProcessorTest {
                     assertValues.add(value);
                 }
         );
+        List<Object> integerList = (List<Object>) assertValues.get(1);
         assertThat(message).isNotNull()
                 .isInstanceOf(EnrichedRecord.class)
                 .extracting(EnrichedRecord::getGenericRecord)
@@ -90,7 +127,6 @@ public class ProtobufSchemaProcessorTest {
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Address.street", "tutorial.Address.number", "tutorial.Address.zipcode");
         assertThat(assertValues).hasSize(3);
         assertThat(assertValues.get(0)).isInstanceOf(String.class);
-        List<Object> integerList = (List<Object>) assertValues.get(1);
         assertThat(integerList.get(0)).isInstanceOf(Integer.class);
         assertThat(assertValues.get(2)).isInstanceOf(Long.class);
 
@@ -120,6 +156,12 @@ public class ProtobufSchemaProcessorTest {
                     assertValues.add(value);
                 }
         );
+        String personName = getPersonNameForMapTestProcessor(assertValues);
+        List<Object> objectList = (List<Object>) assertValues.get(1);
+        DynamicMessage dynamicMessage = (DynamicMessage) objectList.get(0);
+        Object street = getSubFieldForMapTestProcessor(dynamicMessage, "street");
+        Object number = getSubFieldForMapTestProcessor(dynamicMessage, "number");
+        Object zipcode = getSubFieldForMapTestProcessor(dynamicMessage, "zipcode");
 
         assertThat(message).isNotNull()
                 .isInstanceOf(EnrichedRecord.class)
@@ -127,10 +169,33 @@ public class ProtobufSchemaProcessorTest {
                 .isNotNull();
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.name","tutorial.Person.addresses","tutorial.Person.addressesNoDot");
         assertThat(assertValues).hasSize(3);
+        assertThat(personName).isEqualTo("Pablo");
+        assertThat(street).isInstanceOf(String.class).isEqualTo("Sor Joaquina");
+        assertThat(number).isInstanceOf(Integer.class).isEqualTo(2);
+        assertThat(zipcode).isInstanceOf(Integer.class).isEqualTo(15011);
+    }
+
+
+    private Object getSubFieldForMapTestProcessor(DynamicMessage dynamicMessage, String field) {
+        DynamicMessage subDynamicMessage = (DynamicMessage) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
+        return subDynamicMessage.getField(subDynamicMessage.getDescriptorForType().findFieldByName(field));
+    }
+
+    private String getPersonNameForMapTestProcessor(List<Object> assertValues) {
         List<Object> objectList = (List<Object>) assertValues.get(0);
         DynamicMessage dynamicMessage = (DynamicMessage) objectList.get(0);
-        String personName = (String) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
-        assertThat(personName).isEqualTo("Pablo");
+        return (String) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
     }
-    
+
+    private String getIdFieldForEmbeddedTypeTest(List<Object> assertValues) {
+        List<Object> objectList = (List<Object>) assertValues.get(0);
+        DynamicMessage dynamicMessage = (DynamicMessage) objectList.get(0);
+        DynamicMessage firstMap = (DynamicMessage) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
+        List<Object> secondMap = (List<Object>) firstMap.getField(firstMap.getDescriptorForType().findFieldByName("addressesPhone"));
+        DynamicMessage secondMapAsDynamicField = (DynamicMessage) secondMap.get(0);
+        Object thirdArray = secondMapAsDynamicField.getField(secondMapAsDynamicField.getDescriptorForType().findFieldByName("value"));
+        String idField= ((DynamicMessage) thirdArray).getField(((DynamicMessage) thirdArray).getDescriptorForType().findFieldByName("id")).toString();
+        return idField;
+    }
+
 }
