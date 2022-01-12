@@ -9,24 +9,19 @@ package net.coru.kloadgen.randomtool.random;
 import com.github.curiousoddman.rgxgen.RgxGen;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.util.*;
 
 
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-import org.apache.avro.generic.GenericData;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -35,6 +30,14 @@ import org.apache.commons.lang3.StringUtils;
 public class RandomObject {
 
   private static final Map<String, Object> context = new HashMap<>();
+
+  private static final DateTimeFormatter dateTimeFormatter = new DateTimeFormatterBuilder()
+          .appendPattern("uuuu-MM-dd'T'HH:mm:ss['Z']")
+          .optionalStart()
+          .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
+          .optionalEnd()
+          .parseStrict()
+          .toFormatter();
 
   public boolean isTypeValid(String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
@@ -341,7 +344,25 @@ public class RandomObject {
     return getRandomLocalTime(fieldValueList);
   }
 
-  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList){
+  private static boolean isValidDate(String dateStr) {
+    try {
+      LocalDateTime.parse(dateStr, RandomObject.dateTimeFormatter);
+    } catch (DateTimeParseException e) {
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean isValidLongDate(String dateStr) {
+    try {
+      Long.parseLong(dateStr);
+    } catch (NumberFormatException e) {
+      return false;
+    }
+    return true;
+  }
+
+  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList) {
     long minDay = LocalDateTime.of(1900,1,1,0,0).toEpochSecond(ZoneOffset.UTC);
     long maxDay = LocalDateTime.of(2100,1,1,0,0).toEpochSecond(ZoneOffset.UTC);
     long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
@@ -349,7 +370,16 @@ public class RandomObject {
     if (fieldValueList.isEmpty()){
       return LocalDateTime.ofEpochSecond(randomSeconds,RandomUtils.nextInt(0, 1_000_000_000 - 1),ZoneOffset.UTC);
     } else {
-      return LocalDateTime.parse(fieldValueList.get(RandomUtils.nextInt(0,fieldValueList.size())).trim());
+      String str = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size()));
+      if(isValidDate(str)) {
+        return LocalDateTime.parse(str, dateTimeFormatter);
+      }else if(isValidLongDate(str)){
+        long time = Long.parseLong(str);
+        return LocalDateTime.ofEpochSecond(time, RandomUtils.nextInt(0, 1_000_000_000 - 1),ZoneOffset.UTC);
+      }else{
+        throw new KLoadGenException("Enter a date with a valid format (uuuu-MM-dd'T'HH:mm:ss['Z']" +
+                " or long date), for example: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+      }
     }
   }
 

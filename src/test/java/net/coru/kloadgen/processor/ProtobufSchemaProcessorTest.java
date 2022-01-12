@@ -67,5 +67,5 @@ public class ProtobufSchemaProcessorTest {
         assertThat(message.getGenericRecord()).isNotNull();
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.phoneTypes", "tutorial.Person.phoneTypesArray", "tutorial.Person.phoneTypesMap");
     }
-    
+
 }
