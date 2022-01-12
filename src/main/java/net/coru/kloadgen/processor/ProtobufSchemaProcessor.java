@@ -217,7 +217,6 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                 fieldName,
                 mapSize,
                 fieldExpMappingsQueue));
-        fieldExpMappingsQueue.remove();
         return getSafeGetElement(fieldExpMappingsQueue);
     }
 
@@ -360,7 +359,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             builder.setField(valueFieldDescriptor, generatorTool.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
         }else{
             builder.setField(valueFieldDescriptor,
-                    createObject(valueFieldDescriptor.getMessageType(), fieldName, fieldExpMappingsQueue.clone()));
+                    createObject(valueFieldDescriptor.getMessageType(), fieldName, fieldExpMappingsQueue));
         }
 
         return builder.build();
