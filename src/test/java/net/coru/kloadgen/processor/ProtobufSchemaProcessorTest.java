@@ -15,7 +15,6 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -62,9 +61,6 @@ public class ProtobufSchemaProcessorTest {
         assertThat(assertKeys).hasSize(1).containsExactlyInAnyOrder( "tutorial.Person.phones");
         assertThat(idField).isEqualTo("[Pablo]");
     }
-
-
-
 
     @Test
     void testProtoBufEnumSchemaProcessor() throws IOException {
@@ -175,6 +171,46 @@ public class ProtobufSchemaProcessorTest {
         assertThat(zipcode).isInstanceOf(Integer.class).isEqualTo(15011);
     }
 
+    @Test
+    void testProtoBufComplexTestProcessor() throws IOException {
+        File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = asList(
+                new FieldValueMapping("Test.phone_types[].phone", "long", 0, ""),
+                new FieldValueMapping("Test.phone_types[].principal", "boolean", 0, ""),
+                new FieldValueMapping("Test.name", "string", 0, ""),
+                new FieldValueMapping("Test.age", "int", 0, ""),
+                new FieldValueMapping("Test.address[].street[]", "string-array", 0, ""),
+                new FieldValueMapping("Test.address[].number_street", "int", 0, ""),
+                new FieldValueMapping("Test.pets[:].pet_name", "string", 0, ""),
+                new FieldValueMapping("Test.pets[:].pet_age", "int", 0, ""),
+                new FieldValueMapping("Test.pets[:].owner", "string", 0, ""),
+                new FieldValueMapping("Test.descriptors[:]", "string-map", 0, ""),
+                new FieldValueMapping("Test.dates[]", "string-array", 0, ""),
+                new FieldValueMapping("Test.response", "string", 0, ""),
+                new FieldValueMapping("Test.presents[:].options[]", "string-array", 0, ""));
+        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+        EnrichedRecord message = protobufSchemaProcessor.next();
+        DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+        List<String> assertKeys = new ArrayList<>();
+        List<Object> assertValues = new ArrayList<>();
+        Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+        map.forEach((key, value) ->
+                {
+                    assertKeys.add(key.getFullName());
+                    assertValues.add(value);
+                }
+        );
+
+        assertThat(message).isNotNull()
+                .isInstanceOf(EnrichedRecord.class)
+                .extracting(EnrichedRecord::getGenericRecord)
+                .isNotNull();
+        assertThat(assertKeys).hasSize(8).containsExactlyInAnyOrder("tutorial.Test.phone_types","tutorial.Test.age","tutorial.Test.address","tutorial.Test.pets", "tutorial.Test.descriptors", "tutorial.Test.dates","tutorial.Test.response","tutorial.Test.presents");
+        assertThat(assertValues).hasSize(8).isNotNull();
+        assertThat(assertValues.get(1)).isInstanceOf(Integer.class);
+        assertThat(assertValues.get(6)).isInstanceOf(String.class);
+    }
 
     private Object getSubFieldForMapTestProcessor(DynamicMessage dynamicMessage, String field) {
         DynamicMessage subDynamicMessage = (DynamicMessage) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));

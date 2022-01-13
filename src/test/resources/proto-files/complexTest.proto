@@ -14,7 +14,7 @@ message Test {
     repeated PhoneTypes phone_types = 1;
     optional string name = 2;
     optional int32 age = 3;
-    repeated .tutorial.Address address = 4;
+    repeated .tutorial.Test.Address address = 4;
     map<string, Test.Pet> pets = 5;
     map<string, string> descriptors = 6;
     repeated string dates = 7;
