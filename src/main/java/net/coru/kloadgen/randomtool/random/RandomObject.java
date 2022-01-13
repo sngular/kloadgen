@@ -48,11 +48,8 @@ public class RandomObject {
   }
 
   public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    return ValueUtils.castValue(
-            context.compute(fieldName, (fieldNameMap,
-                                        seqObject) -> seqObject == null ? fieldValueList.get(0)
-                    : seqObject.toString().equals(fieldValueList.get(fieldValueList.size()-1)) ? fieldValueList.get(0) : fieldValueList.get(fieldValueList.indexOf(seqObject)+1)),
-            fieldType);
+    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer)seqObject) + 1) % fieldValueList.size());
+    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
   }
 
 
