@@ -56,13 +56,6 @@ public class RandomObject {
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
-    if ("seq".equalsIgnoreCase(fieldType)) {
-      if (!fieldValueList.isEmpty() && '{' == fieldValueList.get(0).charAt(0)) {
-        fieldValueList.set(0, fieldValueList.get(0).substring(1));
-        return generateSequenceForFieldValueList(fieldValueList.get(0), fieldType, fieldValueList, context);
-      }
-      value = generateSeq(fieldValueList.get(0), fieldType, fieldValueList, context);
-    }else {
         switch (fieldType) {
           case ValidTypeConstants.STRING:
             value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
@@ -157,7 +150,7 @@ public class RandomObject {
             value = fieldType;
             break;
         }
-      }
+
     return value;
   }
 
