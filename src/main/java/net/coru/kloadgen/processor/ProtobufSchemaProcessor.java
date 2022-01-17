@@ -1,10 +1,13 @@
 package net.coru.kloadgen.processor;
 
+import com.github.os72.protobuf.dynamic.DynamicSchema;
+import com.github.os72.protobuf.dynamic.MessageDefinition;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
-import com.google.protobuf.EnumValue;
 import com.google.protobuf.Message;
+import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
+import com.squareup.wire.schema.internal.parser.TypeElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class ProtobufSchemaProcessor extends SchemaProcessorLib {
@@ -54,7 +58,8 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
     public EnrichedRecord next() {
         ProtobufSchema protobufSchema = getProtobufSchema();
-        DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(protobufSchema.toDescriptor());
+        DynamicMessage.Builder messageBuilder = null;
+        messageBuilder = DynamicMessage.newBuilder(protobufSchema.toDescriptor());
         DynamicMessage message;
         if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
             ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
@@ -212,7 +217,6 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                 fieldName,
                 mapSize,
                 fieldExpMappingsQueue));
-        fieldExpMappingsQueue.remove();
         return getSafeGetElement(fieldExpMappingsQueue);
     }
 
@@ -355,7 +359,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             builder.setField(valueFieldDescriptor, generatorTool.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
         }else{
             builder.setField(valueFieldDescriptor,
-                    createObject(valueFieldDescriptor.getMessageType(), fieldName, fieldExpMappingsQueue.clone()));
+                    createObject(valueFieldDescriptor.getMessageType(), fieldName, fieldExpMappingsQueue));
         }
 
         return builder.build();

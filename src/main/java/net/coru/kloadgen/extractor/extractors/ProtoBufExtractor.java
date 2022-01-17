@@ -58,9 +58,6 @@ public class ProtoBufExtractor {
                                         extractNestedTypes(field, completeFieldList, nestedTypes, subfield, isArray, imports);
                                     } else if (nestedTypes.containsKey(dotType)) {
                                         extractDotTypesWhenIsInNestedType(field, completeFieldList, nestedTypes, subfield, isArray, dotType, imports);
-                                    } else if (!imports.isEmpty() && isExternalType(imports, subfield.getType())) {
-                                        String externalType = getExternalType(imports, subfield.getType());
-                                        extractDotTypeWhenNotNestedType(field, completeFieldList, subfield, isArray, externalType);
                                     } else {
                                         extractDotTypeWhenNotNestedType(field, completeFieldList, subfield, isArray, dotType);
                                     }

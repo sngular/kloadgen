@@ -89,18 +89,6 @@ class ProtobufExtractorTest {
     }
 
     @Test
-    void testExternalTypesImports() throws IOException {
-        File testFile = fileHelper.getFile("/proto-files/externalTypesTest.proto");
-        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-        assertThat(fieldValueMappingList)
-                .hasSize(3)
-                .containsExactlyInAnyOrder(
-                        new FieldValueMapping("Test.time", ".google.protobuf.Timestamp", 0, ""),
-                        new FieldValueMapping("Test.imported_descriptor", ".google.protobuf.DescriptorProto", 0, ""),
-                        new FieldValueMapping("Test.normal_string", "string", 0, ""));
-    }
-
-    @Test
     void testComplexProto() throws IOException {
         File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUFF"));
@@ -117,8 +105,8 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("Test.pets[:].pet_age", "int", 0, ""),
                         new FieldValueMapping("Test.pets[:].owner", "string", 0, ""),
                         new FieldValueMapping("Test.descriptors[:]", "string-map", 0, ""),
-                        new FieldValueMapping("Test.dates[]", "google.protobuf.Timestamp-array", 0, ""),
-                        new FieldValueMapping("Test.response", "google.protobuf.compiler.CodeGeneratorResponse", 0, ""),
+                        new FieldValueMapping("Test.dates[]", "string-array", 0, ""),
+                        new FieldValueMapping("Test.response", "string", 0, ""),
                         new FieldValueMapping("Test.presents[:].options[]", "string-array", 0, "")
                 );
     }
