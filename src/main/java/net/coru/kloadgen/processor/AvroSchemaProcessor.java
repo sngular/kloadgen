@@ -271,9 +271,8 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             String fullFieldName = getFullMethodName(fieldValueMapping, rootFieldName);
 
             boolean isOptional = false;
-            //if (schema.getField(fieldValueMapping.getFieldName()).schema().getType() == UNION){
-            if (subSchema.getField(cleanPath).schema().getType() == UNION){
-                for (Schema type: subSchema.getField(cleanPath).schema().getTypes()){
+            if (subSchema.getField(fieldNameSubEntity).schema().getType() == UNION){
+                for (Schema type: subSchema.getField(fieldNameSubEntity).schema().getTypes()){
                     if (type.getType() == NULL){
                         isOptional = true;
                         break;

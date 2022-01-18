@@ -361,7 +361,7 @@ class AvroSchemaProcessorTest {
         assertThat(record.get("friends")).isNull();
         assertThat(record.get("favorite_cars")).isNotNull();
 
-        ArrayList<GenericRecord> result = (ArrayList) ((GenericRecord) message.getGenericRecord()).get("favorite_cars");
+        List<GenericRecord> result = (List) ((GenericRecord) message.getGenericRecord()).get("favorite_cars");
         for(GenericRecord f: result){
             assertThat(f.get("brand")).isNotNull();
             assertThat(f.get("power")).isNull();
