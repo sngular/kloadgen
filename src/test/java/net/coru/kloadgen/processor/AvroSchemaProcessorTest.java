@@ -1,12 +1,10 @@
 package net.coru.kloadgen.processor;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -15,7 +13,6 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.testutil.FileHelper;
-import net.sf.saxon.trans.SymbolicName;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -26,11 +23,8 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
-import org.apache.kafka.common.record.TimestampType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 
 import static java.util.Arrays.asList;
@@ -236,6 +230,42 @@ class AvroSchemaProcessorTest {
                 .hasSize(1);
         Map<String, String> result = (Map<String, String>) ((GenericRecord) message.getGenericRecord()).get("values");
         assertThat(result).hasSize(2).containsEntry("n", "1").containsEntry("t", "2");
+    }
+
+    @Test
+    void testNullOnOptionalFields() throws IOException {
+        File testFile = fileHelper.getFile("/avro-files/testNullOnOptionalFields.avsc");
+        List<FieldValueMapping> fieldValueMappingList =
+                extractor.flatPropertiesList(extractor.schemaTypesList(testFile, "AVRO"));
+
+        fieldValueMappingList.get(1).setFieldValuesList("null");
+        fieldValueMappingList.get(2).setFieldValuesList("null");
+        fieldValueMappingList.get(3).setFieldValuesList("null");
+        fieldValueMappingList.get(5).setFieldValuesList("null");
+
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(extractor.schemaTypesList(testFile,"AVRO"),
+                new SchemaMetadata(1,1,""), fieldValueMappingList);
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message)
+                .isNotNull()
+                .isInstanceOf(EnrichedRecord.class)
+                .extracting(EnrichedRecord::getGenericRecord)
+                .isNotNull();
+
+        GenericRecord record = (GenericRecord)message.getGenericRecord();
+        assertThat(record.get("name")).isNotNull();
+        assertThat(record.get("favorite_number")).isNull();
+        assertThat(record.get("favorite_color")).isNull();
+        assertThat(record.get("friends")).isNull();
+        assertThat(record.get("favorite_cars")).isNotNull();
+
+        ArrayList<GenericRecord> result = (ArrayList) ((GenericRecord) message.getGenericRecord()).get("favorite_cars");
+        for(GenericRecord f: result){
+            assertThat(f.get("brand")).isNotNull();
+            assertThat(f.get("power")).isNull();
+        }
     }
 
 }

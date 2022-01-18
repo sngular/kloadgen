@@ -1,0 +1,21 @@
+{"namespace": "example.avro",
+    "type": "record",
+    "name": "User",
+    "fields": [
+        {"name": "name", "type": "string"},
+        {"name": "favorite_number",  "type": ["null", "int"]},
+        {"name": "favorite_color", "type": ["null", "string"]},
+		{"name": "friends", "type": ["null", { "type": "array", "items": "string" }]},
+		{"name": "favorite_cars", "type": { "type": "array", "items": { "name": "records", "fields": [
+																									 {
+																										 "name": "brand",
+																										 "type": "string"
+																									 },
+																									 {
+																										 "name": "power",
+																										 "type": ["null", "int"]
+																									 }
+																								 ],
+																								 "type": "record"}}}
+    ]
+}
