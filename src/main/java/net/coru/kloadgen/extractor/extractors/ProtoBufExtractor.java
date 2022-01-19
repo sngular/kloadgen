@@ -2,19 +2,27 @@ package net.coru.kloadgen.extractor.extractors;
 
 
 import com.squareup.wire.schema.Field;
-import com.squareup.wire.schema.OneOf;
-import com.squareup.wire.schema.internal.parser.*;
+import com.squareup.wire.schema.internal.parser.EnumElement;
+import com.squareup.wire.schema.internal.parser.FieldElement;
+import com.squareup.wire.schema.internal.parser.MessageElement;
+import com.squareup.wire.schema.internal.parser.OneOfElement;
+import com.squareup.wire.schema.internal.parser.ProtoFileElement;
+import com.squareup.wire.schema.internal.parser.TypeElement;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.sf.saxon.trans.SymbolicName;
 import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static net.coru.kloadgen.util.ProtobufHelper.*;
+import static net.coru.kloadgen.util.ProtobufHelper.protobufTypes;
 
 
 public class ProtoBufExtractor {
@@ -35,7 +43,7 @@ public class ProtoBufExtractor {
     }
 
 
-    private void processField(TypeElement field, List<FieldValueMapping> completeFieldList, List<String> imports) {
+    public void processField(TypeElement field, List<FieldValueMapping> completeFieldList, List<String> imports) {
         HashMap<String, TypeElement> nestedTypes = new HashMap<>();
         fillNestedTypes(field, nestedTypes);
         if (field instanceof MessageElement) {

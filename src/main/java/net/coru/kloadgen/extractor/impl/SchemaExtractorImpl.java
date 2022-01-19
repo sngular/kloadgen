@@ -5,7 +5,6 @@
  */
 
 package net.coru.kloadgen.extractor.impl;
-
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
@@ -17,7 +16,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUT
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
-
+import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
@@ -82,14 +81,17 @@ public class SchemaExtractorImpl implements SchemaExtractor {
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
     SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
-
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
     if ("AVRO".equalsIgnoreCase(schema.schemaType())) {
       (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> avroExtractor.processField(field, attributeList));
     } else if ("JSON".equalsIgnoreCase(schema.schemaType())){
       attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
-    } else {
+    } else if ("PROTOBUF".equalsIgnoreCase(schema.schemaType())) {
+     ProtoFileElement protoFileElement = (((ProtobufSchema) schema).rawSchema());
+     protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports()));
+    }
+    else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schema.schemaType()));
     }
     return Pair.of(schema.schemaType(), attributeList);
@@ -118,7 +120,6 @@ public class SchemaExtractorImpl implements SchemaExtractor {
       return avroExtractor.processSchema(((AvroSchema)schema).rawSchema());
     } else if ("JSON".equalsIgnoreCase(schema.schemaType())) {
       return jsonExtractor.processSchema(((JsonSchema)schema).toJsonNode());
-
     } else if ("PROTOBUF".equalsIgnoreCase(schema.schemaType())) {
       return protoBufExtractor.processSchema(((ProtobufSchema) schema).rawSchema());
     }

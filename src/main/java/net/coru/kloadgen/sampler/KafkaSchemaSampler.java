@@ -28,10 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.TextFormat;
+import com.sun.source.doctree.SeeTree;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
@@ -39,6 +41,7 @@ import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import net.coru.kloadgen.serializer.AvroSerializer;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.serializer.ProtobufSerializer;
 import org.apache.avro.Conversions;
 import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;
@@ -55,6 +58,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 
 public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
+    private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
 
     private static final long serialVersionUID = 1L;
 
@@ -75,6 +79,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     private transient BaseLoadGenerator keyGenerator;
 
     private transient Properties props;
+
 
 
     private void configGenericData(){
@@ -177,11 +182,11 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     }
 
     private Boolean enrichedValueFlag() {
-        return AvroSerializer.class.getName().equals(props.get(VALUE_SERIALIZER_CLASS_CONFIG));
+        return SERIALIZER_SET.contains(props.get(VALUE_SERIALIZER_CLASS_CONFIG));
     }
 
     private Boolean enrichedKeyFlag() {
-        return AvroSerializer.class.getName().equals(props.get(KEY_SERIALIZER_CLASS_CONFIG));
+        return SERIALIZER_SET.contains(props.get(KEY_SERIALIZER_CLASS_CONFIG));
     }
 
     private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord, SampleResult sampleResult) {

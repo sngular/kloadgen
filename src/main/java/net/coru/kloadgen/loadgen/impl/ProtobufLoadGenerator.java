@@ -1,20 +1,17 @@
 package net.coru.kloadgen.loadgen.impl;
 
-import com.google.protobuf.Descriptors;
-import com.google.protobuf.TextFormat;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.ProtobufSchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import org.apache.avro.Schema;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +32,9 @@ public class ProtobufLoadGenerator implements BaseLoadGenerator {
     }
 
     @Override
-    public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
+    public void setUpGenerator(Map<String, String> originals, String protoSchemaName, List<FieldValueMapping> fieldExprMappings) {
         try {
-            this.protobufSchemaProcessor.processSchema(retrieveSchema(originals, avroSchemaName), metadata, fieldExprMappings);
+            this.protobufSchemaProcessor.processSchema(retrieveSchema(originals, protoSchemaName), metadata, fieldExprMappings);
         } catch (Exception exc){
             log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
             throw new KLoadGenException(exc);
@@ -47,8 +44,8 @@ public class ProtobufLoadGenerator implements BaseLoadGenerator {
     @Override
     public void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings) {
         try {
-            Schema.Parser parser = new Schema.Parser();
-            this.protobufSchemaProcessor.processSchema((ParsedSchema) parser.parse(schema), new SchemaMetadata(1, 1, schema), fieldExprMappings);
+            ProtobufSchema protobufSchema = new ProtobufSchema(schema);
+            this.protobufSchemaProcessor.processSchema(protobufSchema, new SchemaMetadata(1, 1, schema), fieldExprMappings);
         } catch (Exception exc){
             log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
             throw new KLoadGenException(exc);
