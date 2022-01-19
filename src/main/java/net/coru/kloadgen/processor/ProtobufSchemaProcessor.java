@@ -79,9 +79,9 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                         throw new KLoadGenException("Wrong configuration Map - Array");
                     }
                 } else if (typeFilter.startsWith("[")) {
-                    if (checkIfMap(typeFilter)) {
+                    if (checkIfMap(typeFilter, fieldValueMapping.getFieldType())) {
                         fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, typeName);
-                    } else if (checkIfArray(typeFilter)) {
+                    } else if (checkIfArray(typeFilter, fieldValueMapping.getFieldType())) {
                         String cleanFieldName = fieldName.substring(0, fieldName.indexOf("["));
                         fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, typeName, cleanFieldName);
                     } else if (checkIfRecordMap(typeFilter)) {
@@ -151,10 +151,10 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                     processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
                 }
             } else if (typeFilter.startsWith("[")) {
-                if (checkIfMap(typeFilter)) {
+                if (checkIfMap(typeFilter, fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
-                } else if (checkIfArray(typeFilter)) {
+                } else if (checkIfArray(typeFilter, fieldValueMapping.getFieldType())) {
                     String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
                     processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, fieldName, fieldNameSubEntity);
                 } else if (checkIfRecordMap(typeFilter)) {

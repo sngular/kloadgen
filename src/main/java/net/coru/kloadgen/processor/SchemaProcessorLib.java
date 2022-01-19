@@ -48,13 +48,13 @@ public abstract class SchemaProcessorLib {
         return !StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]")).contains("][");
     }
 
-    static boolean checkIfMap(String typeFilter) {
+    static boolean checkIfMap(String typeFilter, String fieldType) {
 
-        return typeFilter.matches("\\[\\d?:]");
+        return typeFilter.matches("\\[\\d?:]") || fieldType.endsWith("map-map");
     }
 
-    static boolean checkIfArray(String typeFilter) {
-        return typeFilter.matches("\\[\\d?]");
+    static boolean checkIfArray(String typeFilter, String fieldType) {
+        return typeFilter.matches("\\[\\d?]" ) || fieldType.endsWith("array-array")  ;
     }
 
     static boolean checkIfArrayMap(String type) {
