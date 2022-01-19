@@ -33,8 +33,3 @@ message Person {
     }
 
 }
-
-message Pet {
-  repeated string name = 1;
-}
-

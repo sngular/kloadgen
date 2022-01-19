@@ -176,7 +176,7 @@ class ProtobufExtractorTest {
         File testFile = fileHelper.getFile("/proto-files/completeProto.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         assertThat(fieldValueMappingList)
-                .hasSize(12)
+                .hasSize(11)
                 .containsExactlyInAnyOrder(
                         new FieldValueMapping("Person.name", "string", 0, ""),
                         new FieldValueMapping("Person.id", "int", 0, ""),
@@ -188,8 +188,7 @@ class ProtobufExtractorTest {
                         new FieldValueMapping("Person.addressesMap[:].zipcode", "long", 0, ""),
                         new FieldValueMapping("Person.addressesNoDotMap[:].id[]", "string-array", 0, ""),
                         new FieldValueMapping("Person.addressesNoDotMap[:].zipcode", "long", 0, ""),
-                        new FieldValueMapping("Person.phones[]", "enum-array", 0, "[MOBILE, HOME, WORK]"),
-                        new FieldValueMapping("Pet.name[]", "string-array", 0, "")
+                        new FieldValueMapping("Person.phones[]", "enum-array", 0, "[MOBILE, HOME, WORK]")
                 );
     }
 

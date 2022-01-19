@@ -106,7 +106,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   public ParsedSchema schemaTypesList(File schemaFile, String schemaType) throws IOException {
     ParsedSchema parsedSchema;
     if ("AVRO".equalsIgnoreCase(schemaType)) {
-      parsedSchema = new AvroSchema(readLineByLine(schemaFile.getPath()));
+      parsedSchema = avroExtractor.getParsedSchema(readLineByLine(schemaFile.getPath()));
     } else if ("Json-schema".equalsIgnoreCase(schemaType)) {
       parsedSchema = new JsonSchema(readLineByLine(schemaFile.getPath()));
     } else {

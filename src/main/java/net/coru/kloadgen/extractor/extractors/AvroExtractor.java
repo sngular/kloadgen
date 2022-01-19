@@ -92,11 +92,9 @@ public class AvroExtractor {
                 }
             });
             completeFieldList.addAll(internalFields);
-            //extractedArrayCollection(innerField, completeFieldList, internalFields);
         } else if (checkIfMap(innerField) && !checkIfRecord(innerField.getValueType())) {
             List<FieldValueMapping> internalFields = extractMapInternalFields(fieldName + "[:]", innerField.getValueType());
             completeFieldList.addAll(internalFields);
-            // extractedMapCollection(innerField, completeFieldList, internalFields);
         } else {
             completeFieldList.add(new FieldValueMapping(fieldName, innerField.getType().getName() + MAP_POSTFIX));
         }
