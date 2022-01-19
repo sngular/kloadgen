@@ -1,6 +1,7 @@
 package net.coru.kloadgen.processor;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -22,7 +23,7 @@ import java.util.*;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProtobufSchemaProcessorTest {
+class ProtobufSchemaProcessorTest {
 
     private final FileHelper fileHelper = new FileHelper();
     private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
@@ -38,10 +39,10 @@ public class ProtobufSchemaProcessorTest {
     }
     
     @Test
-    void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException {
+    void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
-        List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("Person.phones[1:].addressesPhone[1:].id[1]", "string-array", 0, "Pablo"));
+        List<FieldValueMapping> fieldValueMappingList = List.of(
+            new FieldValueMapping("Person.phones[1:].addressesPhone[1:].id[1]", "string-array", 0, "Pablo"));
         ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
         protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile,"Protobuf"), new SchemaMetadata(1,1,""), fieldValueMappingList);
         EnrichedRecord message = protobufSchemaProcessor.next();
@@ -63,7 +64,7 @@ public class ProtobufSchemaProcessorTest {
     }
 
     @Test
-    void testProtoBufEnumSchemaProcessor() throws IOException {
+    void testProtoBufEnumSchemaProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/enumTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         fieldValueMappingList.get(0).setFieldValuesList("HOME, WORK");
@@ -99,7 +100,7 @@ public class ProtobufSchemaProcessorTest {
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.phoneTypes", "tutorial.Person.phoneTypesArray", "tutorial.Person.phoneTypesMap");
     }
     @Test
-    void testProtoBufEasyTestProcessor() throws IOException {
+    void testProtoBufEasyTestProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
         ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
@@ -129,7 +130,7 @@ public class ProtobufSchemaProcessorTest {
     }
 
     @Test
-    void testProtoBufMapTestProcessor() throws IOException {
+    void testProtoBufMapTestProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
         List<FieldValueMapping> fieldValueMappingList = asList(
                 new FieldValueMapping("Person.name[:]", "string-map", 0, "Pablo"),
@@ -172,7 +173,7 @@ public class ProtobufSchemaProcessorTest {
     }
 
     @Test
-    void testProtoBufComplexTestProcessor() throws IOException {
+    void testProtoBufComplexTestProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
         List<FieldValueMapping> fieldValueMappingList = asList(
                 new FieldValueMapping("Test.phone_types[].phone", "long", 0, ""),

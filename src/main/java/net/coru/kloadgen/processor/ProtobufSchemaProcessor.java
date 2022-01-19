@@ -2,23 +2,30 @@ package net.coru.kloadgen.processor;
 
 import com.github.os72.protobuf.dynamic.DynamicSchema;
 import com.github.os72.protobuf.dynamic.MessageDefinition;
+import com.google.protobuf.AnyProto;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
+import com.squareup.wire.schema.internal.parser.ProtoParser;
 import com.squareup.wire.schema.internal.parser.TypeElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
+
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.tika.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,10 +63,9 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         randomMap = new RandomMap();
     }
 
-    public EnrichedRecord next() {
-        ProtobufSchema protobufSchema = getProtobufSchema();
-        DynamicMessage.Builder messageBuilder = null;
-        messageBuilder = DynamicMessage.newBuilder(protobufSchema.toDescriptor());
+    public EnrichedRecord next() throws DescriptorValidationException, IOException {
+       // ProtobufSchema protobufSchema = getProtobufSchema();
+        DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(buildSomething());
         DynamicMessage message;
         if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
             ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
@@ -121,6 +127,23 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         return new EnrichedRecord(metadata, message);
     }
 
+    private Descriptors.Descriptor buildSomething() throws Descriptors.DescriptorValidationException, IOException {
+
+        DynamicSchema.Builder importBuilder = DynamicSchema.newBuilder();
+        importBuilder.setName("google.protobuf.Timestamp");
+        importBuilder.setPackage("google.protobuf");
+        importBuilder.addMessageDefinition(MessageDefinition.newBuilder("Timestamp").addField("optional", "int64", "seconds", 1)
+            .addField("optional", "int32", "nanos", 2).build());
+
+        DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
+        schemaBuilder.addDependency("google.protobuf.Timestamp");
+        schemaBuilder.addSchema(importBuilder.build());
+        schemaBuilder.addMessageDefinition(
+            MessageDefinition.newBuilder("test")
+                .addField("optional", ".google.protobuf.Timestamp", "time", 1).build());
+
+        return schemaBuilder.build().getMessageDescriptor("test");
+    }
     private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder, FieldValueMapping fieldValueMapping, String typeName, String fieldName) {
         Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
         Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();

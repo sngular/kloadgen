@@ -5,10 +5,14 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -77,7 +81,7 @@ class AvroSchemaProcessorTest {
         );
 
         File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+        ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
         GenericRecord entity = setUpEntityForAvroTestWithSubEntitySimpleArray(parsedSchema);
@@ -118,7 +122,7 @@ class AvroSchemaProcessorTest {
         );
 
         File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+        ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
         GenericRecord entity = setUpEntityForAvroTestWithSubEntityArray(parsedSchema);
@@ -152,7 +156,7 @@ class AvroSchemaProcessorTest {
                 new FieldValueMapping("timestamp", "long", 0, "5")
         );
         File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+        ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
         EnrichedRecord message = avroSchemaProcessor.next();
@@ -348,7 +352,7 @@ class AvroSchemaProcessorTest {
         EnrichedRecord message = avroSchemaProcessor.next();
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
-        assertEquals(date, expectedDate);
+        assertThat(date).isEqualTo(expectedDate);
     }
 
     @Test

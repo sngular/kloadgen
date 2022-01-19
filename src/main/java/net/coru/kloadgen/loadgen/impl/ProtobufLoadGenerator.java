@@ -1,6 +1,7 @@
 package net.coru.kloadgen.loadgen.impl;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.TextFormat;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
@@ -57,7 +58,14 @@ public class ProtobufLoadGenerator implements BaseLoadGenerator {
 
     @Override
     public EnrichedRecord nextMessage() {
-        return protobufSchemaProcessor.next();
+        try {
+            return protobufSchemaProcessor.next();
+        } catch (DescriptorValidationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private ParsedSchema retrieveSchema(Map<String, String> originals, String avroSchemaName) throws IOException, RestClientException {
