@@ -183,6 +183,9 @@ This screen will allow to choose a schema from file(.avsc or.json).
 ![File Generator Table](/Value_Schema_File_Load_Generator_Config.png)
 
 AVRO or Json structure will be flattened and show in the table.
+
+**Note**: If there are embedded schemas, then the last of the schema's definition will be taken as the main one, and it'll be expected than the uppers are related to it. If there are unrelated schemas, they will be ignored.
+
 We will see 4 columns where we will configure the Random Generator system.
 
   * **Field Name** : Flattened field name compose by all the properties from the root class. Ex: PropClass1.PropClass2.ProrpClass3 **Note**: In case to be an array "[]" will appear at the end. If you want to define a specific size for the array just type the number inside "[5]".
@@ -273,7 +276,7 @@ Example:
 #### Special types
 
 There are two special types, first, a mix of map and array, ( * )-map-array which will generate an array of maps. This special type have a way to specify the size of both collections. The size of the array will be placed in braces that do not have colon "[8]", the size of the map will be located to the left of the colon "[8:]" in the braces that have it. The resulting structure follows this pattern: ArrayOfMap[ArraySize][MapSize:]. Secondly, the other special type is the (*)-array-map which will generate a map of arrays, it follows this pattern: MapOfArray[MapSize:][ArraySize]. 
-#### Special functions
+## Special functions
 
 | Type | Details |  Returns |
 |----------|:-------:|:--------:|
@@ -283,12 +286,14 @@ In the sequence generator you can specify an starting value just put it in the F
 others will be not consider.
 Other values will be considered Constants for this field and will be converted to the Field Type. Keep that in mind to avoid Cast Exceptions
 
-## Generation of sequences
-Since 3.5.4 version KloadGen has added support for sequences. Type **"{"** in the FieldValueList to get the data processed as a sequence. For example in this picture:
+Since 3.6.3 version KloadGen will require to Type both **"seq"** in Field Type and **"{"** the FieldValueList if you want to create a 
+custom sequence of values. **In future versions** typing **"{"** in Field Value List will not be required and supported.
+
+Here we have an example of how KloadGen generates Sequences:
 
 ![Sequence Generator](/Sequence_Generator.png)
 
-The field id will be generated as sequences from 1 to 5. 
+The field name will be generated as sequences from 1 to 5.
 
 ### Kafka Headers Configuration
 

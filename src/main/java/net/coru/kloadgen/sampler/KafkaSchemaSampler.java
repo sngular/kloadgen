@@ -8,7 +8,6 @@ package net.coru.kloadgen.sampler;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static net.coru.kloadgen.util.ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
 import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT;
@@ -132,8 +131,6 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
 
     protected Properties properties(JavaSamplerContext context) {
         Properties commonProps = SamplerUtil.setupCommonProperties(context);
-        commonProps.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
-            context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, "false"));
         if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
             commonProps.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
         }

@@ -1,5 +1,8 @@
 package net.coru.kloadgen.extractor.extractors;
 
+import com.kitfox.svg.A;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.avro.Schema;
@@ -29,6 +32,15 @@ public class AvroExtractor {
         return attributeList;
     }
 
+    public ParsedSchema getParsedSchema(String schema) {
+        ParsedSchema parsed = new AvroSchema(schema);
+        Schema schemaObj = (Schema) parsed.rawSchema();
+        if(schemaObj.getType().equals(Schema.Type.UNION)) {
+            Schema lastElement = schemaObj.getTypes().get(schemaObj.getTypes().size() -1);
+            return new AvroSchema(lastElement.toString());
+        }
+        return parsed;
+    }
     private List<FieldValueMapping> extractInternalFields(Schema.Field field) {
         return processFieldList(field.schema().getFields());
     }

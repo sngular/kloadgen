@@ -61,6 +61,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         randomObject = new RandomObject();
         randomMap = new RandomMap();
         avroGeneratorTool = new AvroGeneratorTool();
+
     }
 
     public EnrichedRecord next() {
@@ -106,7 +107,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                                     fieldValueMapping.getFieldType(),
                                     fieldValueMapping.getValueLength(),
                                     fieldValueMapping.getFieldValuesList(),
-                                    extractConstrains(schema.getField(fieldValueMapping.getFieldName()))
+                                    extractConstraints(schema.getField(fieldValueMapping.getFieldName()))
                             )
                     );
                     fieldExpMappingsQueue.remove();
@@ -117,7 +118,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return new EnrichedRecord(metadata, entity);
     }
 
-    private Map<ConstraintTypeEnum, String> extractConstrains(Schema.Field field) {
+    private Map<ConstraintTypeEnum, String> extractConstraints(Schema.Field field) {
         Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
 
         if (Objects.nonNull(field.schema().getObjectProp("precision")))
@@ -240,8 +241,9 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         GenericRecord subEntity = createRecord(innerSchema);
         if (null == subEntity) {
             throw new KLoadGenException("Something Odd just happened");
+        } else {
+            subEntity.getSchema();
         }
-
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
         while (!fieldExpMappingsQueue.isEmpty()
                 && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
@@ -291,7 +293,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                                 fieldValueMapping.getFieldType(),
                                 fieldValueMapping.getValueLength(),
                                 fieldValueMapping.getFieldValuesList(),
-                                extractConstrains(subEntity.getSchema().getField(cleanFieldName))
+                                extractConstraints(subEntity.getSchema().getField(cleanFieldName))
                         )
                 );
             }

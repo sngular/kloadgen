@@ -8,8 +8,10 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.avro.LogicalTypes;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.groovy.util.Maps;
 import org.apache.jmeter.threads.JMeterContext;
@@ -36,6 +38,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -262,6 +265,114 @@ class AvroSchemaProcessorTest {
                 .hasSize(1);
         Map<String, String> result = (Map<String, String>) ((GenericRecord) message.getGenericRecord()).get("values");
         assertThat(result).hasSize(2).containsEntry("n", "1").containsEntry("t", "2");
+    }
+
+    private GenericRecord setUpEntityForAvroTestWithSubEntitySimpleArray(ParsedSchema parsedSchema) {
+        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+        Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
+        GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
+        Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
+        GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
+        anotherLevelRecord.put("subEntityIntArray", asList(1, 1));
+        subEntityRecord.put("anotherLevel", anotherLevelRecord);
+
+        entity.put("subEntity", subEntityRecord);
+        entity.put("topLevelIntArray", asList(2, 2, 2));
+
+        return entity;
+    }
+
+    @Test
+    void testAvroSchemaProcessorWithSubEntitySimpleArray() throws IOException {
+        List<FieldValueMapping> fieldValueMappings = asList(
+                new FieldValueMapping("subEntity.anotherLevel.subEntityIntArray[2]", "int-array", 0, "[1]"),
+                new FieldValueMapping("topLevelIntArray[3]", "int-array", 0, "[2]")
+        );
+
+        File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+        ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+        GenericRecord entity = setUpEntityForAvroTestWithSubEntitySimpleArray(parsedSchema);
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+        assertThat(message.getGenericRecord()).isNotNull();
+        assertThat(message.getGenericRecord()).isEqualTo(entity);
+    }
+
+    private GenericRecord setUpEntityForAvroTestWithSubEntityArray(ParsedSchema parsedSchema) {
+        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+        Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
+        GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
+        Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
+        Schema subEntityRecordArraySchema = anotherLevelSchema.getField("subEntityRecordArray").schema().getElementType();
+        GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
+        GenericRecord subEntityItemsRecord = new GenericData.Record(subEntityRecordArraySchema);
+        subEntityItemsRecord.put("name", "second");
+        anotherLevelRecord.put("subEntityRecordArray", asList(subEntityItemsRecord, subEntityItemsRecord));
+
+        subEntityRecord.put("anotherLevel", anotherLevelRecord);
+        entity.put("subEntity", subEntityRecord);
+
+        GenericRecord topLevelRecordArray =
+                new GenericData.Record(entity.getSchema().getField("topLevelRecordArray").schema().getElementType());
+        topLevelRecordArray.put("name", "third");
+        entity.put("topLevelRecordArray", singletonList(topLevelRecordArray));
+
+        return entity;
+    }
+
+    @Test
+    void testAvroSchemaProcessorWithSubEntityArray() throws IOException {
+        List<FieldValueMapping> fieldValueMappings = asList(
+                new FieldValueMapping("subEntity.anotherLevel.subEntityRecordArray[2].name", "string", 0, "second"),
+                new FieldValueMapping("topLevelRecordArray[1].name", "string", 0, "third")
+        );
+
+        File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+        ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+        GenericRecord entity = setUpEntityForAvroTestWithSubEntityArray(parsedSchema);
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+        assertThat(message.getGenericRecord()).isNotNull();
+        assertThat(message.getGenericRecord()).isEqualTo(entity);
+    }
+
+    private GenericRecord setUpEntityForEmbeddedAvroTest(ParsedSchema parsedSchema) {
+        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+        GenericRecord subEntityFieldMySchema = new GenericData.Record(entity.getSchema().getField("fieldMySchema").schema());
+
+        subEntityFieldMySchema.put("testInt_id", 4);
+        subEntityFieldMySchema.put("testLong", 3L);
+        subEntityFieldMySchema.put("fieldString", "testing");
+
+        entity.put("fieldMySchema", subEntityFieldMySchema);
+        entity.put("timestamp", 5L);
+
+        return entity;
+    }
+
+    @Test
+    void testEmbeddedAvroSchemaProcessor() throws IOException {
+        List<FieldValueMapping> fieldValueMappings = asList(
+                new FieldValueMapping("fieldMySchema.testInt_id", "int", 0, "4"),
+                new FieldValueMapping("fieldMySchema.testLong", "long", 0, "3"),
+                new FieldValueMapping("fieldMySchema.fieldString", "string", 0, "testing"),
+                new FieldValueMapping("timestamp", "long", 0, "5")
+        );
+        File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
+        ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+        EnrichedRecord message = avroSchemaProcessor.next();
+        GenericRecord entity = setUpEntityForEmbeddedAvroTest(parsedSchema);
+        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+        assertThat(message.getGenericRecord()).isNotNull();
+        assertThat(message.getGenericRecord()).isEqualTo(entity);
     }
 
 }

@@ -28,11 +28,18 @@ public class StatelessGeneratorTool {
   public Object generateObject(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
 
-    Object value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
-    if ("seq".equals(fieldType)) {
-      value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
-    }
+    Object value;
 
+    if ("seq".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
+        fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
+        return randomObject.generateSequenceForFieldValueList(fieldValuesList.get(0), fieldType, fieldValuesList, context);
+      } else {
+        value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
+      }
+    } else {
+      value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
+    }
     return value;
   }
 

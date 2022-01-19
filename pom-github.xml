@@ -6,7 +6,7 @@
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
-  <version>3.5.5</version>
+  <version>3.6.3</version>
 
   <distributionManagement>
     <repository>
@@ -255,6 +255,10 @@
     <repository>
       <id>confluent</id>
       <url>https://packages.confluent.io/maven/</url>
+    </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
     </repository>
   </repositories>
   <build>

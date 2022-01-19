@@ -1,3 +1,4 @@
+
 /*
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -65,6 +66,20 @@ class SchemaExtractorTest {
                 .containsExactlyInAnyOrder(
                         new FieldValueMapping("Name", "string"),
                         new FieldValueMapping("Age", "int")
+                );
+    }
+
+    @Test
+    void testFlatPropertiesEmbeddedAvros() throws IOException {
+        File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
+        assertThat(fieldValueMappingList)
+                .hasSize(4)
+                .containsExactlyInAnyOrder(
+                        new FieldValueMapping("fieldMySchema.testInt_id", "int"),
+                        new FieldValueMapping("fieldMySchema.testLong", "long"),
+                        new FieldValueMapping("fieldMySchema.fieldString", "string"),
+                        new FieldValueMapping("timestamp", "long")
                 );
     }
 
@@ -140,28 +155,27 @@ class SchemaExtractorTest {
                 );
     }
 
-  @Test
-  void testFlatPropertiesLogicalTypes () throws IOException {
+    @Test
+    void testFlatPropertiesLogicalTypes() throws IOException {
 
-    File testFile = fileHelper.getFile("/avro-files/testLogicalTypes");
+        File testFile = fileHelper.getFile("/avro-files/testLogicalTypes");
 
-    List<FieldValueMapping> fieldValueMappingList =
-            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
+        List<FieldValueMapping> fieldValueMappingList =
+                schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
 
-    assertThat(fieldValueMappingList)
-            .hasSize(10)
-            .containsExactlyInAnyOrder(
-                    new FieldValueMapping("Date", "int_date"),
-                    new FieldValueMapping("TimeMillis", "int_time-millis"),
-                    new FieldValueMapping("TimeMicros", "long_time-micros"),
-                    new FieldValueMapping("TimestampMillis", "long_timestamp-millis"),
-                    new FieldValueMapping("TimestampMicros", "long_timestamp-micros"),
-                    new FieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
-                    new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
-                    new FieldValueMapping("UUID","string_uuid"),
-                    new FieldValueMapping("Decimal","bytes_decimal"),
-                    new FieldValueMapping("DecimalFixed","fixed_decimal")
-            );
-  }
-
+        assertThat(fieldValueMappingList)
+                .hasSize(10)
+                .containsExactlyInAnyOrder(
+                        new FieldValueMapping("Date", "int_date"),
+                        new FieldValueMapping("TimeMillis", "int_time-millis"),
+                        new FieldValueMapping("TimeMicros", "long_time-micros"),
+                        new FieldValueMapping("TimestampMillis", "long_timestamp-millis"),
+                        new FieldValueMapping("TimestampMicros", "long_timestamp-micros"),
+                        new FieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
+                        new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
+                        new FieldValueMapping("UUID", "string_uuid"),
+                        new FieldValueMapping("Decimal", "bytes_decimal"),
+                        new FieldValueMapping("DecimalFixed", "fixed_decimal")
+                );
+    }
 }

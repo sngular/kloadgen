@@ -8,13 +8,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
-
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
@@ -22,6 +22,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -102,12 +103,14 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Random Value for Field")
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
     assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Random Value for Field with Logical Types")
   @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
   void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
                                                    Field field, Object expected,
@@ -124,11 +127,35 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value")
   @MethodSource("parametersForGenerateRandomValue")
   void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
     Object number = new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap());
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
     assertThat(String.valueOf(number)).hasSize(valueLength);
+  }
+
+  private static Stream<Arguments> parametersForGenerateRandomValueWithList() {
+    return Stream.of(
+            Arguments.of(18,
+                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")),
+            Arguments.of(20,
+                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20", "1", "2")));
+  }
+
+  @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value With a List of Values")
+  @MethodSource("parametersForGenerateRandomValueWithList")
+  void testGenerateRandomValueWithList(int size, List<String> values, List<String> expected) {
+
+    var intList = new ArrayList<>();
+    var context = new HashMap<String, Object>();
+    for (int i=0; i <= size; i++) {
+      intList.add(new AvroGeneratorTool().generateSequenceForFieldValueList("ClientCode", "seq", values, context));
+    }
+    assertThat(intList).containsExactlyElementsOf(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
@@ -138,6 +165,7 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value for Enums")
   @MethodSource("parametersForGenerateRandomValueForEnums")
   void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
     assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap()))
@@ -152,6 +180,7 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value for Field")
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
       Object expectedTyped) {
@@ -213,6 +242,7 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Recover Variable from Context")
   @MethodSource("parametersForShouldRecoverVariableFromContext")
   void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field, Object expected) {
     JMeterVariables variables = new JMeterVariables();
@@ -224,6 +254,7 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Recover Variable from Context Logical Types")
   @MethodSource("parametersForShouldRecoverVariableFromContextLogicalTypes")
   void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field,
                                         Object expected, Map<ConstraintTypeEnum, String> constrains) {
@@ -234,6 +265,4 @@ class AvroGeneratorToolTest {
             "{VARIABLE}"),constrains))
             .isEqualTo(expected);
   }
-
-
 }
