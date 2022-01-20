@@ -2,41 +2,39 @@ package net.coru.kloadgen.processor;
 
 import com.github.os72.protobuf.dynamic.DynamicSchema;
 import com.github.os72.protobuf.dynamic.MessageDefinition;
-import com.google.protobuf.AnyProto;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
-import com.squareup.wire.schema.internal.parser.MessageElement;
+import com.squareup.wire.schema.Schema;
+import com.squareup.wire.schema.SchemaLoader;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import com.squareup.wire.schema.internal.parser.ProtoParser;
-import com.squareup.wire.schema.internal.parser.TypeElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
-
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import org.apache.tika.io.IOUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class ProtobufSchemaProcessor extends SchemaProcessorLib {
+
+    private static Set<String> TYPES = Set.of("double", "float", "int32", "int64", "uint32", "uint64","sint32", "sint64", "fixed32", "fixed64", "sfixed32", "sfixed64", "bool", "string", "bytes");
+
+    private static Set<String> LABEL = Set.of("required", "optional");
 
     private ProtoFileElement schema;
     private SchemaMetadata metadata;
@@ -129,21 +127,67 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
     private Descriptors.Descriptor buildSomething() throws Descriptors.DescriptorValidationException, IOException {
 
-        DynamicSchema.Builder importBuilder = DynamicSchema.newBuilder();
-        importBuilder.setName("google.protobuf.Timestamp");
-        importBuilder.setPackage("google.protobuf");
-        importBuilder.addMessageDefinition(MessageDefinition.newBuilder("Timestamp").addField("optional", "int64", "seconds", 1)
-            .addField("optional", "int32", "nanos", 2).build());
+        var schemaToString = new String(getClass().getClassLoader().getResourceAsStream("google/protobuf/timestamp.proto").readAllBytes());
+
+        var lines = new ArrayList(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
+
+        var importedSchema = processImported(lines);
 
         DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
         schemaBuilder.addDependency("google.protobuf.Timestamp");
-        schemaBuilder.addSchema(importBuilder.build());
+        schemaBuilder.addSchema(importedSchema);
         schemaBuilder.addMessageDefinition(
             MessageDefinition.newBuilder("test")
                 .addField("optional", ".google.protobuf.Timestamp", "time", 1).build());
 
         return schemaBuilder.build().getMessageDescriptor("test");
     }
+
+    private Predicate<String> isValid() {
+        return line -> !line.contains("//") && !line.isEmpty();
+    }
+
+    private DynamicSchema processImported(List<String> importedLines) throws DescriptorValidationException {
+
+        DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
+
+        var linesIterator = importedLines.listIterator();
+        String packageName = "";
+        while(linesIterator.hasNext()) {
+            var fileLine = linesIterator.next();
+
+            if (fileLine.startsWith("package")) {
+                packageName = StringUtils.chop(fileLine.substring(7).trim());
+                schemaBuilder.setPackage(packageName);
+            }
+            if (fileLine.startsWith("message")) {
+                var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
+                schemaBuilder.setName(packageName + "." + messageName.toLowerCase());
+                schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
+            }
+            if (fileLine.startsWith("import")) {
+                schemaBuilder.addDependency(fileLine.substring(6));
+            }
+        }
+
+        return schemaBuilder.build();
+    }
+
+    private MessageDefinition buildMessage(String messageName, ListIterator<String> messageLines) {
+
+        MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
+        while(messageLines.hasNext()) {
+            var field = messageLines.next().trim().split("\\s");
+            if (TYPES.contains(field[0])) {
+                messageDefinition.addField("optional", field[0], field[1], Integer.parseInt(StringUtils.chop(field[3])));
+            } else if (LABEL.contains(field[0])) {
+                messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(StringUtils.chop(field[4])));
+            }
+        }
+
+        return messageDefinition.build();
+    }
+
     private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder, FieldValueMapping fieldValueMapping, String typeName, String fieldName) {
         Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
         Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
@@ -219,6 +263,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     @NotNull
     private ProtobufSchema getProtobufSchema() {
         String schemaToString = schema.toSchema();
+
         return new ProtobufSchema(schemaToString);
     }
 

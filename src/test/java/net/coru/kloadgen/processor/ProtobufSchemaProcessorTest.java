@@ -231,8 +231,7 @@ class ProtobufSchemaProcessorTest {
         List<Object> secondMap = (List<Object>) firstMap.getField(firstMap.getDescriptorForType().findFieldByName("addressesPhone"));
         DynamicMessage secondMapAsDynamicField = (DynamicMessage) secondMap.get(0);
         Object thirdArray = secondMapAsDynamicField.getField(secondMapAsDynamicField.getDescriptorForType().findFieldByName("value"));
-        String idField= ((DynamicMessage) thirdArray).getField(((DynamicMessage) thirdArray).getDescriptorForType().findFieldByName("id")).toString();
-        return idField;
+        return ((DynamicMessage) thirdArray).getField(((DynamicMessage) thirdArray).getDescriptorForType().findFieldByName("id")).toString();
     }
 
 }

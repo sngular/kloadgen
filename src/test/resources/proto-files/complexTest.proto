@@ -20,6 +20,7 @@ message Test {
     repeated string dates = 7;
     optional string response = 8;
     map<string, Present> presents = 9;
+    .google.protobuf.Timestamp creationDate = 10;
 
     message Present {
         repeated string options = 1;
