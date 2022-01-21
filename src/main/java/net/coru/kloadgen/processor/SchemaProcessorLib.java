@@ -150,15 +150,15 @@ public abstract class SchemaProcessorLib {
 
         var value = new HashMap<>(mapSize);
         if ("seq".equals(fieldType)) {
+            if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
+                parameterList.set(0, parameterList.get(0).substring(1));
+                value.put(generateMapKey(), randomObject.generateSequenceForFieldValueList(parameterList.get(0), fieldType, parameterList, context));
+            }
             for (int i = mapSize; i > 0; i--) {
                 value.put(generateMapKey(),
                         randomObject.generateSeq(fieldName, fieldType, parameterList, context));
             }
-        } else  if (!parameterList.isEmpty() && parameterList.get(0).charAt(0) == "{".charAt(0)){
-            parameterList.set(0, parameterList.get(0).substring(1));
-            value.put(generateMapKey(),randomObject.generateSequenceForFieldValueList(parameterList.get(0), fieldType, parameterList, context ));
-        }
-        else {
+        } else {
             return randomMap.generateMap(fieldType, mapSize, parameterList, fieldValueLength, arraySize, Collections.emptyMap());
         }
 
@@ -173,11 +173,15 @@ public abstract class SchemaProcessorLib {
                         JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
                         fieldValue
         );
-
         List value = new ArrayList<>(arraySize);
         if ("seq".equals(fieldType)) {
-            for (int i = arraySize; i > 0 ; i--) {
-                value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
+            if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
+                parameterList.set(0, parameterList.get(0).substring(1));
+                value.add(randomObject.generateSequenceForFieldValueList(parameterList.get(0), fieldType, parameterList, context));
+            } else {
+                for (int i = arraySize; i > 0; i--) {
+                    value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
+                }
             }
         } else {
             value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());

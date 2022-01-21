@@ -281,7 +281,7 @@ There are two special types, first, a mix of map and array, ( * )-map-array whic
 
 KLoadGen supports the use of null values in FieldValueList for any optional field defined in a schema. This results in any field defined with `"type": ["null", AnyType]` that has a null value setted on it's FieldValueList, will be produced as null object always, without a random choose between null and 'AnyType'. This feature works the same for any field in the schema, including that ones inside a data structure as a map or an array.
 
-#### Special functions
+## Special functions
 
 | Type | Details |  Returns |
 |----------|:-------:|:--------:|
@@ -291,12 +291,14 @@ In the sequence generator you can specify an starting value just put it in the F
 others will be not consider.
 Other values will be considered Constants for this field and will be converted to the Field Type. Keep that in mind to avoid Cast Exceptions
 
-## Generation of sequences
-Since 3.5.4 version KloadGen has added support for sequences. Type **"{"** in the FieldValueList to get the data processed as a sequence. For example in this picture:
+Since 3.6.3 version KloadGen will require to Type both **"seq"** in Field Type and **"{"** the FieldValueList if you want to create a 
+custom sequence of values. **In future versions** typing **"{"** in Field Value List will not be required and supported.
+
+Here we have an example of how KloadGen generates Sequences:
 
 ![Sequence Generator](/Sequence_Generator.png)
 
-The field id will be generated as sequences from 1 to 5. 
+The field name will be generated as sequences from 1 to 5.
 
 ### Kafka Headers Configuration
 
