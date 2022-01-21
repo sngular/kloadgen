@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -28,6 +30,8 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.validation.constraints.NotNull;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -340,12 +344,13 @@ class AvroSchemaProcessorTest {
 
         fieldValueMappingList.get(1).setFieldValuesList("null");
         fieldValueMappingList.get(2).setFieldValuesList("null");
-        fieldValueMappingList.get(3).setFieldValuesList("null");
         fieldValueMappingList.get(5).setFieldValuesList("null");
+        fieldValueMappingList.get(7).setFieldValuesList("null");
+        fieldValueMappingList.get(8).setFieldValuesList("null");
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(extractor.schemaTypesList(testFile,"AVRO"),
-                new SchemaMetadata(1,1,""), fieldValueMappingList);
+        avroSchemaProcessor.processSchema(extractor.schemaTypesList(testFile, "AVRO"),
+                new SchemaMetadata(1, 1, ""), fieldValueMappingList);
         EnrichedRecord message = avroSchemaProcessor.next();
 
         assertThat(message)
@@ -354,18 +359,24 @@ class AvroSchemaProcessorTest {
                 .extracting(EnrichedRecord::getGenericRecord)
                 .isNotNull();
 
-        GenericRecord record = (GenericRecord)message.getGenericRecord();
+        GenericRecord record = (GenericRecord) message.getGenericRecord();
         assertThat(record.get("name")).isNotNull();
         assertThat(record.get("favorite_number")).isNull();
         assertThat(record.get("favorite_color")).isNull();
+        assertThat(record.get("emails")).isNotNull();
+        assertThat(record.get("phones")).isNotNull();
         assertThat(record.get("friends")).isNull();
         assertThat(record.get("favorite_cars")).isNotNull();
 
         List<GenericRecord> result = (List) ((GenericRecord) message.getGenericRecord()).get("favorite_cars");
-        for(GenericRecord f: result){
-            assertThat(f.get("brand")).isNotNull();
-            assertThat(f.get("power")).isNull();
-        }
+        assertThat(result).allMatch(getGenericRecordPredicate());
+    }
+
+    @NotNull
+    private Predicate<GenericRecord> getGenericRecordPredicate() {
+        return genericRecord -> Objects.nonNull(genericRecord.get("brand")) &&
+                Objects.isNull(genericRecord.get("power")) &&
+                Objects.isNull(genericRecord.get("parts"));
     }
 
 }

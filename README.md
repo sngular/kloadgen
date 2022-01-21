@@ -275,7 +275,12 @@ Example:
 
 #### Special types
 
-There are two special types, first, a mix of map and array, ( * )-map-array which will generate an array of maps. This special type have a way to specify the size of both collections. The size of the array will be placed in braces that do not have colon "[8]", the size of the map will be located to the left of the colon "[8:]" in the braces that have it. The resulting structure follows this pattern: ArrayOfMap[ArraySize][MapSize:]. Secondly, the other special type is the (*)-array-map which will generate a map of arrays, it follows this pattern: MapOfArray[MapSize:][ArraySize]. 
+There are two special types, first, a mix of map and array, ( * )-map-array which will generate an array of maps. This special type have a way to specify the size of both collections. The size of the array will be placed in braces that do not have colon "[8]", the size of the map will be located to the left of the colon "[8:]" in the braces that have it. The resulting structure follows this pattern: ArrayOfMap[ArraySize][MapSize:]. Secondly, the other special type is the (*)-array-map which will generate a map of arrays, it follows this pattern: MapOfArray[MapSize:][ArraySize].
+
+#### Null values
+
+KLoadGen supports the use of null values in FieldValueList for any optional field defined in a schema. This results in any field defined with `"type": ["null", AnyType]` that has a null value setted on it's FieldValueList, will be produced as null object always, without a random choose between null and 'AnyType'. This feature works the same for any field in the schema, including that ones inside a data structure as a map or an array.
+
 #### Special functions
 
 | Type | Details |  Returns |

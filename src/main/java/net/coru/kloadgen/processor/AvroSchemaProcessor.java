@@ -74,16 +74,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                 String fieldName = getCleanMethodName(fieldValueMapping, "");
                 String fullFieldName = getFullMethodName(fieldValueMapping, "");
 
-                boolean isOptional = false;
-                if (schema.getField(fieldName).schema().getType() == UNION){
-                    for (Schema type: schema.getField(fieldName).schema().getTypes()){
-                        if (type.getType() == NULL){
-                            isOptional = true;
-                            break;
-                        }
-                    }
-                }
-                if (isOptional && fieldValueMapping.getFieldValuesList().contains("null")){
+                if (isOptionalField(schema.getField(fieldName)) && fieldValueMapping.getFieldValuesList().contains("null")){
                     fieldExpMappingsQueue.remove();
                     fieldValueMapping = fieldExpMappingsQueue.peek();
                 } else {
@@ -247,6 +238,13 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return realField;
     }
 
+    private Boolean isOptionalField(Field field){
+        if (UNION.equals(field.schema().getType())) {
+            return IteratorUtils.matchesAny(field.schema().getTypes().iterator(), type -> type.getType() == NULL);
+        }
+        return false;
+    }
+
     private GenericRecord createObject(final Schema subSchema, final String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
         Schema innerSchema = subSchema;
         if (subSchema.getType().equals(MAP)) {
@@ -270,16 +268,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, rootFieldName);
             String fullFieldName = getFullMethodName(fieldValueMapping, rootFieldName);
 
-            boolean isOptional = false;
-            if (subSchema.getField(fieldNameSubEntity).schema().getType() == UNION){
-                for (Schema type: subSchema.getField(fieldNameSubEntity).schema().getTypes()){
-                    if (type.getType() == NULL){
-                        isOptional = true;
-                        break;
-                    }
-                }
-            }
-            if (isOptional && fieldValueMapping.getFieldValuesList().contains("null")){
+            if (isOptionalField(subSchema.getField(fieldNameSubEntity)) && fieldValueMapping.getFieldValuesList().contains("null")){
                 fieldExpMappingsQueue.poll();
                 fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
             } else {
