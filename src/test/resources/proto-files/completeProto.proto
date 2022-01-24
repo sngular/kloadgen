@@ -15,22 +15,16 @@ message Person {
   map<string, Address> addressesNoDotMap = 6;
   repeated PhoneTypes phones = 7;
 
-    message Address{
-      repeated string id = 1;
-      optional int64 zipcode = 2;
-    }
+  message Address{
+    repeated string id = 1;
+    optional int64 zipcode = 2;
+  }
 
-    message Book{
-      optional string title = 1;
-      optional int32 pages = 2;
-      optional sint64 characters = 3;
-    }
-
-    enum PhoneTypes{
-        MOBILE = 0;
-        HOME = 1;
-        WORK = 2;
-    }
+  enum PhoneTypes{
+      MOBILE = 0;
+      HOME = 1;
+      WORK = 2;
+  }
 
 }
 

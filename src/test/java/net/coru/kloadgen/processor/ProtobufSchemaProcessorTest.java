@@ -180,7 +180,6 @@ class ProtobufSchemaProcessorTest {
         protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
         EnrichedRecord message = protobufSchemaProcessor.next();
         DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
-        System.out.println(genericRecord);
         assertThat(genericRecord).isNotNull();
     }
 
