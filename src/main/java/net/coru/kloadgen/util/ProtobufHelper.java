@@ -2,10 +2,11 @@ package net.coru.kloadgen.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ProtobufHelper {
 
-    public static final Map<String, String > protobufTypes = new HashMap<>()
+    public static final Map<String, String > PROTOBUF_TYPES = new HashMap<>()
     {{
         put("double", "double");
         put("float", "float");
@@ -24,5 +25,6 @@ public class ProtobufHelper {
         put("bytes", "ByteString");
     }};
 
-
+    public static final Set<String> NOT_ACCEPTED_IMPORTS = Set.of("google/protobuf/descriptor.proto", "google/protobuf/compiler/plugin.proto");
+    public static final Set<String> LABEL = Set.of("required", "optional");
 }

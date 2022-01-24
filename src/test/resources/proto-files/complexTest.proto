@@ -14,13 +14,12 @@ message Test {
     repeated PhoneTypes phone_types = 1;
     optional string name = 2;
     optional int32 age = 3;
-    repeated .tutorial.Test.Address address = 4;
+    repeated Test.Address address = 4;
     map<string, Test.Pet> pets = 5;
     map<string, string> descriptors = 6;
     repeated string dates = 7;
     optional string response = 8;
     map<string, Present> presents = 9;
-    .google.protobuf.Timestamp creationDate = 10;
 
     message Present {
         repeated string options = 1;

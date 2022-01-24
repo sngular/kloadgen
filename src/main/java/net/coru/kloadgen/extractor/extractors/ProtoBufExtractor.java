@@ -2,11 +2,9 @@ package net.coru.kloadgen.extractor.extractors;
 
 
 import com.squareup.wire.schema.Field;
-import com.squareup.wire.schema.OneOf;
 import com.squareup.wire.schema.internal.parser.*;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.sf.saxon.trans.SymbolicName;
 import org.apache.commons.lang3.RandomUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,11 +46,11 @@ public class ProtoBufExtractor {
                                 Field.Label label = checkNullLabel(subfield);
                                 boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
                                 boolean isMap = subfield.getType().startsWith("map");
-                                if (protobufTypes.containsKey(subfield.getType())) {
+                                if (PROTOBUF_TYPES.containsKey(subfield.getType())) {
                                     extractPrimitiveTypes(field, completeFieldList, subfield, isArray);
                                 } else if (isMap) {
                                     extractMapType(field, completeFieldList, nestedTypes, subfield, imports);
-                                } else if (!protobufTypes.containsKey(subfield.getType())) {
+                                } else if (!PROTOBUF_TYPES.containsKey(subfield.getType())) {
                                     String dotType = checkDotType(subfield.getType(), imports);
                                     if (nestedTypes.containsKey(subfield.getType())) {
                                         extractNestedTypes(field, completeFieldList, nestedTypes, subfield, isArray, imports);
@@ -78,8 +76,8 @@ public class ProtoBufExtractor {
         for(OneOfElement oneOfElement: oneOfs) {
             if(!oneOfElement.getFields().isEmpty()) {
                 FieldElement subField = oneOfElement.getFields().get(RandomUtils.nextInt(0, oneOfElement.getFields().size()));
-                if(protobufTypes.containsKey(subField.getType())) {
-                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subField.getName(), protobufTypes.get(subField.getType()), 0, ""));
+                if(PROTOBUF_TYPES.containsKey(subField.getType())) {
+                    completeFieldList.add(new FieldValueMapping(field.getName() + "." + subField.getName(), PROTOBUF_TYPES.get(subField.getType()), 0, ""));
                 }else if(nestedTypes.containsKey(subField.getType())) {
                     MessageElement clonedField = new MessageElement(field.getLocation(), field.getName(), field.getDocumentation(),
                             field.getNestedTypes(), field.getOptions(), field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(), field.getExtensions(), field.getGroups());
@@ -105,15 +103,15 @@ public class ProtoBufExtractor {
     private void extractMapType(TypeElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports) {
         String subFieldType = extractInternalMapFields(subfield);
         String dotTypeMap = checkDotType(subFieldType, imports);
-        if (protobufTypes.containsKey(subFieldType)) {
+        if (PROTOBUF_TYPES.containsKey(subFieldType)) {
             completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]", subFieldType.replace(subFieldType,
-                    protobufTypes.get(subFieldType)) + MAP_POSTFIX, 0, ""));
+                    PROTOBUF_TYPES.get(subFieldType)) + MAP_POSTFIX, 0, ""));
         } else if (nestedTypes.containsKey(subFieldType)) {
             extractNestedTypesMap(field, completeFieldList, nestedTypes, subfield, imports);
         } else if (nestedTypes.containsKey(dotTypeMap)) {
             extractDotTypesMap(field, completeFieldList, nestedTypes, subfield, dotTypeMap, imports);
         } else if (!imports.isEmpty() && isExternalType(imports, dotTypeMap)) {
-            completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]", protobufTypes.get("string") + MAP_POSTFIX, 0, ""));
+            completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]", PROTOBUF_TYPES.get("string") + MAP_POSTFIX, 0, ""));
         } else {
             throw new KLoadGenException("Something Odd Just Happened: Unsupported type of value");
         }
@@ -130,11 +128,11 @@ public class ProtoBufExtractor {
         if (isArray) {
             completeFieldList
                     .add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", subfield.getType().replace(subfield.getType(),
-                            protobufTypes.get(subfield.getType()))+ ARRAY_POSTFIX, 0, ""));
+                            PROTOBUF_TYPES.get(subfield.getType()))+ ARRAY_POSTFIX, 0, ""));
         } else {
             completeFieldList
                     .add(new FieldValueMapping(field.getName() + "." + subfield.getName(), subfield.getType().replace(subfield.getType(),
-                            protobufTypes.get(subfield.getType())), 0, ""));
+                            PROTOBUF_TYPES.get(subfield.getType())), 0, ""));
         }
     }
 

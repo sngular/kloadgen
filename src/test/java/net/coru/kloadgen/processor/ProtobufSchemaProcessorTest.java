@@ -59,7 +59,7 @@ class ProtobufSchemaProcessorTest {
         String idField = getIdFieldForEmbeddedTypeTest(assertValues);
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(assertKeys).hasSize(1).containsExactlyInAnyOrder( "tutorial.Person.phones");
+        assertThat(assertKeys).hasSize(1).containsExactlyInAnyOrder( "Person.phones");
         assertThat(idField).isEqualTo("[Pablo]");
     }
 
@@ -121,7 +121,7 @@ class ProtobufSchemaProcessorTest {
                 .isInstanceOf(EnrichedRecord.class)
                 .extracting(EnrichedRecord::getGenericRecord)
                 .isNotNull();
-        assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Address.street", "tutorial.Address.number", "tutorial.Address.zipcode");
+        assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("Address.street", "Address.number", "Address.zipcode");
         assertThat(assertValues).hasSize(3);
         assertThat(assertValues.get(0)).isInstanceOf(String.class);
         assertThat(integerList.get(0)).isInstanceOf(Integer.class);
@@ -170,6 +170,18 @@ class ProtobufSchemaProcessorTest {
         assertThat(street).isInstanceOf(String.class).isEqualTo("Sor Joaquina");
         assertThat(number).isInstanceOf(Integer.class).isEqualTo(2);
         assertThat(zipcode).isInstanceOf(Integer.class).isEqualTo(15011);
+    }
+
+    @Test
+    void testProtoBufMapTest2Processor() throws IOException, DescriptorValidationException {
+        File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+        EnrichedRecord message = protobufSchemaProcessor.next();
+        DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+        System.out.println(genericRecord);
+        assertThat(genericRecord).isNotNull();
     }
 
     @Test

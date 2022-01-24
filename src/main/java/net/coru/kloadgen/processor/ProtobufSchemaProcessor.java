@@ -6,17 +6,20 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
+import com.google.protobuf.Timestamp;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
+import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.ProtobufHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
@@ -25,12 +28,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.*;
 
-
+@Slf4j
 public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
-    private static Set<String> TYPES = Set.of("double", "float", "int32", "int64", "uint32", "uint64", "sint32", "sint64", "fixed32", "fixed64", "sfixed32", "sfixed64", "bool", "string", "bytes");
 
-    private static Set<String> LABEL = Set.of("required", "optional");
 
     private ProtoFileElement schema;
     private SchemaMetadata metadata;
@@ -130,9 +131,11 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         for (String importedClass : imports) {
             String schemaToString = new String(getClass().getClassLoader().getResourceAsStream(importedClass).readAllBytes());
             lines = new ArrayList(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
-            var importedSchema = processImported(lines);
-            schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
-            schemaBuilder.addSchema(importedSchema);
+            if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
+                var importedSchema = processImported(lines);
+                schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
+                schemaBuilder.addSchema(importedSchema);
+            }
         }
         MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
         schemaBuilder.addMessageDefinition(buildMessageDefinition(messageElement));
@@ -145,22 +148,36 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         HashMap<String, MessageElement> nestedTypes = new HashMap<>();
         fillNestedTypes(messageElement, nestedTypes);
         MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(messageElement.getName());
-
         for (int i = 0; i < messageElement.getFields().size(); i++) {
+            var messageType = messageElement.getFields().get(i).getType();
+
+            var dotType = checkDotType(messageType);
             if (nestedTypes.containsKey(messageElement.getFields().get(i).getType())) {
                 msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(messageElement.getFields().get(i).getType())));
             }
+            if(nestedTypes.containsKey(dotType)){
+                msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(dotType)));
+            }
             if (messageElement.getFields().get(i).getType().startsWith("map")) {
-                msgDef.addField("optional",
+                var realType = StringUtils.chop(messageType.substring(messageType.indexOf(',')+1).trim());
+                var mapDotType = checkDotType(realType);
+                if(nestedTypes.containsKey(realType)){
+                    msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(realType)));
+                }
+                if(nestedTypes.containsKey(mapDotType)){
+                    msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(mapDotType)));
+                }
+                msgDef.addField("repeated",
                         "typemapnumber" + i,
                         messageElement.getFields().get(i).getName(),
                         messageElement.getFields().get(i).getTag());
+
                 msgDef.addMessageDefinition(
                         MessageDefinition.newBuilder("typemapnumber" + i)
                                 .addField("optional",
                                         "string", "key", 1)
                                 .addField("optional",
-                                        "string", "value", 2).build()
+                                        realType, "value", 2).build()
                 );
             } else {
                 if (Objects.nonNull(messageElement.getFields().get(i).getLabel())) {
@@ -210,7 +227,9 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             if (fileLine.startsWith("message")) {
                 var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
                 schemaBuilder.setName(packageName + "." + messageName);
-                schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
+
+                    schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
+
             }
             if (fileLine.startsWith("import")) {
                 schemaBuilder.addDependency(fileLine.substring(6));
@@ -225,14 +244,22 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
         while (messageLines.hasNext()) {
             var field = messageLines.next().trim().split("\\s");
-            if (TYPES.contains(field[0])) {
-                messageDefinition.addField("optional", field[0], field[1], Integer.parseInt(StringUtils.chop(field[3])));
-            } else if (LABEL.contains(field[0])) {
-                messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(StringUtils.chop(field[4])));
+            if (ProtobufHelper.PROTOBUF_TYPES.containsKey(field[0])) {
+                messageDefinition.addField("optional", field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
+            } else if (ProtobufHelper.LABEL.contains(field[0])) {
+                messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
             }
         }
 
         return messageDefinition.build();
+    }
+
+    public String checkIfChoppable(String field){
+        String choppedField = field;
+        if (field.endsWith(";")){
+            choppedField = StringUtils.chop(field);
+        }
+        return choppedField;
     }
 
     private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder, FieldValueMapping fieldValueMapping, String typeName, String fieldName) {
@@ -511,5 +538,13 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
     private Descriptors.FieldDescriptor getFieldDescriptorForField(DynamicMessage.Builder messageBuilder, String typeName) {
         return messageBuilder.getDescriptorForType().findFieldByName(typeName);
+    }
+    private String checkDotType(String subfieldType) {
+        String dotType = "";
+        if (subfieldType.startsWith(".") || subfieldType.contains(".")) {
+            String[] typeSplit = subfieldType.split("\\.");
+            dotType = typeSplit[typeSplit.length - 1];
+        }
+        return dotType;
     }
 }
