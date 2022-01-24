@@ -40,6 +40,7 @@ public class JsonExtractor {
     List<FieldValueMapping> attributeList = new ArrayList<>();
 
     schema.getProperties().forEach(field -> attributeList.addAll(processField(field)));
+    attributeList.forEach(field -> field.setRequired(schema.getRequiredFields().contains(field.getFieldName())));
     return attributeList;
   }
 

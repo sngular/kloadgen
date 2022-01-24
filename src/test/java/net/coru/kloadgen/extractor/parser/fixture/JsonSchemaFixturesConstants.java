@@ -13,6 +13,8 @@ import net.coru.kloadgen.model.json.ObjectField;
 import net.coru.kloadgen.model.json.Schema;
 import net.coru.kloadgen.model.json.StringField;
 
+import java.util.Arrays;
+
 public class JsonSchemaFixturesConstants {
 
   public static final Schema SIMPLE_SCHEMA =
@@ -20,6 +22,7 @@ public class JsonSchemaFixturesConstants {
                 .id("https://example.com/person.schema.json")
                 .name("http://json-schema.org/draft-07/schema#")
                 .type("object")
+                .requiredFields(Arrays.asList("age", "lastName"))
                 .property(StringField.builder().name("firstName").build())
                 .property(StringField.builder().name("lastName").build())
                 .property(IntegerField.builder().name("age").build())
@@ -30,6 +33,7 @@ public class JsonSchemaFixturesConstants {
                 .id("https://example.com/geographical-location.schema.json")
                 .name("http://json-schema.org/draft-07/schema#")
                 .type("object")
+                .requiredFields(Arrays.asList("latitude", "longitude"))
                 .property(NumberField
                     .builder()
                     .name("latitude")
@@ -78,6 +82,7 @@ public class JsonSchemaFixturesConstants {
           .id("")
           .name("http://json-schema.org/draft-04/schema#")
           .type("object")
+              .requiredFields(Arrays.asList("_id", "userId", "storeId", "snapshotId", "addressId", "addressLine", "alias", "contactInformation", "countryCode", "geopoliticalSubdivisions", "_metadata", "_entity", "_class"))
           .property(StringField.builder().name("_id").build())
           .property(NumberField.builder().name("userId").minimum(1).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
           .property(NumberField.builder().name("storeId").minimum(0).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())

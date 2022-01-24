@@ -43,56 +43,61 @@ public class JsonSchemaProcessor {
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
       while (!fieldExpMappingsQueue.isEmpty()) {
         String fieldName = getCleanMethodName(fieldValueMapping, "");
-        if (cleanUpPath(fieldValueMapping, "").contains("[")) {
-          if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
-            fieldExpMappingsQueue.poll();
-            entity.putPOJO(fieldName, createBasicMap(fieldValueMapping.getFieldType(),
-                calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getFieldValuesList()));
-          } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
-            fieldExpMappingsQueue.poll();
-            entity.putPOJO(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
-                calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getValueLength(),
-                fieldValueMapping.getFieldValuesList()));
-          } else if (cleanUpPath(fieldValueMapping, "").contains("][]")) {
-            entity.putArray(fieldName).addAll(
-                    createObjectMap(
-                            fieldName,
-                            calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                            fieldExpMappingsQueue));
-            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-          } else if (isBasicArray(fieldValueMapping.getFieldType())) {
-            fieldExpMappingsQueue.poll();
-            entity
-              .putArray(fieldName)
-              .addAll(createBasicArray(
-                      fieldName,
-                      fieldValueMapping.getFieldType(),
+        if (!fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")){
+          fieldExpMappingsQueue.remove();
+          fieldValueMapping = fieldExpMappingsQueue.peek();
+        } else {
+          if (cleanUpPath(fieldValueMapping, "").contains("[")) {
+            if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
+              fieldExpMappingsQueue.poll();
+              entity.putPOJO(fieldName, createBasicMap(fieldValueMapping.getFieldType(),
+                      calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                      fieldValueMapping.getFieldValuesList()));
+            } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
+              fieldExpMappingsQueue.poll();
+              entity.putPOJO(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
                       calculateSize(fieldValueMapping.getFieldName(), fieldName),
                       fieldValueMapping.getValueLength(),
                       fieldValueMapping.getFieldValuesList()));
+            } else if (cleanUpPath(fieldValueMapping, "").contains("][]")) {
+              entity.putArray(fieldName).addAll(
+                      createObjectMap(
+                              fieldName,
+                              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                              fieldExpMappingsQueue));
+              fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            } else if (isBasicArray(fieldValueMapping.getFieldType())) {
+              fieldExpMappingsQueue.poll();
+              entity
+                      .putArray(fieldName)
+                      .addAll(createBasicArray(
+                              fieldName,
+                              fieldValueMapping.getFieldType(),
+                              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                              fieldValueMapping.getValueLength(),
+                              fieldValueMapping.getFieldValuesList()));
+              fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            } else {
+              entity.putArray(fieldName).addAll(
+                      createObjectArray(
+                              fieldName,
+                              calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                              fieldExpMappingsQueue));
+              fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            }
+          } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
+            entity.set(fieldName, createObject(fieldName, fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           } else {
-            entity.putArray(fieldName).addAll(
-                createObjectArray(
-                    fieldName,
-                    calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                    fieldExpMappingsQueue));
-            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            entity.putPOJO(Objects.requireNonNull(fieldValueMapping).getFieldName(),
+                    mapper.convertValue(
+                            statelessGeneratorTool.generateObject(fieldName,
+                                    fieldValueMapping.getFieldType(),
+                                    fieldValueMapping.getValueLength(),
+                                    fieldValueMapping.getFieldValuesList()), JsonNode.class));
+            fieldExpMappingsQueue.remove();
+            fieldValueMapping = fieldExpMappingsQueue.peek();
           }
-        } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
-          entity.set(fieldName, createObject(fieldName, fieldExpMappingsQueue));
-          fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-        } else {
-          entity.putPOJO(Objects.requireNonNull(fieldValueMapping).getFieldName(),
-                 mapper.convertValue(
-                     statelessGeneratorTool.generateObject(fieldName,
-                             fieldValueMapping.getFieldType(),
-                             fieldValueMapping.getValueLength(),
-                             fieldValueMapping.getFieldValuesList()), JsonNode.class));
-          fieldExpMappingsQueue.remove();
-          fieldValueMapping = fieldExpMappingsQueue.peek();
         }
       }
     }

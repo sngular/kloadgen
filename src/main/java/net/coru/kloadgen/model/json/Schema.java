@@ -34,7 +34,7 @@ public class Schema {
 
 		List<Field> definitions = new ArrayList<>();
 
-		List<String> requireFields = new ArrayList<>();
+		List<String> requiredFields = new ArrayList<>();
 
 		public SchemaBuilder property(Field field) {
 			properties.add(field);
@@ -62,17 +62,17 @@ public class Schema {
 		}
 
 		public SchemaBuilder requiredField(String field) {
-			requireFields.add(field);
+			requiredFields.add(field);
 			return this;
 		}
 
 		public SchemaBuilder requiredFields(List<String> fields) {
-			requireFields.addAll(fields);
+			requiredFields.addAll(fields);
 			return this;
 		}
 
 		public SchemaBuilder requiredFields(String[] fields) {
-			requireFields.addAll(asList(fields));
+			requiredFields.addAll(asList(fields));
 			return this;
 		}
 	}

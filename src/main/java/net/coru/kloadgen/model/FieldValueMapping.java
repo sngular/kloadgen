@@ -30,6 +30,8 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 @EqualsAndHashCode(callSuper = false)
 public class FieldValueMapping extends AbstractTestElement {
 
+    public static final String FIELD_CONSTRAINTS = "constrains";
+    public static final String FIELD_REQUIRED = "required";
     public static final String FIELD_NAME = "fieldName";
     public static final String FIELD_TYPE = "fieldType";
     public static final String VALUE_LENGTH = "valueLength";
@@ -39,6 +41,7 @@ public class FieldValueMapping extends AbstractTestElement {
     private String fieldType;
     private Integer valueLength;
     private String fieldValueList;
+    private Boolean required = false;
 
     private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
 
@@ -57,14 +60,23 @@ public class FieldValueMapping extends AbstractTestElement {
         this.setFieldValuesList(valueList);
     }
 
+    public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList, Boolean required) {
+        this.setFieldName(fieldName);
+        this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
+        this.setFieldType(fieldType);
+        this.setFieldValuesList(valueList);
+        this.setRequired(required != null && required);
+    }
+
     @Builder
     public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String fieldValueList,
-        Map<ConstraintTypeEnum, String> constrains) {
+        Map<ConstraintTypeEnum, String> constrains, Boolean required) {
         this.setFieldName(fieldName);
         this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
         this.setFieldType(fieldType);
         this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
         this.constrains = constrains;
+        this.setRequired(required != null && required);
     }
 
     public String getFieldName() {
@@ -125,6 +137,14 @@ public class FieldValueMapping extends AbstractTestElement {
     public void setFieldValuesList(String fieldValuesList) {
         this.fieldValueList = fieldValuesList;
         setProperty(FIELD_VALUES_LIST, fieldValuesList);
+    }
+
+    public Boolean getRequired() {
+        return required;
+    }
+
+    public void setRequired(Boolean required) {
+        this.required = required;
     }
 
     public void init() {

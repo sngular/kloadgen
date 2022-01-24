@@ -6,7 +6,7 @@
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
-  <version>3.7.3</version>
+  <version>3.7.0</version>
 
   <distributionManagement>
     <repository>
