@@ -8,6 +8,14 @@
   <artifactId>kloadgen</artifactId>
 
   <version>3.12.0</version>
+  <licenses>
+    <license>
+      <name>Mozilla Public License 2.0</name>
+      <url>https://github.com/corunet/kloadgen/blob/master/LICENSE</url>
+      <distribution>repo</distribution>
+      <comments></comments>
+    </license>
+  </licenses>
 
   <properties>
     <assertj-core.version>3.18.1</assertj-core.version>
