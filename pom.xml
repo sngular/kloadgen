@@ -387,7 +387,7 @@
                   </excludes>
                 </filter>
               </filters>
-              <shadedClassifierName>${project.artifactId}-${lane}-${project.version}</shadedClassifierName>
+              <shadedClassifierName>${lane}</shadedClassifierName>
               <shadedArtifactAttached>true</shadedArtifactAttached>
             </configuration>
             <executions>
@@ -503,7 +503,7 @@
                       </excludes>
                     </filter>
                   </filters>
-                  <finalName>${project.artifactId}-${lane}-${project.version}</finalName>
+                  <finalName>${lane}</finalName>
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -518,5 +518,4 @@
       </build>
     </profile>
   </profiles>
-
 </project>
