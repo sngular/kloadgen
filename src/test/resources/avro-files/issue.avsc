@@ -1,0 +1,53 @@
+{
+  "type": "record",
+  "name": "OptionalArrayEvent",
+  "namespace": "net.coru",
+  "fields": [
+   {
+      "name": "mainObject",
+      "type": {
+        "type": "record",
+        "name": "PlayerData",
+        "doc": "Player account data",
+        "fields": [
+          {
+            "name": "arrayValue",
+            "type": {
+              "type": "array",
+              "items": 
+                [{
+                  "name": "TestingRecord",
+                  "type": "record",
+                  "fields": [
+                    {
+                      "name": "optional1",
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    {
+                      "name": "optional2",
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    {
+                      "name": "optional3",
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  ]
+                }, "null"
+              ],
+              "default": null
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
