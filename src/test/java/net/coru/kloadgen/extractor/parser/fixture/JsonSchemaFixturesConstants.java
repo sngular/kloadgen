@@ -22,7 +22,7 @@ public class JsonSchemaFixturesConstants {
                 .id("https://example.com/person.schema.json")
                 .name("http://json-schema.org/draft-07/schema#")
                 .type("object")
-                .requiredFields(Arrays.asList("age", "lastName"))
+                .requiredFields(Arrays.asList("lastName", "age"))
                 .property(StringField.builder().name("firstName").build())
                 .property(StringField.builder().name("lastName").build())
                 .property(IntegerField.builder().name("age").build())
