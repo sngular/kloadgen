@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -159,7 +160,7 @@ class AvroGeneratorToolTest {
     var intList = new ArrayList<>();
     var context = new HashMap<String, Object>();
     for (int i=0; i <= size; i++) {
-      intList.add(new AvroGeneratorTool().generateSequenceForFieldValueList("ClientCode", "seq", values, context));
+      intList.add(new RandomObject().generateSequenceForFieldValueList("ClientCode", "seq", values, context));
     }
     assertThat(intList).containsExactlyElementsOf(expected);
   }
