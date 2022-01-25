@@ -85,9 +85,7 @@ public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
             FieldValueMapping.FIELD_NAME,
             FieldValueMapping.FIELD_TYPE,
             FieldValueMapping.VALUE_LENGTH,
-            FieldValueMapping.FIELD_VALUES_LIST,
-            FieldValueMapping.FIELD_CONSTRAINTS,
-            FieldValueMapping.FIELD_REQUIRED
+            FieldValueMapping.FIELD_VALUES_LIST
         });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);

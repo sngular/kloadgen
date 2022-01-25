@@ -41,7 +41,7 @@ public class FieldValueMapping extends AbstractTestElement {
     private String fieldType;
     private Integer valueLength;
     private String fieldValueList;
-    private Boolean required = false;
+    private Boolean required = true;
 
     private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
 
@@ -51,6 +51,7 @@ public class FieldValueMapping extends AbstractTestElement {
         this.setFieldName(fieldName);
         this.setValueLength(0);
         this.setFieldType(fieldType);
+        this.setRequired(true);
     }
 
     public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList) {
@@ -58,6 +59,7 @@ public class FieldValueMapping extends AbstractTestElement {
         this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
         this.setFieldType(fieldType);
         this.setFieldValuesList(valueList);
+        this.setRequired(true);
     }
 
     public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList, Boolean required) {
@@ -75,7 +77,7 @@ public class FieldValueMapping extends AbstractTestElement {
         this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
         this.setFieldType(fieldType);
         this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
-        this.constrains = constrains;
+        this.setConstrains(constrains);
         this.setRequired(required != null && required);
     }
 
@@ -140,11 +142,12 @@ public class FieldValueMapping extends AbstractTestElement {
     }
 
     public Boolean getRequired() {
-        return required;
+        return getPropertyAsBoolean(FIELD_REQUIRED);
     }
 
     public void setRequired(Boolean required) {
         this.required = required;
+        setProperty(FIELD_REQUIRED, required);
     }
 
     public void init() {
@@ -153,6 +156,10 @@ public class FieldValueMapping extends AbstractTestElement {
 
     public Map<ConstraintTypeEnum, String> getConstrains() {
         return constrains;
+    }
+
+    public void setConstrains(Map<ConstraintTypeEnum, String> constrains) {
+        this.constrains = constrains;
     }
 
     public static class FieldValueMappingBuilder {
