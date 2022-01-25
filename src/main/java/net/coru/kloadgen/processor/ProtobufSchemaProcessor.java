@@ -1,13 +1,16 @@
 package net.coru.kloadgen.processor;
 
 import com.github.os72.protobuf.dynamic.DynamicSchema;
+import com.github.os72.protobuf.dynamic.EnumDefinition;
 import com.github.os72.protobuf.dynamic.MessageDefinition;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
+import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
+import com.squareup.wire.schema.internal.parser.TypeElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
@@ -21,6 +24,7 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.util.ProtobufHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -142,66 +146,82 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             }
         }
         MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
-        schemaBuilder.addMessageDefinition(buildMessageDefinition(messageElement));
+        HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+        schemaBuilder.setPackage(schema.getPackageName());
+        schemaBuilder.addMessageDefinition(buildMessageDefinition(messageElement.getName(), messageElement, nestedTypes));
         return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
     }
 
-    private MessageDefinition buildMessageDefinition(MessageElement messageElement) {
-        HashMap<String, MessageElement> nestedTypes = new HashMap<>();
+    private MessageDefinition buildMessageDefinition(String fieldName, TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
         fillNestedTypes(messageElement, nestedTypes);
-        MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(messageElement.getName());
-        for (int i = 0; i < messageElement.getFields().size(); i++) {
-            var messageType = messageElement.getFields().get(i).getType();
+        MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
+        var element = (MessageElement) messageElement;
+        for (var elementField : element.getFields()) {
+            var elementFieldType = elementField.getType();
+            var dotType = checkDotType(elementFieldType);
+            if (nestedTypes.containsKey(elementFieldType)) {
+                addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes);
+            }
 
-            var dotType = checkDotType(messageType);
-            if (nestedTypes.containsKey(messageElement.getFields().get(i).getType())) {
-                msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(messageElement.getFields().get(i).getType())));
+            if (nestedTypes.containsKey(dotType)) {
+                addDefinition(msgDef, dotType, nestedTypes.remove(dotType), nestedTypes);
             }
-            if(nestedTypes.containsKey(dotType)){
-                msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(dotType)));
-            }
-            if (messageElement.getFields().get(i).getType().startsWith("map")) {
-                var realType = StringUtils.chop(messageType.substring(messageType.indexOf(',') + 1).trim());
+
+            if (elementField.getType().startsWith("map")) {
+                var realType = StringUtils.chop(elementFieldType.substring(elementFieldType.indexOf(',') + 1).trim());
                 var mapDotType = checkDotType(realType);
-                if(nestedTypes.containsKey(realType)){
-                    msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(realType)));
+
+                if (nestedTypes.containsKey(realType)) {
+                    addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes);
                 }
-                if(nestedTypes.containsKey(mapDotType)){
-                    msgDef.addMessageDefinition(buildMessageDefinition(nestedTypes.get(mapDotType)));
+
+                if (nestedTypes.containsKey(mapDotType)) {
+                    addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes);
                 }
                 msgDef.addField("repeated",
-                        "typemapnumber" + i,
-                        messageElement.getFields().get(i).getName(),
-                        messageElement.getFields().get(i).getTag());
+                        "typemapnumber" + elementField.getName(),
+                    elementField.getName(),
+                    elementField.getTag());
 
                 msgDef.addMessageDefinition(
-                        MessageDefinition.newBuilder("typemapnumber" + i)
+                        MessageDefinition.newBuilder("typemapnumber" + elementField.getName())
                                 .addField(OPTIONAL, "string", "key", 1)
                                 .addField(OPTIONAL, realType, "value", 2).build()
                 );
+            } else if (Objects.nonNull(elementField.getLabel())) {
+                msgDef.addField(elementField.getLabel().toString().toLowerCase(),
+                    elementField.getType(),
+                    elementField.getName(),
+                    elementField.getTag());
             } else {
-                if (Objects.nonNull(messageElement.getFields().get(i).getLabel())) {
-                    msgDef.addField(messageElement.getFields().get(i).getLabel().toString().toLowerCase(),
-                            messageElement.getFields().get(i).getType(),
-                            messageElement.getFields().get(i).getName(),
-                            messageElement.getFields().get(i).getTag());
-                } else {
-                    msgDef.addField(OPTIONAL,
-                            messageElement.getFields().get(i).getType(),
-                            messageElement.getFields().get(i).getName(),
-                            messageElement.getFields().get(i).getTag());
-                }
-
+                msgDef.addField(OPTIONAL,
+                    elementField.getType(),
+                    elementField.getName(),
+                    elementField.getTag());
             }
-
         }
         return msgDef.build();
     }
 
-    private void fillNestedTypes(MessageElement messageElement, HashMap<String, MessageElement> nestedTypes) {
-        if (!messageElement.getNestedTypes().isEmpty()) {
+    private void addDefinition(MessageDefinition.Builder msgDef, String typeName, TypeElement typeElement, HashMap<String, TypeElement> nestedTypes) {
+        if (typeElement instanceof EnumElement) {
+            var enumElement = (EnumElement) typeElement;
+            EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
+            for (var constant: enumElement.getConstants()) {
+                builder.addValue(constant.getName(), constant.getTag());
+            }
+            msgDef.addEnumDefinition(builder.build());
+        } else {
+            if (!typeName.contains(".")) {
+                msgDef.addMessageDefinition(buildMessageDefinition(typeName, typeElement, nestedTypes));
+            }
+        }
+    }
+
+    private void fillNestedTypes(TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
+        if (!CollectionUtils.isEmpty(messageElement.getNestedTypes())) {
             messageElement.getNestedTypes().forEach(nestedType ->
-                    nestedTypes.put(nestedType.getName(), (MessageElement) nestedType)
+                    nestedTypes.put(nestedType.getName(), nestedType)
             );
         }
     }

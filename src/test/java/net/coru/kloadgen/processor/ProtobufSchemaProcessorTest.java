@@ -59,7 +59,7 @@ class ProtobufSchemaProcessorTest {
         String idField = getIdFieldForEmbeddedTypeTest(assertValues);
         assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
         assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(assertKeys).hasSize(1).containsExactlyInAnyOrder( "Person.phones");
+        assertThat(assertKeys).hasSize(1).containsExactlyInAnyOrder( "tutorial.Person.phones");
         assertThat(idField).isEqualTo("[Pablo]");
     }
 
@@ -121,7 +121,7 @@ class ProtobufSchemaProcessorTest {
                 .isInstanceOf(EnrichedRecord.class)
                 .extracting(EnrichedRecord::getGenericRecord)
                 .isNotNull();
-        assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("Address.street", "Address.number", "Address.zipcode");
+        assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Address.street", "tutorial.Address.number", "tutorial.Address.zipcode");
         assertThat(assertValues).hasSize(3);
         assertThat(assertValues.get(0)).isInstanceOf(String.class);
         assertThat(integerList.get(0)).isInstanceOf(Integer.class);

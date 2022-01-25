@@ -9,7 +9,7 @@ option java_outer_classname = "AddressBookProtos";
 
 message Person {
   map<string, string> name = 1;
-  map<string, .tutorial.Address> addresses = 2;
+  map<string, .tutorial.Person.Address> addresses = 2;
   map<string, Address> addressesNoDot = 3;
   
   message Address{
