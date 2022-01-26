@@ -48,7 +48,6 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         protobufHelper = new ProtobufHelper();
     }
 
-
     public void processSchema(ProtoFileElement schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
         throws DescriptorValidationException, IOException {
         this.schema = buildDescriptor(schema);
@@ -113,14 +112,14 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                     if (fieldValueMapping.getFieldType().equals("enum")) {
                         processFieldValueMappingAsEnum(messageBuilder, fieldValueMapping, typeName, fieldName);
                     } else {
-                        messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
-                                randomObject.generateRandom(
-                                        fieldValueMapping.getFieldType(),
-                                        fieldValueMapping.getValueLength(),
-                                        fieldValueMapping.getFieldValuesList(),
-                                        fieldValueMapping.getConstrains()
-                                )
-                        );
+                        var descriptor = messageBuilder.getDescriptorForType().findFieldByName(typeName);
+                        messageBuilder.setField(descriptor,
+                            generatorTool.generateObject(descriptor,
+                                fieldValueMapping.getFieldType(),
+                                fieldValueMapping.getValueLength(),
+                                fieldValueMapping.getFieldValuesList(),
+                                fieldValueMapping.getConstrains()
+                            ));
                     }
                     fieldExpMappingsQueue.remove();
                     fieldValueMapping = fieldExpMappingsQueue.peek();
@@ -337,8 +336,9 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
             } else {
                 fieldExpMappingsQueue.poll();
-                messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName),
-                        randomObject.generateRandom(
+                var descriptor = messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName);
+                messageBuilder.setField(descriptor,
+                    generatorTool.generateObject(descriptor,
                                 fieldValueMapping.getFieldType(),
                                 fieldValueMapping.getValueLength(),
                                 fieldValueMapping.getFieldValuesList(),

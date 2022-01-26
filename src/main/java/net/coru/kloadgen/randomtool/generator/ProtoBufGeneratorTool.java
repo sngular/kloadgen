@@ -1,14 +1,17 @@
 package net.coru.kloadgen.randomtool.generator;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.EnumValue;
 import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class ProtoBufGeneratorTool {
 
@@ -50,5 +53,11 @@ public class ProtoBufGeneratorTool {
             }
         }
         return value;
+    }
+
+    public Object generateObject(FieldDescriptor descriptor, String fieldType, Integer valueLength, List<String> fieldValuesList,
+        Map<ConstraintTypeEnum, String> constrains) {
+
+        return null;
     }
 }

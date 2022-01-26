@@ -157,11 +157,18 @@ public class RandomObject {
         value = getDecimalValueOrRandom(fieldValueList, constrains);
         break;
       default:
-        value = fieldType;
+        value = buildFromClasspath(fieldType);
         break;
     }
 
     return value;
+  }
+
+  private Object buildFromClasspath(String fieldType) {
+    if (fieldType.contains(".")) {
+      this.getClass().getResourceAsStream(fieldType);
+    }
+    return null;
   }
 
   private Long getSafeValue(List<String> fieldValueList) {

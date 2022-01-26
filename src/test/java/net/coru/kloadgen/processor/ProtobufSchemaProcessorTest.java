@@ -15,6 +15,7 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,7 @@ class ProtobufSchemaProcessorTest {
     }
     
     @Test
+    @DisplayName("Be able to process embedded schema")
     void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
         List<FieldValueMapping> fieldValueMappingList = List.of(
@@ -64,6 +66,7 @@ class ProtobufSchemaProcessorTest {
     }
 
     @Test
+    @DisplayName("Be able to process enum in the schema")
     void testProtoBufEnumSchemaProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/enumTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
@@ -99,7 +102,9 @@ class ProtobufSchemaProcessorTest {
                 .isIn("HOME", "WORK", "MOBILE");
         assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("tutorial.Person.phoneTypes", "tutorial.Person.phoneTypesArray", "tutorial.Person.phoneTypesMap");
     }
+
     @Test
+    @DisplayName("Be able to process easy schema")
     void testProtoBufEasyTestProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
         List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
@@ -130,6 +135,7 @@ class ProtobufSchemaProcessorTest {
     }
 
     @Test
+    @DisplayName("Be able to process map in schema")
     void testProtoBufMapTestProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
         List<FieldValueMapping> fieldValueMappingList = asList(
@@ -173,17 +179,7 @@ class ProtobufSchemaProcessorTest {
     }
 
     @Test
-    void testProtoBufMapTest2Processor() throws IOException, DescriptorValidationException {
-        File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
-        List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-        EnrichedRecord message = protobufSchemaProcessor.next();
-        DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
-        assertThat(genericRecord).isNotNull();
-    }
-
-    @Test
+    @DisplayName("Be able to process complex schema")
     void testProtoBufComplexTestProcessor() throws IOException, DescriptorValidationException {
         File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
         List<FieldValueMapping> fieldValueMappingList = asList(
@@ -220,6 +216,67 @@ class ProtobufSchemaProcessorTest {
                 .isNotNull();
         assertThat(assertKeys).hasSize(8).containsExactlyInAnyOrder("tutorial.Test.phone_types","tutorial.Test.age","tutorial.Test.address","tutorial.Test.pets", "tutorial.Test.descriptors", "tutorial.Test.dates","tutorial.Test.response","tutorial.Test.presents");
         assertThat(assertValues).hasSize(8).isNotNull();
+        assertThat(assertValues.get(1)).isInstanceOf(Integer.class);
+        assertThat(assertValues.get(6)).isInstanceOf(String.class);
+    }
+
+    @Test
+    @DisplayName("Be able to process provided complex schema")
+    void testProtoBufProvidedComplexTestProcessor() throws IOException, DescriptorValidationException {
+        File testFile = fileHelper.getFile("/proto-files/providedTest.proto");
+        List<FieldValueMapping> fieldValueMappingList = asList(
+            new FieldValueMapping("IncidentEvent.id", "int", 0, ""),
+            new FieldValueMapping("IncidentEvent.occurrence_id", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.load_number", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.claim_type.code", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.claim_type.description", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.collision_type.code", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.collision_type.description", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_cause_type.code", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_cause_type.description", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_type.code", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_type.description", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.review_status_type.code", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.review_status_type.description", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_latitude", "double", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_longitude", "double", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_date", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_city", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_state", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.location_description", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_number", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_type", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_prefix", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.driver.driver_id", "int", 0, ""),
+            new FieldValueMapping("IncidentEvent.driver.driver_first_name", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.driver.driver_last_name", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.dot_accident_indicator", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.drug_test_required_indicator", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.hazardous_material_indicator", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.preventable_indicator", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.report_by_name", "string", 0, ""),
+            new FieldValueMapping("IncidentEvent.create_user_id", "string", 0, ""));
+        ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+        protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+        EnrichedRecord message = protobufSchemaProcessor.next();
+        DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+        List<String> assertKeys = new ArrayList<>();
+        List<Object> assertValues = new ArrayList<>();
+        Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+        map.forEach((key, value) ->
+            {
+                assertKeys.add(key.getFullName());
+                assertValues.add(value);
+            }
+        );
+
+        assertThat(message).isNotNull()
+            .isInstanceOf(EnrichedRecord.class)
+            .extracting(EnrichedRecord::getGenericRecord)
+            .isNotNull();
+        assertThat(assertKeys).hasSize(31).containsExactlyInAnyOrder("tutorial.Test.phone_types","tutorial.Test.age","tutorial.Test.address","tutorial.Test.pets", "tutorial.Test.descriptors", "tutorial.Test.dates","tutorial.Test.response","tutorial.Test.presents");
+        assertThat(assertValues).isNotNull().hasSize(31);
         assertThat(assertValues.get(1)).isInstanceOf(Integer.class);
         assertThat(assertValues.get(6)).isInstanceOf(String.class);
     }
