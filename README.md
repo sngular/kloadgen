@@ -5,7 +5,7 @@
 
 ___
 
-KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO and JSON schema. It allows sending kafka messages with a structure defined as an AVRO Schema or a Json Schema. It connects to the Scheme Registry Server, retrieve the subject to send and generate a random message every time.
+KLoadGen is Kafka load generator plugin for JMeter designed to work with AVRO and JSON schemas. It allows sending kafka messages with a structure defined as an AVRO schema or a Json schema. It connects to the Scheme Registry Server, retrieves the subject to send and generates a random message every time.
 
 ## Table of contents
 
@@ -18,17 +18,15 @@ KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO an
 
 ## Getting Started
 
-KLoadGen includes eight main components
+KLoadGen includes eight main components:
 
-* **Kafka Schema Sampler** : This jmeter java sampler sends messages to kafka, it uses the value and key configuration and generate a data matching that definition. 
+* **Kafka Schema Sampler** : This jmeter java sampler sends messages to kafka, it uses the value and key configuration and generates a data matching that definition. 
 
-* **Kafka Consumer Sampler** : This jmeter java sampler reads messages from kafka, it uses the value and key 
-  configuration to deserialize read messages.
+* **Kafka Consumer Sampler** : This jmeter java sampler reads messages from kafka, it uses the value and key configuration to deserialize read messages.
 
-* **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property
-  configurations.
+* **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
 
-* **Value Serialized Config** : This jmeter config element generates plaintext messages based on input schema template designed.
+* **Value Serialized Config** : This jmeter config element generates plain text messages based on input schema template designed.
 
 * **Value File Serialized Config** : This jmeter config element allows to upload a value schema file instead to get it from the Schema
   Registry.
