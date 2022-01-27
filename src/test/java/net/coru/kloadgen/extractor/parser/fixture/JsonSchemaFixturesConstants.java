@@ -82,7 +82,7 @@ public class JsonSchemaFixturesConstants {
           .id("")
           .name("http://json-schema.org/draft-04/schema#")
           .type("object")
-              .requiredFields(Arrays.asList("_id", "userId", "storeId", "snapshotId", "addressId", "addressLine", "alias", "contactInformation", "countryCode", "geopoliticalSubdivisions", "_metadata", "_entity", "_class"))
+              .requiredFields(Arrays.asList("_id", "userId", "storeId", "snapshotId", "addressId", "addressLine", "alias", "contactInformation", "countryCode", "geopoliticalSubdivisions", "_metadata", "_entity", "_class", "email", "firstName", "phones", "level1", "createdAt", "createdBy", "lastUpdatedAt", "lastUpdatedBy", "projectVersion", "projectName", "schema"))
           .property(StringField.builder().name("_id").build())
           .property(NumberField.builder().name("userId").minimum(1).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
           .property(NumberField.builder().name("storeId").minimum(0).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
@@ -302,7 +302,7 @@ public class JsonSchemaFixturesConstants {
                      .build())
                  .build())
               .build())
-              .requiredFields(asList("_class","_entity", "_metadata","orderId","storeId","type", "status","origin","orderItems"))
+              .requiredFields(asList("_class","_entity", "_metadata","orderId","storeId","type", "status","origin","orderItems", "createdAt", "createdBy", "lastUpdatedAt", "lastUpdatedBy", "status", "addressId", "systemType"))
               .definitions(asList(
                   ObjectField
                       .builder()

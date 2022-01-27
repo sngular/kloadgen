@@ -1,24 +1,25 @@
 package net.coru.kloadgen.processor;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
+import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JsonSchemaProcessorTest {
@@ -36,22 +37,22 @@ public class JsonSchemaProcessorTest {
         JMeterUtils.setLocale(Locale.ENGLISH);
     }
 
-    @Test
-    void testNullOnOptionalFields() throws IOException {
-        File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
-        List<FieldValueMapping> fieldValueMappingList =
-                extractor.flatPropertiesList(extractor.schemaTypesList(testFile, "JSON"));
+    private static Stream<Object> parametersForTestNullOnOptionalField(){
+        return Stream.of(
+                Arguments.of(SIMPLE_SCHEMA, SIMPLE_SCHEMA_EXPECTED),
+                Arguments.of(SIMPLE_SCHEMA_ARRAY, SIMPLE_SCHEMA_ARRAY_EXPECTED),
+                Arguments.of(COMPLEX_SCHEMA, COMPLEX_SCHEMA_EXPECTED)
+        );
+    }
 
-        fieldValueMappingList.get(0).setFieldValuesList("null");
-        fieldValueMappingList.get(1).setFieldValuesList("null");
-        fieldValueMappingList.get(2).setFieldValuesList("null");
+    @ParameterizedTest
+    @MethodSource("parametersForTestNullOnOptionalField")
+    void testNullOnOptionalField(List<FieldValueMapping> schemaAsJson, String expected) {
 
         JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
-        jsonSchemaProcessor.processSchema(fieldValueMappingList);
+        jsonSchemaProcessor.processSchema(schemaAsJson);
         ObjectNode message = jsonSchemaProcessor.next();
 
-        assertThat(message.get("firstName")).isNull();
-        assertThat(message.get("lastName")).isNotNull();
-        assertThat(message.get("age")).isNotNull();
+        assertThat(message.toString()).isEqualTo(expected);
     }
 }

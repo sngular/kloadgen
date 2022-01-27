@@ -10,9 +10,9 @@ import static net.coru.kloadgen.model.ConstraintTypeEnum.MULTIPLE_OF;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+
+import java.util.*;
+
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -40,7 +40,26 @@ public class JsonExtractor {
     List<FieldValueMapping> attributeList = new ArrayList<>();
 
     schema.getProperties().forEach(field -> attributeList.addAll(processField(field)));
-    attributeList.forEach(field -> field.setRequired(schema.getRequiredFields().contains(field.getFieldName())));
+
+    Set<String> requiredFields = new HashSet<String>(schema.getRequiredFields());
+
+    for (FieldValueMapping field: attributeList){
+      if (field.getFieldName().contains(".")){
+
+        String[] names = field.getFieldName().split("\\.");
+        List<String> namesList = Arrays.asList(names).subList(names.length-2, names.length);
+
+        if (!Collections.disjoint(requiredFields, namesList)){
+          field.setRequired(true);
+          requiredFields.add(names[1]);
+        }
+        else {
+          field.setRequired(false);
+        }
+      } else{
+        field.setRequired(requiredFields.contains(field.getFieldName()));
+      }
+    }
     return attributeList;
   }
 

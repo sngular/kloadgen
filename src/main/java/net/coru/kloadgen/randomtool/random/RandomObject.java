@@ -88,6 +88,7 @@ public class RandomObject {
               value = Double.MAX_VALUE;
             }
             break;
+          case ValidTypeConstants.NUMBER:
           case ValidTypeConstants.FLOAT:
             try {
               value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();

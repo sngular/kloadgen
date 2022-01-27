@@ -87,6 +87,10 @@ public class JSONSchemaParser implements SchemaParser {
     List<String> requiredFields = new ArrayList<>();
     requiredList.elements().forEachRemaining((elm) -> requiredFields.add(elm.textValue()));
 
+    for (JsonNode field: jsonNode.path(PROPERTIES)) {
+      field.path(REQUIRED).elements().forEachRemaining((elm) -> requiredFields.add(elm.textValue()));
+    }
+
     CollectionUtils.collect(jsonNode.path(PROPERTIES).fieldNames(),
         fieldName -> buildProperty(fieldName, jsonNode.path(PROPERTIES).get(fieldName)),
         fields);

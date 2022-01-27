@@ -47,6 +47,8 @@ public class ValidTypeConstants {
   // Object values
   public static final String FLOAT = "float";
 
+  public static final String NUMBER = "number";
+
   public static final String ARRAY = "array";
 
   public static final String MAP = "map";

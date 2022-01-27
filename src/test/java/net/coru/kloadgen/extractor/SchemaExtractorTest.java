@@ -9,6 +9,7 @@ package net.coru.kloadgen.extractor;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,9 +27,12 @@ import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import static net.coru.kloadgen.model.ConstraintTypeEnum.MAXIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -202,6 +206,35 @@ class SchemaExtractorTest {
             new FieldValueMapping("mainObject.arrayValue[].optional2", "string"),
             new FieldValueMapping("mainObject.arrayValue[].optional3", "string")
         );
+  }
+
+  @Test
+  @DisplayName("Should propagate required status to children fields not required of a required field")
+  void testRequiredPropagationChildrenFields() throws IOException {
+    File testFile = fileHelper.getFile("/jsonschema/complex-document.jcs");
+
+    List<FieldValueMapping> fieldValueMappingList =
+            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+
+    assertThat(fieldValueMappingList)
+            .contains(
+                    new FieldValueMapping("geopoliticalSubdivisions.level1.code", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
+                      put(MINIMUM_VALUE, "2");
+                      put(MAXIMUM_VALUE, "3");
+                    }}, true),
+                    new FieldValueMapping("geopoliticalSubdivisions.level1.freeForm", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
+                      put(MINIMUM_VALUE, "1");
+                      put(MAXIMUM_VALUE, "256");
+                    }}, true),
+                    new FieldValueMapping("geopoliticalSubdivisions.level2.code", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
+                      put(MINIMUM_VALUE, "2");
+                      put(MAXIMUM_VALUE, "3");
+                    }}, false),
+                    new FieldValueMapping("geopoliticalSubdivisions.level2.freeForm", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
+                      put(MINIMUM_VALUE, "1");
+                      put(MAXIMUM_VALUE, "256");
+                    }}, false)
+            );
   }
 
 }
