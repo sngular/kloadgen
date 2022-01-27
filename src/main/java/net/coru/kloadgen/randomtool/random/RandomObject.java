@@ -66,7 +66,7 @@ public class RandomObject {
       fieldValueList.set(0, fieldValueList.get(0).substring(1));
       return generateSequenceForFieldValueList(fieldValueList.get(0), fieldType, fieldValueList, context );
     }
-    switch (fieldType) {
+    switch (fieldType.toLowerCase(Locale.ROOT)) {
       case ValidTypeConstants.STRING:
         value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
         break;

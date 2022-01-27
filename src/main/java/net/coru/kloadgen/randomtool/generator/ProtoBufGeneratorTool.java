@@ -5,6 +5,7 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.EnumValue;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.commons.lang3.RandomUtils;
 
@@ -12,8 +13,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ProtoBufGeneratorTool {
+
+    private final static RandomObject RANDOM_OBJECT = new RandomObject();;
 
     private final String ENUM = "enum";
     private final String ENUM_ARRAY = "enum-array";
@@ -57,7 +61,10 @@ public class ProtoBufGeneratorTool {
 
     public Object generateObject(FieldDescriptor descriptor, String fieldType, Integer valueLength, List<String> fieldValuesList,
         Map<ConstraintTypeEnum, String> constrains) {
-
-        return null;
+        Object result = null;
+        if(Objects.nonNull(descriptor.getJavaType())) {
+            result = RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constrains);
+        }
+        return result;
     }
 }

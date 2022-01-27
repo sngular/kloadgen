@@ -275,10 +275,32 @@ class ProtobufSchemaProcessorTest {
             .isInstanceOf(EnrichedRecord.class)
             .extracting(EnrichedRecord::getGenericRecord)
             .isNotNull();
-        assertThat(assertKeys).hasSize(31).containsExactlyInAnyOrder("tutorial.Test.phone_types","tutorial.Test.age","tutorial.Test.address","tutorial.Test.pets", "tutorial.Test.descriptors", "tutorial.Test.dates","tutorial.Test.response","tutorial.Test.presents");
-        assertThat(assertValues).isNotNull().hasSize(31);
-        assertThat(assertValues.get(1)).isInstanceOf(Integer.class);
-        assertThat(assertValues.get(6)).isInstanceOf(String.class);
+        assertThat(assertKeys).hasSize(23)
+            .containsExactlyInAnyOrder(
+                "company.IncidentEvent.id",
+                "company.IncidentEvent.occurrence_id",
+                "company.IncidentEvent.load_number",
+                "company.IncidentEvent.claim_type",
+                "company.IncidentEvent.collision_type",
+                "company.IncidentEvent.incident_cause_type",
+                "company.IncidentEvent.incident_type",
+                "company.IncidentEvent.review_status_type",
+                "company.IncidentEvent.incident_latitude",
+                "company.IncidentEvent.incident_longitude",
+                "company.IncidentEvent.incident_date",
+                "company.IncidentEvent.incident_time",
+                "company.IncidentEvent.incident_city",
+                "company.IncidentEvent.incident_state",
+                "company.IncidentEvent.location_description",
+                "company.IncidentEvent.incident_equipment_details",
+                "company.IncidentEvent.driver",
+                "company.IncidentEvent.dot_accident_indicator",
+                "company.IncidentEvent.drug_test_required_indicator",
+                "company.IncidentEvent.hazardous_material_indicator",
+                "company.IncidentEvent.preventable_indicator",
+                "company.IncidentEvent.report_by_name",
+                "company.IncidentEvent.create_user_id");
+        assertThat(assertValues).isNotNull().hasSize(23);
     }
 
     private Object getSubFieldForMapTestProcessor(DynamicMessage dynamicMessage, String field) {

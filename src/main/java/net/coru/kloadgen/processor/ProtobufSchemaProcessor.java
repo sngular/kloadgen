@@ -1,19 +1,23 @@
 package net.coru.kloadgen.processor;
 
-import com.github.os72.protobuf.dynamic.DynamicSchema;
-import com.github.os72.protobuf.dynamic.EnumDefinition;
-import com.github.os72.protobuf.dynamic.MessageDefinition;
+import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Message;
-import com.squareup.wire.schema.internal.parser.EnumElement;
-import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import com.squareup.wire.schema.internal.parser.TypeElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -21,20 +25,9 @@ import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import net.coru.kloadgen.util.ProtobufHelper;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.*;
 
 @Slf4j
 public class ProtobufSchemaProcessor extends SchemaProcessorLib {
-
-    public static final String OPTIONAL = "optional";
 
     private Descriptors.Descriptor schema;
     private SchemaMetadata metadata;
@@ -42,15 +35,10 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     private RandomMap randomMap;
     private List<FieldValueMapping> fieldExprMappings;
     private ProtoBufGeneratorTool generatorTool;
-    public ProtobufHelper protobufHelper;
-
-    public ProtobufSchemaProcessor() {
-        protobufHelper = new ProtobufHelper();
-    }
 
     public void processSchema(ProtoFileElement schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
         throws DescriptorValidationException, IOException {
-        this.schema = buildDescriptor(schema);
+        this.schema = new ProtoBufProcessorHelper().buildDescriptor(schema);
         this.fieldExprMappings = fieldExprMappings;
         this.metadata = metadata;
         randomObject = new RandomObject();
@@ -59,7 +47,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
     public void processSchema(ParsedSchema parsedSchema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
         throws DescriptorValidationException, IOException {
-        this.schema = buildDescriptor((ProtoFileElement) parsedSchema.rawSchema());
+        this.schema = new ProtoBufProcessorHelper().buildDescriptor((ProtoFileElement) parsedSchema.rawSchema());
         this.fieldExprMappings = fieldExprMappings;
         this.metadata = metadata;
         randomObject = new RandomObject();
@@ -113,13 +101,17 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                         processFieldValueMappingAsEnum(messageBuilder, fieldValueMapping, typeName, fieldName);
                     } else {
                         var descriptor = messageBuilder.getDescriptorForType().findFieldByName(typeName);
-                        messageBuilder.setField(descriptor,
-                            generatorTool.generateObject(descriptor,
-                                fieldValueMapping.getFieldType(),
-                                fieldValueMapping.getValueLength(),
-                                fieldValueMapping.getFieldValuesList(),
-                                fieldValueMapping.getConstrains()
-                            ));
+                        if (MESSAGE.equals(descriptor.getType())) {
+                            messageBuilder.setField(descriptor, createFieldObject(descriptor.getMessageType()));
+                        } else {
+                            messageBuilder.setField(descriptor,
+                                generatorTool.generateObject(descriptor,
+                                    fieldValueMapping.getFieldType(),
+                                    fieldValueMapping.getValueLength(),
+                                    fieldValueMapping.getFieldValuesList(),
+                                    fieldValueMapping.getConstrains()
+                                ));
+                        }
                     }
                     fieldExpMappingsQueue.remove();
                     fieldValueMapping = fieldExpMappingsQueue.peek();
@@ -130,160 +122,16 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         return new EnrichedRecord(metadata, message);
     }
 
-    private Descriptors.Descriptor buildDescriptor(ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
-
-        DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
-        var lines = new ArrayList<String>();
-        List<String> imports = schema.getImports();
-        for (String importedClass : imports) {
-            String schemaToString = new String(getClass().getClassLoader().getResourceAsStream(importedClass).readAllBytes());
-            lines.addAll(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
-            if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
-                var importedSchema = processImported(lines);
-                schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
-                schemaBuilder.addSchema(importedSchema);
-            }
-        }
-        MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
-        HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-        schemaBuilder.setPackage(schema.getPackageName());
-        schemaBuilder.addMessageDefinition(buildMessageDefinition(messageElement.getName(), messageElement, nestedTypes));
-        return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
-    }
-
-    private MessageDefinition buildMessageDefinition(String fieldName, TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
-        fillNestedTypes(messageElement, nestedTypes);
-        MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
-        var element = (MessageElement) messageElement;
-        for (var elementField : element.getFields()) {
-            var elementFieldType = elementField.getType();
-            var dotType = checkDotType(elementFieldType);
-            if (nestedTypes.containsKey(elementFieldType)) {
-                addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes);
-            }
-
-            if (nestedTypes.containsKey(dotType)) {
-                addDefinition(msgDef, dotType, nestedTypes.remove(dotType), nestedTypes);
-            }
-
-            if (elementField.getType().startsWith("map")) {
-                var realType = StringUtils.chop(elementFieldType.substring(elementFieldType.indexOf(',') + 1).trim());
-                var mapDotType = checkDotType(realType);
-
-                if (nestedTypes.containsKey(realType)) {
-                    addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes);
-                }
-
-                if (nestedTypes.containsKey(mapDotType)) {
-                    addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes);
-                }
-                msgDef.addField("repeated",
-                        "typemapnumber" + elementField.getName(),
-                    elementField.getName(),
-                    elementField.getTag());
-
-                msgDef.addMessageDefinition(
-                        MessageDefinition.newBuilder("typemapnumber" + elementField.getName())
-                                .addField(OPTIONAL, "string", "key", 1)
-                                .addField(OPTIONAL, realType, "value", 2).build()
-                );
-            } else if (Objects.nonNull(elementField.getLabel())) {
-                msgDef.addField(elementField.getLabel().toString().toLowerCase(),
-                    elementField.getType(),
-                    elementField.getName(),
-                    elementField.getTag());
-            } else {
-                msgDef.addField(OPTIONAL,
-                    elementField.getType(),
-                    elementField.getName(),
-                    elementField.getTag());
-            }
-        }
-        return msgDef.build();
-    }
-
-    private void addDefinition(MessageDefinition.Builder msgDef, String typeName, TypeElement typeElement, HashMap<String, TypeElement> nestedTypes) {
-        if (typeElement instanceof EnumElement) {
-            var enumElement = (EnumElement) typeElement;
-            EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
-            for (var constant: enumElement.getConstants()) {
-                builder.addValue(constant.getName(), constant.getTag());
-            }
-            msgDef.addEnumDefinition(builder.build());
-        } else {
-            if (!typeName.contains(".")) {
-                msgDef.addMessageDefinition(buildMessageDefinition(typeName, typeElement, nestedTypes));
-            }
-        }
-    }
-
-    private void fillNestedTypes(TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
-        if (!CollectionUtils.isEmpty(messageElement.getNestedTypes())) {
-            messageElement.getNestedTypes().forEach(nestedType ->
-                    nestedTypes.put(nestedType.getName(), nestedType)
-            );
-        }
-    }
-
-    private Predicate<String> isValid() {
-        return line -> !line.contains("//") && !line.isEmpty();
-    }
-
-    private DynamicSchema processImported(List<String> importedLines) throws DescriptorValidationException {
-
-        DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
-
-        String packageName = "";
-        var linesIterator = importedLines.listIterator();
-        while (linesIterator.hasNext()) {
-            var fileLine = linesIterator.next();
-
-            if (fileLine.startsWith("package")) {
-                packageName = StringUtils.chop(fileLine.substring(7).trim());
-                schemaBuilder.setPackage(packageName);
-            }
-            if (fileLine.startsWith("message")) {
-                var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
-                schemaBuilder.setName(packageName + "." + messageName);
-                schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
-
-            }
-            if (fileLine.startsWith("import")) {
-                schemaBuilder.addDependency(fileLine.substring(6));
-            }
+    private Object createFieldObject(Descriptors.Descriptor descriptor) {
+        DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(descriptor);
+        for (var field: descriptor.getFields()) {
+            messageBuilder.setField(field,
+                randomObject.generateRandom(
+                    field.getType().getJavaType().name(),
+                    0, Collections.emptyList(), Collections.emptyMap()));
         }
 
-        return schemaBuilder.build();
-    }
-
-    private MessageDefinition buildMessage(String messageName, ListIterator<String> messageLines) {
-
-        MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
-        while (messageLines.hasNext()) {
-            var field = messageLines.next().trim().split("\\s");
-            if (protobufHelper.isValidType(field[0])) {
-                messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
-            } else if (ProtobufHelper.LABEL.contains(field[0])) {
-                messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
-            }
-        }
-
-        return messageDefinition.build();
-    }
-
-    public String checkIfChoppable(String field){
-        String choppedField = field;
-        if (field.endsWith(";")){
-            choppedField = StringUtils.chop(field);
-        }
-        return choppedField;
-    }
-
-    private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder, FieldValueMapping fieldValueMapping, String typeName, String fieldName) {
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
-        Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
-        messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
-                generatorTool.generateObject(enumDescriptor, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getFieldValuesList()));
+        return messageBuilder.build();
     }
 
     private DynamicMessage createObject(final Descriptors.Descriptor subMessageDescriptor, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
@@ -337,14 +185,18 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             } else {
                 fieldExpMappingsQueue.poll();
                 var descriptor = messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName);
-                messageBuilder.setField(descriptor,
-                    generatorTool.generateObject(descriptor,
-                                fieldValueMapping.getFieldType(),
-                                fieldValueMapping.getValueLength(),
-                                fieldValueMapping.getFieldValuesList(),
-                                fieldValueMapping.getConstrains()
+                if (MESSAGE.equals(descriptor.getType())) {
+                    messageBuilder.setField(descriptor, createFieldObject(descriptor.getMessageType()));
+                } else {
+                    messageBuilder.setField(descriptor,
+                        generatorTool.generateObject(descriptor,
+                            fieldValueMapping.getFieldType(),
+                            fieldValueMapping.getValueLength(),
+                            fieldValueMapping.getFieldValuesList(),
+                            fieldValueMapping.getConstrains()
                         )
-                );
+                    );
+                }
             }
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         }
@@ -360,6 +212,13 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                 fieldExpMappingsQueue);
         fieldExpMappingsQueue.remove();
         return getSafeGetElement(fieldExpMappingsQueue);
+    }
+
+    private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder, FieldValueMapping fieldValueMapping, String typeName, String fieldName) {
+        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+        Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
+        messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
+            generatorTool.generateObject(enumDescriptor, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getFieldValuesList()));
     }
 
     private FieldValueMapping processFieldValueMappingAsRecordMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
@@ -550,12 +409,5 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     private Descriptors.FieldDescriptor getFieldDescriptorForField(DynamicMessage.Builder messageBuilder, String typeName) {
         return messageBuilder.getDescriptorForType().findFieldByName(typeName);
     }
-    private String checkDotType(String subfieldType) {
-        String dotType = "";
-        if (subfieldType.startsWith(".") || subfieldType.contains(".")) {
-            String[] typeSplit = subfieldType.split("\\.");
-            dotType = typeSplit[typeSplit.length - 1];
-        }
-        return dotType;
-    }
+
 }
