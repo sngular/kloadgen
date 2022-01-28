@@ -8,6 +8,7 @@ package net.coru.kloadgen.serializer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
@@ -18,10 +19,10 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
-public class GenericAvroRecordSerializer<T extends GenericRecord>  implements Serializer<T> {
+public class GenericAvroRecordSerializer<T extends GenericRecord> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String topic, T record) {
+  public byte[] serialize(String topic , T record) {
 
     DatumWriter<T> writer = new SpecificDatumWriter<>(record.getSchema());
     byte[] data = new byte[0];
@@ -29,8 +30,8 @@ public class GenericAvroRecordSerializer<T extends GenericRecord>  implements Se
     Encoder jsonEncoder;
     try {
       jsonEncoder = EncoderFactory.get().jsonEncoder(
-          record.getSchema(), stream);
-      writer.write(record, jsonEncoder);
+          record.getSchema() , stream);
+      writer.write(record , jsonEncoder);
       jsonEncoder.flush();
       data = stream.toByteArray();
     } catch (IOException e) {
@@ -40,7 +41,7 @@ public class GenericAvroRecordSerializer<T extends GenericRecord>  implements Se
   }
 
   @Override
-  public byte[] serialize(String topic, Headers headers, T data) {
-    return serialize(topic, data);
+  public byte[] serialize(String topic , Headers headers , T data) {
+    return serialize(topic , data);
   }
 }

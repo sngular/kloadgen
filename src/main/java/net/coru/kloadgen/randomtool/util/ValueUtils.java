@@ -8,6 +8,7 @@ package net.coru.kloadgen.randomtool.util;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.jmeter.threads.JMeterContextService;
 
 public class ValueUtils {
@@ -20,12 +21,12 @@ public class ValueUtils {
     List<String> parameterList = new ArrayList<>(fieldValuesList);
 
     parameterList.replaceAll(fieldValue ->
-        fieldValue.matches("\\$\\{\\w*}") ?
-            JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
+                                 fieldValue.matches("\\$\\{\\w*}") ?
+                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2 , fieldValue.length() - 1)) : fieldValue);
     return parameterList;
   }
 
-  public static Object castValue(Object value, String type) {
+  public static Object castValue(Object value , String type) {
     Object castValue;
     switch (type) {
       case ValidTypeConstants.INT:

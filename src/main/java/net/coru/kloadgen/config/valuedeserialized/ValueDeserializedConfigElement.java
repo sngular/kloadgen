@@ -13,11 +13,12 @@
 package net.coru.kloadgen.config.valuedeserialized;
 
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,10 +51,10 @@ public class ValueDeserializedConfigElement extends ConfigTestElement implements
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
-    variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
-    variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY, valueDeSerializerConfiguration);
-    variables.putObject(VALUE_NAME_STRATEGY, valueNameStrategy);
+    variables.putObject(VALUE_SCHEMA_PROPERTIES , valueSchemaProperties);
+    variables.putObject(VALUE_SCHEMA_TYPE , valueSchemaType);
+    variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY , valueDeSerializerConfiguration);
+    variables.putObject(VALUE_NAME_STRATEGY , valueNameStrategy);
 
   }
 

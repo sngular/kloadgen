@@ -1,6 +1,7 @@
 package net.coru.kloadgen.extractor.extractors;
 
 import static java.lang.String.join;
+
 import static net.coru.kloadgen.model.ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.FORMAT;
@@ -9,10 +10,11 @@ import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.MULTIPLE_OF;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -49,15 +51,14 @@ public class JsonExtractor {
 
   private List<FieldValueMapping> processFieldList(List<Field> fieldList) {
     List<FieldValueMapping> completeFieldList = new ArrayList<>();
-    for(Field innerField : fieldList) {
+    for (Field innerField : fieldList) {
       completeFieldList.addAll(processField(innerField));
     }
     return completeFieldList;
   }
 
-
-  private Transformer<FieldValueMapping, FieldValueMapping> fixName(String fieldName, String splitter) {
-    return fieldValue-> {
+  private Transformer<FieldValueMapping, FieldValueMapping> fixName(String fieldName , String splitter) {
+    return fieldValue -> {
       fieldValue.setFieldName(fieldName + splitter + fieldValue.getFieldName());
       return fieldValue;
     };
@@ -66,17 +67,17 @@ public class JsonExtractor {
   private List<FieldValueMapping> processField(Field innerField) {
     List<FieldValueMapping> completeFieldList = new ArrayList<>();
     if (innerField instanceof ObjectField) {
-      processRecordFieldList(innerField.getName(), ".", extractInternalFields((ObjectField)innerField), completeFieldList);
+      processRecordFieldList(innerField.getName() , "." , extractInternalFields((ObjectField) innerField) , completeFieldList);
     } else if (innerField instanceof ArrayField) {
       completeFieldList.addAll(extractArrayInternalFields((ArrayField) innerField));
     } else if (innerField instanceof EnumField) {
       completeFieldList.add(FieldValueMapping
-          .builder()
-          .fieldName(innerField.getName())
-          .fieldType(innerField.getType())
-          .valueLength(0)
-          .fieldValueList(join(",", ((EnumField) innerField).getEnumValues()))
-          .build());
+                                .builder()
+                                .fieldName(innerField.getName())
+                                .fieldType(innerField.getType())
+                                .valueLength(0)
+                                .fieldValueList(join("," , ((EnumField) innerField).getEnumValues()))
+                                .build());
     } else if (innerField instanceof MapField) {
       completeFieldList.addAll(extractMapInternalFields((MapField) innerField));
     } else if (innerField instanceof NumberField) {
@@ -85,11 +86,11 @@ public class JsonExtractor {
           .fieldName(innerField.getName())
           .fieldType(innerField.getType());
 
-      addConstraint(builder, EXCLUDED_MAXIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getExclusiveMaximum()));
-      addConstraint(builder, EXCLUDED_MINIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getExclusiveMinimum()));
-      addConstraint(builder, MAXIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getMaximum()));
-      addConstraint(builder, MINIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getMinimum()));
-      addConstraint(builder, MULTIPLE_OF, getSafeNumberAsString(((NumberField) innerField).getMultipleOf()));
+      addConstraint(builder , EXCLUDED_MAXIMUM_VALUE , getSafeNumberAsString(((NumberField) innerField).getExclusiveMaximum()));
+      addConstraint(builder , EXCLUDED_MINIMUM_VALUE , getSafeNumberAsString(((NumberField) innerField).getExclusiveMinimum()));
+      addConstraint(builder , MAXIMUM_VALUE , getSafeNumberAsString(((NumberField) innerField).getMaximum()));
+      addConstraint(builder , MINIMUM_VALUE , getSafeNumberAsString(((NumberField) innerField).getMinimum()));
+      addConstraint(builder , MULTIPLE_OF , getSafeNumberAsString(((NumberField) innerField).getMultipleOf()));
 
       completeFieldList.add(builder.build());
     } else if (innerField instanceof StringField) {
@@ -98,10 +99,10 @@ public class JsonExtractor {
           .fieldName(innerField.getName())
           .fieldType(innerField.getType());
 
-      addConstraint(builder, REGEX, ((StringField) innerField).getRegex());
-      addConstraint(builder, MAXIMUM_VALUE, getSafeNumberAsString(((StringField) innerField).getMaxlength()));
-      addConstraint(builder, MINIMUM_VALUE, getSafeNumberAsString(((StringField) innerField).getMinLength()));
-      addConstraint(builder, FORMAT, ((StringField) innerField).getFormat());
+      addConstraint(builder , REGEX , ((StringField) innerField).getRegex());
+      addConstraint(builder , MAXIMUM_VALUE , getSafeNumberAsString(((StringField) innerField).getMaxlength()));
+      addConstraint(builder , MINIMUM_VALUE , getSafeNumberAsString(((StringField) innerField).getMinLength()));
+      addConstraint(builder , FORMAT , ((StringField) innerField).getFormat());
 
       completeFieldList.add(builder.build());
     } else {
@@ -110,9 +111,9 @@ public class JsonExtractor {
     return completeFieldList;
   }
 
-  private void addConstraint(FieldValueMapping.FieldValueMappingBuilder builder, ConstraintTypeEnum constrain, String constrainValue) {
+  private void addConstraint(FieldValueMapping.FieldValueMappingBuilder builder , ConstraintTypeEnum constrain , String constrainValue) {
     if (StringUtils.isNotBlank(constrainValue)) {
-      builder.constrain(constrain, constrainValue);
+      builder.constrain(constrain , constrainValue);
     }
   }
 
@@ -130,12 +131,12 @@ public class JsonExtractor {
       if (value instanceof ObjectField) {
         for (Field arrayElementField : value.getProperties()) {
           CollectionUtils.collect(
-              processField(arrayElementField),
-              fixName(innerField.getName(), "[]."),
+              processField(arrayElementField) ,
+              fixName(innerField.getName() , "[].") ,
               completeFieldList);
         }
       } else {
-        completeFieldList.add(FieldValueMapping.builder().fieldName(innerField.getName() + "[]").fieldType( value.getType() + "-array").build());
+        completeFieldList.add(FieldValueMapping.builder().fieldName(innerField.getName() + "[]").fieldType(value.getType() + "-array").build());
       }
     }
     return completeFieldList;
@@ -147,8 +148,8 @@ public class JsonExtractor {
     if (value instanceof ObjectField) {
       for (Field arrayElementField : value.getProperties()) {
         CollectionUtils.collect(
-            processField(arrayElementField),
-            fixName(innerField.getName(), "[][]."),
+            processField(arrayElementField) ,
+            fixName(innerField.getName() , "[][].") ,
             completeFieldList);
       }
     } else {
@@ -157,7 +158,7 @@ public class JsonExtractor {
     return completeFieldList;
   }
 
-  private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields, List<FieldValueMapping> completeFieldList) {
+  private void processRecordFieldList(String fieldName , String splitter , List<FieldValueMapping> internalFields , List<FieldValueMapping> completeFieldList) {
     internalFields.forEach(internalField -> {
       if (Objects.nonNull(internalField.getFieldName())) {
         internalField.setFieldName(fieldName + splitter + internalField.getFieldName());

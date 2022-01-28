@@ -6,7 +6,6 @@
 
 package net.coru.kloadgen.property.editor;
 
-import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -14,6 +13,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
+import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
             .setScanners(new SubTypesScanner()));
-    ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
+    ReflectionUtils.extractSerializers(nameStrategyComboBox , reflections , SubjectNameStrategy.class);
   }
 
   @Override
@@ -94,7 +95,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
 
   @Override
   public void setValue(Object value) {
-    this.nameStrategyComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
+    this.nameStrategyComboBox.setSelectedItem(Objects.requireNonNullElse(value , 0));
   }
 
   @Override

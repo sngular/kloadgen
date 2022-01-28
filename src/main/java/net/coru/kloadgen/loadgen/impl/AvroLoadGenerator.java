@@ -8,14 +8,15 @@ package net.coru.kloadgen.loadgen.impl;
 
 import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
@@ -37,21 +38,21 @@ public class AvroLoadGenerator implements BaseLoadGenerator {
     avroSchemaProcessor = new AvroSchemaProcessor();
   }
 
-  public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(Map<String, String> originals , String avroSchemaName , List<FieldValueMapping> fieldExprMappings) {
     try {
-      this.avroSchemaProcessor.processSchema(retrieveSchema(originals, avroSchemaName), metadata, fieldExprMappings);
-    } catch (Exception exc){
-      log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
+      this.avroSchemaProcessor.processSchema(retrieveSchema(originals , avroSchemaName) , metadata , fieldExprMappings);
+    } catch (Exception exc) {
+      log.error("Please make sure that properties data type and expression function return type are compatible with each other" , exc);
       throw new KLoadGenException(exc);
     }
   }
 
-  public void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(String schema , List<FieldValueMapping> fieldExprMappings) {
     try {
       Schema.Parser parser = new Schema.Parser();
-      this.avroSchemaProcessor.processSchema(parser.parse(schema), new SchemaMetadata(1, 1, schema), fieldExprMappings);
-    } catch (Exception exc){
-      log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
+      this.avroSchemaProcessor.processSchema(parser.parse(schema) , new SchemaMetadata(1 , 1 , schema) , fieldExprMappings);
+    } catch (Exception exc) {
+      log.error("Please make sure that properties data type and expression function return type are compatible with each other" , exc);
       throw new KLoadGenException(exc);
     }
   }
@@ -60,13 +61,13 @@ public class AvroLoadGenerator implements BaseLoadGenerator {
     return avroSchemaProcessor.next();
   }
 
-  private ParsedSchema retrieveSchema(Map<String, String> originals, String avroSchemaName) throws IOException, RestClientException {
-    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
+  private ParsedSchema retrieveSchema(Map<String, String> originals , String avroSchemaName) throws IOException, RestClientException {
+    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG) , 1000 , originals);
     return getSchemaBySubject(avroSchemaName);
   }
 
   private ParsedSchema getSchemaBySubject(String avroSubjectName) throws IOException, RestClientException {
     metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSubjectName);
-    return schemaRegistryClient.getSchemaBySubjectAndId(avroSubjectName, metadata.getId());
+    return schemaRegistryClient.getSchemaBySubjectAndId(avroSubjectName , metadata.getId());
   }
 }

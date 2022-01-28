@@ -13,6 +13,7 @@
 package net.coru.kloadgen.config.keydeserialized;
 
 import java.beans.PropertyDescriptor;
+
 import net.coru.kloadgen.property.editor.KeyDeserializerPropertyEditor;
 import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
@@ -32,26 +33,26 @@ public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(KeyDeserializedConfigElement.class);
 
-    createPropertyGroup("key_deserialized_load_generator", new String[]{
-        KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, /*KEY_SUBJECT_NAME,*/ KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
+    createPropertyGroup("key_deserialized_load_generator" , new String[]{
+        KEY_NAME_STRATEGY , KEY_DESERIALIZER_PROPERTY , /*KEY_SUBJECT_NAME,*/ KEY_SCHEMA_PROPERTIES , KEY_SCHEMA_TYPE
     });
 
     PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
     nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
-    nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    nameStrategyPropertyProps.setValue(DEFAULT, "");
-    nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    nameStrategyPropertyProps.setValue(NOT_UNDEFINED , Boolean.TRUE);
+    nameStrategyPropertyProps.setValue(DEFAULT , "");
+    nameStrategyPropertyProps.setValue(NOT_EXPRESSION , Boolean.FALSE);
 
     PropertyDescriptor serializerPropertyProps = property(KEY_DESERIALIZER_PROPERTY);
     serializerPropertyProps.setPropertyEditorClass(KeyDeserializerPropertyEditor.class);
-    serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    serializerPropertyProps.setValue(DEFAULT, "");
-    serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    serializerPropertyProps.setValue(NOT_UNDEFINED , Boolean.TRUE);
+    serializerPropertyProps.setValue(DEFAULT , "");
+    serializerPropertyProps.setValue(NOT_EXPRESSION , Boolean.FALSE);
 
     PropertyDescriptor schemaType = property(KEY_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
-    schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    schemaType.setValue(DEFAULT, "<avro subject>");
-    schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    schemaType.setValue(NOT_UNDEFINED , Boolean.TRUE);
+    schemaType.setValue(DEFAULT , "<avro subject>");
+    schemaType.setValue(NOT_EXPRESSION , Boolean.FALSE);
   }
 }

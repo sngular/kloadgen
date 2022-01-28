@@ -12,13 +12,14 @@
 
 package net.coru.kloadgen.config.valuefiledeserialized;
 
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_TYPE;
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,11 +54,11 @@ public class ValueFileDeserializedConfigElement extends ConfigTestElement implem
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(VALUE_SCHEMA, valueSchemaDefinition);
-    variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
-    variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
-    variables.putObject(VALUE_SUBJECT_NAME, valueSubjectName);
-    variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY, valueDeSerializerConfiguration);
+    variables.putObject(VALUE_SCHEMA , valueSchemaDefinition);
+    variables.putObject(VALUE_SCHEMA_PROPERTIES , valueSchemaProperties);
+    variables.putObject(VALUE_SCHEMA_TYPE , valueSchemaType);
+    variables.putObject(VALUE_SUBJECT_NAME , valueSubjectName);
+    variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY , valueDeSerializerConfiguration);
   }
 
 }

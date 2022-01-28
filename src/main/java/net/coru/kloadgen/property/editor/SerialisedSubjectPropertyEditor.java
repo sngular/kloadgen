@@ -8,7 +8,6 @@ package net.coru.kloadgen.property.editor;
 
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -21,6 +20,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -76,7 +77,7 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     subjectNameComboBox = new JComboBox<>();
     panel.setLayout(new BorderLayout());
     panel.add(subjectNameComboBox);
-    panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
+    panel.add(loadClassBtn , BorderLayout.AFTER_LINE_ENDS);
     AutoCompletion.enable(subjectNameComboBox);
     this.loadClassBtn.addActionListener(this);
   }
@@ -103,22 +104,22 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
           TableEditor tableEditor = (TableEditor) propertyEditor;
-          propertyEditor.setValue(mergeValue(tableEditor.getValue(), attributeList.getRight()));
+          propertyEditor.setValue(mergeValue(tableEditor.getValue() , attributeList.getRight()));
         } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
           propertyEditor.setValue(attributeList.getKey());
         }
       }
-      JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
-          JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(null , "Successful retrieving of subject : " + subjectName , "Successful retrieving properties" ,
+                                    JOptionPane.INFORMATION_MESSAGE);
     } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
-      JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-          JOptionPane.ERROR_MESSAGE);
-      log.error(e.getMessage(), e);
+      JOptionPane.showMessageDialog(null , "Failed retrieve schema properties : " + e.getMessage() , "ERROR: Failed to retrieve properties!" ,
+                                    JOptionPane.ERROR_MESSAGE);
+      log.error(e.getMessage() , e);
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
+  protected List<FieldValueMapping> mergeValue(Object tableEditorValue , List<FieldValueMapping> attributeList) {
 
     if (!(tableEditorValue instanceof ArrayList<?>)) {
       log.error("Table Editor is not array list");
@@ -128,8 +129,8 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     List<FieldValueMapping> fieldValueList;
     try {
       fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
-    }catch(Exception e) {
-      log.error("Table Editor is not FieldValueMapping list", e);
+    } catch (Exception e) {
+      log.error("Table Editor is not FieldValueMapping list" , e);
       return attributeList;
     }
 
@@ -138,9 +139,9 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     }
 
     List<FieldValueMapping> result = new ArrayList<>();
-    for(FieldValueMapping fieldValue: attributeList) {
+    for (FieldValueMapping fieldValue : attributeList) {
 
-      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
+      FieldValueMapping existsValue = checkExists(fieldValue , fieldValueList);
 
       if (existsValue != null) {
         result.add(existsValue);
@@ -153,12 +154,11 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     return result;
   }
 
-  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
+  private FieldValueMapping checkExists(FieldValueMapping fieldValue , List<FieldValueMapping> fieldValueList) {
 
-    return IterableUtils.find(fieldValueList,
-        v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
+    return IterableUtils.find(fieldValueList ,
+                              v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
   }
-
 
   @Override
   public void clearGui() {

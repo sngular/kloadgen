@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -46,7 +47,7 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
   }
 
   @Override
-  public void clearGui() { }
+  public void clearGui() {}
 
   @Override
   public Component getCustomEditor() {
@@ -65,7 +66,7 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
-    propertyDescriptor.setValue("schemaType", value);
+    propertyDescriptor.setValue("schemaType" , value);
     schemaType = value;
   }
 

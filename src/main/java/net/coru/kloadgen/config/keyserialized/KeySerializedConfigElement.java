@@ -14,6 +14,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,12 +49,12 @@ public class KeySerializedConfigElement extends ConfigTestElement implements Tes
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
-    variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
-    variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
-    variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
-    variables.putObject(KEY_NAME_STRATEGY, keyNameStrategy);
-    variables.putObject(SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
+    variables.putObject(KEY_SUBJECT_NAME , keySubjectName);
+    variables.putObject(KEY_SCHEMA_PROPERTIES , keySchemaProperties);
+    variables.putObject(KEY_SCHEMA_TYPE , keySchemaType);
+    variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY , keySerializerConfiguration);
+    variables.putObject(KEY_NAME_STRATEGY , keyNameStrategy);
+    variables.putObject(SCHEMA_KEYED_MESSAGE_KEY , Boolean.TRUE);
   }
 
 }

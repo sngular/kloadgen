@@ -13,5 +13,6 @@ import lombok.Value;
 public class EnrichedRecord {
 
   SchemaMetadata schemaMetadata;
+
   Object genericRecord;
 }

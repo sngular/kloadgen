@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,18 +61,18 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
     Map<String, String> schemaProperties = getProperties();
 
-    jMeterVariables.put(SCHEMA_REGISTRY_URL, checkPropertyOrVariable(getRegistryUrl()));
+    jMeterVariables.put(SCHEMA_REGISTRY_URL , checkPropertyOrVariable(getRegistryUrl()));
     if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
-      jMeterVariables.put(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
+      jMeterVariables.put(SCHEMA_REGISTRY_AUTH_FLAG , FLAG_YES);
       if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
-        jMeterVariables.put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
-        jMeterVariables.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-        jMeterVariables.put(USER_INFO_CONFIG,
-            schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
+        jMeterVariables.put(SCHEMA_REGISTRY_AUTH_KEY , SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
+        jMeterVariables.put(BASIC_AUTH_CREDENTIALS_SOURCE , "USER_INFO");
+        jMeterVariables.put(USER_INFO_CONFIG ,
+                            schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
       } else if (SCHEMA_REGISTRY_AUTH_BEARER_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
-        jMeterVariables.put(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BEARER_TYPE);
-        jMeterVariables.put(BEARER_AUTH_CREDENTIALS_SOURCE, "STATIC_TOKEN");
-        jMeterVariables.put(BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SCHEMA_REGISTRY_AUTH_BEARER_KEY));
+        jMeterVariables.put(SCHEMA_REGISTRY_AUTH_KEY , SCHEMA_REGISTRY_AUTH_BEARER_TYPE);
+        jMeterVariables.put(BEARER_AUTH_CREDENTIALS_SOURCE , "STATIC_TOKEN");
+        jMeterVariables.put(BEARER_AUTH_TOKEN_CONFIG , schemaProperties.get(SCHEMA_REGISTRY_AUTH_BEARER_KEY));
       }
     }
   }
@@ -99,7 +100,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     Map<String, String> propertiesMap = new HashMap<>();
     for (TestElementProperty property : schemaProperties) {
       PropertyMapping propertyMapping = (PropertyMapping) property.getObjectValue();
-      propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
+      propertiesMap.put(propertyMapping.getPropertyName() , checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
   }
@@ -107,16 +108,16 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   private Map<String, String> fromPropertyMappingToPropertiesMap(List<PropertyMapping> schemaProperties) {
     Map<String, String> propertiesMap = new HashMap<>();
     for (PropertyMapping propertyMapping : schemaProperties) {
-      propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
+      propertiesMap.put(propertyMapping.getPropertyName() , checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
   }
 
   private String checkPropertyOrVariable(String textToCheck) {
-    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")){
-      return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length()-2));
-    } else if (textToCheck.matches("\\$\\{\\w*}")){
-      return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
+    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
+      return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6 , textToCheck.length() - 2));
+    } else if (textToCheck.matches("\\$\\{\\w*}")) {
+      return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2 , textToCheck.length() - 1));
     } else {
       return textToCheck;
     }

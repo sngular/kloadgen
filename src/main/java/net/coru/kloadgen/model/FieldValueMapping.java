@@ -8,16 +8,17 @@ package net.coru.kloadgen.model;
 
 import static java.util.Arrays.asList;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -30,128 +31,139 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 @EqualsAndHashCode(callSuper = false)
 public class FieldValueMapping extends AbstractTestElement {
 
-    public static final String FIELD_NAME = "fieldName";
-    public static final String FIELD_TYPE = "fieldType";
-    public static final String VALUE_LENGTH = "valueLength";
-    public static final String FIELD_VALUES_LIST = "fieldValuesList";
+  public static final String FIELD_NAME = "fieldName";
 
-    private String fieldName;
-    private String fieldType;
-    private Integer valueLength;
-    private String fieldValueList;
+  public static final String FIELD_TYPE = "fieldType";
 
-    private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
+  public static final String VALUE_LENGTH = "valueLength";
 
-    private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+  public static final String FIELD_VALUES_LIST = "fieldValuesList";
 
-    public FieldValueMapping(String fieldName, String fieldType) {
-        this.setFieldName(fieldName);
-        this.setValueLength(0);
-        this.setFieldType(fieldType);
-    }
+  private String fieldName;
 
-    public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList) {
-        this.setFieldName(fieldName);
-        this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
-        this.setFieldType(fieldType);
-        this.setFieldValuesList(valueList);
-    }
+  private String fieldType;
 
-    @Builder
-    public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String fieldValueList,
-        Map<ConstraintTypeEnum, String> constrains) {
-        this.setFieldName(fieldName);
-        this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
-        this.setFieldType(fieldType);
-        this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
-        this.constrains = constrains;
-    }
+  private Integer valueLength;
 
-    public String getFieldName() {
-        return getPropertyAsString(FIELD_NAME);
-    }
+  private String fieldValueList;
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-        setProperty(FIELD_NAME, fieldName);
-    }
+  private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
 
-    public Integer getValueLength() {
-        return getPropertyAsInt(VALUE_LENGTH);
-    }
+  private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
-    public void setValueLength(Integer valueLength) {
-        this.valueLength = valueLength;
-        setProperty(VALUE_LENGTH, valueLength);
-    }
+  public FieldValueMapping(String fieldName , String fieldType) {
+    this.setFieldName(fieldName);
+    this.setValueLength(0);
+    this.setFieldType(fieldType);
+  }
 
-    public String getFieldType() {
-        return getPropertyAsString(FIELD_TYPE);
-    }
+  public FieldValueMapping(String fieldName , String fieldType , Integer valueLength , String valueList) {
+    this.setFieldName(fieldName);
+    this.setValueLength(Objects.requireNonNullElse(valueLength , 0));
+    this.setFieldType(fieldType);
+    this.setFieldValuesList(valueList);
+  }
 
-    public void setFieldType(String propertyValue) {
-        this.fieldType = propertyValue;
-        setProperty(FIELD_TYPE, propertyValue);
-    }
+  @Builder
+  public FieldValueMapping(
+      String fieldName , String fieldType , Integer valueLength , String fieldValueList ,
+      Map<ConstraintTypeEnum, String> constrains) {
+    this.setFieldName(fieldName);
+    this.setValueLength(Objects.requireNonNullElse(valueLength , 0));
+    this.setFieldType(fieldType);
+    this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList , ""));
+    this.constrains = constrains;
+  }
 
-    public List<String> getFieldValuesList() {
-        List<String> result = new ArrayList<>();
-        String inputFieldValueList = getPropertyAsString(FIELD_VALUES_LIST);
-        String inputFieldValueAux;
-        if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
-            try {
-                inputFieldValueAux = inputFieldValueList;
-                if (inputFieldValueAux.charAt(0) != "[".charAt(0))
-                    inputFieldValueAux = "[" + inputFieldValueAux;
-                if (inputFieldValueAux.charAt(inputFieldValueAux.length()-1) != "]".charAt(0))
-                    inputFieldValueAux += "]";
-                JsonNode nodes = mapper.readTree(inputFieldValueAux);
-                Iterator<JsonNode> nodeElements = nodes.elements();
-                while (nodeElements.hasNext()) {
-                    result.add(nodeElements.next().toString());
-                }
-            } catch (JsonProcessingException e) {
-                inputFieldValueAux = inputFieldValueList;
-                if (inputFieldValueAux.charAt(0) == "[".charAt(0))
-                    inputFieldValueAux = inputFieldValueAux.substring(1);
-                if (inputFieldValueAux.charAt(inputFieldValueAux.length()-1) == "]".charAt(0))
-                    inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
-                result.addAll(asList(inputFieldValueAux.trim().split("\\s*,\\s*", - 1)));
-            }
+  public String getFieldName() {
+    return getPropertyAsString(FIELD_NAME);
+  }
+
+  public void setFieldName(String fieldName) {
+    this.fieldName = fieldName;
+    setProperty(FIELD_NAME , fieldName);
+  }
+
+  public Integer getValueLength() {
+    return getPropertyAsInt(VALUE_LENGTH);
+  }
+
+  public void setValueLength(Integer valueLength) {
+    this.valueLength = valueLength;
+    setProperty(VALUE_LENGTH , valueLength);
+  }
+
+  public String getFieldType() {
+    return getPropertyAsString(FIELD_TYPE);
+  }
+
+  public void setFieldType(String propertyValue) {
+    this.fieldType = propertyValue;
+    setProperty(FIELD_TYPE , propertyValue);
+  }
+
+  public List<String> getFieldValuesList() {
+    List<String> result = new ArrayList<>();
+    String inputFieldValueList = getPropertyAsString(FIELD_VALUES_LIST);
+    String inputFieldValueAux;
+    if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
+      try {
+        inputFieldValueAux = inputFieldValueList;
+          if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
+              inputFieldValueAux = "[" + inputFieldValueAux;
+          }
+          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
+              inputFieldValueAux += "]";
+          }
+        JsonNode nodes = mapper.readTree(inputFieldValueAux);
+        Iterator<JsonNode> nodeElements = nodes.elements();
+        while (nodeElements.hasNext()) {
+          result.add(nodeElements.next().toString());
         }
-        return result;
+      } catch (JsonProcessingException e) {
+        inputFieldValueAux = inputFieldValueList;
+          if (inputFieldValueAux.charAt(0) == "[".charAt(0)) {
+              inputFieldValueAux = inputFieldValueAux.substring(1);
+          }
+          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
+              inputFieldValueAux = inputFieldValueAux.substring(0 , inputFieldValueAux.length() - 1);
+          }
+        result.addAll(asList(inputFieldValueAux.trim().split("\\s*,\\s*" , -1)));
+      }
+    }
+    return result;
+  }
+
+  public void setFieldValuesList(String fieldValuesList) {
+    this.fieldValueList = fieldValuesList;
+    setProperty(FIELD_VALUES_LIST , fieldValuesList);
+  }
+
+  public void init() {
+    this.setName("Object Field");
+  }
+
+  public Map<ConstraintTypeEnum, String> getConstrains() {
+    return constrains;
+  }
+
+  public static class FieldValueMappingBuilder {
+
+    private final Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
+
+    public FieldValueMappingBuilder constrain(ConstraintTypeEnum key , String value) {
+      constrains.putIfAbsent(key , value);
+      return this;
     }
 
-    public void setFieldValuesList(String fieldValuesList) {
-        this.fieldValueList = fieldValuesList;
-        setProperty(FIELD_VALUES_LIST, fieldValuesList);
+    public FieldValueMappingBuilder constrains(Map<ConstraintTypeEnum, String> newConstrains) {
+      constrains.putAll(newConstrains);
+      return this;
     }
 
-    public void init() {
-        this.setName("Object Field");
+    public FieldValueMappingBuilder clearConstrains() {
+      constrains.clear();
+      return this;
     }
-
-    public Map<ConstraintTypeEnum, String> getConstrains() {
-        return constrains;
-    }
-
-    public static class FieldValueMappingBuilder {
-
-        private final Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
-
-        public FieldValueMappingBuilder constrain(ConstraintTypeEnum key, String value) {
-            constrains.putIfAbsent(key, value);
-            return this;
-        }
-
-        public FieldValueMappingBuilder constrains(Map<ConstraintTypeEnum, String> newConstrains) {
-            constrains.putAll(newConstrains);
-            return this;
-        }
-
-        public FieldValueMappingBuilder clearConstrains() {
-            constrains.clear();
-            return this;
-        }
-    }
+  }
 }

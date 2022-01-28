@@ -19,6 +19,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Properties;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,11 +52,11 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
   public Properties properties(JavaSamplerContext context) {
     Properties props = SamplerUtil.setupCommonConsumerProperties(context);
-    props.put(MAX_POLL_RECORDS_CONFIG, "1");
-    props.put(ENABLE_AUTO_COMMIT_CONFIG, "false");
-    props.put(SESSION_TIMEOUT_MS_CONFIG, "10000");
+    props.put(MAX_POLL_RECORDS_CONFIG , "1");
+    props.put(ENABLE_AUTO_COMMIT_CONFIG , "false");
+    props.put(SESSION_TIMEOUT_MS_CONFIG , "10000");
     timeout = Long.parseLong(props.getProperty("timeout.millis"));
-    log.debug("Populated properties: {}", props);
+    log.debug("Populated properties: {}" , props);
     return props;
   }
 
@@ -63,7 +64,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     return KafkaConsumerSampler.log;
   }
 
-  private void configGenericData(){
+  private void configGenericData() {
     GenericData genericData = GenericData.get();
 
     genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
@@ -97,17 +98,17 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
       boolean running = true;
       Instant startTime = Instant.now();
       while (running) {
-        ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(5, ChronoUnit.SECONDS));
+        ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(5 , ChronoUnit.SECONDS));
 
         if (!records.isEmpty()) {
           running = false;
           ConsumerRecord<Object, Object> consumerRecord = records.iterator().next();
-          fillSampleResult(sampleResult, prettify(consumerRecord), true);
+          fillSampleResult(sampleResult , prettify(consumerRecord) , true);
           consumer.commitSync();
         }
 
         Instant endTime = Instant.now();
-        if (Duration.between(startTime, endTime).toMillis() > timeout) {
+        if (Duration.between(startTime , endTime).toMillis() > timeout) {
           running = false;
           sampleResult = null;
           if (Objects.nonNull(thread)) {
@@ -116,21 +117,21 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
         }
       }
     } catch (Exception e) {
-      logger().error("Failed to receive message", e);
-      fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",
-          false);
+      logger().error("Failed to receive message" , e);
+      fillSampleResult(sampleResult , e.getMessage() != null ? e.getMessage() : "" ,
+                       false);
     }
     return sampleResult;
   }
 
   private String prettify(ConsumerRecord<Object, Object> consumerRecord) {
     return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key() +
-        ", value: " + consumerRecord.value().toString() + " }}";
+           ", value: " + consumerRecord.value().toString() + " }}";
   }
 
-  private void fillSampleResult(SampleResult sampleResult, String responseData, boolean successful) {
+  private void fillSampleResult(SampleResult sampleResult , String responseData , boolean successful) {
     if (Objects.nonNull(sampleResult)) {
-      sampleResult.setResponseData(responseData, StandardCharsets.UTF_8.name());
+      sampleResult.setResponseData(responseData , StandardCharsets.UTF_8.name());
       sampleResult.setSuccessful(successful);
       sampleResult.sampleEnd();
     }

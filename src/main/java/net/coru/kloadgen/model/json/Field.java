@@ -1,6 +1,7 @@
 package net.coru.kloadgen.model.json;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,10 +13,11 @@ import lombok.ToString;
 @EqualsAndHashCode
 public abstract class Field {
 
-	String name;
-	String type;
+  String name;
 
-	public abstract Field cloneField(String fieldName);
+  String type;
 
-	public abstract List<Field> getProperties();
+  public abstract Field cloneField(String fieldName);
+
+  public abstract List<Field> getProperties();
 }

@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
@@ -58,12 +59,12 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
   private void fillDeserializer(JComboBox<String> objectJComboBox) {
     deserializerComboBox = objectJComboBox;
     Reflections reflections = new Reflections(new ConfigurationBuilder()
-        .addUrls(ClasspathHelper.forClass(Deserializer.class))
-        .filterInputsBy(new FilterBuilder()
-            .includePackage("net.coru.kloadgen.serializer",
-                "io.confluent.kafka.serializers"))
-        .setScanners(new SubTypesScanner()));
-    ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
+                                                  .addUrls(ClasspathHelper.forClass(Deserializer.class))
+                                                  .filterInputsBy(new FilterBuilder()
+                                                                      .includePackage("net.coru.kloadgen.serializer" ,
+                                                                                      "io.confluent.kafka.serializers"))
+                                                  .setScanners(new SubTypesScanner()));
+    ReflectionUtils.extractDeserializers(deserializerComboBox , reflections , Deserializer.class);
   }
 
   @Override
@@ -103,7 +104,7 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public void setValue(Object value) {
-    this.deserializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
+    this.deserializerComboBox.setSelectedItem(Objects.requireNonNullElse(value , 0));
   }
 
   @Override

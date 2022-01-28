@@ -6,25 +6,26 @@
 
 package net.coru.kloadgen.serializer;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.CharSet;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
-public class GenericJsonRecordSerializer<T extends ObjectNode>  implements Serializer<T> {
+public class GenericJsonRecordSerializer<T extends ObjectNode> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String topic, T record) {
+  public byte[] serialize(String topic , T record) {
 
     byte[] data = new byte[0];
     try {
       ObjectMapper mapper = new ObjectMapper();
-      mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
+      mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature() , true);
       data = mapper.writeValueAsString(record).getBytes(CharSet.ASCII_ALPHA.toString());
     } catch (IOException e) {
       log.error("Serialization error:" + e.getMessage());
@@ -33,7 +34,7 @@ public class GenericJsonRecordSerializer<T extends ObjectNode>  implements Seria
   }
 
   @Override
-  public byte[] serialize(String topic, Headers headers, T data) {
+  public byte[] serialize(String topic , Headers headers , T data) {
     return new byte[0];
   }
 }

@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
@@ -61,11 +62,11 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Serializer.class))
             .filterInputsBy(new FilterBuilder()
-                .includePackage("net.coru.kloadgen.serializer",
-                    "io.confluent.kafka.serializers"))
+                                .includePackage("net.coru.kloadgen.serializer" ,
+                                                "io.confluent.kafka.serializers"))
             .setScanners(new SubTypesScanner()));
 
-    ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
+    ReflectionUtils.extractSerializers(serializerComboBox , reflections , Serializer.class);
 
   }
 
@@ -101,7 +102,7 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public void setValue(Object value) {
-    this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
+    this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value , 0));
   }
 
   @Override

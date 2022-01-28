@@ -26,7 +26,7 @@ public class ProtoBufProcessorHelper {
 
   private static final String OPTIONAL = "optional";
 
-  private ProtobufHelper protobufHelper = new ProtobufHelper();
+  private final ProtobufHelper protobufHelper = new ProtobufHelper();
 
   Descriptors.Descriptor buildDescriptor(ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
 
@@ -35,7 +35,7 @@ public class ProtoBufProcessorHelper {
     List<String> imports = schema.getImports();
     for (String importedClass : imports) {
       String schemaToString = new String(getClass().getClassLoader().getResourceAsStream(importedClass).readAllBytes());
-      lines.addAll(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
+      lines.addAll(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")) , isValid()));
       if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
         var importedSchema = processImported(lines);
         schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
@@ -45,23 +45,23 @@ public class ProtoBufProcessorHelper {
     MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
     HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     schemaBuilder.setPackage(schema.getPackageName());
-    schemaBuilder.addMessageDefinition(buildMessageDefinition(messageElement.getName(), messageElement, nestedTypes));
+    schemaBuilder.addMessageDefinition(buildMessageDefinition(messageElement.getName() , messageElement , nestedTypes));
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
-  private MessageDefinition buildMessageDefinition(String fieldName, TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
-    fillNestedTypes(messageElement, nestedTypes);
+  private MessageDefinition buildMessageDefinition(String fieldName , TypeElement messageElement , HashMap<String, TypeElement> nestedTypes) {
+    fillNestedTypes(messageElement , nestedTypes);
     MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     var element = (MessageElement) messageElement;
     for (var elementField : element.getFields()) {
       var elementFieldType = elementField.getType();
       var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
-        addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes);
+        addDefinition(msgDef , elementFieldType , nestedTypes.remove(elementFieldType) , nestedTypes);
       }
 
       if (nestedTypes.containsKey(dotType)) {
-        addDefinition(msgDef, dotType, nestedTypes.remove(dotType), nestedTypes);
+        addDefinition(msgDef , dotType , nestedTypes.remove(dotType) , nestedTypes);
       }
 
       if (elementField.getType().startsWith("map")) {
@@ -69,56 +69,56 @@ public class ProtoBufProcessorHelper {
         var mapDotType = checkDotType(realType);
 
         if (nestedTypes.containsKey(realType)) {
-          addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes);
+          addDefinition(msgDef , realType , nestedTypes.remove(realType) , nestedTypes);
         }
 
         if (nestedTypes.containsKey(mapDotType)) {
-          addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes);
+          addDefinition(msgDef , mapDotType , nestedTypes.remove(mapDotType) , nestedTypes);
         }
-        msgDef.addField("repeated",
-            "typemapnumber" + elementField.getName(),
-            elementField.getName(),
-            elementField.getTag());
+        msgDef.addField("repeated" ,
+                        "typemapnumber" + elementField.getName() ,
+                        elementField.getName() ,
+                        elementField.getTag());
 
         msgDef.addMessageDefinition(
             MessageDefinition.newBuilder("typemapnumber" + elementField.getName())
-                .addField(OPTIONAL, "string", "key", 1)
-                .addField(OPTIONAL, realType, "value", 2).build()
+                             .addField(OPTIONAL , "string" , "key" , 1)
+                             .addField(OPTIONAL , realType , "value" , 2).build()
         );
       } else if (Objects.nonNull(elementField.getLabel())) {
-        msgDef.addField(elementField.getLabel().toString().toLowerCase(),
-            elementField.getType(),
-            elementField.getName(),
-            elementField.getTag());
+        msgDef.addField(elementField.getLabel().toString().toLowerCase() ,
+                        elementField.getType() ,
+                        elementField.getName() ,
+                        elementField.getTag());
       } else {
-        msgDef.addField(OPTIONAL,
-            elementField.getType(),
-            elementField.getName(),
-            elementField.getTag());
+        msgDef.addField(OPTIONAL ,
+                        elementField.getType() ,
+                        elementField.getName() ,
+                        elementField.getTag());
       }
     }
     return msgDef.build();
   }
 
-  private void addDefinition(MessageDefinition.Builder msgDef, String typeName, TypeElement typeElement, HashMap<String, TypeElement> nestedTypes) {
+  private void addDefinition(MessageDefinition.Builder msgDef , String typeName , TypeElement typeElement , HashMap<String, TypeElement> nestedTypes) {
     if (typeElement instanceof EnumElement) {
       var enumElement = (EnumElement) typeElement;
       EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
-      for (var constant: enumElement.getConstants()) {
-        builder.addValue(constant.getName(), constant.getTag());
+      for (var constant : enumElement.getConstants()) {
+        builder.addValue(constant.getName() , constant.getTag());
       }
       msgDef.addEnumDefinition(builder.build());
     } else {
       if (!typeName.contains(".")) {
-        msgDef.addMessageDefinition(buildMessageDefinition(typeName, typeElement, nestedTypes));
+        msgDef.addMessageDefinition(buildMessageDefinition(typeName , typeElement , nestedTypes));
       }
     }
   }
 
-  private void fillNestedTypes(TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
+  private void fillNestedTypes(TypeElement messageElement , HashMap<String, TypeElement> nestedTypes) {
     if (!CollectionUtils.isEmpty(messageElement.getNestedTypes())) {
       messageElement.getNestedTypes().forEach(nestedType ->
-          nestedTypes.put(nestedType.getName(), nestedType)
+                                                  nestedTypes.put(nestedType.getName() , nestedType)
       );
     }
   }
@@ -143,7 +143,7 @@ public class ProtoBufProcessorHelper {
       if (fileLine.startsWith("message")) {
         var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
         schemaBuilder.setName(packageName + "." + messageName);
-        schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
+        schemaBuilder.addMessageDefinition(buildMessage(messageName , linesIterator));
 
       }
       if (fileLine.startsWith("import")) {
@@ -154,24 +154,24 @@ public class ProtoBufProcessorHelper {
     return schemaBuilder.build();
   }
 
-  private MessageDefinition buildMessage(String messageName, ListIterator<String> messageLines) {
+  private MessageDefinition buildMessage(String messageName , ListIterator<String> messageLines) {
 
     MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
     while (messageLines.hasNext()) {
       var field = messageLines.next().trim().split("\\s");
       if (protobufHelper.isValidType(field[0])) {
-        messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
+        messageDefinition.addField(OPTIONAL , field[0] , field[1] , Integer.parseInt(checkIfChoppable(field[3])));
       } else if (ProtobufHelper.LABEL.contains(field[0])) {
-        messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
+        messageDefinition.addField(field[0] , field[1] , field[2] , Integer.parseInt(checkIfChoppable(field[4])));
       }
     }
 
     return messageDefinition.build();
   }
 
-  public String checkIfChoppable(String field){
+  public String checkIfChoppable(String field) {
     String choppedField = field;
-    if (field.endsWith(";")){
+    if (field.endsWith(";")) {
       choppedField = StringUtils.chop(field);
     }
     return choppedField;

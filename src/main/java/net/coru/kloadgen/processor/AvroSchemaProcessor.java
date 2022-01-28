@@ -6,6 +6,29 @@
 
 package net.coru.kloadgen.processor;
 
+import static org.apache.avro.Schema.Type.ARRAY;
+import static org.apache.avro.Schema.Type.BOOLEAN;
+import static org.apache.avro.Schema.Type.BYTES;
+import static org.apache.avro.Schema.Type.DOUBLE;
+import static org.apache.avro.Schema.Type.FIXED;
+import static org.apache.avro.Schema.Type.FLOAT;
+import static org.apache.avro.Schema.Type.INT;
+import static org.apache.avro.Schema.Type.LONG;
+import static org.apache.avro.Schema.Type.MAP;
+import static org.apache.avro.Schema.Type.RECORD;
+import static org.apache.avro.Schema.Type.STRING;
+import static org.apache.avro.Schema.Type.UNION;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -22,327 +45,326 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import static org.apache.avro.Schema.Type.*;
-
 public class AvroSchemaProcessor extends SchemaProcessorLib {
 
-    private final Set<Type> typesSet = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
-    private Schema schema;
-    private SchemaMetadata metadata;
-    private List<FieldValueMapping> fieldExprMappings;
-    private RandomObject randomObject;
-    private RandomMap randomMap;
-    private AvroGeneratorTool avroGeneratorTool;
+  private final Set<Type> typesSet = EnumSet.of(INT , DOUBLE , FLOAT , BOOLEAN , STRING , LONG , BYTES , FIXED);
 
-    public void processSchema(ParsedSchema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
-        this.schema = (Schema) schema.rawSchema();
-        this.fieldExprMappings = fieldExprMappings;
-        this.metadata = metadata;
-        randomObject = new RandomObject();
-        randomMap = new RandomMap();
-        avroGeneratorTool = new AvroGeneratorTool();
+  private Schema schema;
 
-    }
+  private SchemaMetadata metadata;
 
-    public void processSchema(Schema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
-        this.schema = schema;
-        this.fieldExprMappings = fieldExprMappings;
-        this.metadata = metadata;
-        randomObject = new RandomObject();
-        randomMap = new RandomMap();
-        avroGeneratorTool = new AvroGeneratorTool();
+  private List<FieldValueMapping> fieldExprMappings;
 
-    }
+  private RandomObject randomObject;
 
-    public EnrichedRecord next() {
-        GenericRecord entity = new GenericData.Record(schema);
-        if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
-            ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-            FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-            while (!fieldExpMappingsQueue.isEmpty()) {
-                String cleanPath = cleanUpPath(fieldValueMapping, "");
-                String fieldName = getCleanMethodName(fieldValueMapping, "");
-                String typeFilter = cleanPath.replaceAll(fieldName, "");
-                if (typeFilter.matches("\\[.*]\\[.*")) {
-                    if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfIsRecordMapArray(cleanPath)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfIsRecordArrayMap(cleanPath)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else {
-                        throw new KLoadGenException("Wrong configuration Map - Array");
-                    }
-                } else if (typeFilter.startsWith("[")) {
-                    if (checkIfMap(typeFilter)) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfArray(typeFilter)) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfRecordMap(typeFilter)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfRecordArray(typeFilter)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else {
-                        throw new KLoadGenException("Wrong configuration Map - Array");
-                    }
-                } else if (typeFilter.startsWith(".")) {
-                    entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
-                    fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-                } else {
-                    entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
-                            avroGeneratorTool.generateObject(
-                                    entity.getSchema().getField(fieldName),
-                                    fieldValueMapping.getFieldType(),
-                                    fieldValueMapping.getValueLength(),
-                                    fieldValueMapping.getFieldValuesList(),
-                                    extractConstrains(schema.getField(fieldValueMapping.getFieldName()))
-                            )
-                    );
-                    fieldExpMappingsQueue.remove();
-                    fieldValueMapping = fieldExpMappingsQueue.peek();
-                }
-            }
-        }
-        return new EnrichedRecord(metadata, entity);
-    }
+  private RandomMap randomMap;
 
-    private Map<ConstraintTypeEnum, String> extractConstrains(Schema.Field field) {
-        Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
+  private AvroGeneratorTool avroGeneratorTool;
 
-        if (Objects.nonNull(field.schema().getObjectProp("precision")))
-            constrains.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
+  public void processSchema(ParsedSchema schema , SchemaMetadata metadata , List<FieldValueMapping> fieldExprMappings) {
+    this.schema = (Schema) schema.rawSchema();
+    this.fieldExprMappings = fieldExprMappings;
+    this.metadata = metadata;
+    randomObject = new RandomObject();
+    randomMap = new RandomMap();
+    avroGeneratorTool = new AvroGeneratorTool();
 
-        if (Objects.nonNull(field.schema().getObjectProp("scale")))
-            constrains.put(ConstraintTypeEnum.SCALE, field.schema().getObjectProp("scale").toString());
+  }
 
-        return constrains;
-    }
+  public void processSchema(Schema schema , SchemaMetadata metadata , List<FieldValueMapping> fieldExprMappings) {
+    this.schema = schema;
+    this.fieldExprMappings = fieldExprMappings;
+    this.metadata = metadata;
+    randomObject = new RandomObject();
+    randomMap = new RandomMap();
+    avroGeneratorTool = new AvroGeneratorTool();
 
-    private FieldValueMapping processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+  }
 
-        entity.put(fieldName, createObjectArray(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(),
-                fieldName,
-                arraySize,
-                fieldExpMappingsQueue));
-        return getSafeGetElement(fieldExpMappingsQueue);
-    }
-
-    private FieldValueMapping processFieldValueMappingAsRecordMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), getCleanMethodName(fieldValueMapping, fieldName));
-
-        entity.put(fieldName, createObjectMap(extractType(entity.getSchema().getField(fieldName), MAP).getValueType(),
-                fieldName,
-                mapSize,
-                fieldExpMappingsQueue));
-        return getSafeGetElement(fieldExpMappingsQueue);
-    }
-
-    private FieldValueMapping processFieldValueMappingAsSimpleArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
-        entity.put(fieldName,
-                createArray(fieldName, arraySize, fieldExpMappingsQueue));
-        return getSafeGetElement(fieldExpMappingsQueue);
-    }
-
-    private FieldValueMapping processFieldValueMappingAsSimpleMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        fieldExpMappingsQueue.remove();
-        // Add condition that checks (][)
-        entity.put(fieldName, createSimpleTypeMap(fieldName, fieldValueMapping.getFieldType(),
-                calculateMapSize(fieldValueMapping.getFieldName(), fieldName),
-                fieldValueMapping.getValueLength(),
-                fieldValueMapping.getFieldValuesList()));
-        return fieldExpMappingsQueue.peek();
-    }
-
-    private FieldValueMapping processFieldValueMappingAsSimpleArrayMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        fieldExpMappingsQueue.remove();
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
-        Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
-        var simpleTypeArrayMap = createSimpleTypeArrayMap(fieldName, fieldValueMapping.getFieldType(), arraySize, mapSize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
-        entity.put(fieldName, simpleTypeArrayMap);
-        return getSafeGetElement(fieldExpMappingsQueue);
-    }
-
-    private FieldValueMapping processFieldValueMappingAsSimpleMapArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
-        Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
-
-        var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), fieldValueMapping.getValueLength(), arraySize, fieldValueMapping.getConstrains());
-
-        entity.put(fieldName, mapArray);
-        return getSafeGetElement(fieldExpMappingsQueue);
-    }
-
-    private FieldValueMapping processFieldValueMappingAsRecordArrayMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
-        Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
-
-        Map<String, List> recordMapArray = new HashMap<>(mapSize);
-        for (int i = 0; i < mapSize - 1; i++) {
-            ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-            recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
-                    createObjectArray(extractType(entity.getSchema().getField(fieldName), MAP).getValueType().getElementType(), fieldName, arraySize, temporalQueue));
-        }
-        recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
-                createObjectArray(extractType(entity.getSchema().getField(fieldName), MAP).getValueType().getElementType(), fieldName, arraySize, fieldExpMappingsQueue));
-        entity.put(fieldName, recordMapArray);
-        return getSafeGetElement(fieldExpMappingsQueue);
-    }
-
-    private FieldValueMapping processFieldValueMappingAsRecordMapArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
-        Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
-        var recordArrayMap = new ArrayList<>(arraySize);
-        for (int i = 0; i < arraySize - 1; i++) {
-            ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-            recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(), fieldName, mapSize, temporalQueue));
-        }
-        recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(), fieldName, arraySize, fieldExpMappingsQueue));
-        entity.put(fieldName, recordArrayMap);
-        return getSafeGetElement(fieldExpMappingsQueue);
-    }
-
-    private Schema extractType(Field field, Type typeToMatch) {
-        Schema realField = field.schema();
-        if (UNION.equals(field.schema().getType())) {
-            realField = IteratorUtils.find(field.schema().getTypes().iterator(), type -> typeToMatch.equals(type.getType()));
-        }
-        return realField;
-    }
-
-    private GenericRecord createObject(final Schema subSchema, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-        Schema innerSchema = subSchema;
-        if (subSchema.getType().equals(MAP)) {
-            innerSchema = subSchema.getValueType();
-        } else if (subSchema.getType().equals(ARRAY)) {
-            innerSchema = innerSchema.getElementType();
-        }
-        GenericRecord subEntity = createRecord(innerSchema);
-        if (null == subEntity) {
-            throw new KLoadGenException("Something Odd just happened");
-        }
-
-        FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-        while (!fieldExpMappingsQueue.isEmpty()
-                && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
-                || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
-                || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
-                || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
-            String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
-            String subFieldName = getCleanMethodName(fieldValueMapping, fieldName);
-            String typeFilter = cleanFieldName.replaceAll(subFieldName, "");
-            if (typeFilter.matches("\\[.]\\[.*") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
-                if (checkIfMapArray(fieldValueMapping.getFieldType())) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
-                    String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfIsRecordMapArray(cleanFieldName)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfIsRecordArrayMap(cleanFieldName)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                }
-            } else if (typeFilter.startsWith("[")) {
-                if (checkIfMap(typeFilter)) {
-                    String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfArray(typeFilter)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfRecordMap(typeFilter)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfRecordArray(typeFilter)) {
-                    String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                    processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                }
-            } else if (typeFilter.startsWith(".")) {
-                String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-                subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
-                        fieldNameSubEntity,
-                        fieldExpMappingsQueue));
-            } else {
-                fieldExpMappingsQueue.poll();
-                subEntity.put(cleanFieldName, avroGeneratorTool.generateObject(
-                                subEntity.getSchema().getField(cleanFieldName),
-                                fieldValueMapping.getFieldType(),
-                                fieldValueMapping.getValueLength(),
-                                fieldValueMapping.getFieldValuesList(),
-                                extractConstrains(subEntity.getSchema().getField(cleanFieldName))
-                        )
-                );
-            }
-            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-        }
-        return subEntity;
-    }
-
-    private GenericRecord createRecord(Schema schema) {
-        if (RECORD == schema.getType()) {
-            return new GenericData.Record(schema);
-        } else if (UNION == schema.getType()) {
-            return createRecord(getRecordUnion(schema.getTypes()));
-        } else if (ARRAY == schema.getType()) {
-            return createRecord(schema.getElementType());
-        } else if (MAP == schema.getType()) {
-            return createRecord(schema.getElementType());
+  public EnrichedRecord next() {
+    GenericRecord entity = new GenericData.Record(schema);
+    if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
+      FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+      while (!fieldExpMappingsQueue.isEmpty()) {
+        String cleanPath = cleanUpPath(fieldValueMapping , "");
+        String fieldName = getCleanMethodName(fieldValueMapping , "");
+        String typeFilter = cleanPath.replaceAll(fieldName , "");
+        if (typeFilter.matches("\\[.*]\\[.*")) {
+          if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
+            fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue , entity , fieldName);
+          } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
+            fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue , entity , fieldName);
+          } else if (checkIfIsRecordMapArray(cleanPath)) {
+            fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , entity , fieldName);
+          } else if (checkIfIsRecordArrayMap(cleanPath)) {
+            fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , entity , fieldName);
+          } else {
+            throw new KLoadGenException("Wrong configuration Map - Array");
+          }
+        } else if (typeFilter.startsWith("[")) {
+          if (checkIfMap(typeFilter)) {
+            fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , entity , fieldName);
+          } else if (checkIfArray(typeFilter)) {
+            fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , entity , fieldName);
+          } else if (checkIfRecordMap(typeFilter)) {
+            fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue , entity , fieldName);
+          } else if (checkIfRecordArray(typeFilter)) {
+            fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , entity , fieldName);
+          } else {
+            throw new KLoadGenException("Wrong configuration Map - Array");
+          }
+        } else if (typeFilter.startsWith(".")) {
+          entity.put(fieldName , createObject(entity.getSchema().getField(fieldName).schema() , fieldName , fieldExpMappingsQueue));
+          fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
-            return null;
+          entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName() ,
+                     avroGeneratorTool.generateObject(
+                         entity.getSchema().getField(fieldName) ,
+                         fieldValueMapping.getFieldType() ,
+                         fieldValueMapping.getValueLength() ,
+                         fieldValueMapping.getFieldValuesList() ,
+                         extractConstrains(schema.getField(fieldValueMapping.getFieldName()))
+                     )
+          );
+          fieldExpMappingsQueue.remove();
+          fieldValueMapping = fieldExpMappingsQueue.peek();
         }
+      }
+    }
+    return new EnrichedRecord(metadata , entity);
+  }
+
+  private Map<ConstraintTypeEnum, String> extractConstrains(Schema.Field field) {
+    Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
+
+      if (Objects.nonNull(field.schema().getObjectProp("precision"))) {
+          constrains.put(ConstraintTypeEnum.PRECISION , field.schema().getObjectProp("precision").toString());
+      }
+
+      if (Objects.nonNull(field.schema().getObjectProp("scale"))) {
+          constrains.put(ConstraintTypeEnum.SCALE , field.schema().getObjectProp("scale").toString());
+      }
+
+    return constrains;
+  }
+
+  private FieldValueMapping processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
+
+    entity.put(fieldName , createObjectArray(extractType(entity.getSchema().getField(fieldName) , ARRAY).getElementType() ,
+                                             fieldName ,
+                                             arraySize ,
+                                             fieldExpMappingsQueue));
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private FieldValueMapping processFieldValueMappingAsRecordMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , getCleanMethodName(fieldValueMapping , fieldName));
+
+    entity.put(fieldName , createObjectMap(extractType(entity.getSchema().getField(fieldName) , MAP).getValueType() ,
+                                           fieldName ,
+                                           mapSize ,
+                                           fieldExpMappingsQueue));
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private FieldValueMapping processFieldValueMappingAsSimpleArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
+    entity.put(fieldName ,
+               createArray(fieldName , arraySize , fieldExpMappingsQueue));
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private FieldValueMapping processFieldValueMappingAsSimpleMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    fieldExpMappingsQueue.remove();
+    // Add condition that checks (][)
+    entity.put(fieldName , createSimpleTypeMap(fieldName , fieldValueMapping.getFieldType() ,
+                                               calculateMapSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                               fieldValueMapping.getValueLength() ,
+                                               fieldValueMapping.getFieldValuesList()));
+    return fieldExpMappingsQueue.peek();
+  }
+
+  private FieldValueMapping processFieldValueMappingAsSimpleArrayMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    fieldExpMappingsQueue.remove();
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
+    var simpleTypeArrayMap = createSimpleTypeArrayMap(fieldName , fieldValueMapping.getFieldType() , arraySize , mapSize , fieldValueMapping.getValueLength() ,
+                                                      fieldValueMapping.getFieldValuesList());
+    entity.put(fieldName , simpleTypeArrayMap);
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private FieldValueMapping processFieldValueMappingAsSimpleMapArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
+
+    var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType() , mapSize , fieldValueMapping.getFieldValuesList() , fieldValueMapping.getValueLength() , arraySize ,
+                                         fieldValueMapping.getConstrains());
+
+    entity.put(fieldName , mapArray);
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private FieldValueMapping processFieldValueMappingAsRecordArrayMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
+
+    Map<String, List> recordMapArray = new HashMap<>(mapSize);
+    for (int i = 0; i < mapSize - 1; i++) {
+      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
+      recordMapArray.put((String) randomObject.generateRandom("string" , fieldValueMapping.getValueLength() , Collections.emptyList() , Collections.emptyMap()) ,
+                         createObjectArray(extractType(entity.getSchema().getField(fieldName) , MAP).getValueType().getElementType() , fieldName , arraySize , temporalQueue));
+    }
+    recordMapArray.put((String) randomObject.generateRandom("string" , fieldValueMapping.getValueLength() , Collections.emptyList() , Collections.emptyMap()) ,
+                       createObjectArray(extractType(entity.getSchema().getField(fieldName) , MAP).getValueType().getElementType() , fieldName , arraySize ,
+                                         fieldExpMappingsQueue));
+    entity.put(fieldName , recordMapArray);
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private FieldValueMapping processFieldValueMappingAsRecordMapArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , GenericRecord entity , String fieldName) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
+    var recordArrayMap = new ArrayList<>(arraySize);
+    for (int i = 0; i < arraySize - 1; i++) {
+      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
+      recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName) , ARRAY).getElementType() , fieldName , mapSize , temporalQueue));
+    }
+    recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName) , ARRAY).getElementType() , fieldName , arraySize , fieldExpMappingsQueue));
+    entity.put(fieldName , recordArrayMap);
+    return getSafeGetElement(fieldExpMappingsQueue);
+  }
+
+  private Schema extractType(Field field , Type typeToMatch) {
+    Schema realField = field.schema();
+    if (UNION.equals(field.schema().getType())) {
+      realField = IteratorUtils.find(field.schema().getTypes().iterator() , type -> typeToMatch.equals(type.getType()));
+    }
+    return realField;
+  }
+
+  private GenericRecord createObject(final Schema subSchema , final String fieldName , final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    Schema innerSchema = subSchema;
+    if (subSchema.getType().equals(MAP)) {
+      innerSchema = subSchema.getValueType();
+    } else if (subSchema.getType().equals(ARRAY)) {
+      innerSchema = innerSchema.getElementType();
+    }
+    GenericRecord subEntity = createRecord(innerSchema);
+    if (null == subEntity) {
+      throw new KLoadGenException("Something Odd just happened");
     }
 
-    private Schema getRecordUnion(List<Schema> types) {
-        Schema isRecord = null;
-        for (Schema innerSchema : types) {
-            if (RECORD == innerSchema.getType() || ARRAY == innerSchema.getType() || MAP == innerSchema.getType() || typesSet.contains(innerSchema.getType())) {
-                isRecord = innerSchema;
-            }
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    while (!fieldExpMappingsQueue.isEmpty()
+           && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + fieldName + "$")
+               || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
+               || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
+               || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
+      String cleanFieldName = cleanUpPath(fieldValueMapping , fieldName);
+      String subFieldName = getCleanMethodName(fieldValueMapping , fieldName);
+      String typeFilter = cleanFieldName.replaceAll(subFieldName , "");
+      if (typeFilter.matches("\\[.]\\[.*") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
+        if (checkIfMapArray(fieldValueMapping.getFieldType())) {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
+        } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
+          String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
+        } else if (checkIfIsRecordMapArray(cleanFieldName)) {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
+        } else if (checkIfIsRecordArrayMap(cleanFieldName)) {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
         }
-        return isRecord;
+      } else if (typeFilter.startsWith("[")) {
+        if (checkIfMap(typeFilter)) {
+          String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
+        } else if (checkIfArray(typeFilter)) {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
+        } else if (checkIfRecordMap(typeFilter)) {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsRecordMap(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
+        } else if (checkIfRecordArray(typeFilter)) {
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
+          processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , subEntity , fieldNameSubEntity);
+        }
+      } else if (typeFilter.startsWith(".")) {
+        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
+        subEntity.put(fieldNameSubEntity , createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema() ,
+                                                        fieldNameSubEntity ,
+                                                        fieldExpMappingsQueue));
+      } else {
+        fieldExpMappingsQueue.poll();
+        subEntity.put(cleanFieldName , avroGeneratorTool.generateObject(
+                          subEntity.getSchema().getField(cleanFieldName) ,
+                          fieldValueMapping.getFieldType() ,
+                          fieldValueMapping.getValueLength() ,
+                          fieldValueMapping.getFieldValuesList() ,
+                          extractConstrains(subEntity.getSchema().getField(cleanFieldName))
+                      )
+        );
+      }
+      fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
     }
+    return subEntity;
+  }
 
-    private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-        List<GenericRecord> objectArray = new ArrayList<>(arraySize);
-        for (int i = 0; i < arraySize - 1; i++) {
-            ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-            objectArray.add(createObject(subSchema, fieldName, temporalQueue));
-        }
-        objectArray.add(createObject(subSchema, fieldName, fieldExpMappingsQueue));
-        return objectArray;
+  private GenericRecord createRecord(Schema schema) {
+    if (RECORD == schema.getType()) {
+      return new GenericData.Record(schema);
+    } else if (UNION == schema.getType()) {
+      return createRecord(getRecordUnion(schema.getTypes()));
+    } else if (ARRAY == schema.getType()) {
+      return createRecord(schema.getElementType());
+    } else if (MAP == schema.getType()) {
+      return createRecord(schema.getElementType());
+    } else {
+      return null;
     }
+  }
 
-    private Map<String, GenericRecord> createObjectMap(Schema subSchema, String fieldName, Integer mapSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-        Map<String, GenericRecord> objectMap = new HashMap<>(mapSize);
-        for (int i = 0; i < mapSize - 1; i++) {
-            ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-            objectMap.put(generateMapKey(), createObject(subSchema, fieldName, temporalQueue));
-        }
-        objectMap.put(generateMapKey(), createObject(subSchema, fieldName, fieldExpMappingsQueue));
-        return objectMap;
+  private Schema getRecordUnion(List<Schema> types) {
+    Schema isRecord = null;
+    for (Schema innerSchema : types) {
+      if (RECORD == innerSchema.getType() || ARRAY == innerSchema.getType() || MAP == innerSchema.getType() || typesSet.contains(innerSchema.getType())) {
+        isRecord = innerSchema;
+      }
     }
+    return isRecord;
+  }
+
+  private List<GenericRecord> createObjectArray(Schema subSchema , String fieldName , Integer arraySize , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    List<GenericRecord> objectArray = new ArrayList<>(arraySize);
+    for (int i = 0; i < arraySize - 1; i++) {
+      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
+      objectArray.add(createObject(subSchema , fieldName , temporalQueue));
+    }
+    objectArray.add(createObject(subSchema , fieldName , fieldExpMappingsQueue));
+    return objectArray;
+  }
+
+  private Map<String, GenericRecord> createObjectMap(Schema subSchema , String fieldName , Integer mapSize , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    Map<String, GenericRecord> objectMap = new HashMap<>(mapSize);
+    for (int i = 0; i < mapSize - 1; i++) {
+      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
+      objectMap.put(generateMapKey() , createObject(subSchema , fieldName , temporalQueue));
+    }
+    objectMap.put(generateMapKey() , createObject(subSchema , fieldName , fieldExpMappingsQueue));
+    return objectMap;
+  }
 
 }
