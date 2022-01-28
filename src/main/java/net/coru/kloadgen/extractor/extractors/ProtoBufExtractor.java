@@ -10,12 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.squareup.wire.schema.Field;
-import com.squareup.wire.schema.internal.parser.EnumElement;
-import com.squareup.wire.schema.internal.parser.FieldElement;
-import com.squareup.wire.schema.internal.parser.MessageElement;
-import com.squareup.wire.schema.internal.parser.OneOfElement;
-import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import com.squareup.wire.schema.internal.parser.TypeElement;
+import com.squareup.wire.schema.OneOf;
+import com.squareup.wire.schema.internal.parser.*;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.ProtobufHelper;

@@ -91,8 +91,12 @@ public class SchemaExtractorImpl implements SchemaExtractor {
       (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> avroExtractor.processField(field , attributeList));
     } else if ("JSON".equalsIgnoreCase(schema.schemaType())) {
       attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
-    } else {
-      throw new KLoadGenException(String.format("Schema type not supported %s" , schema.schemaType()));
+    } else if ("PROTOBUF".equalsIgnoreCase(schema.schemaType())) {
+     ProtoFileElement protoFileElement = (((ProtobufSchema) schema).rawSchema());
+     protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports()));
+    }
+    else {
+      throw new KLoadGenException(String.format("Schema type not supported %s", schema.schemaType()));
     }
     return Pair.of(schema.schemaType() , attributeList);
   }

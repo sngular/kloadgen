@@ -154,21 +154,21 @@ public class AvroExtractor {
   private void extractUnionRecord(Schema.Field innerField , List<FieldValueMapping> completeFieldList) {
     Schema recordUnion = getRecordUnion(innerField.schema().getTypes());
     if (null != recordUnion) {
-      processField(innerField , completeFieldList , recordUnion);
+      processField(innerField, completeFieldList, recordUnion);
     } else {
       completeFieldList.add(new FieldValueMapping(innerField.name() , getNotNullType(innerField.schema().getTypes())));
     }
   }
 
-  private void processField(Schema.Field innerField , List<FieldValueMapping> completeFieldList , Schema recordUnion) {
+  private void processField(Schema.Field innerField, List<FieldValueMapping> completeFieldList , Schema recordUnion) {
     if (checkIfRecord(recordUnion)) {
-      processRecordFieldList(innerField.name() , "." , processFieldList(recordUnion.getFields()) , completeFieldList);
+      processRecordFieldList(innerField.name(), ".", processFieldList(recordUnion.getFields()) , completeFieldList);
     } else if (checkIfArray(recordUnion)) {
-      extractArray(innerField , completeFieldList , recordUnion.getElementType());
+      extractArray(innerField, completeFieldList, recordUnion.getElementType());
     } else if (checkIfMap(recordUnion)) {
       List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name() + "[:]" , recordUnion.getValueType());
       if (internalFields.size() == 1 && internalFields.get(0).getFieldName().endsWith("[:][:]")) {
-        tweakType(internalFields.get(0) , MAP_POSTFIX);
+        tweakType(internalFields.get(0), MAP_POSTFIX);
       }
       completeFieldList.addAll(internalFields);
     } else {

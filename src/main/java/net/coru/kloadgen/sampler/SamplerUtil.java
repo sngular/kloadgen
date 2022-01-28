@@ -430,7 +430,7 @@ public final class SamplerUtil {
         generator = new JsonLoadGenerator();
       } else if (jMeterVariables.get(KEY_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroLoadGenerator();
-      } else if (jMeterVariables.get(VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+      } else if (jMeterVariables.get(KEY_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
         generator = new ProtobufLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");

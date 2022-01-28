@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
-import java.util.Objects;
-import java.util.function.Predicate;
 
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.SchemaExtractor;
@@ -32,7 +30,6 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

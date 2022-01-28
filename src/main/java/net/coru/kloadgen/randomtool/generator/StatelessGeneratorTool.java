@@ -26,28 +26,35 @@ public class StatelessGeneratorTool {
 
   private final RandomObject randomObject = new RandomObject();
 
-  public Object generateObject(String fieldName , String fieldType , Integer valueLength , List<String> fieldValuesList) {
+  public Object generateObject(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
 
-    Object value = randomObject.generateRandom(fieldType , valueLength , parameterList , Collections.emptyMap());
-    if ("seq".equals(fieldType)) {
-      value = randomObject.generateSeq(fieldName , fieldType , parameterList , context);
-    }
+    Object value;
 
+    if ("seq".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
+        fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
+        return randomObject.generateSequenceForFieldValueList(fieldValuesList.get(0), fieldType, fieldValuesList, context);
+      } else {
+        value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
+      }
+    } else {
+      value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
+    }
     return value;
   }
 
-  public Object generateMap(String fieldType , Integer valueLength , List<String> fieldValuesList , Integer size) {
+  public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-    return randomMap.generateMap(fieldType , valueLength , parameterList , size , Collections.emptyMap());
+    return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
-  public Object generateArray(String fieldName , String fieldType , Integer arraySize , Integer valueLength , List<String> fieldValuesList) {
+  public Object generateArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
 
-    Object value = randomArray.generateArray(fieldType , valueLength , parameterList , arraySize , Collections.emptyMap());
+    Object value = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     if ("seq".equals(fieldType)) {
-      value = randomObject.generateSeq(fieldName , fieldType , parameterList , context);
+      value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
     }
 
     return value;
