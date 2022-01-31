@@ -27,8 +27,8 @@ public class StringField extends Field {
   }
 
   @Builder(toBuilder = true)
-  public StringField(String name , String regex , int minLength , int maxlength , String format) {
-    super(name , "string");
+  public StringField(String name, String regex, int minLength, int maxlength, String format) {
+    super(name, "string");
     this.regex = regex;
     this.maxlength = maxlength;
     this.minLength = minLength;

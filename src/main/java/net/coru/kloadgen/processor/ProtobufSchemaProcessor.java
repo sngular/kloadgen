@@ -41,7 +41,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
   private ProtoBufGeneratorTool generatorTool;
 
-  public void processSchema(ProtoFileElement schema , SchemaMetadata metadata , List<FieldValueMapping> fieldExprMappings)
+  public void processSchema(ProtoFileElement schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
       throws DescriptorValidationException, IOException {
     this.schema = new ProtoBufProcessorHelper().buildDescriptor(schema);
     this.fieldExprMappings = fieldExprMappings;
@@ -50,7 +50,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     generatorTool = new ProtoBufGeneratorTool();
   }
 
-  public void processSchema(ParsedSchema parsedSchema , SchemaMetadata metadata , List<FieldValueMapping> fieldExprMappings)
+  public void processSchema(ParsedSchema parsedSchema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
       throws DescriptorValidationException, IOException {
     this.schema = new ProtoBufProcessorHelper().buildDescriptor((ProtoFileElement) parsedSchema.rawSchema());
     this.fieldExprMappings = fieldExprMappings;
@@ -69,52 +69,52 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
       while (!fieldExpMappingsQueue.isEmpty()) {
         fieldValueMapping.setFieldName(fieldValueMapping.getFieldName().substring(fieldValueMapping.getFieldName().indexOf(".") + 1));
-        String cleanPath = cleanUpPath(fieldValueMapping , "");
-        String typeName = getCleanMethodName(fieldValueMapping , "");
+        String cleanPath = cleanUpPath(fieldValueMapping, "");
+        String typeName = getCleanMethodName(fieldValueMapping, "");
         String fieldName = fieldValueMapping.getFieldName().substring(fieldValueMapping.getFieldName().lastIndexOf(".") + 1);
-        String typeFilter = cleanPath.replaceAll(typeName , "");
+        String typeFilter = cleanPath.replaceAll(typeName, "");
         if (typeFilter.matches("\\[.*]\\[.*")) {
           if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
-            fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue , messageBuilder , typeName);
+            fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, messageBuilder, typeName);
           } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
-            fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue , messageBuilder , typeName);
+            fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, messageBuilder, typeName);
           } else if (checkIfIsRecordMapArray(cleanPath)) {
-            fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , messageBuilder , typeName);
+            fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, messageBuilder, typeName);
           } else if (checkIfIsRecordArrayMap(cleanPath)) {
-            fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , messageBuilder , typeName);
+            fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, messageBuilder, typeName);
           } else {
             throw new KLoadGenException("Wrong configuration Map - Array");
           }
         } else if (typeFilter.startsWith("[")) {
           if (checkIfMap(typeFilter)) {
-            fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , messageBuilder , typeName);
+            fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, typeName);
           } else if (checkIfArray(typeFilter)) {
-            String cleanFieldName = fieldName.substring(0 , fieldName.indexOf("["));
-            fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , messageBuilder , typeName , cleanFieldName);
+            String cleanFieldName = fieldName.substring(0, fieldName.indexOf("["));
+            fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, typeName, cleanFieldName);
           } else if (checkIfRecordMap(typeFilter)) {
-            fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue , messageBuilder , typeName);
+            fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, typeName);
           } else if (checkIfRecordArray(typeFilter)) {
-            fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , messageBuilder , typeName);
+            fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, typeName);
           } else {
             throw new KLoadGenException("Wrong configuration Map - Array");
           }
         } else if (typeFilter.startsWith(".")) {
-          messageBuilder.setField(getFieldDescriptorForField(messageBuilder , typeName) ,
-                                  createObject(getDescriptorForField(messageBuilder , typeName) , typeName , fieldExpMappingsQueue));
+          messageBuilder.setField(getFieldDescriptorForField(messageBuilder, typeName),
+                                  createObject(getDescriptorForField(messageBuilder, typeName), typeName, fieldExpMappingsQueue));
           fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         } else {
           if (fieldValueMapping.getFieldType().equals("enum")) {
-            processFieldValueMappingAsEnum(messageBuilder , fieldValueMapping , typeName , fieldName);
+            processFieldValueMappingAsEnum(messageBuilder, fieldValueMapping, typeName, fieldName);
           } else {
             var descriptor = messageBuilder.getDescriptorForType().findFieldByName(typeName);
             if (MESSAGE.equals(descriptor.getType())) {
-              messageBuilder.setField(descriptor , createFieldObject(descriptor.getMessageType()));
+              messageBuilder.setField(descriptor, createFieldObject(descriptor.getMessageType()));
             } else {
-              messageBuilder.setField(descriptor ,
-                                      generatorTool.generateObject(descriptor ,
-                                                                   fieldValueMapping.getFieldType() ,
-                                                                   fieldValueMapping.getValueLength() ,
-                                                                   fieldValueMapping.getFieldValuesList() ,
+              messageBuilder.setField(descriptor,
+                                      generatorTool.generateObject(descriptor,
+                                                                   fieldValueMapping.getFieldType(),
+                                                                   fieldValueMapping.getValueLength(),
+                                                                   fieldValueMapping.getFieldValuesList(),
                                                                    fieldValueMapping.getConstrains()
                                       ));
             }
@@ -125,22 +125,22 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
       }
     }
     message = messageBuilder.build();
-    return new EnrichedRecord(metadata , message);
+    return new EnrichedRecord(metadata, message);
   }
 
   private Object createFieldObject(Descriptors.Descriptor descriptor) {
     DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(descriptor);
     for (var field : descriptor.getFields()) {
-      messageBuilder.setField(field ,
+      messageBuilder.setField(field,
                               randomObject.generateRandom(
-                                  field.getType().getJavaType().name() ,
-                                  0 , Collections.emptyList() , Collections.emptyMap()));
+                                  field.getType().getJavaType().name(),
+                                  0, Collections.emptyList(), Collections.emptyMap()));
     }
 
     return messageBuilder.build();
   }
 
-  private DynamicMessage createObject(final Descriptors.Descriptor subMessageDescriptor , final String fieldName , final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private DynamicMessage createObject(final Descriptors.Descriptor subMessageDescriptor, final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
 
     DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(subMessageDescriptor);
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
@@ -150,55 +150,55 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                || fieldValueMapping.getFieldName().matches(fieldName + "\\..*")
                || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\[.*")
                || fieldValueMapping.getFieldName().matches(".*" + fieldName + "\\..*"))) {
-      String cleanFieldName = cleanUpPath(fieldValueMapping , fieldName);
-      String typeName = getCleanMethodName(fieldValueMapping , fieldName);
-      String typeFilter = cleanFieldName.replaceAll(typeName , "");
+      String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
+      String typeName = getCleanMethodName(fieldValueMapping, fieldName);
+      String typeFilter = cleanFieldName.replaceAll(typeName, "");
       if (typeFilter.matches("\\[.]\\[.*") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
         if (checkIfMapArray(fieldValueMapping.getFieldType())) {
-          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue , messageBuilder , fieldNameSubEntity);
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
         } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
-          String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue , messageBuilder , fieldNameSubEntity);
+          String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
         } else if (checkIfIsRecordMapArray(cleanFieldName)) {
-          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue , messageBuilder , fieldNameSubEntity);
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
         } else if (checkIfIsRecordArrayMap(cleanFieldName)) {
-          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue , messageBuilder , fieldNameSubEntity);
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
         }
       } else if (typeFilter.startsWith("[")) {
         if (checkIfMap(typeFilter)) {
-          String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , messageBuilder , fieldNameSubEntity);
+          String fieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
         } else if (checkIfArray(typeFilter)) {
-          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , messageBuilder , fieldName , fieldNameSubEntity);
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, fieldName, fieldNameSubEntity);
         } else if (checkIfRecordMap(typeFilter)) {
-          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsRecordMap(fieldExpMappingsQueue , messageBuilder , fieldNameSubEntity);
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
         } else if (checkIfRecordArray(typeFilter)) {
-          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
-          processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , messageBuilder , fieldNameSubEntity);
+          String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+          processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldNameSubEntity);
         }
       } else if (typeFilter.startsWith(".")) {
-        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping , fieldName);
-        messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName) ,
-                                createObject(getDescriptorForField(messageBuilder , fieldNameSubEntity) ,
-                                             fieldNameSubEntity ,
+        String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+        messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName),
+                                createObject(getDescriptorForField(messageBuilder, fieldNameSubEntity),
+                                             fieldNameSubEntity,
                                              fieldExpMappingsQueue));
 
       } else {
         fieldExpMappingsQueue.poll();
         var descriptor = messageBuilder.getDescriptorForType().findFieldByName(cleanFieldName);
         if (MESSAGE.equals(descriptor.getType())) {
-          messageBuilder.setField(descriptor , createFieldObject(descriptor.getMessageType()));
+          messageBuilder.setField(descriptor, createFieldObject(descriptor.getMessageType()));
         } else {
-          messageBuilder.setField(descriptor ,
-                                  generatorTool.generateObject(descriptor ,
-                                                               fieldValueMapping.getFieldType() ,
-                                                               fieldValueMapping.getValueLength() ,
-                                                               fieldValueMapping.getFieldValuesList() ,
+          messageBuilder.setField(descriptor,
+                                  generatorTool.generateObject(descriptor,
+                                                               fieldValueMapping.getFieldType(),
+                                                               fieldValueMapping.getValueLength(),
+                                                               fieldValueMapping.getFieldValuesList(),
                                                                fieldValueMapping.getConstrains()
                                   )
           );
@@ -209,221 +209,221 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     return messageBuilder.build();
   }
 
-  private FieldValueMapping processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String fieldName) {
+  private FieldValueMapping processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-    createObjectArray(messageBuilder ,
-                      fieldName ,
-                      arraySize ,
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+    createObjectArray(messageBuilder,
+                      fieldName,
+                      arraySize,
                       fieldExpMappingsQueue);
     fieldExpMappingsQueue.remove();
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
-  private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder , FieldValueMapping fieldValueMapping , String typeName , String fieldName) {
-    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-    Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder , typeName).getEnumType();
-    messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName) ,
-                            generatorTool.generateObject(enumDescriptor , fieldValueMapping.getFieldType() , arraySize , fieldValueMapping.getFieldValuesList()));
+  private void processFieldValueMappingAsEnum(DynamicMessage.Builder messageBuilder, FieldValueMapping fieldValueMapping, String typeName, String fieldName) {
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+    Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
+    messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
+                            generatorTool.generateObject(enumDescriptor, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getFieldValuesList()));
   }
 
-  private FieldValueMapping processFieldValueMappingAsRecordMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String fieldName) {
+  private FieldValueMapping processFieldValueMappingAsRecordMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
-    messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName) , createObjectMap(messageBuilder ,
-                                                                                                               fieldName ,
-                                                                                                               mapSize ,
-                                                                                                               fieldExpMappingsQueue));
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
+    messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName), createObjectMap(messageBuilder,
+                                                                                                              fieldName,
+                                                                                                              mapSize,
+                                                                                                              fieldExpMappingsQueue));
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
   private FieldValueMapping processFieldValueMappingAsSimpleArray(
-      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String typeName , String fieldName) {
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String typeName, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     if (Objects.nonNull(messageBuilder.getDescriptorForType().findFieldByName(typeName)) &&
         messageBuilder.getDescriptorForType().findFieldByName(typeName).getType().equals(Descriptors.FieldDescriptor.Type.MESSAGE)) {
-      messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName) ,
-                              createObject(messageBuilder.getDescriptorForType().findFieldByName(typeName).getMessageType() , typeName , fieldExpMappingsQueue));
+      messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
+                              createObject(messageBuilder.getDescriptorForType().findFieldByName(typeName).getMessageType(), typeName, fieldExpMappingsQueue));
     } else if (Objects.nonNull(messageBuilder.getDescriptorForType().findFieldByName(typeName)) &&
                messageBuilder.getDescriptorForType().findFieldByName(typeName).getType().equals(Descriptors.FieldDescriptor.Type.ENUM)) {
-      Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-      Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder , typeName).getEnumType();
-      messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName) ,
-                              generatorTool.generateObject(enumDescriptor , fieldValueMapping.getFieldType() , arraySize , fieldValueMapping.getFieldValuesList()));
+      Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+      Descriptors.EnumDescriptor enumDescriptor = getFieldDescriptorForField(messageBuilder, typeName).getEnumType();
+      messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(typeName),
+                              generatorTool.generateObject(enumDescriptor, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getFieldValuesList()));
       fieldExpMappingsQueue.remove();
     } else {
-      Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-      messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName) ,
-                              createArray(fieldName , arraySize , fieldExpMappingsQueue));
+      Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+      messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
+                              createArray(fieldName, arraySize, fieldExpMappingsQueue));
     }
 
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
-  private FieldValueMapping processFieldValueMappingAsSimpleMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String fieldName) {
+  private FieldValueMapping processFieldValueMappingAsSimpleMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , getCleanMethodName(fieldValueMapping , fieldName));
-    messageBuilder.setField(getFieldDescriptorForField(messageBuilder , fieldName) ,
-                            createSimpleObjectMap(messageBuilder , fieldName , mapSize , fieldExpMappingsQueue)
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), getCleanMethodName(fieldValueMapping, fieldName));
+    messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName),
+                            createSimpleObjectMap(messageBuilder, fieldName, mapSize, fieldExpMappingsQueue)
     );
     fieldExpMappingsQueue.remove();
     return fieldExpMappingsQueue.peek();
   }
 
   private FieldValueMapping processFieldValueMappingAsSimpleArrayMap(
-      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String fieldName) {
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     fieldExpMappingsQueue.remove();
-    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
-    var simpleTypeArrayMap = createSimpleTypeArrayMap(fieldName , fieldValueMapping.getFieldType() , arraySize , mapSize , fieldValueMapping.getValueLength() ,
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
+    var simpleTypeArrayMap = createSimpleTypeArrayMap(fieldName, fieldValueMapping.getFieldType(), arraySize, mapSize, fieldValueMapping.getValueLength(),
                                                       fieldValueMapping.getFieldValuesList());
-    messageBuilder.setField(getFieldDescriptorForField(messageBuilder , fieldName) , simpleTypeArrayMap);
+    messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName), simpleTypeArrayMap);
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
   private FieldValueMapping processFieldValueMappingAsSimpleMapArray(
-      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String fieldName) {
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
-    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
 
-    var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType() , mapSize , fieldValueMapping.getFieldValuesList() , fieldValueMapping.getValueLength() , arraySize ,
+    var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), fieldValueMapping.getValueLength(), arraySize,
                                          fieldValueMapping.getConstrains());
 
-    messageBuilder.setField(getFieldDescriptorForField(messageBuilder , fieldName) , mapArray);
+    messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName), mapArray);
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
   private FieldValueMapping processFieldValueMappingAsRecordArrayMap(
-      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String fieldName) {
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
 
     Map<String, List> recordMapArray = new HashMap<>(mapSize);
     for (int i = 0; i < mapSize - 1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      recordMapArray.put((String) randomObject.generateRandom("string" , fieldValueMapping.getValueLength() , Collections.emptyList() , Collections.emptyMap()) ,
-                         createComplexObjectArray(messageBuilder , fieldName , arraySize , temporalQueue));
+      recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
+                         createComplexObjectArray(messageBuilder, fieldName, arraySize, temporalQueue));
     }
-    recordMapArray.put((String) randomObject.generateRandom("string" , fieldValueMapping.getValueLength() , Collections.emptyList() , Collections.emptyMap()) ,
-                       createComplexObjectArray(messageBuilder , fieldName , arraySize , fieldExpMappingsQueue));
-    messageBuilder.setField(getFieldDescriptorForField(messageBuilder , fieldName) , recordMapArray);
+    recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
+                       createComplexObjectArray(messageBuilder, fieldName, arraySize, fieldExpMappingsQueue));
+    messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName), recordMapArray);
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
   private FieldValueMapping processFieldValueMappingAsRecordMapArray(
-      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue , DynamicMessage.Builder messageBuilder , String fieldName) {
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    Integer arraySize = calculateSize(fieldValueMapping.getFieldName() , fieldName);
-    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName() , fieldName);
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
     var recordArrayMap = new ArrayList<>(arraySize);
     for (int i = 0; i < arraySize - 1; i++) {
 
-      recordArrayMap.add(createObjectMap(messageBuilder , fieldName , mapSize , fieldExpMappingsQueue.clone()));
+      recordArrayMap.add(createObjectMap(messageBuilder, fieldName, mapSize, fieldExpMappingsQueue.clone()));
     }
-    recordArrayMap.add(createObjectMap(messageBuilder , fieldName , arraySize , fieldExpMappingsQueue));
-    messageBuilder.setField(getFieldDescriptorForField(messageBuilder , fieldName) , recordArrayMap);
+    recordArrayMap.add(createObjectMap(messageBuilder, fieldName, arraySize, fieldExpMappingsQueue));
+    messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName), recordArrayMap);
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
-  private void createObjectArray(DynamicMessage.Builder messageBuilder , String fieldName , Integer arraySize , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private void createObjectArray(DynamicMessage.Builder messageBuilder, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
 
     for (int i = 0; i < arraySize - 1; i++) {
-      messageBuilder.addRepeatedField(getFieldDescriptorForField(messageBuilder , fieldName) ,
-                                      createObject(getDescriptorForField(messageBuilder , fieldName) , fieldName , fieldExpMappingsQueue.clone()));
+      messageBuilder.addRepeatedField(getFieldDescriptorForField(messageBuilder, fieldName),
+                                      createObject(getDescriptorForField(messageBuilder, fieldName), fieldName, fieldExpMappingsQueue.clone()));
     }
-    messageBuilder.addRepeatedField(getFieldDescriptorForField(messageBuilder , fieldName) ,
-                                    createObject(getDescriptorForField(messageBuilder , fieldName) , fieldName , fieldExpMappingsQueue));
+    messageBuilder.addRepeatedField(getFieldDescriptorForField(messageBuilder, fieldName),
+                                    createObject(getDescriptorForField(messageBuilder, fieldName), fieldName, fieldExpMappingsQueue));
   }
 
   private List<DynamicMessage> createComplexObjectArray(
-      DynamicMessage.Builder messageBuilder , String fieldName , Integer arraySize , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+      DynamicMessage.Builder messageBuilder, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     List<DynamicMessage> objectArray = new ArrayList<>(arraySize);
     for (int i = 0; i < arraySize - 1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.add(createObject(messageBuilder.getDescriptorForType() , fieldName , temporalQueue));
+      objectArray.add(createObject(messageBuilder.getDescriptorForType(), fieldName, temporalQueue));
     }
-    objectArray.add(createObject(messageBuilder.getDescriptorForType() , fieldName , fieldExpMappingsQueue));
+    objectArray.add(createObject(messageBuilder.getDescriptorForType(), fieldName, fieldExpMappingsQueue));
     return objectArray;
   }
 
-  private List<Message> createObjectMap(DynamicMessage.Builder messageBuilder , String fieldName , Integer mapSize , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private List<Message> createObjectMap(DynamicMessage.Builder messageBuilder, String fieldName, Integer mapSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     List<Message> messageMap = new ArrayList<>();
-    Descriptors.FieldDescriptor descriptor = getFieldDescriptorForField(messageBuilder , fieldName);
+    Descriptors.FieldDescriptor descriptor = getFieldDescriptorForField(messageBuilder, fieldName);
 
     for (int i = 0; i < mapSize - 1; i++) {
-      messageMap.add(buildMapEntry(descriptor , fieldName , fieldExpMappingsQueue.clone()));
+      messageMap.add(buildMapEntry(descriptor, fieldName, fieldExpMappingsQueue.clone()));
     }
-    messageMap.add(buildMapEntry(descriptor , fieldName , fieldExpMappingsQueue));
-    messageBuilder.setField(descriptor , messageMap);
+    messageMap.add(buildMapEntry(descriptor, fieldName, fieldExpMappingsQueue));
+    messageBuilder.setField(descriptor, messageMap);
     return messageMap;
   }
 
-  private List<Message> createSimpleObjectMap(DynamicMessage.Builder messageBuilder , String fieldName , Integer mapSize , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private List<Message> createSimpleObjectMap(DynamicMessage.Builder messageBuilder, String fieldName, Integer mapSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     List<Message> messageMap = new ArrayList<>();
-    Descriptors.FieldDescriptor descriptor = getFieldDescriptorForField(messageBuilder , fieldName);
+    Descriptors.FieldDescriptor descriptor = getFieldDescriptorForField(messageBuilder, fieldName);
 
     for (int i = 0; i < mapSize - 1; i++) {
-      messageMap.add(buildSimpleMapEntry(descriptor , fieldExpMappingsQueue.clone()));
+      messageMap.add(buildSimpleMapEntry(descriptor, fieldExpMappingsQueue.clone()));
     }
-    messageMap.add(buildSimpleMapEntry(descriptor , fieldExpMappingsQueue));
-    messageBuilder.setField(descriptor , messageMap);
+    messageMap.add(buildSimpleMapEntry(descriptor, fieldExpMappingsQueue));
+    messageBuilder.setField(descriptor, messageMap);
     return messageMap;
   }
 
-  private Message buildMapEntry(Descriptors.FieldDescriptor descriptor , String fieldName , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private Message buildMapEntry(Descriptors.FieldDescriptor descriptor, String fieldName, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor.getMessageType());
     Descriptors.FieldDescriptor keyFieldDescriptor = descriptor.getMessageType().findFieldByName("key");
-    builder.setField(keyFieldDescriptor ,
-                     randomObject.generateRandom("string" , 10 , Collections.emptyList() , Collections.emptyMap()));
+    builder.setField(keyFieldDescriptor,
+                     randomObject.generateRandom("string", 10, Collections.emptyList(), Collections.emptyMap()));
     Descriptors.FieldDescriptor valueFieldDescriptor = descriptor.getMessageType().findFieldByName("value");
     if (valueFieldDescriptor.getType().equals(Descriptors.FieldDescriptor.Type.ENUM)) {
       List<String> fieldValueMappings = new ArrayList<>();
       for (Descriptors.EnumValueDescriptor value : valueFieldDescriptor.getEnumType().getValues()) {
         fieldValueMappings.add(value.getName());
       }
-      builder.setField(valueFieldDescriptor , generatorTool.generateObject(valueFieldDescriptor.getEnumType() , valueFieldDescriptor.getType().name() , 0 , fieldValueMappings));
+      builder.setField(valueFieldDescriptor, generatorTool.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
     } else {
-      builder.setField(valueFieldDescriptor ,
-                       createObject(valueFieldDescriptor.getMessageType() , fieldName , fieldExpMappingsQueue));
+      builder.setField(valueFieldDescriptor,
+                       createObject(valueFieldDescriptor.getMessageType(), fieldName, fieldExpMappingsQueue));
     }
 
     return builder.build();
   }
 
-  private Message buildSimpleMapEntry(Descriptors.FieldDescriptor descriptor , ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private Message buildSimpleMapEntry(Descriptors.FieldDescriptor descriptor, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    String fieldValueMappingCleanType = fieldValueMapping.getFieldType().substring(0 , fieldValueMapping.getFieldType().indexOf("-map"));
+    String fieldValueMappingCleanType = fieldValueMapping.getFieldType().substring(0, fieldValueMapping.getFieldType().indexOf("-map"));
     DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor.getMessageType());
     Descriptors.FieldDescriptor keyFieldDescriptor = descriptor.getMessageType().findFieldByName("key");
-    builder.setField(keyFieldDescriptor ,
-                     randomObject.generateRandom("string" , 10 , Collections.emptyList() , Collections.emptyMap()));
+    builder.setField(keyFieldDescriptor,
+                     randomObject.generateRandom("string", 10, Collections.emptyList(), Collections.emptyMap()));
     Descriptors.FieldDescriptor valueFieldDescriptor = descriptor.getMessageType().findFieldByName("value");
     if (valueFieldDescriptor.getType().equals(Descriptors.FieldDescriptor.Type.ENUM)) {
       List<String> fieldValueMappings = new ArrayList<>();
       for (Descriptors.EnumValueDescriptor value : valueFieldDescriptor.getEnumType().getValues()) {
         fieldValueMappings.add(value.getName());
       }
-      builder.setField(valueFieldDescriptor , generatorTool.generateObject(valueFieldDescriptor.getEnumType() , valueFieldDescriptor.getType().name() , 0 , fieldValueMappings));
+      builder.setField(valueFieldDescriptor, generatorTool.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
     } else {
-      builder.setField(valueFieldDescriptor ,
+      builder.setField(valueFieldDescriptor,
                        randomObject.generateRandom(
-                           fieldValueMappingCleanType ,
-                           fieldValueMapping.getValueLength() ,
-                           fieldValueMapping.getFieldValuesList() ,
+                           fieldValueMappingCleanType,
+                           fieldValueMapping.getValueLength(),
+                           fieldValueMapping.getFieldValuesList(),
                            fieldValueMapping.getConstrains()));
     }
 
     return builder.build();
   }
 
-  private Descriptors.Descriptor getDescriptorForField(DynamicMessage.Builder messageBuilder , String typeName) {
+  private Descriptors.Descriptor getDescriptorForField(DynamicMessage.Builder messageBuilder, String typeName) {
     return messageBuilder.getDescriptorForType().findFieldByName(typeName).getMessageType();
   }
 
-  private Descriptors.FieldDescriptor getFieldDescriptorForField(DynamicMessage.Builder messageBuilder , String typeName) {
+  private Descriptors.FieldDescriptor getFieldDescriptorForField(DynamicMessage.Builder messageBuilder, String typeName) {
     return messageBuilder.getDescriptorForType().findFieldByName(typeName);
   }
 

@@ -23,8 +23,8 @@ public class UUIDField extends Field {
   }
 
   @Builder(toBuilder = true)
-  public UUIDField(String name , String regex , String format) {
-    super(name , "uuid");
+  public UUIDField(String name, String regex, String format) {
+    super(name, "uuid");
     this.regex = regex;
     this.format = format;
   }

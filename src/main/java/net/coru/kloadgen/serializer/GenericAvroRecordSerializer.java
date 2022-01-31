@@ -22,7 +22,7 @@ import org.apache.kafka.common.serialization.Serializer;
 public class GenericAvroRecordSerializer<T extends GenericRecord> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String topic , T record) {
+  public byte[] serialize(String topic, T record) {
 
     DatumWriter<T> writer = new SpecificDatumWriter<>(record.getSchema());
     byte[] data = new byte[0];
@@ -30,8 +30,8 @@ public class GenericAvroRecordSerializer<T extends GenericRecord> implements Ser
     Encoder jsonEncoder;
     try {
       jsonEncoder = EncoderFactory.get().jsonEncoder(
-          record.getSchema() , stream);
-      writer.write(record , jsonEncoder);
+          record.getSchema(), stream);
+      writer.write(record, jsonEncoder);
       jsonEncoder.flush();
       data = stream.toByteArray();
     } catch (IOException e) {
@@ -41,7 +41,7 @@ public class GenericAvroRecordSerializer<T extends GenericRecord> implements Ser
   }
 
   @Override
-  public byte[] serialize(String topic , Headers headers , T data) {
-    return serialize(topic , data);
+  public byte[] serialize(String topic, Headers headers, T data) {
+    return serialize(topic, data);
   }
 }

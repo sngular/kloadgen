@@ -22,11 +22,11 @@ public class ValueUtils {
 
     parameterList.replaceAll(fieldValue ->
                                  fieldValue.matches("\\$\\{\\w*}") ?
-                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2 , fieldValue.length() - 1)) : fieldValue);
+                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
     return parameterList;
   }
 
-  public static Object castValue(Object value , String type) {
+  public static Object castValue(Object value, String type) {
     Object castValue;
     switch (type) {
       case ValidTypeConstants.INT:

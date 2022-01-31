@@ -26,39 +26,39 @@ public class AvroSerializer<T extends EnrichedRecord> implements Serializer<T> {
 
   private static final byte MAGIC_BYTE = 0x0;
 
-  private static final int idSize = 4;
+  private static final int ID_SIZE = 4;
 
   @Override
-  public byte[] serialize(String topic , T data) {
+  public byte[] serialize(String topic, T data) {
     try {
       byte[] result = null;
 
       if (data != null) {
-        log.debug("data='{}'" , data);
+        log.debug("data='{}'", data);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
-        byteArrayOutputStream.write(ByteBuffer.allocate(idSize).putInt(data.getSchemaMetadata().getId()).array());
-        BinaryEncoder binaryEncoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream , null);
+        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).putInt(data.getSchemaMetadata().getId()).array());
+        BinaryEncoder binaryEncoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(((GenericRecord) data.getGenericRecord()).getSchema());
-        datumWriter.write((GenericRecord) data.getGenericRecord() , binaryEncoder);
+        datumWriter.write((GenericRecord) data.getGenericRecord(), binaryEncoder);
 
         binaryEncoder.flush();
         byteArrayOutputStream.close();
 
         result = byteArrayOutputStream.toByteArray();
-        log.debug("serialized data='{}'" , DatatypeConverter.printHexBinary(result));
+        log.debug("serialized data='{}'", DatatypeConverter.printHexBinary(result));
       }
       return result;
     } catch (IOException ex) {
       throw new SerializationException(
-          "Can't serialize data='" + data + "' for topic='" + topic + "'" , ex);
+          "Can't serialize data='" + data + "' for topic='" + topic + "'", ex);
     }
   }
 
   @Override
-  public byte[] serialize(String topic , Headers headers , T data) {
-    return serialize(topic , data);
+  public byte[] serialize(String topic, Headers headers, T data) {
+    return serialize(topic, data);
   }
 
 }

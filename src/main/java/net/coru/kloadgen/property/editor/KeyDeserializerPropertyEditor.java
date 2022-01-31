@@ -61,10 +61,10 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
     Reflections reflections = new Reflections(new ConfigurationBuilder()
                                                   .addUrls(ClasspathHelper.forClass(Deserializer.class))
                                                   .filterInputsBy(new FilterBuilder()
-                                                                      .includePackage("net.coru.kloadgen.serializer" ,
+                                                                      .includePackage("net.coru.kloadgen.serializer",
                                                                                       "io.confluent.kafka.serializers"))
                                                   .setScanners(new SubTypesScanner()));
-    ReflectionUtils.extractDeserializers(deserializerComboBox , reflections , Deserializer.class);
+    ReflectionUtils.extractDeserializers(deserializerComboBox, reflections);
   }
 
   @Override
@@ -104,7 +104,7 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public void setValue(Object value) {
-    this.deserializerComboBox.setSelectedItem(Objects.requireNonNullElse(value , 0));
+    this.deserializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override

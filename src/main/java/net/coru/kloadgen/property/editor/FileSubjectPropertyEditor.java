@@ -86,15 +86,15 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   private void init() {
     schemaTypeComboBox = new JComboBox<>();
     schemaTypeComboBox.setEditable(false);
-    schemaTypeComboBox.insertItemAt("AVRO" , 0);
-    schemaTypeComboBox.insertItemAt("JSON-Schema" , 1);
-    schemaTypeComboBox.insertItemAt("PROTOBUF" , 2);
+    schemaTypeComboBox.insertItemAt("AVRO", 0);
+    schemaTypeComboBox.insertItemAt("JSON-Schema", 1);
+    schemaTypeComboBox.insertItemAt("PROTOBUF", 2);
     schemaTypeComboBox.setSelectedIndex(0);
     subjectNameComboBox = new JComboBox<>();
     subjectNameComboBox.setEditable(true);
     panel.setLayout(new BorderLayout());
     openFileDialogButton.addActionListener(this::actionFileChooser);
-    panel.add(openFileDialogButton , BorderLayout.LINE_END);
+    panel.add(openFileDialogButton, BorderLayout.LINE_END);
     panel.add(subjectNameComboBox);
     panel.add(schemaTypeComboBox);
     AutoCompletion.enable(subjectNameComboBox);
@@ -103,20 +103,20 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   public void actionFileChooser(ActionEvent event) {
 
-    int returnValue = fileChooser.showDialog(panel , JMeterUtils.getResString("file_visualizer_open"));
+    int returnValue = fileChooser.showDialog(panel, JMeterUtils.getResString("file_visualizer_open"));
 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
       File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
       try {
         String schemaType = schemaTypeComboBox.getSelectedItem().toString();
-        parserSchema = schemaExtractor.schemaTypesList(subjectName , schemaType);
+        parserSchema = schemaExtractor.schemaTypesList(subjectName, schemaType);
         subjectNameComboBox.removeAllItems();
         subjectNameComboBox.addItem(parserSchema.name());
         subjectNameComboBox.setSelectedItem(parserSchema.name());
       } catch (IOException e) {
-        JOptionPane.showMessageDialog(panel , "Can't read a file : " + e.getMessage() , "ERROR: Failed to retrieve properties!" ,
+        JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
                                       JOptionPane.ERROR_MESSAGE);
-        log.error(e.getMessage() , e);
+        log.error(e.getMessage(), e);
       }
       subjectNameComboBox.addFocusListener(new ComboFiller());
     }
@@ -164,18 +164,18 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
           }
         } catch (NoSuchFieldException | IllegalAccessException e) {
           JOptionPane
-              .showMessageDialog(panel , "Failed to retrieve schema : " + e.getMessage() , "ERROR: Failed to retrieve properties!" ,
+              .showMessageDialog(panel, "Failed to retrieve schema : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
                                  JOptionPane.ERROR_MESSAGE);
-          log.error(e.getMessage() , e);
+          log.error(e.getMessage(), e);
         } catch (AvroRuntimeException ex) {
           JOptionPane
-              .showMessageDialog(panel , "Failed to process schema : " + ex.getMessage() , "ERROR: Failed to retrieve properties!" ,
+              .showMessageDialog(panel, "Failed to process schema : " + ex.getMessage(), "ERROR: Failed to retrieve properties!",
                                  JOptionPane.ERROR_MESSAGE);
-          log.error(ex.getMessage() , ex);
+          log.error(ex.getMessage(), ex);
         }
       } else {
         JOptionPane
-            .showMessageDialog(panel , "No schema has been loaded, we cannot extract properties" , "ERROR: Failed to retrieve properties!" ,
+            .showMessageDialog(panel, "No schema has been loaded, we cannot extract properties", "ERROR: Failed to retrieve properties!",
                                JOptionPane.WARNING_MESSAGE);
       }
     }

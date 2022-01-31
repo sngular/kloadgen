@@ -127,7 +127,7 @@ public class AutoCompletion extends PlainDocument {
     }
   }
 
-  public void remove(int offs , int len) throws BadLocationException {
+  public void remove(int offs, int len) throws BadLocationException {
     // return immediately when selecting an item
     int editOffs = offs;
     if (selecting) {
@@ -146,20 +146,20 @@ public class AutoCompletion extends PlainDocument {
       }
       highlightCompletedText(editOffs);
     } else {
-      super.remove(editOffs , len);
+      super.remove(editOffs, len);
     }
   }
 
-  public void insertString(int offs , String str , AttributeSet a) throws BadLocationException {
+  public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
     // return immediately when selecting an item
     int editOffs = offs;
     if (selecting) {
       return;
     }
     // insert the string into the document
-    super.insertString(editOffs , str , a);
+    super.insertString(editOffs, str, a);
     // lookup and select a matching item
-    Object item = lookupItem(getText(0 , getLength()));
+    Object item = lookupItem(getText(0, getLength()));
     if (item != null) {
       setSelectedItem(item);
     } else {
@@ -178,8 +178,8 @@ public class AutoCompletion extends PlainDocument {
   private void setText(String text) {
     try {
       // remove all text and insert the completed string
-      super.remove(0 , getLength());
-      super.insertString(0 , text , null);
+      super.remove(0, getLength());
+      super.insertString(0, text, null);
     } catch (BadLocationException e) {
       throw new KLoadGenException(e.toString());
     }
@@ -199,14 +199,14 @@ public class AutoCompletion extends PlainDocument {
   private Object lookupItem(String pattern) {
     Object selectedItem = model.getSelectedItem();
     // only search for a different item if the currently selected does not match
-    if (selectedItem != null && startsWithIgnoreCase(selectedItem.toString() , pattern)) {
+    if (selectedItem != null && startsWithIgnoreCase(selectedItem.toString(), pattern)) {
       return selectedItem;
     } else {
       // iterate over all items
       for (int i = 0, n = model.getSize(); i < n; i++) {
         Object currentItem = model.getElementAt(i);
         // current item starts with the pattern?
-        if (currentItem != null && startsWithIgnoreCase(currentItem.toString() , pattern)) {
+        if (currentItem != null && startsWithIgnoreCase(currentItem.toString(), pattern)) {
           return currentItem;
         }
       }
@@ -216,13 +216,13 @@ public class AutoCompletion extends PlainDocument {
   }
 
   // checks if str1 starts with str2 - ignores case
-  private boolean startsWithIgnoreCase(String str1 , String str2) {
+  private boolean startsWithIgnoreCase(String str1, String str2) {
     return str1.toUpperCase().startsWith(str2.toUpperCase());
   }
 
   private static void createAndShowGUI() {
     // the combo box (add/modify items if you like to)
-    final JComboBox<String> comboBox = new JComboBox<>(new String[]{"Ester" , "Jordi" , "Jordina" , "Jorge" , "Sergi"});
+    final JComboBox<String> comboBox = new JComboBox<>(new String[]{"Ester", "Jordi", "Jordina", "Jorge", "Sergi"});
     enable(comboBox);
 
     // create and show a window containing the combo box

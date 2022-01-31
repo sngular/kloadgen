@@ -14,9 +14,9 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 
 public interface BaseLoadGenerator {
 
-  void setUpGenerator(Map<String, String> originals , String avroSchemaName , List<FieldValueMapping> fieldExprMappings);
+  void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings);
 
-  void setUpGenerator(String schema , List<FieldValueMapping> fieldExprMappings);
+  void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings);
 
   EnrichedRecord nextMessage();
 }

@@ -24,34 +24,34 @@ public class RandomArray {
   }
 
   public Object generateArray(
-      String fieldType , Integer valueLength , List<String> fieldValueList , Integer arraySize ,
+      String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
 
     switch (fieldType) {
       case ValidTypeConstants.INT_ARRAY:
-        value = generate(ValidTypeConstants.INT , arraySize , valueLength , fieldValueList , constrains);
+        value = generate(ValidTypeConstants.INT, arraySize, valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.LONG_ARRAY:
-        value = generate(ValidTypeConstants.LONG , arraySize , valueLength , fieldValueList , constrains);
+        value = generate(ValidTypeConstants.LONG, arraySize, valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.DOUBLE_ARRAY:
-        value = generate(ValidTypeConstants.DOUBLE , arraySize , valueLength , fieldValueList , constrains);
+        value = generate(ValidTypeConstants.DOUBLE, arraySize, valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.SHORT_ARRAY:
-        value = generate(ValidTypeConstants.SHORT , arraySize , valueLength , fieldValueList , constrains);
+        value = generate(ValidTypeConstants.SHORT, arraySize, valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.FLOAT_ARRAY:
-        value = generate(ValidTypeConstants.FLOAT , arraySize , valueLength , fieldValueList , constrains);
+        value = generate(ValidTypeConstants.FLOAT, arraySize, valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.STRING_ARRAY:
-        value = generate(ValidTypeConstants.STRING , arraySize , valueLength , fieldValueList , constrains);
+        value = generate(ValidTypeConstants.STRING, arraySize, valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.UUID_ARRAY:
-        value = generate(ValidTypeConstants.UUID , arraySize , 0 , fieldValueList , Collections.emptyMap());
+        value = generate(ValidTypeConstants.UUID, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
       case ValidTypeConstants.BOOLEAN_ARRAY:
-        value = generate(ValidTypeConstants.BOOLEAN , arraySize , 0 , fieldValueList , Collections.emptyMap());
+        value = generate(ValidTypeConstants.BOOLEAN, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
       default:
         value = new ArrayList<>();
@@ -59,31 +59,31 @@ public class RandomArray {
     }
 
     if (fieldType.endsWith("-array-array")) {
-      value = generateArrayOfArray(fieldType.replace("-array-array" , "-array") , valueLength , fieldValueList , arraySize , arraySize ,
+      value = generateArrayOfArray(fieldType.replace("-array-array", "-array"), valueLength, fieldValueList, arraySize, arraySize,
                                    constrains);
     }
     return value;
   }
 
   private Object generateArrayOfArray(
-      String fieldType , Integer valueLength , List<String> fieldValueList , Integer arraySize , Integer innerArraySize , Map<ConstraintTypeEnum, String> constrains) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1 , 5) : arraySize;
+      String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize, Integer innerArraySize, Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<Object> array = new ArrayList<>(size);
 
     for (int i = 0; i < size; i++) {
-      array.add(generateArray(fieldType , valueLength , fieldValueList , innerArraySize , constrains));
+      array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains));
     }
     return array;
   }
 
   private List<Object> generate(
-      String type , Integer arraySize , Integer valueLength , List<String> fieldValueList ,
+      String type, Integer arraySize, Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1 , 5) : arraySize;
+    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<Object> array = new ArrayList<>(size);
 
     for (int i = 0; i < size; i++) {
-      array.add(randomObject.generateRandom(type , valueLength , fieldValueList , constrains));
+      array.add(randomObject.generateRandom(type, valueLength, fieldValueList, constrains));
     }
 
     return array;

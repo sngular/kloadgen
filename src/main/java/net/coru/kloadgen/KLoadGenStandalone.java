@@ -43,7 +43,7 @@ public class KLoadGenStandalone {
     CommandLineParser parser = new DefaultParser();
     try {
 
-      CommandLine line = parser.parse(options , args);
+      CommandLine line = parser.parse(options, args);
       Path jMeterPropsFile = Paths.get(line.getOptionValue("h"));
       if (!Files.exists(jMeterPropsFile) || !Files.isReadable(jMeterPropsFile) || !Files.isDirectory(jMeterPropsFile)) {
         throw new KLoadGenException("JMeter properties File not Valid");
@@ -69,7 +69,7 @@ public class KLoadGenStandalone {
           throw new KLoadGenException("Path is required to be a folder");
         }
 
-        JMeterUtils.setProperty(JMETER_REPORT_OUTPUT_DIR_PROPERTY , resultsFile.toAbsolutePath().toString());
+        JMeterUtils.setProperty(JMETER_REPORT_OUTPUT_DIR_PROPERTY, resultsFile.toAbsolutePath().toString());
       }
 
       StandardJMeterEngine jmeter = new StandardJMeterEngine();
@@ -86,38 +86,38 @@ public class KLoadGenStandalone {
           throw new KLoadGenException("Folders are not allow in this Option");
         }
 
-        reportGenerator = createCollector(testPlanTree , resultsFile);
-        testPlanTree.add(testPlanTree.getArray()[0] , new ListenToTest(reportGenerator));
+        reportGenerator = createCollector(testPlanTree, resultsFile);
+        testPlanTree.add(testPlanTree.getArray()[0], new ListenToTest(reportGenerator));
       }
       jmeter.configure(testPlanTree);
       jmeter.run();
 
     } catch (ParseException ex) {
-      log.log(Level.SEVERE , "Parsing failed.  Reason: " , ex);
+      log.log(Level.SEVERE, "Parsing failed.  Reason: ", ex);
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp("kloadgen" , options);
+      formatter.printHelp("kloadgen", options);
     } catch (KLoadGenException | ConfigurationException ex) {
-      log.log(Level.SEVERE , "Wrong parameters.  Reason: " , ex);
+      log.log(Level.SEVERE, "Wrong parameters.  Reason: ", ex);
       HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp("kloadgen" , options);
+      formatter.printHelp("kloadgen", options);
     } catch (IOException ex) {
-      log.log(Level.SEVERE , "Error accessing files.  Reason: " , ex);
+      log.log(Level.SEVERE, "Error accessing files.  Reason: ", ex);
     }
 
   }
 
-  private static ReportGenerator createCollector(HashTree testPlanTree , Path resultsFile) throws ConfigurationException {
+  private static ReportGenerator createCollector(HashTree testPlanTree, Path resultsFile) throws ConfigurationException {
     Summariser summariser = null;
-    String summariserName = JMeterUtils.getPropDefault("summariser.name" , "KLoagGenSummariser");//$NON-NLS-1$
+    String summariserName = JMeterUtils.getPropDefault("summariser.name", "KLoagGenSummariser");//$NON-NLS-1$
     if (summariserName.length() > 0) {
-      log.info(String.format("Creating summariser <%s>" , summariserName));
+      log.info(String.format("Creating summariser <%s>", summariserName));
       summariser = new Summariser(summariserName);
     }
     ResultCollector resultCollector;
     resultCollector = new ResultCollector(summariser);
     resultCollector.setFilename(resultsFile.toAbsolutePath().toString());
-    testPlanTree.add(testPlanTree.getArray()[0] , resultCollector);
-    return new ReportGenerator(resultsFile.toAbsolutePath().toString() , resultCollector);
+    testPlanTree.add(testPlanTree.getArray()[0], resultCollector);
+    return new ReportGenerator(resultsFile.toAbsolutePath().toString(), resultCollector);
   }
 
   private static Options createCLIOptions() {

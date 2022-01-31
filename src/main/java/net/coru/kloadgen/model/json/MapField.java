@@ -21,8 +21,8 @@ public class MapField extends Field {
   }
 
   @Builder(toBuilder = true)
-  public MapField(String name , Field mapType) {
-    super(name , "map");
+  public MapField(String name, Field mapType) {
+    super(name, "map");
     this.mapType = mapType;
   }
 

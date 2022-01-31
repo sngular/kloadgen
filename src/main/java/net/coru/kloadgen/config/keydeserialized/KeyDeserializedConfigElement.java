@@ -52,11 +52,11 @@ public class KeyDeserializedConfigElement extends ConfigTestElement implements T
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(KEY_SCHEMA_PROPERTIES , keySchemaProperties);
-    variables.putObject(KEY_SCHEMA_TYPE , keySchemaType);
-    variables.putObject(KEY_DESERIALIZER_CLASS_PROPERTY , keyDeserializerConfiguration);
-    variables.putObject(KEY_NAME_STRATEGY , keyNameStrategy);
-    variables.putObject(SCHEMA_KEYED_MESSAGE_KEY , Boolean.TRUE);
+    variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
+    variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
+    variables.putObject(KEY_DESERIALIZER_CLASS_PROPERTY, keyDeserializerConfiguration);
+    variables.putObject(KEY_NAME_STRATEGY, keyNameStrategy);
+    variables.putObject(SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 
 }

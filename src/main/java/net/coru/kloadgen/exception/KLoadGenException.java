@@ -16,7 +16,7 @@ public class KLoadGenException extends RuntimeException {
     super(exc);
   }
 
-  public KLoadGenException(String message , Exception exc) {
-    super(message , exc);
+  public KLoadGenException(String message, Exception exc) {
+    super(message, exc);
   }
 }

@@ -39,6 +39,6 @@ public class KafkaHeadersConfigElement extends ConfigTestElement implements Test
 
     Map<String, Object> threadVars = context.getSamplerContext();
 
-    threadVars.put(KAFKA_HEADERS , kafkaHeaders);
+    threadVars.put(KAFKA_HEADERS, kafkaHeaders);
   }
 }

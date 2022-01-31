@@ -20,12 +20,12 @@ import org.apache.kafka.common.serialization.Serializer;
 public class GenericJsonRecordSerializer<T extends ObjectNode> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String topic , T record) {
+  public byte[] serialize(String topic, T record) {
 
     byte[] data = new byte[0];
     try {
       ObjectMapper mapper = new ObjectMapper();
-      mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature() , true);
+      mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
       data = mapper.writeValueAsString(record).getBytes(CharSet.ASCII_ALPHA.toString());
     } catch (IOException e) {
       log.error("Serialization error:" + e.getMessage());
@@ -34,7 +34,7 @@ public class GenericJsonRecordSerializer<T extends ObjectNode> implements Serial
   }
 
   @Override
-  public byte[] serialize(String topic , Headers headers , T data) {
+  public byte[] serialize(String topic, Headers headers, T data) {
     return new byte[0];
   }
 }

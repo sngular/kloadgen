@@ -37,7 +37,7 @@ public class AvroDeserializer implements Deserializer<Object> {
   private boolean isKey;
 
   @Override
-  public void configure(Map<String, ?> configs , boolean isKey) {
+  public void configure(Map<String, ?> configs, boolean isKey) {
     AvroDeserializer.configs.putAll(configs);
     this.isKey = isKey;
   }
@@ -53,7 +53,7 @@ public class AvroDeserializer implements Deserializer<Object> {
   }
 
   @Override
-  public Object deserialize(String topic , byte[] data) {
+  public Object deserialize(String topic, byte[] data) {
 
     Object result;
     String schemaString;
@@ -72,8 +72,8 @@ public class AvroDeserializer implements Deserializer<Object> {
       int start = buffer.position() + buffer.arrayOffset();
 
       try {
-        decoder = DecoderFactory.get().binaryDecoder(buffer.array() , start , length , null);
-        result = reader.read(null , decoder);
+        decoder = DecoderFactory.get().binaryDecoder(buffer.array(), start, length, null);
+        result = reader.read(null, decoder);
       } catch (RuntimeException | IOException ex) {
         throw new SerializationException("Error deserializing Avro message");
       }
@@ -86,8 +86,8 @@ public class AvroDeserializer implements Deserializer<Object> {
   }
 
   @Override
-  public Object deserialize(String topic , Headers headers , byte[] data) {
-    return deserialize(topic , data);
+  public Object deserialize(String topic, Headers headers, byte[] data) {
+    return deserialize(topic, data);
   }
 
   @Override

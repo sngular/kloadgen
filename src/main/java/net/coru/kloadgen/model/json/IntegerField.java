@@ -25,8 +25,8 @@ public class IntegerField extends Field {
   }
 
   @Builder(toBuilder = true)
-  public IntegerField(String name , String defaultValue , int minimum , int maximum) {
-    super(name , "number");
+  public IntegerField(String name, String defaultValue, int minimum, int maximum) {
+    super(name, "number");
     this.defaultValue = defaultValue;
     this.maximum = maximum;
     this.minimum = minimum;

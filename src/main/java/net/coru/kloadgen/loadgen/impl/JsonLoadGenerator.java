@@ -38,36 +38,36 @@ public class JsonLoadGenerator implements BaseLoadGenerator {
     jsonSchemaProcessor = new JsonSchemaProcessor();
   }
 
-  public void setUpGenerator(Map<String, String> originals , String avroSchemaName , List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
     try {
       this.jsonSchemaProcessor.processSchema(fieldExprMappings);
     } catch (Exception exc) {
-      log.error("Please make sure that properties data type and expression function return type are compatible with each other" , exc);
+      log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
     }
   }
 
-  public void setUpGenerator(String schema , List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings) {
     try {
       this.jsonSchemaProcessor.processSchema(fieldExprMappings);
     } catch (Exception exc) {
-      log.error("Please make sure that properties data type and expression function return type are compatible with each other" , exc);
+      log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
     }
   }
 
   public EnrichedRecord nextMessage() {
-    return new EnrichedRecord(metadata , jsonSchemaProcessor.next());
+    return new EnrichedRecord(metadata, jsonSchemaProcessor.next());
   }
 
-  private ParsedSchema retrieveSchema(Map<String, String> originals , String avroSchemaName) throws IOException, RestClientException {
-    schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)) , 1000 , List.of(new JsonSchemaProvider()) , originals);
+  private ParsedSchema retrieveSchema(Map<String, String> originals, String avroSchemaName) throws IOException, RestClientException {
+    schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000, List.of(new JsonSchemaProvider()), originals);
 
     return getSchemaBySubject(avroSchemaName);
   }
 
   private ParsedSchema getSchemaBySubject(String avroSubjectName) throws IOException, RestClientException {
     metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSubjectName);
-    return schemaRegistryClient.getSchemaBySubjectAndId(avroSubjectName , metadata.getId());
+    return schemaRegistryClient.getSchemaBySubjectAndId(avroSubjectName, metadata.getId());
   }
 }

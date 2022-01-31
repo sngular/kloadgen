@@ -25,8 +25,8 @@ public class EnumField extends Field {
   }
 
   @Builder(toBuilder = true)
-  public EnumField(String name , String defaultValue , List<String> enumValues) {
-    super(name , "enum");
+  public EnumField(String name, String defaultValue, List<String> enumValues) {
+    super(name, "enum");
     this.defaultValue = defaultValue;
     this.enumValues = enumValues;
   }

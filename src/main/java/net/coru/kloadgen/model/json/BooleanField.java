@@ -15,7 +15,7 @@ public class BooleanField extends Field {
 
   @Builder(toBuilder = true)
   public BooleanField(String name) {
-    super(name , "boolean");
+    super(name, "boolean");
   }
 
   @Override

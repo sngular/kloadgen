@@ -91,7 +91,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
     panel.add(schemaRegistryUrl);
 
-    panel.add(testSchemaRepoBtn , BorderLayout.AFTER_LINE_ENDS);
+    panel.add(testSchemaRepoBtn, BorderLayout.AFTER_LINE_ENDS);
     this.testSchemaRepoBtn.addActionListener(this);
   }
 
@@ -115,14 +115,14 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
   public void setValue(Object value) {
     if (Objects.nonNull(value)) {
       this.schemaRegistryUrl.setText(value.toString());
-      propertyDescriptor.setValue("schemaRegistryUrl" , value.toString());
+      propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
     }
 
   }
 
   public void setSchemaRegistryUrl(String schemaUrl) {
     this.schemaRegistryUrl.setText(schemaUrl);
-    propertyDescriptor.setValue("schemaRegistryUrl" , schemaUrl);
+    propertyDescriptor.setValue("schemaRegistryUrl", schemaUrl);
   }
 
   @SneakyThrows
@@ -161,48 +161,48 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
       }
       Map<String, String> originals = new HashMap<>();
 
-      originals.put(SCHEMA_REGISTRY_URL_CONFIG , checkPropertyOrVariable(schemaRegistryUrl.getText()));
+      originals.put(SCHEMA_REGISTRY_URL_CONFIG, checkPropertyOrVariable(schemaRegistryUrl.getText()));
       if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
-        JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG , FLAG_YES);
+        JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
         if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
           JMeterContextService.getContext().getProperties()
-                              .setProperty(SCHEMA_REGISTRY_AUTH_KEY , SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
+                              .setProperty(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
 
-          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE , "USER_INFO");
-          originals.put(USER_INFO_CONFIG , schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
+          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+          originals.put(USER_INFO_CONFIG, schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
         }
       }
-      SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()) , 1000 , List.of(new AvroSchemaProvider() , new JsonSchemaProvider()) ,
+      SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()),
                                                                                  originals);
 
       List<String> subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());
-      JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL , checkPropertyOrVariable(schemaRegistryUrl.getText()));
-      JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS , StringUtils.join(subjects , ","));
+      JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, checkPropertyOrVariable(schemaRegistryUrl.getText()));
+      JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
       if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
-        JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG , FLAG_YES);
+        JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
         if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
           JMeterContextService.getContext().getProperties()
-                              .setProperty(SCHEMA_REGISTRY_AUTH_KEY , SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
-          JMeterContextService.getContext().getProperties().setProperty(BASIC_AUTH_CREDENTIALS_SOURCE , "USER_INFO");
-          JMeterContextService.getContext().getProperties().setProperty(USER_INFO_CONFIG ,
+                              .setProperty(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
+          JMeterContextService.getContext().getProperties().setProperty(BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
+          JMeterContextService.getContext().getProperties().setProperty(USER_INFO_CONFIG,
                                                                         schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" +
                                                                         schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
         } else if (SCHEMA_REGISTRY_AUTH_BEARER_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
           JMeterContextService.getContext().getProperties()
-                              .setProperty(SCHEMA_REGISTRY_AUTH_KEY , SCHEMA_REGISTRY_AUTH_BEARER_TYPE);
-          JMeterContextService.getContext().getProperties().setProperty(BEARER_AUTH_CREDENTIALS_SOURCE , "STATIC_TOKEN");
+                              .setProperty(SCHEMA_REGISTRY_AUTH_KEY, SCHEMA_REGISTRY_AUTH_BEARER_TYPE);
+          JMeterContextService.getContext().getProperties().setProperty(BEARER_AUTH_CREDENTIALS_SOURCE, "STATIC_TOKEN");
           JMeterContextService.getContext().getProperties()
-                              .setProperty(BEARER_AUTH_TOKEN_CONFIG , schemaProperties.get(SCHEMA_REGISTRY_AUTH_BEARER_KEY));
+                              .setProperty(BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SCHEMA_REGISTRY_AUTH_BEARER_KEY));
         }
       }
-      JOptionPane.showMessageDialog(null , "Successful contacting Schema Registry at : " + checkPropertyOrVariable(schemaRegistryUrl.getText()) +
-                                           "\n Number of subjects in the Registry : " + subjects.size() , "Successful connection to Schema Registry" ,
+      JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + checkPropertyOrVariable(schemaRegistryUrl.getText()) +
+                                          "\n Number of subjects in the Registry : " + subjects.size(), "Successful connection to Schema Registry",
                                     JOptionPane.INFORMATION_MESSAGE);
     } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException | NullPointerException e) {
       JOptionPane
-          .showMessageDialog(null , "Failed retrieve schema properties: " + e.getMessage() , "ERROR: Failed to retrieve properties!" ,
+          .showMessageDialog(null, "Failed retrieve schema properties: " + e.getMessage(), "ERROR: Failed to retrieve properties!",
                              JOptionPane.ERROR_MESSAGE);
-      log.error(e.getMessage() , e);
+      log.error(e.getMessage(), e);
     }
 
   }
@@ -220,16 +220,16 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
   private Map<String, String> fromListToPropertiesMap(List<PropertyMapping> schemaProperties) {
     Map<String, String> propertiesMap = new HashMap<>();
     for (PropertyMapping property : schemaProperties) {
-      propertiesMap.put(property.getPropertyName() , checkPropertyOrVariable(property.getPropertyValue()));
+      propertiesMap.put(property.getPropertyName(), checkPropertyOrVariable(property.getPropertyValue()));
     }
     return propertiesMap;
   }
 
   private String checkPropertyOrVariable(String textToCheck) {
     if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
-      return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6 , textToCheck.length() - 2));
+      return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
     } else if (textToCheck.matches("\\$\\{\\w*}")) {
-      return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2 , textToCheck.length() - 1));
+      return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
     } else {
       return textToCheck;
     }

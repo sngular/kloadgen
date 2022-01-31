@@ -15,6 +15,6 @@ public interface SchemaExtractor {
 
   List<FieldValueMapping> flatPropertiesList(ParsedSchema parserSchema);
 
-  ParsedSchema schemaTypesList(File schemaFile , String schemaType) throws IOException;
+  ParsedSchema schemaTypesList(File schemaFile, String schemaType) throws IOException;
 
 }

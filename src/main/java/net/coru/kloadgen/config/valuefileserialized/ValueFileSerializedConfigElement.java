@@ -51,12 +51,12 @@ public class ValueFileSerializedConfigElement extends ConfigTestElement implemen
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(VALUE_SCHEMA , valueSchemaDefinition);
-    variables.putObject(VALUE_SCHEMA_PROPERTIES , valueSchemaProperties);
-    variables.putObject(VALUE_SCHEMA_TYPE , valueSchemaType);
-    variables.putObject(VALUE_SUBJECT_NAME , valueSubjectName);
-    variables.putObject(VALUE_SERIALIZER_CLASS_PROPERTY , valueSerializerConfiguration);
-    variables.putObject(VALUE_NAME_STRATEGY , valueNameStrategy);
+    variables.putObject(VALUE_SCHEMA, valueSchemaDefinition);
+    variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
+    variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
+    variables.putObject(VALUE_SUBJECT_NAME, valueSubjectName);
+    variables.putObject(VALUE_SERIALIZER_CLASS_PROPERTY, valueSerializerConfiguration);
+    variables.putObject(VALUE_NAME_STRATEGY, valueNameStrategy);
   }
 
 }

@@ -34,22 +34,22 @@ public class ProtobufLoadGenerator implements BaseLoadGenerator {
   }
 
   @Override
-  public void setUpGenerator(Map<String, String> originals , String avroSchemaName , List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
     try {
-      this.protobufSchemaProcessor.processSchema(retrieveSchema(originals , avroSchemaName) , metadata , fieldExprMappings);
+      this.protobufSchemaProcessor.processSchema(retrieveSchema(originals, avroSchemaName), metadata, fieldExprMappings);
     } catch (Exception exc) {
-      log.error("Please make sure that properties data type and expression function return type are compatible with each other" , exc);
+      log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
     }
   }
 
   @Override
-  public void setUpGenerator(String schema , List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings) {
     try {
       ProtobufSchema protobufSchema = new ProtobufSchema(schema);
       this.protobufSchemaProcessor.processSchema(protobufSchema, new SchemaMetadata(1, 1, schema), fieldExprMappings);
     } catch (Exception exc) {
-      log.error("Please make sure that properties data type and expression function return type are compatible with each other" , exc);
+      log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
     }
   }
@@ -66,13 +66,13 @@ public class ProtobufLoadGenerator implements BaseLoadGenerator {
     return null;
   }
 
-  private ParsedSchema retrieveSchema(Map<String, String> originals , String avroSchemaName) throws IOException, RestClientException {
-    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG) , 1000 , originals);
+  private ParsedSchema retrieveSchema(Map<String, String> originals, String avroSchemaName) throws IOException, RestClientException {
+    schemaRegistryClient = new CachedSchemaRegistryClient(originals.get(SCHEMA_REGISTRY_URL_CONFIG), 1000, originals);
     return getSchemaBySubject(avroSchemaName);
   }
 
   private ParsedSchema getSchemaBySubject(String avroSubjectName) throws IOException, RestClientException {
     metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSubjectName);
-    return schemaRegistryClient.getSchemaBySubjectAndId(avroSubjectName , metadata.getId());
+    return schemaRegistryClient.getSchemaBySubjectAndId(avroSubjectName, metadata.getId());
   }
 }

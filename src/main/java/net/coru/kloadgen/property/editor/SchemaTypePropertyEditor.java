@@ -66,7 +66,7 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
-    propertyDescriptor.setValue("schemaType" , value);
+    propertyDescriptor.setValue("schemaType", value);
     schemaType = value;
   }
 

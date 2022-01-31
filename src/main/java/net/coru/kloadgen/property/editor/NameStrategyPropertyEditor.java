@@ -60,7 +60,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
             .setScanners(new SubTypesScanner()));
-    ReflectionUtils.extractSerializers(nameStrategyComboBox , reflections , SubjectNameStrategy.class);
+    ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
   }
 
   @Override
@@ -95,7 +95,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
 
   @Override
   public void setValue(Object value) {
-    this.nameStrategyComboBox.setSelectedItem(Objects.requireNonNullElse(value , 0));
+    this.nameStrategyComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override

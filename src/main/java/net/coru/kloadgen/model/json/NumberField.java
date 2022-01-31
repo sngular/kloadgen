@@ -33,9 +33,9 @@ public class NumberField extends Field {
 
   @Builder(toBuilder = true)
   public NumberField(
-      String name , String defaultValue , Number minimum , Number maximum , Number exclusiveMinimum ,
-      Number exclusiveMaximum , Number multipleOf) {
-    super(name , "number");
+      String name, String defaultValue, Number minimum, Number maximum, Number exclusiveMinimum,
+      Number exclusiveMaximum, Number multipleOf) {
+    super(name, "number");
     this.defaultValue = defaultValue;
     this.maximum = maximum;
     this.minimum = minimum;
@@ -61,24 +61,24 @@ public class NumberField extends Field {
       return false;
     }
     NumberField that = (NumberField) o;
-    return Objects.equals(defaultValue , that.defaultValue) &&
-           compare(minimum , that.minimum) &&
-           compare(maximum , that.maximum) &&
-           compare(exclusiveMinimum , that.exclusiveMinimum) &&
-           compare(exclusiveMaximum , that.exclusiveMaximum) &&
-           compare(multipleOf , that.multipleOf) &&
-           Objects.equals(super.getName() , ((NumberField) o).getName()) &&
-           Objects.equals(super.getType() , ((NumberField) o).getType());
+    return Objects.equals(defaultValue, that.defaultValue) &&
+           compare(minimum, that.minimum) &&
+           compare(maximum, that.maximum) &&
+           compare(exclusiveMinimum, that.exclusiveMinimum) &&
+           compare(exclusiveMaximum, that.exclusiveMaximum) &&
+           compare(multipleOf, that.multipleOf) &&
+           Objects.equals(super.getName(), ((NumberField) o).getName()) &&
+           Objects.equals(super.getType(), ((NumberField) o).getType());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode() , defaultValue , minimum , maximum , exclusiveMinimum , exclusiveMaximum , multipleOf);
+    return Objects.hash(super.hashCode(), defaultValue, minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf);
   }
 
-  public boolean compare(Number a , Number b) {
+  public boolean compare(Number a, Number b) {
     boolean equals = false;
-    if (Objects.equals(a , b)) {
+    if (Objects.equals(a, b)) {
       equals = true;
     } else if (Objects.nonNull(a)) {
       equals = a.toString().equalsIgnoreCase(b.toString());

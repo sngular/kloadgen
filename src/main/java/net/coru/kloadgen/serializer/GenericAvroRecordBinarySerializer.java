@@ -22,22 +22,22 @@ import org.apache.kafka.common.serialization.Serializer;
 public class GenericAvroRecordBinarySerializer<T extends GenericRecord> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String s , T data) {
+  public byte[] serialize(String s, T data) {
     DatumWriter<T> writer = new SpecificDatumWriter<>(data.getSchema());
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-      Encoder encoder = EncoderFactory.get().binaryEncoder(baos , null);
-      writer.write(data , encoder);
+      Encoder encoder = EncoderFactory.get().binaryEncoder(baos, null);
+      writer.write(data, encoder);
       encoder.flush();
       return baos.toByteArray();
     } catch (IOException e) {
-      log.error("Serialization error for date: {}" , data , e);
+      log.error("Serialization error for date: {}", data, e);
       return new byte[]{};
     }
   }
 
   @Override
-  public byte[] serialize(String topic , Headers headers , T data) {
-    return serialize(topic , data);
+  public byte[] serialize(String topic, Headers headers, T data) {
+    return serialize(topic, data);
   }
 
 }

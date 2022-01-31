@@ -51,10 +51,10 @@ public class ValueDeserializedConfigElement extends ConfigTestElement implements
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(VALUE_SCHEMA_PROPERTIES , valueSchemaProperties);
-    variables.putObject(VALUE_SCHEMA_TYPE , valueSchemaType);
-    variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY , valueDeSerializerConfiguration);
-    variables.putObject(VALUE_NAME_STRATEGY , valueNameStrategy);
+    variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
+    variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
+    variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY, valueDeSerializerConfiguration);
+    variables.putObject(VALUE_NAME_STRATEGY, valueNameStrategy);
 
   }
 

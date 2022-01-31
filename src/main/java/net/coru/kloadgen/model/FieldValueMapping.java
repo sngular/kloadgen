@@ -51,27 +51,27 @@ public class FieldValueMapping extends AbstractTestElement {
 
   private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
-  public FieldValueMapping(String fieldName , String fieldType) {
+  public FieldValueMapping(String fieldName, String fieldType) {
     this.setFieldName(fieldName);
     this.setValueLength(0);
     this.setFieldType(fieldType);
   }
 
-  public FieldValueMapping(String fieldName , String fieldType , Integer valueLength , String valueList) {
+  public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList) {
     this.setFieldName(fieldName);
-    this.setValueLength(Objects.requireNonNullElse(valueLength , 0));
+    this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
     this.setFieldType(fieldType);
     this.setFieldValuesList(valueList);
   }
 
   @Builder
   public FieldValueMapping(
-      String fieldName , String fieldType , Integer valueLength , String fieldValueList ,
+      String fieldName, String fieldType, Integer valueLength, String fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     this.setFieldName(fieldName);
-    this.setValueLength(Objects.requireNonNullElse(valueLength , 0));
+    this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
     this.setFieldType(fieldType);
-    this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList , ""));
+    this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
     this.constrains = constrains;
   }
 
@@ -81,7 +81,7 @@ public class FieldValueMapping extends AbstractTestElement {
 
   public void setFieldName(String fieldName) {
     this.fieldName = fieldName;
-    setProperty(FIELD_NAME , fieldName);
+    setProperty(FIELD_NAME, fieldName);
   }
 
   public Integer getValueLength() {
@@ -90,7 +90,7 @@ public class FieldValueMapping extends AbstractTestElement {
 
   public void setValueLength(Integer valueLength) {
     this.valueLength = valueLength;
-    setProperty(VALUE_LENGTH , valueLength);
+    setProperty(VALUE_LENGTH, valueLength);
   }
 
   public String getFieldType() {
@@ -99,7 +99,7 @@ public class FieldValueMapping extends AbstractTestElement {
 
   public void setFieldType(String propertyValue) {
     this.fieldType = propertyValue;
-    setProperty(FIELD_TYPE , propertyValue);
+    setProperty(FIELD_TYPE, propertyValue);
   }
 
   public List<String> getFieldValuesList() {
@@ -109,12 +109,12 @@ public class FieldValueMapping extends AbstractTestElement {
     if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
       try {
         inputFieldValueAux = inputFieldValueList;
-          if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
-              inputFieldValueAux = "[" + inputFieldValueAux;
-          }
-          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
-              inputFieldValueAux += "]";
-          }
+        if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
+          inputFieldValueAux = "[" + inputFieldValueAux;
+        }
+        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
+          inputFieldValueAux += "]";
+        }
         JsonNode nodes = mapper.readTree(inputFieldValueAux);
         Iterator<JsonNode> nodeElements = nodes.elements();
         while (nodeElements.hasNext()) {
@@ -122,13 +122,13 @@ public class FieldValueMapping extends AbstractTestElement {
         }
       } catch (JsonProcessingException e) {
         inputFieldValueAux = inputFieldValueList;
-          if (inputFieldValueAux.charAt(0) == "[".charAt(0)) {
-              inputFieldValueAux = inputFieldValueAux.substring(1);
-          }
-          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
-              inputFieldValueAux = inputFieldValueAux.substring(0 , inputFieldValueAux.length() - 1);
-          }
-        result.addAll(asList(inputFieldValueAux.trim().split("\\s*,\\s*" , -1)));
+        if (inputFieldValueAux.charAt(0) == "[".charAt(0)) {
+          inputFieldValueAux = inputFieldValueAux.substring(1);
+        }
+        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
+          inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
+        }
+        result.addAll(asList(inputFieldValueAux.trim().split("\\s*,\\s*", -1)));
       }
     }
     return result;
@@ -136,7 +136,7 @@ public class FieldValueMapping extends AbstractTestElement {
 
   public void setFieldValuesList(String fieldValuesList) {
     this.fieldValueList = fieldValuesList;
-    setProperty(FIELD_VALUES_LIST , fieldValuesList);
+    setProperty(FIELD_VALUES_LIST, fieldValuesList);
   }
 
   public void init() {
@@ -151,8 +151,8 @@ public class FieldValueMapping extends AbstractTestElement {
 
     private final Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
 
-    public FieldValueMappingBuilder constrain(ConstraintTypeEnum key , String value) {
-      constrains.putIfAbsent(key , value);
+    public FieldValueMappingBuilder constrain(ConstraintTypeEnum key, String value) {
+      constrains.putIfAbsent(key, value);
       return this;
     }
 

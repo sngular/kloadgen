@@ -23,8 +23,8 @@ public class ObjectField extends Field {
   }
 
   @Builder(toBuilder = true)
-  public ObjectField(String name , List<Field> properties , List<String> required) {
-    super(name , "object");
+  public ObjectField(String name, List<Field> properties, List<String> required) {
+    super(name, "object");
     this.properties = properties;
     this.required = required;
   }

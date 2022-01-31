@@ -63,7 +63,7 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
                             .filterInputsBy(new FilterBuilder()
                                                 .includePackage("org.apache.kafka.common.serialization"))
                             .setScanners(new SubTypesScanner()));
-    ReflectionUtils.extractSerializers(serializerComboBox , reflections , Serializer.class);
+    ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
   }
 
   @Override
@@ -103,7 +103,7 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
 
   @Override
   public void setValue(Object value) {
-    this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value , 0));
+    this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override

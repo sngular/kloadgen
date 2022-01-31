@@ -40,10 +40,10 @@ public class KeySimpleConfigElement extends ConfigTestElement implements TestBea
   public void iterationStart(LoopIterationEvent loopIterationEvent) {
 
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(KEY_VALUE , keyValue);
-    variables.putObject(KEY_TYPE , keyType);
-    variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY , keySerializerConfiguration);
-    variables.putObject(SIMPLE_KEYED_MESSAGE_KEY , Boolean.TRUE);
+    variables.putObject(KEY_VALUE, keyValue);
+    variables.putObject(KEY_TYPE, keyType);
+    variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
+    variables.putObject(SIMPLE_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 
 }

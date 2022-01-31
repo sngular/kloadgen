@@ -66,7 +66,7 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
-    propertyDescriptor.setValue("schemaAsString" , value);
+    propertyDescriptor.setValue("schemaAsString", value);
     schemaAsString = value;
   }
 

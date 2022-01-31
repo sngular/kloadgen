@@ -28,7 +28,7 @@ public class ListenToTest implements TestStateListener, Remoteable {
   @Override
   public void testEnded(String host) {
     final long now = System.currentTimeMillis();
-    log.info("Finished remote host: {} ({})" , host , now);
+    log.info("Finished remote host: {} ({})", host, now);
   }
 
   @Override
@@ -39,14 +39,14 @@ public class ListenToTest implements TestStateListener, Remoteable {
   @Override
   public void testStarted(String host) {
     final long now = System.currentTimeMillis();
-    log.info("Started remote host:  {} ({})" , host , now);
+    log.info("Started remote host:  {} ({})", host, now);
   }
 
   @Override
   public void testStarted() {
     if (log.isInfoEnabled()) {
       final long now = System.currentTimeMillis();
-      log.info("{} ({})" , JMeterUtils.getResString("running_test") , now);
+      log.info("{} ({})", JMeterUtils.getResString("running_test"), now);
     }
   }
 
@@ -60,7 +60,7 @@ public class ListenToTest implements TestStateListener, Remoteable {
         reportGenerator.generate();
         log.info("Dashboard generated");
       } catch (Exception ex) {
-        log.error("Error generating the report: {}" , ex.getMessage() , ex);
+        log.error("Error generating the report: {}", ex.getMessage(), ex);
       }
     }
     checkForRemainingThreads();
@@ -69,7 +69,7 @@ public class ListenToTest implements TestStateListener, Remoteable {
 
   private void checkForRemainingThreads() {
     final int pauseToCheckForRemainingThreads =
-        JMeterUtils.getPropDefault("jmeter.exit.check.pause" , 2000);
+        JMeterUtils.getPropDefault("jmeter.exit.check.pause", 2000);
 
     if (pauseToCheckForRemainingThreads > 0) {
       Thread daemon = new Thread(() -> {

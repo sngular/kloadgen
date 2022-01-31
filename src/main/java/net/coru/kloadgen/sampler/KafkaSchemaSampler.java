@@ -31,9 +31,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import com.google.protobuf.Descriptors;
-import com.google.protobuf.TextFormat;
-import com.sun.source.doctree.SeeTree;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
@@ -58,7 +55,8 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 
 public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
-    private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
+
+  private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
 
   private static final long serialVersionUID = 1L;
 
@@ -112,14 +110,14 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
             ? emptyList() : singletonList(props.getProperty(MESSAGE_KEY_KEY_VALUE));
       }
     } else {
-      props.put(KEY_SERIALIZER_CLASS_CONFIG , KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
+      props.put(KEY_SERIALIZER_CLASS_CONFIG, KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
     }
 
     topic = context.getParameter(KAFKA_TOPIC_CONFIG);
     try {
       producer = new KafkaProducer<>(props);
     } catch (KafkaException e) {
-      getNewLogger().error(e.getMessage() , e);
+      getNewLogger().error(e.getMessage(), e);
     }
   }
 
@@ -131,7 +129,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
   protected Properties properties(JavaSamplerContext context) {
     Properties commonProps = SamplerUtil.setupCommonProperties(context);
     if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
-      commonProps.put(VALUE_NAME_STRATEGY , context.getParameter(VALUE_NAME_STRATEGY));
+      commonProps.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
     }
     return commonProps;
   }
@@ -150,72 +148,72 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
 
       ProducerRecord<Object, Object> producerRecord;
       try {
-        producerRecord = getProducerRecord(messageVal , enrichedKeyFlag() , enrichedValueFlag());
-        List<String> headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders , producerRecord));
+        producerRecord = getProducerRecord(messageVal, enrichedKeyFlag(), enrichedValueFlag());
+        List<String> headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
 
-        sampleResult.setRequestHeaders(StringUtils.join(headersSB , ","));
-        fillSamplerResult(producerRecord , sampleResult);
+        sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
+        fillSamplerResult(producerRecord, sampleResult);
 
-        Future<RecordMetadata> result = producer.send(producerRecord , (metadata , e) -> {
+        Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
           if (e != null) {
-            super.getNewLogger().error("Send failed for record {}" , producerRecord , e);
-            throw new KLoadGenException("Failed to sent message due " , e);
+            super.getNewLogger().error("Send failed for record {}", producerRecord, e);
+            throw new KLoadGenException("Failed to sent message due ", e);
           }
         });
 
-        super.getNewLogger().info("Send message with key: {} and body: {} and headers: {}" ,
-                                  producerRecord.key() , producerRecord.value() , producerRecord.headers());
-        fillSampleResult(sampleResult , prettyPrint(result.get()) , true);
+        super.getNewLogger().info("Send message with key: {} and body: {} and headers: {}",
+                                  producerRecord.key(), producerRecord.value(), producerRecord.headers());
+        fillSampleResult(sampleResult, prettyPrint(result.get()), true);
       } catch (Exception e) {
-        super.getNewLogger().error("Failed to send message" , e);
-        fillSampleResult(sampleResult , e.getMessage() != null ? e.getMessage() : "" , false);
+        super.getNewLogger().error("Failed to send message", e);
+        fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "", false);
       }
     } else {
       super.getNewLogger().error("Failed to Generate message");
-      fillSampleResult(sampleResult , "Failed to Generate message" , false);
+      fillSampleResult(sampleResult, "Failed to Generate message", false);
     }
     return sampleResult;
   }
 
   private Boolean enrichedValueFlag() {
-    return AvroSerializer.class.getName().equals(props.get(VALUE_SERIALIZER_CLASS_CONFIG));
+    return SERIALIZER_SET.contains(props.get(VALUE_SERIALIZER_CLASS_CONFIG).toString());
   }
 
   private Boolean enrichedKeyFlag() {
-    return AvroSerializer.class.getName().equals(props.get(KEY_SERIALIZER_CLASS_CONFIG));
+    return SERIALIZER_SET.contains(props.get(KEY_SERIALIZER_CLASS_CONFIG).toString());
   }
 
-  private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord , SampleResult sampleResult) {
+  private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord, SampleResult sampleResult) {
     if (Objects.isNull(producerRecord.key())) {
-      sampleResult.setSamplerData(String.format("key: null, payload: %s" , producerRecord.value().toString()));
+      sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
     } else {
-      sampleResult.setSamplerData(String.format("key: %s, payload: %s" , producerRecord.key().toString() ,
+      sampleResult.setSamplerData(String.format("key: %s, payload: %s", producerRecord.key().toString(),
                                                 producerRecord.value().toString()));
     }
   }
 
-  private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal , boolean keyFlag , boolean valueFlag) {
+  private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal, boolean keyFlag, boolean valueFlag) {
     ProducerRecord<Object, Object> producerRecord;
     if (keyMessageFlag) {
       if (Objects.isNull(keyGenerator)) {
-        Object key = statelessGeneratorTool.generateObject("key" , msgKeyType , 0 , msgKeyValue).toString();
-        producerRecord = new ProducerRecord<>(topic , key , getObject(messageVal , valueFlag));
+        Object key = statelessGeneratorTool.generateObject("key", msgKeyType, 0, msgKeyValue).toString();
+        producerRecord = new ProducerRecord<>(topic, key, getObject(messageVal, valueFlag));
       } else {
         EnrichedRecord key = keyGenerator.nextMessage();
-        producerRecord = new ProducerRecord<>(topic , getObject(key , keyFlag) , getObject(messageVal , valueFlag));
+        producerRecord = new ProducerRecord<>(topic, getObject(key, keyFlag), getObject(messageVal, valueFlag));
       }
     } else {
-      producerRecord = new ProducerRecord<>(topic , getObject(messageVal , valueFlag));
+      producerRecord = new ProducerRecord<>(topic, getObject(messageVal, valueFlag));
     }
     return producerRecord;
   }
 
-  private Object getObject(EnrichedRecord messageVal , boolean valueFlag) {
+  private Object getObject(EnrichedRecord messageVal, boolean valueFlag) {
     return valueFlag ? messageVal : messageVal.getGenericRecord();
   }
 
-  private void fillSampleResult(SampleResult sampleResult , String respondeData , boolean successful) {
-    sampleResult.setResponseData(respondeData , StandardCharsets.UTF_8.name());
+  private void fillSampleResult(SampleResult sampleResult, String respondeData, boolean successful) {
+    sampleResult.setResponseData(respondeData, StandardCharsets.UTF_8.name());
     sampleResult.setSuccessful(successful);
     sampleResult.sampleEnd();
   }
@@ -238,6 +236,6 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
 
   private String prettyPrint(RecordMetadata recordMetadata) {
     String template = "Topic: %s, partition: %s, offset: %s";
-    return String.format(template , recordMetadata.topic() , recordMetadata.partition() , recordMetadata.offset());
+    return String.format(template, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
   }
 }

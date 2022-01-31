@@ -27,25 +27,25 @@ public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
 
     super(SchemaRegistryConfigElement.class);
 
-    createPropertyGroup("schema_registry_config" , new String[]{
-        SCHEMA_REGISTRY_URL , SCHEMA_REGISTRY_PROPERTIES
+    createPropertyGroup("schema_registry_config", new String[]{
+        SCHEMA_REGISTRY_URL, SCHEMA_REGISTRY_PROPERTIES
     });
 
     PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_URL);
     schemaRegistryUrl.setPropertyEditorClass(SchemaRegistryConfigPropertyEditor.class);
-    schemaRegistryUrl.setValue(NOT_UNDEFINED , Boolean.TRUE);
-    schemaRegistryUrl.setValue(DEFAULT , SCHEMA_REGISTRY_URL_DEFAULT);
-    schemaRegistryUrl.setValue(NOT_EXPRESSION , Boolean.FALSE);
+    schemaRegistryUrl.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    schemaRegistryUrl.setValue(DEFAULT, SCHEMA_REGISTRY_URL_DEFAULT);
+    schemaRegistryUrl.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     TypeEditor tableEditor = TypeEditor.TableEditor;
-    PropertyDescriptor tableProperties = property(SCHEMA_REGISTRY_PROPERTIES , tableEditor);
-    tableProperties.setValue(TableEditor.CLASSNAME , PropertyMapping.class.getName());
-    tableProperties.setValue(TableEditor.HEADERS , new String[]{"Property Name" , "Property Value"});
+    PropertyDescriptor tableProperties = property(SCHEMA_REGISTRY_PROPERTIES, tableEditor);
+    tableProperties.setValue(TableEditor.CLASSNAME, PropertyMapping.class.getName());
+    tableProperties.setValue(TableEditor.HEADERS, new String[]{"Property Name", "Property Value"});
     tableProperties
-        .setValue(TableEditor.OBJECT_PROPERTIES , new String[]{PropertyMapping.PROPERTY_NAME , PropertyMapping.PROPERTY_VALUE});
-    tableProperties.setValue(DEFAULT , DEFAULTS);
-    tableProperties.setValue(NOT_UNDEFINED , Boolean.TRUE);
-    tableProperties.setValue(NOT_EXPRESSION , Boolean.FALSE);
+        .setValue(TableEditor.OBJECT_PROPERTIES, new String[]{PropertyMapping.PROPERTY_NAME, PropertyMapping.PROPERTY_VALUE});
+    tableProperties.setValue(DEFAULT, DEFAULTS);
+    tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    tableProperties.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
   }
 }

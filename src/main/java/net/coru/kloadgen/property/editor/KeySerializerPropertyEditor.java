@@ -60,7 +60,7 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
     Reflections reflections = new Reflections(new ConfigurationBuilder()
                                                   .addUrls(ClasspathHelper.forClass(Serializer.class))
                                                   .setScanners(new SubTypesScanner()));
-    ReflectionUtils.extractSerializers(serializerComboBox , reflections , Serializer.class);
+    ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
   }
 
   @Override
@@ -95,7 +95,7 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
 
   @Override
   public void setValue(Object value) {
-    this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value , 0));
+    this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override

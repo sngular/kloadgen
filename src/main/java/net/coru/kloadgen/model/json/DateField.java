@@ -16,8 +16,8 @@ public class DateField extends Field {
   String format;
 
   @Builder(toBuilder = true)
-  public DateField(String name , String format) {
-    super(name , "timestamp");
+  public DateField(String name, String format) {
+    super(name, "timestamp");
     this.format = format;
   }
 

@@ -20,8 +20,8 @@ public class ArrayField extends Field {
   boolean uniqueItems;
 
   @Builder(toBuilder = true)
-  public ArrayField(String name , List<Field> values , int minItems , boolean uniqueItems) {
-    super(name , "array");
+  public ArrayField(String name, List<Field> values, int minItems, boolean uniqueItems) {
+    super(name, "array");
     this.values = values;
     this.minItems = minItems;
     this.uniqueItems = uniqueItems;
