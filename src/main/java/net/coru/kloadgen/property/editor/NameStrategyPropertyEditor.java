@@ -6,6 +6,8 @@
 
 package net.coru.kloadgen.property.editor;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -59,7 +61,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     Reflections reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
-            .setScanners(new SubTypesScanner()));
+            .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
   }
 

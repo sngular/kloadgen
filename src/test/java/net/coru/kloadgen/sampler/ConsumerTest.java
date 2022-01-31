@@ -11,7 +11,6 @@ import com.github.charithe.kafka.KafkaJunitExtension;
 import com.github.charithe.kafka.KafkaJunitExtensionConfig;
 import com.github.charithe.kafka.StartupMode;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -27,23 +26,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class ConsumerTest {
 
   @Test
-  void testConsumer(KafkaHelper kafkaHelper) throws TimeoutException {
+  void testConsumer(KafkaHelper kafkaHelper) {
     KafkaConsumerSampler consumerSampler;
 
     consumerSampler = new KafkaConsumerSampler();
     Arguments consumerArguments = consumerSampler.getDefaultParameters();
     consumerArguments.removeArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG);
-    consumerArguments.addArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                                  kafkaHelper.producerConfig().get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG).toString());
+    consumerArguments.addArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHelper.producerConfig().get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG).toString());
     consumerArguments.addArgument(GROUP_ID_CONFIG, "anonymous");
     consumerArguments.removeArgument(KAFKA_TOPIC_CONFIG);
     consumerArguments.addArgument(KAFKA_TOPIC_CONFIG, "testTopic");
     consumerArguments.removeArgument("timeout.millis");
     consumerArguments.addArgument("timeout.millis", "20000");
-    consumerArguments.addArgument(VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization" +
-            ".StringDeserializer");
-    consumerArguments.addArgument(KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization" +
-            ".StringDeserializer");
+    consumerArguments.addArgument(VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+    consumerArguments.addArgument(KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     consumerArguments.addArgument(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
     JavaSamplerContext javaSamplerContext = new JavaSamplerContext(consumerArguments);

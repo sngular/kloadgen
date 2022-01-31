@@ -6,7 +6,18 @@
 
 package net.coru.kloadgen.extractor;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -17,24 +28,10 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import ru.lanwen.wiremock.ext.WiremockResolver;
-import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
-import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-@ExtendWith({
-        WiremockResolver.class,
-        WiremockUriResolver.class
-})
+@WireMockTest
 class SchemaExtractorTest {
 
     private final FileHelper fileHelper = new FileHelper();
@@ -51,8 +48,10 @@ class SchemaExtractorTest {
     }
 
     @Test
-    void testFlatPropertiesListSimpleRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    @DisplayName("Should configure Schema Extractor Properties")
+    void testFlatPropertiesListSimpleRecord(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
+
+        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
         JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
         JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
@@ -69,8 +68,8 @@ class SchemaExtractorTest {
     }
 
     @Test
-    void testFlatPropertiesListArrayRecord(@Wiremock WireMockServer server) throws IOException, RestClientException {
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    void testFlatPropertiesListArrayRecord(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
+        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
         JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
         JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
@@ -85,8 +84,8 @@ class SchemaExtractorTest {
     }
 
     @Test
-    void testFlatPropertiesListMapArray(@Wiremock WireMockServer server) throws IOException, RestClientException {
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    void testFlatPropertiesListMapArray(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
+        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
         JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
         JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 

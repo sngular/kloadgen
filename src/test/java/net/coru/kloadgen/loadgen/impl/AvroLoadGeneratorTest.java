@@ -1,17 +1,20 @@
 package net.coru.kloadgen.loadgen.impl;
 
 import static java.util.Arrays.asList;
+
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -21,15 +24,8 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import ru.lanwen.wiremock.ext.WiremockResolver;
-import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
-import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
-@ExtendWith({
-    WiremockResolver.class,
-    WiremockUriResolver.class
-})
+@WireMockTest
 class AvroLoadGeneratorTest {
 
   @BeforeEach
@@ -43,14 +39,14 @@ class AvroLoadGeneratorTest {
   }
 
   @Test
-  void testAvroLoadGenerator(@Wiremock WireMockServer server) throws KLoadGenException {
+  void testAvroLoadGenerator(WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     List<FieldValueMapping> fieldValueMappingList = asList(
         new FieldValueMapping("Name", "string", 0, "Jose"),
         new FieldValueMapping("Age", "int", 0, "43"));
 
     Map<String, String> originals = new HashMap<>();
-    originals.put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    originals.put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
     originals.put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     originals.put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 

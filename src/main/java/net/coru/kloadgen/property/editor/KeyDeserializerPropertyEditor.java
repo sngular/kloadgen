@@ -6,6 +6,8 @@
 
 package net.coru.kloadgen.property.editor;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -61,9 +63,9 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
     Reflections reflections = new Reflections(new ConfigurationBuilder()
                                                   .addUrls(ClasspathHelper.forClass(Deserializer.class))
                                                   .filterInputsBy(new FilterBuilder()
-                                                                      .includePackage("net.coru.kloadgen.serializer",
-                                                                                      "io.confluent.kafka.serializers"))
-                                                  .setScanners(new SubTypesScanner()));
+                                                                      .includePackage("net.coru.kloadgen.serializer")
+                                                                      .includePackage("io.confluent.kafka.serializers"))
+                                                  .setScanners(SubTypes));
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections);
   }
 

@@ -6,6 +6,8 @@
 
 package net.coru.kloadgen.property.editor;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -62,7 +64,7 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
                             .addUrls(ClasspathHelper.forClass(Serializer.class))
                             .filterInputsBy(new FilterBuilder()
                                                 .includePackage("org.apache.kafka.common.serialization"))
-                            .setScanners(new SubTypesScanner()));
+                            .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
   }
 
