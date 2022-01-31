@@ -32,6 +32,7 @@ public class FieldValueMapping extends AbstractTestElement {
 
     public static final String FIELD_CONSTRAINTS = "constrains";
     public static final String FIELD_REQUIRED = "required";
+    public static final String FIELD_PARENT_REQUIRED = "parentRequired";
     public static final String FIELD_NAME = "fieldName";
     public static final String FIELD_TYPE = "fieldType";
     public static final String VALUE_LENGTH = "valueLength";
@@ -42,6 +43,7 @@ public class FieldValueMapping extends AbstractTestElement {
     private Integer valueLength;
     private String fieldValueList;
     private Boolean required = true;
+    private Boolean isParentRequired = true;
 
     private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
 
@@ -52,6 +54,7 @@ public class FieldValueMapping extends AbstractTestElement {
         this.setValueLength(0);
         this.setFieldType(fieldType);
         this.setRequired(true);
+        this.setParentRequired(true);
     }
 
     public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList) {
@@ -60,25 +63,28 @@ public class FieldValueMapping extends AbstractTestElement {
         this.setFieldType(fieldType);
         this.setFieldValuesList(valueList);
         this.setRequired(true);
+        this.setParentRequired(true);
     }
 
-    public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList, Boolean required) {
+    public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList, Boolean required, Boolean isParentRequired) {
         this.setFieldName(fieldName);
         this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
         this.setFieldType(fieldType);
         this.setFieldValuesList(valueList);
         this.setRequired(required != null && required);
+        this.setParentRequired(isParentRequired != null && isParentRequired);
     }
 
     @Builder
     public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String fieldValueList,
-        Map<ConstraintTypeEnum, String> constrains, Boolean required) {
+        Map<ConstraintTypeEnum, String> constrains, Boolean required, Boolean isParentRequired) {
         this.setFieldName(fieldName);
         this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
         this.setFieldType(fieldType);
         this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
         this.setConstrains(constrains);
         this.setRequired(required != null && required);
+        this.setParentRequired(isParentRequired != null && isParentRequired);
     }
 
     public String getFieldName() {
@@ -148,6 +154,16 @@ public class FieldValueMapping extends AbstractTestElement {
     public void setRequired(Boolean required) {
         this.required = required;
         setProperty(FIELD_REQUIRED, required);
+    }
+
+
+    public Boolean getParentRequired() {
+        return getPropertyAsBoolean(FIELD_PARENT_REQUIRED);
+    }
+
+    public void setParentRequired(Boolean parentRequired) {
+        this.isParentRequired = parentRequired;
+        setProperty(FIELD_PARENT_REQUIRED, parentRequired);
     }
 
     public void init() {

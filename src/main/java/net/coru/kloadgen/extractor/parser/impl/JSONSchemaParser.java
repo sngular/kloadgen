@@ -21,17 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.parser.SchemaParser;
-import net.coru.kloadgen.model.json.ArrayField;
-import net.coru.kloadgen.model.json.BooleanField;
-import net.coru.kloadgen.model.json.DateField;
-import net.coru.kloadgen.model.json.EnumField;
-import net.coru.kloadgen.model.json.Field;
-import net.coru.kloadgen.model.json.IntegerField;
-import net.coru.kloadgen.model.json.NumberField;
-import net.coru.kloadgen.model.json.ObjectField;
-import net.coru.kloadgen.model.json.Schema;
-import net.coru.kloadgen.model.json.StringField;
-import net.coru.kloadgen.model.json.UUIDField;
+import net.coru.kloadgen.model.json.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.IteratorUtils;
@@ -45,6 +35,8 @@ public class JSONSchemaParser implements SchemaParser {
   public static final String REQUIRED = "required";
 
   public static final String PROPERTIES = "properties";
+
+  public static final String ADDITIONAL_PROPERTIES = "additionalProperties";
 
   public static final String TYPE = "type";
 
@@ -87,12 +79,11 @@ public class JSONSchemaParser implements SchemaParser {
     List<String> requiredFields = new ArrayList<>();
     requiredList.elements().forEachRemaining((elm) -> requiredFields.add(elm.textValue()));
 
-    for (JsonNode field: jsonNode.path(PROPERTIES)) {
-      field.path(REQUIRED).elements().forEachRemaining((elm) -> requiredFields.add(elm.textValue()));
-    }
+    jsonNode.path(PROPERTIES).fields().forEachRemaining(field -> field.getValue().path(REQUIRED).elements().
+            forEachRemaining((elm) -> requiredFields.add(field.getKey() + "." + elm.textValue())));
 
     CollectionUtils.collect(jsonNode.path(PROPERTIES).fieldNames(),
-        fieldName -> buildProperty(fieldName, jsonNode.path(PROPERTIES).get(fieldName)),
+        fieldName -> buildProperty(fieldName, jsonNode.path(PROPERTIES).get(fieldName), requiredFields.contains(fieldName)),
         fields);
     schema = Schema.builder()
             .id(schemaId.asText())
@@ -287,12 +278,16 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildProperty(String fieldName, JsonNode jsonNode) {
+    return buildProperty(fieldName, jsonNode, null);
+  }
+
+  private Field buildProperty(String fieldName, JsonNode jsonNode, Boolean required) {
     Field result;
     if (isRefNode(jsonNode)) {
       if (isRefNodeSupported(jsonNode)) {
         String referenceName = extractRefName(jsonNode);
         if ("array".equalsIgnoreCase(jsonNode.findPath(TYPE).textValue())) {
-          result = buildArrayField(fieldName, jsonNode, definitionsMap.get(referenceName).cloneField(null));
+          result = buildArrayField(fieldName, jsonNode, definitionsMap.get(referenceName).cloneField(null), required);
         } else {
           result = definitionsMap.get(referenceName).cloneField(fieldName);
         }
@@ -300,17 +295,17 @@ public class JSONSchemaParser implements SchemaParser {
         throw new KLoadGenException(String.format("Reference not Supported: %s", extractRefName(jsonNode)));
       }
     } else if (isAnyType(jsonNode)) {
-      result = buildField(fieldName, jsonNode);
+      result = buildField(fieldName, jsonNode, required);
     } else if (isCombine(jsonNode)) {
       if (Objects.nonNull(jsonNode.get(ANY_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ANY_OF);
+        result = chooseAnyOf(fieldName, jsonNode, ANY_OF, required);
       } else if (Objects.nonNull(jsonNode.get(ALL_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ALL_OF);
+        result = chooseAnyOf(fieldName, jsonNode, ALL_OF, required);
       } else {
-        result = chooseAnyOf(fieldName, jsonNode, ONE_OF);
+        result = chooseAnyOf(fieldName, jsonNode, ONE_OF, required);
       }
     } else if (hasProperties(jsonNode)){
-      result = buildObjectField(fieldName, jsonNode);
+      result = buildObjectField(fieldName, jsonNode, required);
     } else {
       throw new KLoadGenException("Not supported file");
     }
@@ -318,6 +313,10 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildField(String fieldName, JsonNode jsonNode) {
+    return buildField(fieldName, jsonNode, null);
+  }
+
+  private Field buildField(String fieldName, JsonNode jsonNode, Boolean required) {
     Field result;
     String nodeType = getSafeType(jsonNode).toLowerCase();
     if (Objects.nonNull(nodeType)) {
@@ -329,10 +328,10 @@ public class JSONSchemaParser implements SchemaParser {
           result = buildNumberField(fieldName, jsonNode);
           break;
         case "array":
-          result = buildArrayField(fieldName, jsonNode);
+          result = buildArrayField(fieldName, jsonNode, required);
           break;
         case "object":
-          result = buildObjectField(fieldName, jsonNode);
+          result = buildObjectField(fieldName, jsonNode, required);
           break;
         case "boolean":
           result = buildBooleanField(fieldName);
@@ -412,6 +411,10 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field chooseAnyOf(String fieldName, JsonNode jsonNode, String type) {
+    return chooseAnyOf(fieldName, jsonNode, type, null);
+  }
+
+  private Field chooseAnyOf(String fieldName, JsonNode jsonNode, String type, Boolean required) {
     List<JsonNode> properties = IteratorUtils.toList(jsonNode.get(type).elements());
     int optionsNumber = properties.size();
     Field resultObject;
@@ -445,8 +448,11 @@ public class JSONSchemaParser implements SchemaParser {
   private Field buildCombinedType(String fieldName, JsonNode property) {
     return buildField(fieldName, property);
   }
-
   private Field buildCombinedField(String fieldName, List<JsonNode> properties) {
+    return buildCombinedField(fieldName, properties, null);
+  }
+
+  private Field buildCombinedField(String fieldName, List<JsonNode> properties, Boolean required) {
     Field resultObject;
     List<Field> fields = new ArrayList<>();
     for (JsonNode property : properties) {
@@ -462,12 +468,12 @@ public class JSONSchemaParser implements SchemaParser {
         if (Objects.nonNull(property.get(PROPERTIES))) {
           for (Iterator<Entry<String, JsonNode>> it = property.get(PROPERTIES).fields(); it.hasNext(); ) {
             Entry<String, JsonNode> innProperty = it.next();
-            fields.add(buildProperty(innProperty.getKey(), innProperty.getValue()));
+            fields.add(buildProperty(innProperty.getKey(), innProperty.getValue(), required));
           }
         }
       }
     }
-    resultObject = buildObjectField(fieldName, fields);
+    resultObject = buildObjectField(fieldName, fields, required);
     return resultObject;
   }
 
@@ -500,36 +506,65 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildArrayField(String fieldName, JsonNode jsonNode) {
-    return buildArrayField(fieldName, jsonNode, buildProperty(null, jsonNode.path("items")));
+    return buildArrayField(fieldName, jsonNode, buildProperty(null, jsonNode.path("items")), null);
+  }
+
+  private Field buildArrayField(String fieldName, JsonNode jsonNode, Boolean required) {
+    return buildArrayField(fieldName, jsonNode, buildProperty(null, jsonNode.path("items"), required), required);
   }
 
   private Field buildArrayField(String fieldName, JsonNode jsonNode, Field value) {
+    return buildArrayField(fieldName, jsonNode, value, null);
+  }
+
+  private Field buildArrayField(String fieldName, JsonNode jsonNode, Field value, Boolean required) {
     String minItems = jsonNode.path("minItems").asText("0");
     String uniqueItems = jsonNode.path("uniqueItems").asText("false");
     return ArrayField
         .builder()
         .name(fieldName)
         .value(value)
+        .isFieldRequired(required)
         .minItems(Integer.parseInt(minItems))
         .uniqueItems(Boolean.parseBoolean(uniqueItems))
         .build();
   }
 
   private Field buildObjectField(String fieldName, JsonNode jsonNode) {
+    return buildObjectField(fieldName, jsonNode, null);
+  }
+
+  private Field buildObjectField(String fieldName, JsonNode jsonNode, Boolean required) {
     List<Field> properties = new ArrayList<>();
-    List<String> strRequired = jsonNode.findValuesAsText(REQUIRED);
+    JsonNode requiredList = jsonNode.path(REQUIRED);
+    List<String> strRequired = new ArrayList<>();
+    requiredList.elements().forEachRemaining((elm) -> strRequired.add(elm.textValue()));
+
+    //List<String> strRequired = jsonNode.findValuesAsText(REQUIRED);
     CollectionUtils.filter(strRequired, StringUtils::isNotEmpty);
     if (!isCombine(jsonNode)) {
-      CollectionUtils.collect(jsonNode.path(PROPERTIES).fields(), field -> buildProperty(field.getKey(), field.getValue()), properties);
-      return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).build();
+      if (jsonNode.path(ADDITIONAL_PROPERTIES).isNull() || jsonNode.path(ADDITIONAL_PROPERTIES).isEmpty()){
+        CollectionUtils.collect(jsonNode.path(PROPERTIES).fields(), field -> buildProperty(field.getKey(), field.getValue(), strRequired.contains(field.getKey())), properties);
+        if (required != null){
+          return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).isFieldRequired(required).build();
+        }else {
+          return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).build();
+        }
+      } else{
+        JsonNode fieldReaded = jsonNode.path(ADDITIONAL_PROPERTIES);
+        Field field2 = buildProperty("internalMapField", fieldReaded, false);
+        return MapField.builder().name(fieldName).mapType(field2).isFieldRequired(required != null ? required : false).build();
+      }
+
+
     } else {
       Field result;
       if (Objects.nonNull(jsonNode.get(ANY_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ANY_OF);
+        result = chooseAnyOf(fieldName, jsonNode, ANY_OF, required);
       } else if (Objects.nonNull(jsonNode.get(ALL_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ALL_OF);
+        result = chooseAnyOf(fieldName, jsonNode, ALL_OF, required);
       } else {
-        result = chooseAnyOf(fieldName, jsonNode, ONE_OF);
+        result = chooseAnyOf(fieldName, jsonNode, ONE_OF, required);
       }
       return result;
     }
@@ -537,6 +572,10 @@ public class JSONSchemaParser implements SchemaParser {
 
   private Field buildObjectField(String fieldName, List<Field> properties) {
     return ObjectField.builder().name(fieldName).properties(properties).build();
+  }
+
+  private Field buildObjectField(String fieldName, List<Field> properties, Boolean required){
+    return ObjectField.builder().name(fieldName).properties(properties).isFieldRequired(required != null ? required : false).build();
   }
 
   private Field buildBooleanField(String fieldName) {

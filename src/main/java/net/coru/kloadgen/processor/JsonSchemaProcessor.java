@@ -40,17 +40,49 @@ public class JsonSchemaProcessor {
     ObjectNode entity = JsonNodeFactory.instance.objectNode();
     if (!fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
+      ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExprMappings);
+      fieldExpMappingsQueueCopy.poll();
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+
+      int generatedProperties = 0;
+      int elapsedProperties = 0;
+
       while (!fieldExpMappingsQueue.isEmpty()) {
         String fieldName = getCleanMethodName(fieldValueMapping, "");
-        if (!fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")){
+
+        String currentName = fieldName;
+        if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(currentName))
+                && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()){
+          fieldValueMapping.setRequired(true);
+          List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+          temporalFieldValueList.remove("null");
+          fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+          fieldExpMappingsQueueCopy.poll();
+
+        } else {
+         generatedProperties = 0;
+         elapsedProperties = 0;
+         fieldExpMappingsQueueCopy.poll();
+        }
+         generatedProperties++;
+
+        Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName);
+
+        if (!fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")
+        && (!cleanUpPath(fieldValueMapping, "").contains(".") ||
+                (cleanUpPath(fieldValueMapping, "").contains(".") &&
+                cleanUpPath(fieldValueMapping, "").contains("[") ) ||
+                cleanUpPath(fieldValueMapping, "").contains("["))){
+
+          elapsedProperties++;
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
         } else {
           if (cleanUpPath(fieldValueMapping, "").contains("[")) {
             if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
+              String fieldCleanUpPath = cleanUpPath(fieldValueMapping, fieldName).replace("[]","");
               fieldExpMappingsQueue.poll();
-              entity.putPOJO(fieldName, createBasicMap(fieldValueMapping.getFieldType(),
+              entity.putPOJO(fieldCleanUpPath, createBasicMap(fieldValueMapping.getFieldType(),
                       calculateSize(fieldValueMapping.getFieldName(), fieldName),
                       fieldValueMapping.getFieldValuesList()));
             } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
@@ -104,6 +136,19 @@ public class JsonSchemaProcessor {
     return entity;
   }
 
+  private boolean checkIfObject(FieldValueMapping field, String fieldName){
+    if (fieldName != null){
+      return !field.getRequired() && field.getFieldValuesList().contains("null")
+              && (!fieldName.contains(".") ||
+              (fieldName.contains(".") && fieldName.contains("[")) ||
+              fieldName.contains("["));
+    }
+    return !field.getRequired() && field.getFieldValuesList().contains("null")
+            && (!cleanUpPath(field, "").contains(".") ||
+            (cleanUpPath(field, "").contains(".") && cleanUpPath(field, "").contains("[")) ||
+            cleanUpPath(field, "").contains("["));
+  }
+
   private ObjectNode createObject(final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
           throws KLoadGenException {
     ObjectNode subEntity = JsonNodeFactory.instance.objectNode();
@@ -111,11 +156,33 @@ public class JsonSchemaProcessor {
       throw new KLoadGenException("Something Odd just happened");
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+
+    int propertiesCount = 0;
+    int elapsedPropertiesCount = 0;
+
     while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
-      if (!fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")){
+      propertiesCount++;
+      if (checkIfObject(fieldValueMapping, cleanFieldName)){
+        elapsedPropertiesCount++;
+
+        FieldValueMapping actualField = fieldExpMappingsQueue.peek();
         fieldExpMappingsQueue.remove();
-        fieldValueMapping = fieldExpMappingsQueue.peek();
+        FieldValueMapping nextField = fieldExpMappingsQueue.peek();
+
+        if (!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
+                && actualField.getParentRequired()
+                && fieldExpMappingsQueue.peek() != null
+                && propertiesCount == elapsedPropertiesCount){
+          fieldValueMapping = actualField;
+          fieldValueMapping.setRequired(true);
+          List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+          temporalFieldValueList.remove("null");
+          fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+        } else{
+          //fieldExpMappingsQueue.remove();
+          fieldValueMapping = nextField;
+        }
       } else {
         if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
           if (fieldValueMapping.getFieldType().endsWith("map")) {

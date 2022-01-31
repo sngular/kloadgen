@@ -10,11 +10,13 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -54,5 +56,16 @@ public class JsonSchemaProcessorTest {
         ObjectNode message = jsonSchemaProcessor.next();
 
         assertThat(message.toString()).isEqualTo(expected);
+    }
+
+    @Test
+    void testNullOnOptionalMapWithChildren(){
+        JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+        jsonSchemaProcessor.processSchema(SIMPLE_SCHEMA_MAP);
+        ObjectNode message = jsonSchemaProcessor.next();
+
+        assertThat(message.toString()).contains("lastName\":\"García")
+                .contains("itemTipo\":{").doesNotContain("itemType\":{");
+
     }
 }

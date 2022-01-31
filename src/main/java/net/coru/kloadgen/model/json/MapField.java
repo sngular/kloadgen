@@ -20,15 +20,18 @@ public class MapField extends Field{
 
 	Field mapType;
 
+	boolean isFieldRequired;
+
 	@Override
 	public List<Field> getProperties() {
 		return Collections.singletonList(this);
 	}
 
 	@Builder(toBuilder = true)
-	public MapField(String name, Field mapType) {
+	public MapField(String name, Field mapType, boolean isFieldRequired) {
 		super(name, "map");
 		this.mapType = mapType;
+		this.isFieldRequired = isFieldRequired;
 	}
 
 	@Override

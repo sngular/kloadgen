@@ -31,8 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import static net.coru.kloadgen.model.ConstraintTypeEnum.MAXIMUM_VALUE;
-import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.*;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -221,20 +220,62 @@ class SchemaExtractorTest {
                     new FieldValueMapping("geopoliticalSubdivisions.level1.code", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
                       put(MINIMUM_VALUE, "2");
                       put(MAXIMUM_VALUE, "3");
-                    }}, true),
+                    }}, false,true),
                     new FieldValueMapping("geopoliticalSubdivisions.level1.freeForm", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
                       put(MINIMUM_VALUE, "1");
                       put(MAXIMUM_VALUE, "256");
-                    }}, true),
+                    }}, false,true),
                     new FieldValueMapping("geopoliticalSubdivisions.level2.code", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
                       put(MINIMUM_VALUE, "2");
                       put(MAXIMUM_VALUE, "3");
-                    }}, false),
+                    }}, false, false),
                     new FieldValueMapping("geopoliticalSubdivisions.level2.freeForm", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
                       put(MINIMUM_VALUE, "1");
                       put(MAXIMUM_VALUE, "256");
-                    }}, false)
+                    }}, false,false)
             );
+  }
+
+  @Test
+  @DisplayName("Should extract fields in definitions in Json Schema")
+  void testShouldExtractJsonSchemaDefinitions() throws IOException {
+    File testFile = fileHelper.getFile("/jsonschema/medium-document.jcs");
+
+    List<FieldValueMapping> fieldValueMappingList =
+            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+
+    assertThat(fieldValueMappingList).contains(
+            new FieldValueMapping("duty.amount.value","number", 0, "", false, false),
+            new FieldValueMapping("duty.amount.currency","string", 0, "",new HashMap<ConstraintTypeEnum, String>() {{
+              put(MINIMUM_VALUE, "0");
+              put(MAXIMUM_VALUE, "0");
+              put(REGEX, "^(.*)$");
+            }}, false, false),
+            new FieldValueMapping("duty.amount.exponent","number", 0, "", false, false));
+  }
+
+  @Test
+  @DisplayName("Should extract maps of simple data-types from JsonSchema")
+  void testShouldExtractMapSimpleDataType() throws IOException {
+    File testFile = fileHelper.getFile("/jsonschema/test-map.jcs");
+
+    List<FieldValueMapping> fieldValueMappingList =
+            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+
+    assertThat(fieldValueMappingList).contains(
+            new FieldValueMapping("firstName","string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
+              put(MINIMUM_VALUE, "0");
+              put(MAXIMUM_VALUE, "0");
+            }},false, false),
+            new FieldValueMapping("lastName","string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
+              put(MINIMUM_VALUE, "0");
+              put(MAXIMUM_VALUE, "0");
+            }},true, false),
+            new FieldValueMapping("age","number", 0,"",true, false),
+            new FieldValueMapping("testMap.itemType[]","number-map", 0,"", false, true),
+            new FieldValueMapping("testMap.itemTipo[]","string-map", 0,"", false, true)
+
+    );
   }
 
 }
