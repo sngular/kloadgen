@@ -1,3 +1,9 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package net.coru.kloadgen.sampler;
 
 import static java.util.Collections.emptyList;
@@ -235,16 +241,12 @@ public final class SamplerUtil {
   }
 
   public static void setupConsumerDeserializerProperties(JavaSamplerContext context, Properties props) {
-    if (Objects.nonNull(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY));
-    } else {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-    }
-    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_DESERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(VALUE_DESERIALIZER_CLASS_PROPERTY));
-    } else {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-    }
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+                Objects.requireNonNullElse(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY),
+                                           "org.apache.kafka.common.serialization.StringDeserializer"));
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                Objects.requireNonNullElse(context.getJMeterVariables().get(VALUE_DESERIALIZER_CLASS_PROPERTY),
+                                           "org.apache.kafka.common.serialization.StringDeserializer"));
   }
 
   public static void setupConsumerSchemaRegistryProperties(JavaSamplerContext context, Properties props) {
