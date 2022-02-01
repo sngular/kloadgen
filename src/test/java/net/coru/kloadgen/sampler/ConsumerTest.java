@@ -12,11 +12,12 @@ import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PR
 import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.concurrent.ExecutionException;
+
 import com.github.charithe.kafka.KafkaHelper;
 import com.github.charithe.kafka.KafkaJunitExtension;
 import com.github.charithe.kafka.KafkaJunitExtensionConfig;
 import com.github.charithe.kafka.StartupMode;
-import java.util.concurrent.ExecutionException;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -74,10 +75,10 @@ class ConsumerTest {
     assertThat(futureStrings.isDone()).isTrue();
     assertThat(futureStrings.get()).isNotEmpty();
     assertThat(result)
-            .isNotNull()
-            .hasFieldOrPropertyWithValue("success", true);
+        .isNotNull()
+        .hasFieldOrPropertyWithValue("success", true);
     assertThat(result.getResponseDataAsString()).isEqualToIgnoringCase("{ partition: 0, message: { key: key, " +
-            "value: value }}");
+                                                                       "value: value }}");
 
     result = consumerSampler.runTest(javaSamplerContext);
     assertThat(result).isNull();

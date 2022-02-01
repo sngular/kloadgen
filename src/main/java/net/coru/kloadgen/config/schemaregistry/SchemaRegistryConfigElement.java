@@ -77,14 +77,6 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     }
   }
 
-  private String getRegistryUrl() {
-    String registryUrl = getPropertyAsString("schemaRegistryUrl");
-    if (StringUtils.isBlank(registryUrl)) {
-      registryUrl = this.schemaRegistryUrl;
-    }
-    return registryUrl;
-  }
-
   private Map<String, String> getProperties() {
     Map<String, String> result = new HashMap<>();
     if (Objects.nonNull(getProperty("schemaRegistryProperties"))) {
@@ -94,6 +86,24 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
       result.putAll(fromPropertyMappingToPropertiesMap(this.schemaRegistryProperties));
     }
     return result;
+  }
+
+  private String checkPropertyOrVariable(String textToCheck) {
+    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
+      return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
+    } else if (textToCheck.matches("\\$\\{\\w*}")) {
+      return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
+    } else {
+      return textToCheck;
+    }
+  }
+
+  private String getRegistryUrl() {
+    String registryUrl = getPropertyAsString("schemaRegistryUrl");
+    if (StringUtils.isBlank(registryUrl)) {
+      registryUrl = this.schemaRegistryUrl;
+    }
+    return registryUrl;
   }
 
   private Map<String, String> fromTestElementToPropertiesMap(List<TestElementProperty> schemaProperties) {
@@ -111,15 +121,5 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
       propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
-  }
-
-  private String checkPropertyOrVariable(String textToCheck) {
-    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
-      return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
-    } else if (textToCheck.matches("\\$\\{\\w*}")) {
-      return JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
-    } else {
-      return textToCheck;
-    }
   }
 }

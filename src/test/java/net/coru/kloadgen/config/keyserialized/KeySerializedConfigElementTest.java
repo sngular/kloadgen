@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Locale;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.confluent.kafka.serializers.subject.TopicNameStrategy;
@@ -53,7 +52,7 @@ class KeySerializedConfigElementTest {
 
     KeySerializedConfigElement
         keySerializedConfigElement = new KeySerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
-           AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
+                                                                    AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     keySerializedConfigElement.iterationStart(null);
     assertThat(JMeterContextService.getContext().getVariables().getObject(KEY_SUBJECT_NAME)).isNotNull();
     assertThat(JMeterContextService.getContext().getVariables().getObject(KEY_SCHEMA_PROPERTIES)).isNotNull();

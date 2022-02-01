@@ -109,6 +109,16 @@ public abstract class SchemaProcessorLib {
 
   }
 
+  static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
+    return getFullMethodName(fieldValueMapping, fieldName).replaceAll("\\[[0-9]*:?]", "");
+  }
+
+  static String getFullMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
+    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
+    int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
+    return pathToClean.substring(0, endOfField);
+  }
+
   static String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName) {
     int startPosition = 0;
     String cleanPath;
@@ -122,20 +132,40 @@ public abstract class SchemaProcessorLib {
     return cleanPath;
   }
 
-  static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
-    return getFullMethodName(fieldValueMapping, fieldName).replaceAll("\\[[0-9]*:?]", "");
-  }
-
-  static String getFullMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
-    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
-    int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
-    return pathToClean.substring(0, endOfField);
-  }
-
   static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
     int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
+  }
+
+  static Object createArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
+    return generateRandomList(fieldName, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
+  }
+
+  static Object generateRandomList(String fieldName, String fieldType, int arraySize, Integer valueLength, List<String> fieldValuesList) {
+
+    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    parameterList.replaceAll(fieldValue ->
+                                 fieldValue.matches("\\$\\{\\w*}") ?
+                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
+                                     fieldValue
+    );
+
+    var value = new ArrayList<>(arraySize);
+    if ("seq".equals(fieldType)) {
+      for (int i = arraySize; i > 0; i--) {
+        value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
+      }
+    } else {
+      value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
+    }
+
+    return value;
+  }
+
+  static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
+    return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, 0, fieldExpMappings);
   }
 
   static Object generateRandomMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, Integer arraySize, List<String> fieldValuesList) {
@@ -163,38 +193,8 @@ public abstract class SchemaProcessorLib {
     return value;
   }
 
-  static Object generateRandomList(String fieldName, String fieldType, int arraySize, Integer valueLength, List<String> fieldValuesList) {
-
-    List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(fieldValue ->
-                                 fieldValue.matches("\\$\\{\\w*}") ?
-                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-                                     fieldValue
-    );
-
-    var value = new ArrayList<>(arraySize);
-    if ("seq".equals(fieldType)) {
-      for (int i = arraySize; i > 0; i--) {
-        value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
-      }
-    } else {
-      value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
-    }
-
-    return value;
-  }
-
   static String generateMapKey() {
     return (String) randomObject.generateRandom("string", 2, Collections.emptyList(), Collections.emptyMap());
-  }
-
-  static Object createArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
-    return generateRandomList(fieldName, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
-  }
-
-  static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
-    return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, 0, fieldExpMappings);
   }
 
   static Map<String, Object> createSimpleTypeArrayMap(

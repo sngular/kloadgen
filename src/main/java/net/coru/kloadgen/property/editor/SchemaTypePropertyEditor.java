@@ -22,9 +22,9 @@ import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 @Slf4j
 public class SchemaTypePropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private PropertyDescriptor propertyDescriptor;
-
   private final JPanel panel = new JPanel();
+
+  private PropertyDescriptor propertyDescriptor;
 
   private String schemaType;
 
@@ -50,14 +50,14 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
   public void clearGui() {}
 
   @Override
+  public void setDescriptor(PropertyDescriptor descriptor) {
+    propertyDescriptor = descriptor;
+  }  @Override
   public Component getCustomEditor() {
     return this.panel;
   }
 
-  @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
-  }
+
 
   @Override
   public String getAsText() {

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 import java.util.stream.Stream;
+
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.json.Field;
 import net.coru.kloadgen.model.json.NumberField;
@@ -52,14 +53,14 @@ class JSONSchemaParserTest {
     Schema result = jsonSchemaParser.parse(resourceAsFile.getContent("/jsonschema/multiple-type.jcs"));
 
     assertThat(result)
-            .extracting(Schema::getProperties)
-            .satisfies(this::multiTypeTestStringOrNumber);
+        .extracting(Schema::getProperties)
+        .satisfies(this::multiTypeTestStringOrNumber);
   }
 
   private boolean multiTypeTestStringOrNumber(Object field) {
     Set<String> propertyNames = Set.of("id", "version", "dtype", "timestamp", "event_type");
     return (field instanceof StringField || field instanceof NumberField || field instanceof UUIDField) &&
-        propertyNames.contains(((Field)field).getName());
+           propertyNames.contains(((Field) field).getName());
   }
 
 }

@@ -6,6 +6,10 @@ import java.util.Set;
 
 public class ProtobufHelper {
 
+  public static final Set<String> NOT_ACCEPTED_IMPORTS = Set.of("google/protobuf/descriptor.proto", "google/protobuf/compiler/plugin.proto");
+
+  public static final Set<String> LABEL = Set.of("required", "optional");
+
   private static final Map<String, String> PROTOBUF_TYPES = new HashMap<>();
 
   public ProtobufHelper() {
@@ -29,10 +33,6 @@ public class ProtobufHelper {
   public String translateType(String type) {
     return PROTOBUF_TYPES.getOrDefault(type, null);
   }
-
-  public static final Set<String> NOT_ACCEPTED_IMPORTS = Set.of("google/protobuf/descriptor.proto", "google/protobuf/compiler/plugin.proto");
-
-  public static final Set<String> LABEL = Set.of("required", "optional");
 
   public boolean isValidType(String type) {
     return PROTOBUF_TYPES.containsKey(type);

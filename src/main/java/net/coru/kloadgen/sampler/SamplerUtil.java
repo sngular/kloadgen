@@ -200,107 +200,6 @@ public final class SamplerUtil {
     return props;
   }
 
-  public static Arguments getCommonConsumerDefaultParameters() {
-    Arguments defaultParameters = new Arguments();
-    defaultParameters.addArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS_CONFIG_DEFAULT);
-    defaultParameters.addArgument(ZOOKEEPER_SERVERS, ZOOKEEPER_SERVERS_DEFAULT);
-    defaultParameters.addArgument(KAFKA_TOPIC_CONFIG, KAFKA_TOPIC_CONFIG_DEFAULT);
-    defaultParameters.addArgument(ConsumerConfig.SEND_BUFFER_CONFIG, SEND_BUFFER_CONFIG_DEFAULT);
-    defaultParameters.addArgument(ConsumerConfig.RECEIVE_BUFFER_CONFIG, RECEIVE_BUFFER_CONFIG_DEFAULT);
-    defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG, "earliest");
-    defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
-    defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
-    defaultParameters.addArgument(KERBEROS_ENABLED, FLAG_NO);
-    defaultParameters.addArgument(JAAS_ENABLED, FLAG_NO);
-    defaultParameters.addArgument(JAVA_SEC_AUTH_LOGIN_CONFIG, JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT);
-    defaultParameters.addArgument(JAVA_SEC_KRB5_CONFIG, JAVA_SEC_KRB5_CONFIG_DEFAULT);
-    defaultParameters.addArgument(SASL_KERBEROS_SERVICE_NAME, SASL_KERBEROS_SERVICE_NAME_DEFAULT);
-    defaultParameters.addArgument(SASL_MECHANISM, SASL_MECHANISM_DEFAULT);
-    defaultParameters.addArgument(VALUE_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
-    defaultParameters.addArgument(KEY_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
-    defaultParameters.addArgument(SSL_ENABLED, FLAG_NO);
-    defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
-    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "<Keystore Location>");
-    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "<Keystore Password>");
-    defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "<Truststore Location>");
-    defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "<Truststore Password>");
-
-    defaultParameters.addArgument(ConsumerConfig.CLIENT_ID_CONFIG, "");
-    defaultParameters.addArgument(ConsumerConfig.SECURITY_PROVIDERS_CONFIG, "");
-    defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
-    defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-                                  SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
-    defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
-    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
-    defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
-    defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
-    defaultParameters.addArgument(TIMEOUT_MILLIS, "5000");
-    defaultParameters.addArgument(MAX_POLL_INTERVAL_MS_CONFIG, "3000");
-    defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
-    return defaultParameters;
-  }
-
-  public static void setupConsumerDeserializerProperties(JavaSamplerContext context, Properties props) {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                Objects.requireNonNullElse(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY),
-                                           "org.apache.kafka.common.serialization.StringDeserializer"));
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                Objects.requireNonNullElse(context.getJMeterVariables().get(VALUE_DESERIALIZER_CLASS_PROPERTY),
-                                           "org.apache.kafka.common.serialization.StringDeserializer"));
-  }
-
-  public static void setupConsumerSchemaRegistryProperties(JavaSamplerContext context, Properties props) {
-    if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
-      props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
-    }
-    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_NAME_STRATEGY))) {
-      props.put(VALUE_NAME_STRATEGY, context.getJMeterVariables().get(VALUE_NAME_STRATEGY));
-    }
-    if (Objects.nonNull(context.getJMeterVariables().get(KEY_NAME_STRATEGY))) {
-      props.put(KEY_NAME_STRATEGY, context.getJMeterVariables().get(KEY_NAME_STRATEGY));
-    }
-  }
-
-  public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
-    Properties props = new Properties();
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-
-    setupConsumerDeserializerProperties(context, props);
-    setupConsumerSchemaRegistryProperties(context, props);
-
-    props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
-    props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
-    props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
-    props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
-
-    props.put(KAFKA_TOPIC_CONFIG, context.getParameter(KAFKA_TOPIC_CONFIG));
-    props.put(GROUP_ID_CONFIG, context.getParameter(GROUP_ID_CONFIG));
-
-    props.put(CLIENT_ID_CONFIG, context.getParameter(CLIENT_ID_CONFIG));
-
-    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_SCHEMA))) {
-      props.put(VALUE_SCHEMA, context.getJMeterVariables().get(VALUE_SCHEMA));
-    }
-    if (Objects.nonNull(context.getJMeterVariables().get(KEY_SCHEMA))) {
-      props.put(KEY_SCHEMA, context.getJMeterVariables().get(KEY_SCHEMA));
-    }
-
-    props.put(AUTO_OFFSET_RESET_CONFIG, context.getParameter(AUTO_OFFSET_RESET_CONFIG));
-    props.put(TIMEOUT_MILLIS, context.getParameter(TIMEOUT_MILLIS));
-
-    Iterator<String> parameters = context.getParameterNamesIterator();
-    parameters.forEachRemaining(parameter -> {
-      if (parameter.startsWith("_")) {
-        props.put(parameter.substring(1), context.getParameter(parameter));
-      }
-    });
-
-    verifySecurity(context, props);
-
-    props.put(MAX_POLL_INTERVAL_MS_CONFIG, context.getParameter(MAX_POLL_INTERVAL_MS_CONFIG));
-    return props;
-  }
-
   private static void verifySecurity(JavaSamplerContext context, Properties props) {
     if (FLAG_YES.equalsIgnoreCase(context.getParameter(SSL_ENABLED))) {
 
@@ -344,6 +243,111 @@ public final class SamplerUtil {
 
     if (!StringUtils.isBlank(context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG).trim())) {
       props.put(SslConfigs.SSL_PROVIDER_CONFIG, context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG));
+    }
+  }
+
+  private static String propertyOrDefault(String property, String defaultToken, String valueToSent) {
+    return defaultToken.equals(property) ? valueToSent : property;
+  }
+
+  public static Arguments getCommonConsumerDefaultParameters() {
+    Arguments defaultParameters = new Arguments();
+    defaultParameters.addArgument(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS_CONFIG_DEFAULT);
+    defaultParameters.addArgument(ZOOKEEPER_SERVERS, ZOOKEEPER_SERVERS_DEFAULT);
+    defaultParameters.addArgument(KAFKA_TOPIC_CONFIG, KAFKA_TOPIC_CONFIG_DEFAULT);
+    defaultParameters.addArgument(ConsumerConfig.SEND_BUFFER_CONFIG, SEND_BUFFER_CONFIG_DEFAULT);
+    defaultParameters.addArgument(ConsumerConfig.RECEIVE_BUFFER_CONFIG, RECEIVE_BUFFER_CONFIG_DEFAULT);
+    defaultParameters.addArgument(AUTO_OFFSET_RESET_CONFIG, "earliest");
+    defaultParameters.addArgument(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.PLAINTEXT.name);
+    defaultParameters.addArgument(MESSAGE_KEY_KEY_TYPE, MSG_KEY_TYPE);
+    defaultParameters.addArgument(KERBEROS_ENABLED, FLAG_NO);
+    defaultParameters.addArgument(JAAS_ENABLED, FLAG_NO);
+    defaultParameters.addArgument(JAVA_SEC_AUTH_LOGIN_CONFIG, JAVA_SEC_AUTH_LOGIN_CONFIG_DEFAULT);
+    defaultParameters.addArgument(JAVA_SEC_KRB5_CONFIG, JAVA_SEC_KRB5_CONFIG_DEFAULT);
+    defaultParameters.addArgument(SASL_KERBEROS_SERVICE_NAME, SASL_KERBEROS_SERVICE_NAME_DEFAULT);
+    defaultParameters.addArgument(SASL_MECHANISM, SASL_MECHANISM_DEFAULT);
+    defaultParameters.addArgument(VALUE_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
+    defaultParameters.addArgument(KEY_NAME_STRATEGY, TOPIC_NAME_STRATEGY);
+    defaultParameters.addArgument(SSL_ENABLED, FLAG_NO);
+    defaultParameters.addArgument(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "<Key Password>");
+    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "<Keystore Location>");
+    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "<Keystore Password>");
+    defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "<Truststore Location>");
+    defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "<Truststore Password>");
+
+    defaultParameters.addArgument(ConsumerConfig.CLIENT_ID_CONFIG, "");
+    defaultParameters.addArgument(ConsumerConfig.SECURITY_PROVIDERS_CONFIG, "");
+    defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
+    defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
+                                  SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
+    defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
+    defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
+    defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
+    defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
+    defaultParameters.addArgument(TIMEOUT_MILLIS, "5000");
+    defaultParameters.addArgument(MAX_POLL_INTERVAL_MS_CONFIG, "3000");
+    defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
+    return defaultParameters;
+  }
+
+  public static Properties setupCommonConsumerProperties(JavaSamplerContext context) {
+    Properties props = new Properties();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
+
+    setupConsumerDeserializerProperties(context, props);
+    setupConsumerSchemaRegistryProperties(context, props);
+
+    props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
+    props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
+    props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
+    props.put(SASL_MECHANISM, context.getParameter(SASL_MECHANISM));
+
+    props.put(KAFKA_TOPIC_CONFIG, context.getParameter(KAFKA_TOPIC_CONFIG));
+    props.put(GROUP_ID_CONFIG, context.getParameter(GROUP_ID_CONFIG));
+
+    props.put(CLIENT_ID_CONFIG, context.getParameter(CLIENT_ID_CONFIG));
+
+    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_SCHEMA))) {
+      props.put(VALUE_SCHEMA, context.getJMeterVariables().get(VALUE_SCHEMA));
+    }
+    if (Objects.nonNull(context.getJMeterVariables().get(KEY_SCHEMA))) {
+      props.put(KEY_SCHEMA, context.getJMeterVariables().get(KEY_SCHEMA));
+    }
+
+    props.put(AUTO_OFFSET_RESET_CONFIG, context.getParameter(AUTO_OFFSET_RESET_CONFIG));
+    props.put(TIMEOUT_MILLIS, context.getParameter(TIMEOUT_MILLIS));
+
+    Iterator<String> parameters = context.getParameterNamesIterator();
+    parameters.forEachRemaining(parameter -> {
+      if (parameter.startsWith("_")) {
+        props.put(parameter.substring(1), context.getParameter(parameter));
+      }
+    });
+
+    verifySecurity(context, props);
+
+    props.put(MAX_POLL_INTERVAL_MS_CONFIG, context.getParameter(MAX_POLL_INTERVAL_MS_CONFIG));
+    return props;
+  }
+
+  public static void setupConsumerDeserializerProperties(JavaSamplerContext context, Properties props) {
+    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+              Objects.requireNonNullElse(context.getJMeterVariables().get(KEY_DESERIALIZER_CLASS_PROPERTY),
+                                         "org.apache.kafka.common.serialization.StringDeserializer"));
+    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+              Objects.requireNonNullElse(context.getJMeterVariables().get(VALUE_DESERIALIZER_CLASS_PROPERTY),
+                                         "org.apache.kafka.common.serialization.StringDeserializer"));
+  }
+
+  public static void setupConsumerSchemaRegistryProperties(JavaSamplerContext context, Properties props) {
+    if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
+      props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
+    }
+    if (Objects.nonNull(context.getJMeterVariables().get(VALUE_NAME_STRATEGY))) {
+      props.put(VALUE_NAME_STRATEGY, context.getJMeterVariables().get(VALUE_NAME_STRATEGY));
+    }
+    if (Objects.nonNull(context.getJMeterVariables().get(KEY_NAME_STRATEGY))) {
+      props.put(KEY_NAME_STRATEGY, context.getJMeterVariables().get(KEY_NAME_STRATEGY));
     }
   }
 
@@ -483,9 +487,5 @@ public final class SamplerUtil {
       producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
     }
     return headersSB;
-  }
-
-  private static String propertyOrDefault(String property, String defaultToken, String valueToSent) {
-    return defaultToken.equals(property) ? valueToSent : property;
   }
 }

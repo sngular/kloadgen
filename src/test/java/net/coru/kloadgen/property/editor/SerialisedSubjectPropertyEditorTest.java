@@ -35,6 +35,29 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class SerialisedSubjectPropertyEditorTest {
 
+  private static Stream<Arguments> parametersForMergeValue() {
+    return Stream.of(Arguments.of(new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>()),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldName", "fieldType"))),
+                                  new ArrayList<FieldValueMapping>(),
+                                  new ArrayList<FieldValueMapping>()),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldName", "fieldType"))),
+                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
+                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldSchema1", "int"))),
+                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
+                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
+                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
+                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
+                     Arguments.of(new ArrayList<>(
+                                      Collections.singletonList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"))),
+                                  Arrays.asList(new FieldValueMapping("fieldSchema1", "string"), new FieldValueMapping("field2", "string")),
+                                  Arrays.asList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"), new FieldValueMapping("field2", "string"))),
+                     Arguments.of("value",
+                                  Collections.singletonList(new FieldValueMapping("field2", "string")),
+                                  Collections.singletonList(new FieldValueMapping("field2", "string"))));
+  }
+
   @BeforeEach
   public void setUp() {
     File file = new File("src/test/resources");
@@ -51,7 +74,7 @@ class SerialisedSubjectPropertyEditorTest {
 
     ValueSerializedConfigElement
         valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
-              AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
+                                                                        AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     valueSerializedConfigElement.iterationStart(null);
 
@@ -59,30 +82,6 @@ class SerialisedSubjectPropertyEditorTest {
     assertThat(variables.getObject(VALUE_SUBJECT_NAME)).isNotNull();
     assertThat(variables.getObject(VALUE_SCHEMA_PROPERTIES)).isNotNull();
 
-  }
-
-
-  private static Stream<Arguments> parametersForMergeValue() {
-    return Stream.of(Arguments.of(new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>()),
-        Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldName", "fieldType"))),
-            new ArrayList<FieldValueMapping>(),
-            new ArrayList<FieldValueMapping>()),
-        Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldName", "fieldType"))),
-            Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
-            Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
-        Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldSchema1", "int"))),
-            Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
-            Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
-        Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
-            Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
-            Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
-        Arguments.of(new ArrayList<>(
-                Collections.singletonList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"))),
-            Arrays.asList(new FieldValueMapping("fieldSchema1", "string"), new FieldValueMapping("field2", "string")),
-            Arrays.asList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"), new FieldValueMapping("field2", "string"))),
-        Arguments.of("value",
-            Collections.singletonList(new FieldValueMapping("field2", "string")),
-            Collections.singletonList(new FieldValueMapping("field2", "string"))));
   }
 
   @ParameterizedTest
@@ -95,7 +94,6 @@ class SerialisedSubjectPropertyEditorTest {
     assertThat(result).isEqualTo(expected);
 
   }
-
 
 
 }

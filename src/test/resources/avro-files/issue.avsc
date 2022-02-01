@@ -3,7 +3,7 @@
   "name": "OptionalArrayEvent",
   "namespace": "net.coru",
   "fields": [
-   {
+    {
       "name": "mainObject",
       "type": {
         "type": "record",
@@ -14,8 +14,8 @@
             "name": "arrayValue",
             "type": {
               "type": "array",
-              "items": 
-                [{
+              "items": [
+                {
                   "name": "TestingRecord",
                   "type": "record",
                   "fields": [
@@ -41,7 +41,8 @@
                       ]
                     }
                   ]
-                }, "null"
+                },
+                "null"
               ],
               "default": null
             }

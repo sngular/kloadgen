@@ -21,11 +21,6 @@ public class MapField extends Field {
 
   Field mapType;
 
-  @Override
-  public List<Field> getProperties() {
-    return Collections.singletonList(this);
-  }
-
   @Builder(toBuilder = true)
   public MapField(String name, Field mapType) {
     super(name, "map");
@@ -35,5 +30,10 @@ public class MapField extends Field {
   @Override
   public Field cloneField(String fieldName) {
     return this.toBuilder().name(fieldName).build();
+  }
+
+  @Override
+  public List<Field> getProperties() {
+    return Collections.singletonList(this);
   }
 }

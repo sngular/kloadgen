@@ -21,9 +21,9 @@ message Person {
   }
 
   enum PhoneTypes{
-      MOBILE = 0;
-      HOME = 1;
-      WORK = 2;
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
   }
 
 }

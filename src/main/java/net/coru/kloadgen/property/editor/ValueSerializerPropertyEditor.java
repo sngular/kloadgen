@@ -23,7 +23,6 @@ import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
@@ -31,22 +30,11 @@ import org.reflections.util.FilterBuilder;
 @Slf4j
 public class ValueSerializerPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private JComboBox<String> serializerComboBox;
-
   private final JPanel panel = new JPanel();
 
+  private JComboBox<String> serializerComboBox;
+
   public ValueSerializerPropertyEditor() {
-    this.init();
-  }
-
-  public ValueSerializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public ValueSerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
     this.init();
   }
 
@@ -70,6 +58,17 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
 
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
 
+  }
+
+  public ValueSerializerPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public ValueSerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
   }
 
   @Override

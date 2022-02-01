@@ -19,15 +19,14 @@ import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.JsonSchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
-import org.apache.avro.Schema;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
 public class JsonLoadGenerator extends AbstractLoadGenerator implements BaseLoadGenerator {
 
-  private Pair<SchemaMetadata, ParsedSchema> metadata;
-
   private final JsonSchemaProcessor jsonSchemaProcessor;
+
+  private Pair<SchemaMetadata, ParsedSchema> metadata;
 
   public JsonLoadGenerator() {
     jsonSchemaProcessor = new JsonSchemaProcessor();

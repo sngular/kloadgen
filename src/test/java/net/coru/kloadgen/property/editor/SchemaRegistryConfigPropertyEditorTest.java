@@ -12,7 +12,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.util.Locale;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -24,9 +23,6 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import ru.lanwen.wiremock.ext.WiremockResolver;
-import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
 class SchemaRegistryConfigPropertyEditorTest {
 

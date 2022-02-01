@@ -23,7 +23,6 @@ import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
@@ -36,17 +35,6 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
   private JComboBox<String> deserializerComboBox;
 
   public KeyDeserializerPropertyEditor() {
-    this.init();
-  }
-
-  public KeyDeserializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public KeyDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
     this.init();
   }
 
@@ -67,6 +55,17 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
                                                                       .includePackage("io.confluent.kafka.serializers"))
                                                   .setScanners(SubTypes));
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections);
+  }
+
+  public KeyDeserializerPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public KeyDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
   }
 
   @Override

@@ -39,6 +39,8 @@ public class FieldValueMapping extends AbstractTestElement {
 
   public static final String FIELD_VALUES_LIST = "fieldValuesList";
 
+  private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+
   private String fieldName;
 
   private String fieldType;
@@ -48,8 +50,6 @@ public class FieldValueMapping extends AbstractTestElement {
   private String fieldValueList;
 
   private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
-
-  private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
   public FieldValueMapping(String fieldName, String fieldType) {
     this.setFieldName(fieldName);

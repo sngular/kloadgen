@@ -27,11 +27,6 @@ public class StringField extends Field {
 
   String format;
 
-  @Override
-  public List<Field> getProperties() {
-    return Collections.singletonList(this);
-  }
-
   @Builder(toBuilder = true)
   public StringField(String name, String regex, int minLength, int maxlength, String format) {
     super(name, "string");
@@ -44,5 +39,10 @@ public class StringField extends Field {
   @Override
   public Field cloneField(String fieldName) {
     return this.toBuilder().name(fieldName).build();
+  }
+
+  @Override
+  public List<Field> getProperties() {
+    return Collections.singletonList(this);
   }
 }

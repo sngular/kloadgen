@@ -46,8 +46,14 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   private transient KafkaConsumer<Object, Object> consumer;
 
   @Override
-  public Arguments getDefaultParameters() {
-    return SamplerUtil.getCommonConsumerDefaultParameters();
+  public void setupTest(JavaSamplerContext context) {
+
+    Properties props = properties(context);
+    String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
+    consumer = new KafkaConsumer<>(props);
+    configGenericData();
+
+    consumer.subscribe(Collections.singletonList(topic));
   }
 
   public Properties properties(JavaSamplerContext context) {
@@ -58,10 +64,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     timeout = Long.parseLong(props.getProperty("timeout.millis"));
     log.debug("Populated properties: {}", props);
     return props;
-  }
-
-  protected Logger logger() {
-    return KafkaConsumerSampler.log;
   }
 
   private void configGenericData() {
@@ -79,14 +81,15 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   }
 
   @Override
-  public void setupTest(JavaSamplerContext context) {
+  public void teardownTest(JavaSamplerContext context) {
+    if (Objects.nonNull(consumer)) {
+      consumer.close();
+    }
+  }
 
-    Properties props = properties(context);
-    String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
-    consumer = new KafkaConsumer<>(props);
-    configGenericData();
-
-    consumer.subscribe(Collections.singletonList(topic));
+  @Override
+  public Arguments getDefaultParameters() {
+    return SamplerUtil.getCommonConsumerDefaultParameters();
   }
 
   @Override
@@ -124,11 +127,6 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     return sampleResult;
   }
 
-  private String prettify(ConsumerRecord<Object, Object> consumerRecord) {
-    return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key() +
-           ", value: " + consumerRecord.value().toString() + " }}";
-  }
-
   private void fillSampleResult(SampleResult sampleResult, String responseData, boolean successful) {
     if (Objects.nonNull(sampleResult)) {
       sampleResult.setResponseData(responseData, StandardCharsets.UTF_8.name());
@@ -137,11 +135,13 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     }
   }
 
-  @Override
-  public void teardownTest(JavaSamplerContext context) {
-    if (Objects.nonNull(consumer)) {
-      consumer.close();
-    }
+  private String prettify(ConsumerRecord<Object, Object> consumerRecord) {
+    return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key() +
+           ", value: " + consumerRecord.value().toString() + " }}";
+  }
+
+  protected Logger logger() {
+    return KafkaConsumerSampler.log;
   }
 
 }

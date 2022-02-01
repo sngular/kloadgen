@@ -41,8 +41,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class JSONSchemaParser implements SchemaParser {
 
-  private static final Set<String> cyclingSet = new HashSet<>();
-
   public static final String REQUIRED = "required";
 
   public static final String PROPERTIES = "properties";
@@ -54,6 +52,8 @@ public class JSONSchemaParser implements SchemaParser {
   public static final String ALL_OF = "allOf";
 
   public static final String ONE_OF = "oneOf";
+
+  private static final Set<String> cyclingSet = new HashSet<>();
 
   private final ObjectMapper mapper = new ObjectMapper();
 

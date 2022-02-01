@@ -23,11 +23,6 @@ public class UUIDField extends Field {
 
   String format;
 
-  @Override
-  public List<Field> getProperties() {
-    return Collections.singletonList(this);
-  }
-
   @Builder(toBuilder = true)
   public UUIDField(String name, String regex, String format) {
     super(name, "uuid");
@@ -38,5 +33,10 @@ public class UUIDField extends Field {
   @Override
   public Field cloneField(String fieldName) {
     return this.toBuilder().name(fieldName).build();
+  }
+
+  @Override
+  public List<Field> getProperties() {
+    return Collections.singletonList(this);
   }
 }

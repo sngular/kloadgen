@@ -74,6 +74,15 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     this.init();
   }
 
+  private void init() {
+    panel.setLayout(new BorderLayout());
+
+    panel.add(schemaRegistryUrl);
+
+    panel.add(testSchemaRepoBtn, BorderLayout.AFTER_LINE_ENDS);
+    this.testSchemaRepoBtn.addActionListener(this);
+  }
+
   public SchemaRegistryConfigPropertyEditor(Object source) {
     super(source);
     this.init();
@@ -86,54 +95,12 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     this.init();
   }
 
-  private void init() {
-    panel.setLayout(new BorderLayout());
-
-    panel.add(schemaRegistryUrl);
-
-    panel.add(testSchemaRepoBtn, BorderLayout.AFTER_LINE_ENDS);
-    this.testSchemaRepoBtn.addActionListener(this);
-  }
-
-  @Override
-  public String getAsText() {
-    return checkPropertyOrVariable(this.schemaRegistryUrl.getText());
-  }
-
-  @Override
-  public Component getCustomEditor() {
-    return this.panel;
-  }
-
-  @Override
-  public void setAsText(String text) throws IllegalArgumentException {
-    throw new UnsupportedOperationException("Operation not Supported:" + text);
-  }
-
-  @SneakyThrows
-  @Override
-  public void setValue(Object value) {
-    if (Objects.nonNull(value)) {
-      this.schemaRegistryUrl.setText(value.toString());
-      propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
-    }
-
-  }
-
   public void setSchemaRegistryUrl(String schemaUrl) {
     this.schemaRegistryUrl.setText(schemaUrl);
     propertyDescriptor.setValue("schemaRegistryUrl", schemaUrl);
-  }
-
-  @SneakyThrows
-  @Override
-  public Object getValue() {
-    return schemaRegistryUrl.getText();
-  }
-
-  @Override
-  public boolean supportsCustomEditor() {
-    return true;
+  }  @Override
+  public String getAsText() {
+    return checkPropertyOrVariable(this.schemaRegistryUrl.getText());
   }
 
   @Override
@@ -205,16 +172,9 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
       log.error(e.getMessage(), e);
     }
 
-  }
-
-  @Override
-  public void setDescriptor(PropertyDescriptor propertyDescriptor) {
-    this.propertyDescriptor = propertyDescriptor;
-  }
-
-  @Override
-  public void clearGui() {
-    this.schemaRegistryUrl.setText("");
+  }  @Override
+  public Component getCustomEditor() {
+    return this.panel;
   }
 
   private Map<String, String> fromListToPropertiesMap(List<PropertyMapping> schemaProperties) {
@@ -223,6 +183,9 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
       propertiesMap.put(property.getPropertyName(), checkPropertyOrVariable(property.getPropertyValue()));
     }
     return propertiesMap;
+  }  @Override
+  public void setAsText(String text) throws IllegalArgumentException {
+    throw new UnsupportedOperationException("Operation not Supported:" + text);
   }
 
   private String checkPropertyOrVariable(String textToCheck) {
@@ -233,5 +196,42 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     } else {
       return textToCheck;
     }
+  }  @SneakyThrows
+  @Override
+  public void setValue(Object value) {
+    if (Objects.nonNull(value)) {
+      this.schemaRegistryUrl.setText(value.toString());
+      propertyDescriptor.setValue("schemaRegistryUrl", value.toString());
+    }
+
   }
+
+  @Override
+  public void setDescriptor(PropertyDescriptor propertyDescriptor) {
+    this.propertyDescriptor = propertyDescriptor;
+  }
+
+  @Override
+  public void clearGui() {
+    this.schemaRegistryUrl.setText("");
+  }  @SneakyThrows
+  @Override
+  public Object getValue() {
+    return schemaRegistryUrl.getText();
+  }
+
+  @Override
+  public boolean supportsCustomEditor() {
+    return true;
+  }
+
+
+
+
+
+
+
+
+
+
 }

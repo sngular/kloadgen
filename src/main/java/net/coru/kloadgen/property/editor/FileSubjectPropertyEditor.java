@@ -51,35 +51,23 @@ import org.apache.jmeter.util.JMeterUtils;
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private JComboBox<String> schemaTypeComboBox;
-
-  private JComboBox<String> subjectNameComboBox;
+  private static ParsedSchema parserSchema;
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
   private final JPanel panel = new JPanel();
 
-  private PropertyDescriptor propertyDescriptor;
-
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
-
-  private static ParsedSchema parserSchema;
 
   private final JButton openFileDialogButton = new JButton(JMeterUtils.getResString("file_visualizer_open"));
 
+  private JComboBox<String> schemaTypeComboBox;
+
+  private JComboBox<String> subjectNameComboBox;
+
+  private PropertyDescriptor propertyDescriptor;
+
   public FileSubjectPropertyEditor() {
-    this.init();
-  }
-
-  public FileSubjectPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public FileSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
     this.init();
   }
 
@@ -122,13 +110,16 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
+  public FileSubjectPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
 
-  public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
-    if (Objects.nonNull(selectedSchema)) {
-      return schemaExtractor.flatPropertiesList(selectedSchema);
-    }
-    return new ArrayList<>();
+  public FileSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.propertyDescriptor = propertyDescriptor;
+    this.init();
   }
 
   @Override
@@ -181,6 +172,15 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
+  public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
+
+  public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
+    if (Objects.nonNull(selectedSchema)) {
+      return schemaExtractor.flatPropertiesList(selectedSchema);
+    }
+    return new ArrayList<>();
+  }
+
   @Override
   public void clearGui() {
     // Not implementation required
@@ -191,7 +191,19 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     propertyDescriptor = descriptor;
   }
 
-  @Override
+  class ComboFiller implements FocusListener {
+
+    @Override
+    public void focusGained(FocusEvent e) {
+      String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
+      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+      // Override but not used. Implementation not needed.
+    }
+  }  @Override
   public String getAsText() {
     return Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
   }
@@ -225,18 +237,6 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     return true;
   }
 
-  class ComboFiller implements FocusListener {
 
-    @Override
-    public void focusGained(FocusEvent e) {
-      String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
-      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-      // Override but not used. Implementation not needed.
-    }
-  }
 
 }

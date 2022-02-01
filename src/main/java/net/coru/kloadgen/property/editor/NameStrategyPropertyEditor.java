@@ -23,29 +23,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
 @Slf4j
 public class NameStrategyPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private JComboBox<String> nameStrategyComboBox;
-
   private final JPanel panel = new JPanel();
 
+  private JComboBox<String> nameStrategyComboBox;
+
   public NameStrategyPropertyEditor() {
-    this.init();
-  }
-
-  public NameStrategyPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public NameStrategyPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
     this.init();
   }
 
@@ -63,6 +51,17 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
             .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
+  }
+
+  public NameStrategyPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public NameStrategyPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
   }
 
   @Override

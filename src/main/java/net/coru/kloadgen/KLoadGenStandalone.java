@@ -106,6 +106,16 @@ public class KLoadGenStandalone {
 
   }
 
+  private static Options createCLIOptions() {
+    Options options = new Options();
+    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
+    options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
+    options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
+    options.addOption(Option.builder("r").longOpt("reportOutput").hasArg().desc("Report Output Folder").build());
+    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("Jtl File where logs will be dump").build());
+    return options;
+  }
+
   private static ReportGenerator createCollector(HashTree testPlanTree, Path resultsFile) throws ConfigurationException {
     Summariser summariser = null;
     String summariserName = JMeterUtils.getPropDefault("summariser.name", "KLoagGenSummariser");//$NON-NLS-1$
@@ -118,15 +128,5 @@ public class KLoadGenStandalone {
     resultCollector.setFilename(resultsFile.toAbsolutePath().toString());
     testPlanTree.add(testPlanTree.getArray()[0], resultCollector);
     return new ReportGenerator(resultsFile.toAbsolutePath().toString(), resultCollector);
-  }
-
-  private static Options createCLIOptions() {
-    Options options = new Options();
-    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
-    options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
-    options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
-    options.addOption(Option.builder("r").longOpt("reportOutput").hasArg().desc("Report Output Folder").build());
-    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("Jtl File where logs will be dump").build());
-    return options;
   }
 }

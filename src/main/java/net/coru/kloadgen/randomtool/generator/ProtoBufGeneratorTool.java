@@ -31,15 +31,6 @@ public class ProtoBufGeneratorTool {
     return value;
   }
 
-  private Object getArrayEnumOrGenerate(Descriptors.EnumDescriptor descriptor, String fieldType, int arraySize, List<String> parameterList) {
-    List<Object> value = new ArrayList<>(arraySize);
-    for (int i = 0; i < arraySize; i++) {
-      value.add(getEnumOrGenerate(descriptor, fieldType, parameterList));
-    }
-
-    return value;
-  }
-
   private Object getEnumOrGenerate(Descriptors.EnumDescriptor descriptor, String fieldType, List<String> parameterList) {
     Object value = null;
 
@@ -54,6 +45,15 @@ public class ProtoBufGeneratorTool {
         value = enumValues.get(RandomUtils.nextInt(0, enumValues.size()));
       }
     }
+    return value;
+  }
+
+  private Object getArrayEnumOrGenerate(Descriptors.EnumDescriptor descriptor, String fieldType, int arraySize, List<String> parameterList) {
+    List<Object> value = new ArrayList<>(arraySize);
+    for (int i = 0; i < arraySize; i++) {
+      value.add(getEnumOrGenerate(descriptor, fieldType, parameterList));
+    }
+
     return value;
   }
 

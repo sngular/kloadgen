@@ -30,20 +30,25 @@ import org.junit.jupiter.params.provider.MethodSource;
 class RandomObjectTest {
 
   private static final LocalDateTime FIXED_TIMESTAMP = LocalDateTime.of(2019, 12, 6, 10, 15, 30);
-  private static final LocalDate FIXED_DATE = LocalDate.of(2019,12,6);
-  private static final LocalTime FIXED_TIME = LocalTime.of(10,15,30);
+
+  private static final LocalDate FIXED_DATE = LocalDate.of(2019, 12, 6);
+
+  private static final LocalTime FIXED_TIME = LocalTime.of(10, 15, 30);
+
   private static final String TIMESTAMP_STRING = "2019-12-06T10:15:30";
+
   private static final String DATE_STRING = "2019-12-06";
+
   private static final String TIME_STRING = "10:15:30";
 
-  private static long getMillisFromDate (LocalDateTime localDateTime){
+  private static long getMillisFromDate(LocalDateTime localDateTime) {
     return TimeUnit.MILLISECONDS.convert(localDateTime.toEpochSecond(ZoneOffset.UTC), TimeUnit.SECONDS) +
-            TimeUnit.MILLISECONDS.convert(localDateTime.getNano(), TimeUnit.NANOSECONDS);
+           TimeUnit.MILLISECONDS.convert(localDateTime.getNano(), TimeUnit.NANOSECONDS);
   }
 
-  private static long getMicrosFromDate (LocalDateTime localDateTime){
+  private static long getMicrosFromDate(LocalDateTime localDateTime) {
     return TimeUnit.MICROSECONDS.convert(localDateTime.toEpochSecond(ZoneOffset.UTC), TimeUnit.SECONDS) +
-            TimeUnit.MICROSECONDS.convert(localDateTime.getNano(), TimeUnit.NANOSECONDS);
+           TimeUnit.MICROSECONDS.convert(localDateTime.getNano(), TimeUnit.NANOSECONDS);
   }
 
   private static Stream<Arguments> parametersForGenerateSingleRandomValue() {
@@ -67,30 +72,30 @@ class RandomObjectTest {
     );
   }
 
-  private static Stream<Arguments> parametersForGenerateSingleLogicalTypeRandomValue(){
-    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
+  private static Stream<Arguments> parametersForGenerateSingleLogicalTypeRandomValue() {
+    Map<ConstraintTypeEnum, String> decimalConstrains = new HashMap<>();
     decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
     decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
     return Stream.of(
-            Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), FIXED_DATE, Collections.emptyMap()),
-            Arguments.of("int_time-millis", 1, Collections.singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
-            Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
-            Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-            Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-            Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP, Collections.emptyMap()),
-            Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP, Collections.emptyMap()),
-            Arguments.of(
-                    "string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
-                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"), Collections.emptyMap()
-            ),
-            Arguments.of("bytes_decimal", 1, Collections.singletonList("55.555"), new BigDecimal("55.555"),
-                    decimalConstrains),
-            Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new BigDecimal("55.555"),
-                    decimalConstrains)
+        Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), FIXED_DATE, Collections.emptyMap()),
+        Arguments.of("int_time-millis", 1, Collections.singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
+        Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
+        Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING),
+                     FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING),
+                     FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING),
+                     FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING),
+                     FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of(
+            "string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
+            UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"), Collections.emptyMap()
+        ),
+        Arguments.of("bytes_decimal", 1, Collections.singletonList("55.555"), new BigDecimal("55.555"),
+                     decimalConstrains),
+        Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new BigDecimal("55.555"),
+                     decimalConstrains)
 
     );
   }
@@ -109,17 +114,19 @@ class RandomObjectTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSingleLogicalTypeRandomValue")
-  void generateSingleLogicalTypeRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList,
-                                            Object expected, Map<ConstraintTypeEnum,String> constrains) {
+  void generateSingleLogicalTypeRandomValue(
+      String fieldType, Integer valueLength, List<String> fieldValuesList,
+      Object expected, Map<ConstraintTypeEnum, String> constrains) {
     assertThat(new RandomObject().generateRandom(fieldType, valueLength, fieldValuesList, constrains)).isEqualTo(expected);
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context,
+  void testGenerateSequenceValueForField(
+      String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context,
       Object expectedTyped, Object expectedStored) {
 
     assertThat(new RandomObject().generateSeq(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedTyped);
-    assertThat(context).containsEntry(fieldName,expectedStored);
+    assertThat(context).containsEntry(fieldName, expectedStored);
   }
 }

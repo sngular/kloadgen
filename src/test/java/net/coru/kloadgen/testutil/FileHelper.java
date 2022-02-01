@@ -9,6 +9,7 @@ package net.coru.kloadgen.testutil;
 import java.io.File;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.IOUtils;
 
 public final class FileHelper {

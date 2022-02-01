@@ -118,6 +118,16 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     return parsedSchema;
   }
 
+  private static String readLineByLine(String filePath) throws IOException {
+    StringBuilder contentBuilder = new StringBuilder();
+
+    try (Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
+      stream.forEach(s -> contentBuilder.append(s).append("\n"));
+    }
+
+    return contentBuilder.toString();
+  }
+
   private List<FieldValueMapping> processSchema(ParsedSchema schema) {
     if ("AVRO".equalsIgnoreCase(schema.schemaType())) {
       return avroExtractor.processSchema(((AvroSchema) schema).rawSchema());
@@ -128,16 +138,6 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     } else {
       throw new KLoadGenException("Unsupported Schema Type");
     }
-  }
-
-  private static String readLineByLine(String filePath) throws IOException {
-    StringBuilder contentBuilder = new StringBuilder();
-
-    try (Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
-      stream.forEach(s -> contentBuilder.append(s).append("\n"));
-    }
-
-    return contentBuilder.toString();
   }
 
 

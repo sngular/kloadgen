@@ -25,11 +25,6 @@ public class EnumField extends Field {
   @Singular
   List<String> enumValues;
 
-  @Override
-  public List<Field> getProperties() {
-    return Collections.singletonList(this);
-  }
-
   @Builder(toBuilder = true)
   public EnumField(String name, String defaultValue, List<String> enumValues) {
     super(name, "enum");
@@ -40,5 +35,10 @@ public class EnumField extends Field {
   @Override
   public Field cloneField(String fieldName) {
     return this.toBuilder().name(fieldName).build();
+  }
+
+  @Override
+  public List<Field> getProperties() {
+    return Collections.singletonList(this);
   }
 }

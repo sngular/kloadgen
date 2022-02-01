@@ -42,16 +42,6 @@ public class AvroDeserializer implements Deserializer<Object> {
     this.isKey = isKey;
   }
 
-  private ByteBuffer getByteBuffer(byte[] payload) {
-    ByteBuffer buffer = ByteBuffer.wrap(payload);
-    if (buffer.get() != MAGIC_BYTE) {
-      throw new SerializationException("Unknown magic byte!");
-    } else {
-      buffer.position(buffer.position() + ID_SIZE);
-      return buffer;
-    }
-  }
-
   @Override
   public Object deserialize(String topic, byte[] data) {
 
@@ -88,6 +78,16 @@ public class AvroDeserializer implements Deserializer<Object> {
   @Override
   public Object deserialize(String topic, Headers headers, byte[] data) {
     return deserialize(topic, data);
+  }
+
+  private ByteBuffer getByteBuffer(byte[] payload) {
+    ByteBuffer buffer = ByteBuffer.wrap(payload);
+    if (buffer.get() != MAGIC_BYTE) {
+      throw new SerializationException("Unknown magic byte!");
+    } else {
+      buffer.position(buffer.position() + ID_SIZE);
+      return buffer;
+    }
   }
 
   @Override

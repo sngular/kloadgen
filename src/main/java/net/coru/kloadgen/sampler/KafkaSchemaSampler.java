@@ -78,20 +78,6 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
 
   private transient Properties props;
 
-  private void configGenericData() {
-    GenericData genericData = GenericData.get();
-
-    genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimeMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
-    genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
-    genericData.addLogicalTypeConversion(new Conversions.UUIDConversion());
-  }
-
   @Override
   public void setupTest(JavaSamplerContext context) {
     props = properties(context);
@@ -121,17 +107,38 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     }
   }
 
-  @Override
-  public Arguments getDefaultParameters() {
-    return SamplerUtil.getCommonDefaultParameters();
-  }
-
   protected Properties properties(JavaSamplerContext context) {
     Properties commonProps = SamplerUtil.setupCommonProperties(context);
     if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
       commonProps.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
     }
     return commonProps;
+  }
+
+  private void configGenericData() {
+    GenericData genericData = GenericData.get();
+
+    genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimeMicrosConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
+    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
+    genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
+    genericData.addLogicalTypeConversion(new Conversions.UUIDConversion());
+  }
+
+  @Override
+  public void teardownTest(JavaSamplerContext context) {
+    if (Objects.nonNull(producer)) {
+      producer.close();
+    }
+  }
+
+  @Override
+  public Arguments getDefaultParameters() {
+    return SamplerUtil.getCommonDefaultParameters();
   }
 
   @SneakyThrows
@@ -175,21 +182,13 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     return sampleResult;
   }
 
-  private Boolean enrichedValueFlag() {
-    return SERIALIZER_SET.contains(props.get(VALUE_SERIALIZER_CLASS_CONFIG).toString());
-  }
-
-  private Boolean enrichedKeyFlag() {
-    return SERIALIZER_SET.contains(props.get(KEY_SERIALIZER_CLASS_CONFIG).toString());
-  }
-
-  private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord, SampleResult sampleResult) {
-    if (Objects.isNull(producerRecord.key())) {
-      sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
-    } else {
-      sampleResult.setSamplerData(String.format("key: %s, payload: %s", producerRecord.key().toString(),
-                                                producerRecord.value().toString()));
+  private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
+    List<HeaderMapping> headerMappingList = new ArrayList<>();
+    Object headers = jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
+    if (null != headers) {
+      headerMappingList.addAll((List) headers);
     }
+    return headerMappingList;
   }
 
   private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal, boolean keyFlag, boolean valueFlag) {
@@ -208,8 +207,21 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     return producerRecord;
   }
 
-  private Object getObject(EnrichedRecord messageVal, boolean valueFlag) {
-    return valueFlag ? messageVal : messageVal.getGenericRecord();
+  private Boolean enrichedKeyFlag() {
+    return SERIALIZER_SET.contains(props.get(KEY_SERIALIZER_CLASS_CONFIG).toString());
+  }
+
+  private Boolean enrichedValueFlag() {
+    return SERIALIZER_SET.contains(props.get(VALUE_SERIALIZER_CLASS_CONFIG).toString());
+  }
+
+  private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord, SampleResult sampleResult) {
+    if (Objects.isNull(producerRecord.key())) {
+      sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
+    } else {
+      sampleResult.setSamplerData(String.format("key: %s, payload: %s", producerRecord.key().toString(),
+                                                producerRecord.value().toString()));
+    }
   }
 
   private void fillSampleResult(SampleResult sampleResult, String respondeData, boolean successful) {
@@ -218,24 +230,12 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     sampleResult.sampleEnd();
   }
 
-  @Override
-  public void teardownTest(JavaSamplerContext context) {
-    if (Objects.nonNull(producer)) {
-      producer.close();
-    }
-  }
-
-  private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
-    List<HeaderMapping> headerMappingList = new ArrayList<>();
-    Object headers = jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
-    if (null != headers) {
-      headerMappingList.addAll((List) headers);
-    }
-    return headerMappingList;
-  }
-
   private String prettyPrint(RecordMetadata recordMetadata) {
     String template = "Topic: %s, partition: %s, offset: %s";
     return String.format(template, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
+  }
+
+  private Object getObject(EnrichedRecord messageVal, boolean valueFlag) {
+    return valueFlag ? messageVal : messageVal.getGenericRecord();
   }
 }

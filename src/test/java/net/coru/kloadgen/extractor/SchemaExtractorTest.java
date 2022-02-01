@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 class SchemaExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
+
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
   @BeforeEach
@@ -47,13 +48,13 @@ class SchemaExtractorTest {
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
-    @Test
-    @DisplayName("Should configure Schema Extractor Properties")
-    void testFlatPropertiesListSimpleRecord(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
+  @Test
+  @DisplayName("Should configure Schema Extractor Properties")
+  void testFlatPropertiesListSimpleRecord(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
 
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList(
         "avroSubject"
@@ -67,12 +68,12 @@ class SchemaExtractorTest {
         );
   }
 
-    @Test
-    @DisplayName("Should extract Array of Record")
-    void testFlatPropertiesListArrayRecord(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+  @Test
+  @DisplayName("Should extract Array of Record")
+  void testFlatPropertiesListArrayRecord(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList("users");
 
@@ -84,12 +85,12 @@ class SchemaExtractorTest {
         );
   }
 
-    @Test
-    @DisplayName("Should extract Map of Record")
-    void testFlatPropertiesListMapArray(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
-        JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+  @Test
+  @DisplayName("Should extract Map of Record")
+  void testFlatPropertiesListMapArray(WireMockRuntimeInfo wmRuntimeInfo) throws IOException, RestClientException {
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList("arrayMap");
 
@@ -160,32 +161,32 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Should extract Logical times")
-  void testFlatPropertiesLogicalTypes () throws IOException {
+  void testFlatPropertiesLogicalTypes() throws IOException {
 
     File testFile = fileHelper.getFile("/avro-files/testLogicalTypes.avsc");
 
     List<FieldValueMapping> fieldValueMappingList =
-      schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
+        schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
 
     assertThat(fieldValueMappingList)
-      .hasSize(10)
-      .containsExactlyInAnyOrder(
-          new FieldValueMapping("Date", "int_date"),
-          new FieldValueMapping("TimeMillis", "int_time-millis"),
-          new FieldValueMapping("TimeMicros", "long_time-micros"),
-          new FieldValueMapping("TimestampMillis", "long_timestamp-millis"),
-          new FieldValueMapping("TimestampMicros", "long_timestamp-micros"),
-          new FieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
-          new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
-          new FieldValueMapping("UUID","string_uuid"),
-          new FieldValueMapping("Decimal","bytes_decimal"),
-          new FieldValueMapping("DecimalFixed","fixed_decimal")
-      );
+        .hasSize(10)
+        .containsExactlyInAnyOrder(
+            new FieldValueMapping("Date", "int_date"),
+            new FieldValueMapping("TimeMillis", "int_time-millis"),
+            new FieldValueMapping("TimeMicros", "long_time-micros"),
+            new FieldValueMapping("TimestampMillis", "long_timestamp-millis"),
+            new FieldValueMapping("TimestampMicros", "long_timestamp-micros"),
+            new FieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
+            new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
+            new FieldValueMapping("UUID", "string_uuid"),
+            new FieldValueMapping("Decimal", "bytes_decimal"),
+            new FieldValueMapping("DecimalFixed", "fixed_decimal")
+        );
   }
 
   @Test
   @DisplayName("Should extract Optional Array")
-  void testFlatPropertiesOptionalArray () throws IOException {
+  void testFlatPropertiesOptionalArray() throws IOException {
 
     File testFile = fileHelper.getFile("/avro-files/issue.avsc");
 

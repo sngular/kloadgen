@@ -47,18 +47,27 @@ import org.apache.jmeter.threads.JMeterContextService;
 @Slf4j
 public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private JComboBox<String> subjectNameComboBox;
-
   private final JButton loadClassBtn = new JButton("Load Subject");
 
   private final JPanel panel = new JPanel();
 
-  private PropertyDescriptor propertyDescriptor;
-
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
+
+  private JComboBox<String> subjectNameComboBox;
+
+  private PropertyDescriptor propertyDescriptor;
 
   public SerialisedSubjectPropertyEditor() {
     this.init();
+  }
+
+  private void init() {
+    subjectNameComboBox = new JComboBox<>();
+    panel.setLayout(new BorderLayout());
+    panel.add(subjectNameComboBox);
+    panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
+    AutoCompletion.enable(subjectNameComboBox);
+    this.loadClassBtn.addActionListener(this);
   }
 
   public SerialisedSubjectPropertyEditor(Object source) {
@@ -71,15 +80,6 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     super(propertyDescriptor);
     this.propertyDescriptor = propertyDescriptor;
     this.init();
-  }
-
-  private void init() {
-    subjectNameComboBox = new JComboBox<>();
-    panel.setLayout(new BorderLayout());
-    panel.add(subjectNameComboBox);
-    panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
-    AutoCompletion.enable(subjectNameComboBox);
-    this.loadClassBtn.addActionListener(this);
   }
 
   @Override

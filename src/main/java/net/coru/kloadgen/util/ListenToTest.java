@@ -26,14 +26,11 @@ public class ListenToTest implements TestStateListener, Remoteable {
   }
 
   @Override
-  public void testEnded(String host) {
-    final long now = System.currentTimeMillis();
-    log.info("Finished remote host: {} ({})", host, now);
-  }
-
-  @Override
-  public void testEnded() {
-    endTest();
+  public void testStarted() {
+    if (log.isInfoEnabled()) {
+      final long now = System.currentTimeMillis();
+      log.info("{} ({})", JMeterUtils.getResString("running_test"), now);
+    }
   }
 
   @Override
@@ -43,11 +40,14 @@ public class ListenToTest implements TestStateListener, Remoteable {
   }
 
   @Override
-  public void testStarted() {
-    if (log.isInfoEnabled()) {
-      final long now = System.currentTimeMillis();
-      log.info("{} ({})", JMeterUtils.getResString("running_test"), now);
-    }
+  public void testEnded() {
+    endTest();
+  }
+
+  @Override
+  public void testEnded(String host) {
+    final long now = System.currentTimeMillis();
+    log.info("Finished remote host: {} ({})", host, now);
   }
 
   private void endTest() {

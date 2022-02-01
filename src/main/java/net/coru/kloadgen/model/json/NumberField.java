@@ -32,11 +32,6 @@ public class NumberField extends Field {
 
   Number multipleOf;
 
-  @Override
-  public List<Field> getProperties() {
-    return Collections.singletonList(this);
-  }
-
   @Builder(toBuilder = true)
   public NumberField(
       String name, String defaultValue, Number minimum, Number maximum, Number exclusiveMinimum,
@@ -48,11 +43,6 @@ public class NumberField extends Field {
     this.exclusiveMinimum = exclusiveMinimum;
     this.exclusiveMaximum = exclusiveMaximum;
     this.multipleOf = multipleOf;
-  }
-
-  @Override
-  public Field cloneField(String fieldName) {
-    return this.toBuilder().name(fieldName).build();
   }
 
   @Override
@@ -80,6 +70,16 @@ public class NumberField extends Field {
   @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), defaultValue, minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf);
+  }
+
+  @Override
+  public Field cloneField(String fieldName) {
+    return this.toBuilder().name(fieldName).build();
+  }
+
+  @Override
+  public List<Field> getProperties() {
+    return Collections.singletonList(this);
   }
 
   public boolean compare(Number a, Number b) {

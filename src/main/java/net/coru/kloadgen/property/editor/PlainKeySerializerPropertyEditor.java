@@ -23,7 +23,6 @@ import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
@@ -36,17 +35,6 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
   private JComboBox<String> serializerComboBox;
 
   public PlainKeySerializerPropertyEditor() {
-    this.init();
-  }
-
-  public PlainKeySerializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public PlainKeySerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
     this.init();
   }
 
@@ -66,6 +54,17 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
                                                 .includePackage("org.apache.kafka.common.serialization"))
                             .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
+  }
+
+  public PlainKeySerializerPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public PlainKeySerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
   }
 
   @Override

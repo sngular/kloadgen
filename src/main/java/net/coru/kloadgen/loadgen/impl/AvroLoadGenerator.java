@@ -52,5 +52,4 @@ public class AvroLoadGenerator extends AbstractLoadGenerator implements BaseLoad
   }
 
 
-
 }

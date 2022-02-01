@@ -26,6 +26,12 @@ public class AutoCompletion extends PlainDocument {
 
   private final JComboBox<String> comboBox;
 
+  private final boolean hidePopupOnFocusLoss;
+
+  private final transient KeyListener editorKeyListener;
+
+  private final transient FocusListener editorFocusListener;
+
   private transient ComboBoxModel<String> model;
 
   private JTextComponent editor;
@@ -34,15 +40,9 @@ public class AutoCompletion extends PlainDocument {
   // subsequent calls to remove/insertString should be ignored
   private boolean selecting = false;
 
-  private final boolean hidePopupOnFocusLoss;
-
   private boolean hitBackspace = false;
 
   private boolean hitBackspaceOnSelection;
-
-  private final transient KeyListener editorKeyListener;
-
-  private final transient FocusListener editorFocusListener;
 
   public AutoCompletion(final JComboBox<String> comboBox) {
     this.comboBox = comboBox;
@@ -106,11 +106,9 @@ public class AutoCompletion extends PlainDocument {
     highlightCompletedText(0);
   }
 
-  public static void enable(JComboBox<String> comboBox) {
-    // has to be editable
-    comboBox.setEditable(true);
-    // change the editor's document
-    new AutoCompletion(comboBox);
+  private void highlightCompletedText(int start) {
+    editor.setCaretPosition(getLength());
+    editor.moveCaretPosition(start);
   }
 
   private void configureEditor(ComboBoxEditor newEditor) {
@@ -125,6 +123,40 @@ public class AutoCompletion extends PlainDocument {
       editor.addFocusListener(editorFocusListener);
       editor.setDocument(this);
     }
+  }
+
+  private void setText(String text) {
+    try {
+      // remove all text and insert the completed string
+      super.remove(0, getLength());
+      super.insertString(0, text, null);
+    } catch (BadLocationException e) {
+      throw new KLoadGenException(e.toString());
+    }
+  }
+
+  public static void main(String[] args) {
+    javax.swing.SwingUtilities.invokeLater(() -> createAndShowGUI());
+  }
+
+  private static void createAndShowGUI() {
+    // the combo box (add/modify items if you like to)
+    final JComboBox<String> comboBox = new JComboBox<>(new String[]{"Ester", "Jordi", "Jordina", "Jorge", "Sergi"});
+    enable(comboBox);
+
+    // create and show a window containing the combo box
+    final JFrame frame = new JFrame();
+    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    frame.getContentPane().add(comboBox);
+    frame.pack();
+    frame.setVisible(true);
+  }
+
+  public static void enable(JComboBox<String> comboBox) {
+    // has to be editable
+    comboBox.setEditable(true);
+    // change the editor's document
+    new AutoCompletion(comboBox);
   }
 
   public void remove(int offs, int len) throws BadLocationException {
@@ -175,27 +207,6 @@ public class AutoCompletion extends PlainDocument {
     highlightCompletedText(editOffs + str.length());
   }
 
-  private void setText(String text) {
-    try {
-      // remove all text and insert the completed string
-      super.remove(0, getLength());
-      super.insertString(0, text, null);
-    } catch (BadLocationException e) {
-      throw new KLoadGenException(e.toString());
-    }
-  }
-
-  private void highlightCompletedText(int start) {
-    editor.setCaretPosition(getLength());
-    editor.moveCaretPosition(start);
-  }
-
-  private void setSelectedItem(Object item) {
-    selecting = true;
-    model.setSelectedItem(item);
-    selecting = false;
-  }
-
   private Object lookupItem(String pattern) {
     Object selectedItem = model.getSelectedItem();
     // only search for a different item if the currently selected does not match
@@ -215,26 +226,15 @@ public class AutoCompletion extends PlainDocument {
     return null;
   }
 
+  private void setSelectedItem(Object item) {
+    selecting = true;
+    model.setSelectedItem(item);
+    selecting = false;
+  }
+
   // checks if str1 starts with str2 - ignores case
   private boolean startsWithIgnoreCase(String str1, String str2) {
     return str1.toUpperCase().startsWith(str2.toUpperCase());
-  }
-
-  private static void createAndShowGUI() {
-    // the combo box (add/modify items if you like to)
-    final JComboBox<String> comboBox = new JComboBox<>(new String[]{"Ester", "Jordi", "Jordina", "Jorge", "Sergi"});
-    enable(comboBox);
-
-    // create and show a window containing the combo box
-    final JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    frame.getContentPane().add(comboBox);
-    frame.pack();
-    frame.setVisible(true);
-  }
-
-  public static void main(String[] args) {
-    javax.swing.SwingUtilities.invokeLater(() -> createAndShowGUI());
   }
 }
 

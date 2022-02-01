@@ -47,6 +47,126 @@ public class RandomObject {
       .parseStrict()
       .toFormatter();
 
+  private static LocalDate getDateValueOrRandom(List<String> fieldValueList) {
+    LocalDate resultDate;
+    int minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
+    int maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();
+    long randomDay = minDay + RandomUtils.nextInt(0, maxDay - minDay);
+    if (fieldValueList.isEmpty()) {
+      resultDate = LocalDate.ofEpochDay(randomDay);
+    } else {
+      resultDate = LocalDate.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+    }
+    return resultDate;
+  }
+
+  private static LocalTime getRandomLocalTime(List<String> fieldValueList) {
+    long nanoMin = 0;
+    long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
+    if (fieldValueList.isEmpty()) {
+      return LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
+    } else {
+      return LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+    }
+  }
+
+  private static LocalTime getTimeMillisValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalTime(fieldValueList);
+  }
+
+  private static LocalTime getTimeMicrosValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalTime(fieldValueList);
+  }
+
+  private static boolean isValidDate(String dateStr) {
+    try {
+      LocalDateTime.parse(dateStr, RandomObject.dateTimeFormatter);
+    } catch (DateTimeParseException e) {
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean isValidLongDate(String dateStr) {
+    try {
+      Long.parseLong(dateStr);
+    } catch (NumberFormatException e) {
+      return false;
+    }
+    return true;
+  }
+
+  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList) {
+    long minDay = LocalDateTime.of(1900, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
+    long maxDay = LocalDateTime.of(2100, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
+    long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
+
+    if (fieldValueList.isEmpty()) {
+      return LocalDateTime.ofEpochSecond(randomSeconds, RandomUtils.nextInt(0, 1_000_000_000 - 1), ZoneOffset.UTC);
+    } else {
+      String str = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size()));
+      if (isValidDate(str)) {
+        return LocalDateTime.parse(str, dateTimeFormatter);
+      } else if (isValidLongDate(str)) {
+        long time = Long.parseLong(str);
+        return LocalDateTime.ofEpochSecond(time, RandomUtils.nextInt(0, 1_000_000_000 - 1), ZoneOffset.UTC);
+      } else {
+        throw new KLoadGenException("Enter a date with a valid format (uuuu-MM-dd'T'HH:mm:ss['Z']" +
+                                    " or long date), for example: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+      }
+    }
+  }
+
+  private static Instant getTimestampMillisValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
+  }
+
+  private static Instant getTimestampMicrosValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
+  }
+
+  private static LocalDateTime getLocalTimestampMillisValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList);
+  }
+
+  private static LocalDateTime getLocalTimestampMicrosValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList);
+  }
+
+  private static long randomNumberWithLength(int n) {
+    long min = (long) Math.pow(10, n - 1);
+    return RandomUtils.nextLong(min, min * 10);
+  }
+
+  private static BigDecimal getDecimalValueOrRandom(
+      List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
+    int scale;
+    int precision;
+
+    if (Objects.nonNull(constrains.get(ConstraintTypeEnum.PRECISION))) {
+      precision = Integer.parseInt(constrains.get(ConstraintTypeEnum.PRECISION));
+      scale = Objects.nonNull(constrains.get(ConstraintTypeEnum.SCALE)) ?
+          Integer.parseInt(constrains.get(ConstraintTypeEnum.SCALE)) : 0;
+
+      if (precision <= 0) {
+        throw new KLoadGenException("Decimal precision must be greater dan 0");
+      }
+      if (scale < 0 || scale > precision) {
+        throw new KLoadGenException("Scale must be zero or a positive integer less than or equal to the precision");
+      }
+
+      if (fieldValueList.isEmpty()) {
+        return BigDecimal.valueOf(randomNumberWithLength(precision), scale);
+      } else {
+        return new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      }
+
+    } else {
+      throw new KLoadGenException("Missing decimal precision");
+    }
+  }
+
   public boolean isTypeValid(String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
   }
@@ -57,6 +177,10 @@ public class RandomObject {
             fieldNameMap,
             seqObject) -> seqObject == null ? getSafeValue(fieldValueList) : ((Long) seqObject) + 1),
         fieldType);
+  }
+
+  private Long getSafeValue(List<String> fieldValueList) {
+    return fieldValueList.isEmpty() ? 1L : Long.parseLong(fieldValueList.get(0));
   }
 
   public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
@@ -179,10 +303,6 @@ public class RandomObject {
       this.getClass().getResourceAsStream(fieldType);
     }
     return null;
-  }
-
-  private Long getSafeValue(List<String> fieldValueList) {
-    return fieldValueList.isEmpty() ? 1L : Long.parseLong(fieldValueList.get(0));
   }
 
   private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
@@ -329,126 +449,6 @@ public class RandomObject {
       minimum = Long.parseLong(StringUtils.rightPad("1", valueLength, '0'));
     }
     return minimum;
-  }
-
-  private static LocalDate getDateValueOrRandom(List<String> fieldValueList) {
-    LocalDate resultDate;
-    int minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
-    int maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();
-    long randomDay = minDay + RandomUtils.nextInt(0, maxDay - minDay);
-    if (fieldValueList.isEmpty()) {
-      resultDate = LocalDate.ofEpochDay(randomDay);
-    } else {
-      resultDate = LocalDate.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
-    }
-    return resultDate;
-  }
-
-  private static LocalTime getRandomLocalTime(List<String> fieldValueList) {
-    long nanoMin = 0;
-    long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
-    if (fieldValueList.isEmpty()) {
-      return LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
-    } else {
-      return LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
-    }
-  }
-
-  private static LocalTime getTimeMillisValueOrRandom(List<String> fieldValueList) {
-    return getRandomLocalTime(fieldValueList);
-  }
-
-  private static LocalTime getTimeMicrosValueOrRandom(List<String> fieldValueList) {
-    return getRandomLocalTime(fieldValueList);
-  }
-
-  private static boolean isValidDate(String dateStr) {
-    try {
-      LocalDateTime.parse(dateStr, RandomObject.dateTimeFormatter);
-    } catch (DateTimeParseException e) {
-      return false;
-    }
-    return true;
-  }
-
-  private static boolean isValidLongDate(String dateStr) {
-    try {
-      Long.parseLong(dateStr);
-    } catch (NumberFormatException e) {
-      return false;
-    }
-    return true;
-  }
-
-  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList) {
-    long minDay = LocalDateTime.of(1900, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
-    long maxDay = LocalDateTime.of(2100, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
-    long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
-
-    if (fieldValueList.isEmpty()) {
-      return LocalDateTime.ofEpochSecond(randomSeconds, RandomUtils.nextInt(0, 1_000_000_000 - 1), ZoneOffset.UTC);
-    } else {
-      String str = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size()));
-      if (isValidDate(str)) {
-        return LocalDateTime.parse(str, dateTimeFormatter);
-      } else if (isValidLongDate(str)) {
-        long time = Long.parseLong(str);
-        return LocalDateTime.ofEpochSecond(time, RandomUtils.nextInt(0, 1_000_000_000 - 1), ZoneOffset.UTC);
-      } else {
-        throw new KLoadGenException("Enter a date with a valid format (uuuu-MM-dd'T'HH:mm:ss['Z']" +
-                                    " or long date), for example: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-      }
-    }
-  }
-
-  private static Instant getTimestampMillisValueOrRandom(List<String> fieldValueList) {
-    return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
-  }
-
-  private static Instant getTimestampMicrosValueOrRandom(List<String> fieldValueList) {
-    return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
-  }
-
-  private static LocalDateTime getLocalTimestampMillisValueOrRandom(List<String> fieldValueList) {
-    return getRandomLocalDateTime(fieldValueList);
-  }
-
-  private static LocalDateTime getLocalTimestampMicrosValueOrRandom(List<String> fieldValueList) {
-    return getRandomLocalDateTime(fieldValueList);
-  }
-
-  private static long randomNumberWithLength(int n) {
-    long min = (long) Math.pow(10, n - 1);
-    return RandomUtils.nextLong(min, min * 10);
-  }
-
-  private static BigDecimal getDecimalValueOrRandom(
-      List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
-    int scale;
-    int precision;
-
-    if (Objects.nonNull(constrains.get(ConstraintTypeEnum.PRECISION))) {
-      precision = Integer.parseInt(constrains.get(ConstraintTypeEnum.PRECISION));
-      scale = Objects.nonNull(constrains.get(ConstraintTypeEnum.SCALE)) ?
-          Integer.parseInt(constrains.get(ConstraintTypeEnum.SCALE)) : 0;
-
-      if (precision <= 0) {
-        throw new KLoadGenException("Decimal precision must be greater dan 0");
-      }
-      if (scale < 0 || scale > precision) {
-        throw new KLoadGenException("Scale must be zero or a positive integer less than or equal to the precision");
-      }
-
-      if (fieldValueList.isEmpty()) {
-        return BigDecimal.valueOf(randomNumberWithLength(precision), scale);
-      } else {
-        return new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
-      }
-
-    } else {
-      throw new KLoadGenException("Missing decimal precision");
-    }
   }
 
 }
