@@ -19,6 +19,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class ConsumerTest {
 
   @Test
+  @Disabled
   void testConsumer(KafkaHelper kafkaHelper) throws ExecutionException, InterruptedException {
     KafkaConsumerSampler consumerSampler;
 
