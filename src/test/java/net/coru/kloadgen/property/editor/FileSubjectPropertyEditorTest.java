@@ -17,9 +17,10 @@ import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class FileSubjectPropertyEditorTest {
+class FileSubjectPropertyEditorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
@@ -28,7 +29,8 @@ public class FileSubjectPropertyEditorTest {
   private final SchemaExtractor extractor = new SchemaExtractorImpl();
 
   @Test
-  public void extractEmbeddedAvroTest() throws IOException {
+  @DisplayName("File Subject Property Editor extract AVRO")
+  void extractEmbeddedAvroTest() throws IOException {
     File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
     ParsedSchema schema = extractor.schemaTypesList(testFile, "AVRO");
     List<FieldValueMapping> fieldValueMappingList = editor.getAttributeList(schema);
