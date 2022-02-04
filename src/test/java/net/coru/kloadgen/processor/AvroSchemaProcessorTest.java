@@ -13,8 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -37,10 +36,19 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.validation.constraints.NotNull;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL_FIELDS;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL_FIELDS;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL_FIELDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AvroSchemaProcessorTest {
@@ -342,47 +350,33 @@ class AvroSchemaProcessorTest {
         assertThat(result).hasSize(2).containsEntry("n", "1").containsEntry("t", "2");
     }
 
-    @Test
-    void testNullOnOptionalFields() throws IOException {
-        File testFile = fileHelper.getFile("/avro-files/testNullOnOptionalFields.avsc");
-        List<FieldValueMapping> fieldValueMappingList =
-                extractor.flatPropertiesList(extractor.schemaTypesList(testFile, "AVRO"));
 
-        fieldValueMappingList.get(1).setFieldValuesList("null");
-        fieldValueMappingList.get(2).setFieldValuesList("null");
-        fieldValueMappingList.get(5).setFieldValuesList("null");
-        fieldValueMappingList.get(7).setFieldValuesList("null");
-        fieldValueMappingList.get(8).setFieldValuesList("null");
+    private static Stream<Object> parametersForTestNullOnOptionalField(){
+        return Stream.of(
+            Arguments.of(BASIC_STRING_ARRAY_MAP_NULL, BASIC_STRING_ARRAY_MAP_NULL_FIELDS),
+            Arguments.of(ARRAY_OPTIONAL_NULL, ARRAY_OPTIONAL_NULL_FIELDS),
+            Arguments.of(MAP_OPTIONAL_NULL, MAP_OPTIONAL_NULL_FIELDS)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("parametersForTestNullOnOptionalField")
+    void testNullOnOptionalField(Schema schema, List<FieldValueMapping> fieldValueMapping){
+        SchemaMetadata metadata = new SchemaMetadata(1, 1, "");
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(extractor.schemaTypesList(testFile, "AVRO"),
-                new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+        avroSchemaProcessor.processSchema(schema, metadata, fieldValueMapping);
         EnrichedRecord message = avroSchemaProcessor.next();
 
         assertThat(message)
-                .isNotNull()
-                .isInstanceOf(EnrichedRecord.class)
-                .extracting(EnrichedRecord::getGenericRecord)
-                .isNotNull();
+            .isNotNull()
+            .isInstanceOf(EnrichedRecord.class)
+            .extracting(EnrichedRecord::getGenericRecord)
+            .isNotNull();
 
         GenericRecord record = (GenericRecord) message.getGenericRecord();
-        assertThat(record.get("name")).isNotNull();
-        assertThat(record.get("favorite_number")).isNull();
-        assertThat(record.get("favorite_color")).isNull();
-        assertThat(record.get("emails")).isNotNull();
-        assertThat(record.get("phones")).isNotNull();
-        assertThat(record.get("friends")).isNull();
-        assertThat(record.get("favorite_cars")).isNotNull();
+        assertThat(record.get(0)).isNotNull();
+        assertThat(record.get(1)).isNull();
 
-        List<GenericRecord> result = (List) ((GenericRecord) message.getGenericRecord()).get("favorite_cars");
-        assertThat(result).allMatch(getGenericRecordPredicate());
     }
-
-    @NotNull
-    private Predicate<GenericRecord> getGenericRecordPredicate() {
-        return genericRecord -> Objects.nonNull(genericRecord.get("brand")) &&
-                Objects.isNull(genericRecord.get("power")) &&
-                Objects.isNull(genericRecord.get("parts"));
-    }
-
 }

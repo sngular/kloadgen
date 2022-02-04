@@ -50,8 +50,7 @@ public class JsonSchemaProcessor {
       while (!fieldExpMappingsQueue.isEmpty()) {
         String fieldName = getCleanMethodName(fieldValueMapping, "");
 
-        String currentName = fieldName;
-        if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(currentName))
+        if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
                 && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()){
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
@@ -66,7 +65,7 @@ public class JsonSchemaProcessor {
         }
          generatedProperties++;
 
-        Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName);
+        //Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName);
 
         if (!fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")
         && (!cleanUpPath(fieldValueMapping, "").contains(".") ||
@@ -136,7 +135,7 @@ public class JsonSchemaProcessor {
     return entity;
   }
 
-  private boolean checkIfObject(FieldValueMapping field, String fieldName){
+  private boolean checkIfObjectOptional(FieldValueMapping field, String fieldName){
     if (fieldName != null){
       return !field.getRequired() && field.getFieldValuesList().contains("null")
               && (!fieldName.contains(".") ||
@@ -157,14 +156,14 @@ public class JsonSchemaProcessor {
     }
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
 
-    int propertiesCount = 0;
-    int elapsedPropertiesCount = 0;
+    int generatedProperties = 0;
+    int elapsedProperties = 0;
 
     while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
-      propertiesCount++;
-      if (checkIfObject(fieldValueMapping, cleanFieldName)){
-        elapsedPropertiesCount++;
+      generatedProperties++;
+      if (checkIfObjectOptional(fieldValueMapping, cleanFieldName)){
+        elapsedProperties++;
 
         FieldValueMapping actualField = fieldExpMappingsQueue.peek();
         fieldExpMappingsQueue.remove();
@@ -173,7 +172,7 @@ public class JsonSchemaProcessor {
         if (!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
                 && actualField.getParentRequired()
                 && fieldExpMappingsQueue.peek() != null
-                && propertiesCount == elapsedPropertiesCount){
+                && (generatedProperties == elapsedProperties && generatedProperties>0)){
           fieldValueMapping = actualField;
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();

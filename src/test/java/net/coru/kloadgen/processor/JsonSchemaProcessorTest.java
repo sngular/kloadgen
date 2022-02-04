@@ -1,10 +1,7 @@
 package net.coru.kloadgen.processor;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import net.coru.kloadgen.extractor.SchemaExtractor;
-import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -16,7 +13,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -25,9 +21,6 @@ import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JsonSchemaProcessorTest {
-
-    private final FileHelper fileHelper = new FileHelper();
-    private final SchemaExtractor extractor = new SchemaExtractorImpl();
 
     @BeforeEach
     public void setUp() {

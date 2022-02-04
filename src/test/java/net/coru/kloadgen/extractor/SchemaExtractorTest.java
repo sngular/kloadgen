@@ -85,8 +85,8 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("Users[].id", "long"),
-            new FieldValueMapping("Users[].name", "string")
+            new FieldValueMapping("Users[].id", "long", 0, ""),
+            new FieldValueMapping("Users[].name", "string", 0, "")
         );
   }
 
@@ -102,8 +102,8 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("name", "string"),
-            new FieldValueMapping("values[][:]", "string-map-array")
+            new FieldValueMapping("name", "string", 0, null, true, true),
+            new FieldValueMapping("values[][:]", "string-map-array", 0 ,"", true, true)
         );
   }
 
@@ -115,10 +115,10 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(4)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("fieldMySchema.testInt_id", "int"),
-            new FieldValueMapping("fieldMySchema.testLong", "long"),
-            new FieldValueMapping("fieldMySchema.fieldString", "string"),
-            new FieldValueMapping("timestamp", "long")
+            new FieldValueMapping("fieldMySchema.testInt_id", "int",0,""),
+            new FieldValueMapping("fieldMySchema.testLong", "long",0,""),
+            new FieldValueMapping("fieldMySchema.fieldString", "string",0,""),
+            new FieldValueMapping("timestamp", "long",0,null, true, true)
         );
   }
 
@@ -133,14 +133,14 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(8)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("mapOfString[:]", "string-map"),
-            new FieldValueMapping("arrayOfString[]", "string-array"),
-            new FieldValueMapping("arrayOfMap[][:]", "string-map-array"),
-            new FieldValueMapping("mapOfArray[:][]", "int-array-map"),
-            new FieldValueMapping("mapOfArrayOfRecord[:][].name", "string"),
-            new FieldValueMapping("mapOfArrayOfRecord[:][].age", "int"),
-            new FieldValueMapping("arrayOfMapOfRecord[][:].name", "string"),
-            new FieldValueMapping("arrayOfMapOfRecord[][:].age", "int")
+            new FieldValueMapping("mapOfString[:]", "string-map", 0, "", false, false),
+            new FieldValueMapping("arrayOfString[]", "string-array", 0, "", false, false),
+            new FieldValueMapping("arrayOfMap[][:]", "string-map-array", 0, "", false, false),
+            new FieldValueMapping("mapOfArray[:][]", "int-array-map", 0, "", false, false),
+            new FieldValueMapping("mapOfArrayOfRecord[:][].name", "string", 0, "", false, false),
+            new FieldValueMapping("mapOfArrayOfRecord[:][].age", "int", 0, "", true, false),
+            new FieldValueMapping("arrayOfMapOfRecord[][:].name", "string", 0, "", false, false),
+            new FieldValueMapping("arrayOfMapOfRecord[][:].age", "int", 0, "", true, false)
         );
   }
 
@@ -152,15 +152,15 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(9)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("theMap[:][].otherType.addTypeId", "string"),
-            new FieldValueMapping("theMap[:][].otherType.name", "string"),
-            new FieldValueMapping("theMap[:][].otherType.otherField", "string"),
-            new FieldValueMapping("theMap[:][].addAmount", "bytes_decimal"),
-            new FieldValueMapping("theMap[:][].addCode", "string"),
-            new FieldValueMapping("theMap[:][].metadataMap[:]", "string-map"),
-            new FieldValueMapping("theMap[:][].metadataArray[]", "string-array"),
-            new FieldValueMapping("theMap[:][].metadataMapMap[:][:]", "string-map-map"),
-            new FieldValueMapping("theMap[:][].metadataArrayArray[][]", "string-array-array")
+            new FieldValueMapping("theMap[:][].otherType.addTypeId", "string", 0, "", true, true),
+            new FieldValueMapping("theMap[:][].otherType.name", "string", 0, "", true, true),
+            new FieldValueMapping("theMap[:][].otherType.otherField", "string", 0, "", false, true),
+            new FieldValueMapping("theMap[:][].addAmount", "bytes_decimal", 0, "", true, true),
+            new FieldValueMapping("theMap[:][].addCode", "string", 0, "", false, true),
+            new FieldValueMapping("theMap[:][].metadataMap[:]", "string-map", 0, "", false, true),
+            new FieldValueMapping("theMap[:][].metadataArray[]", "string-array", 0, "", false, true),
+            new FieldValueMapping("theMap[:][].metadataMapMap[:][:]", "string-map-map", 0, "", true, true),
+            new FieldValueMapping("theMap[:][].metadataArrayArray[][]", "string-array-array", 0, "", true, true)
         );
   }
 
@@ -201,9 +201,9 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("mainObject.arrayValue[].optional1", "string"),
-            new FieldValueMapping("mainObject.arrayValue[].optional2", "string"),
-            new FieldValueMapping("mainObject.arrayValue[].optional3", "string")
+            new FieldValueMapping("mainObject.arrayValue[].optional1", "string", 0, "", false, true),
+            new FieldValueMapping("mainObject.arrayValue[].optional2", "string", 0, "", false, true),
+            new FieldValueMapping("mainObject.arrayValue[].optional3", "string", 0, "", false, true)
         );
   }
 

@@ -68,13 +68,34 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         GenericRecord entity = new GenericData.Record(schema);
         if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
             ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
+            ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExprMappings);
+            fieldExpMappingsQueueCopy.poll();
             FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+
+            int generatedProperties = 0;
+            int elapsedProperties = 0;
+
             while (!fieldExpMappingsQueue.isEmpty()) {
                 String cleanPath = cleanUpPath(fieldValueMapping, "");
                 String fieldName = getCleanMethodName(fieldValueMapping, "");
                 String fullFieldName = getFullMethodName(fieldValueMapping, "");
 
-                if (isOptionalField(schema.getField(fieldName)) && fieldValueMapping.getFieldValuesList().contains("null")){
+                if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
+                    && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()){
+                    fieldValueMapping.setRequired(true);
+                    List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+                    temporalFieldValueList.remove("null");
+                    fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+                    fieldExpMappingsQueueCopy.poll();
+                } else {
+                    generatedProperties = 0;
+                    elapsedProperties = 0;
+                    fieldExpMappingsQueueCopy.poll();
+                }
+                generatedProperties++;
+
+                if (isOptionalField(schema.getField(fieldName)) && !fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")){
+                    elapsedProperties++;
                     fieldExpMappingsQueue.remove();
                     fieldValueMapping = fieldExpMappingsQueue.peek();
                 } else {
@@ -259,6 +280,10 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             subEntity.getSchema();
         }
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+
+        int generatedProperties = 0;
+        int elapsedProperties = 0;
+
         while (!fieldExpMappingsQueue.isEmpty()
                 && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + rootFieldName + "$")
                 || fieldValueMapping.getFieldName().matches(rootFieldName + "\\..*")
@@ -268,9 +293,34 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, rootFieldName);
             String fullFieldName = getFullMethodName(fieldValueMapping, rootFieldName);
 
-            if (isOptionalField(subSchema.getField(fieldNameSubEntity)) && fieldValueMapping.getFieldValuesList().contains("null")){
-                fieldExpMappingsQueue.poll();
-                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            generatedProperties++;
+
+            if (((subSchema.getType().equals(RECORD) && isOptionalField(subSchema.getField(fieldNameSubEntity)))  ||
+                 (subSchema.getType().equals(ARRAY) && isOptionalField(subSchema.getField(fieldNameSubEntity))) ||
+                 (subSchema.getType().equals(MAP) && isOptionalField(subSchema.getValueType().getField(fieldNameSubEntity))))
+                && fieldValueMapping.getFieldValuesList().contains("null")){
+
+                elapsedProperties++;
+                FieldValueMapping actualField = fieldExpMappingsQueue.peek();
+                fieldExpMappingsQueue.remove();
+                FieldValueMapping nextField = fieldExpMappingsQueue.peek();
+
+                if (((fieldExpMappingsQueue.peek() != null && !Objects.requireNonNull(nextField).getFieldName().contains(rootFieldName))
+                    || fieldExpMappingsQueue.peek() == null)
+                    && actualField.getParentRequired()
+                    && (generatedProperties == elapsedProperties && generatedProperties>0)){
+
+                    fieldValueMapping = actualField;
+                    fieldValueMapping.setRequired(true);
+                    List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+                    temporalFieldValueList.remove("null");
+                    fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+                    if (fieldExpMappingsQueue.peek() == null){
+                        fieldExpMappingsQueue.add(fieldValueMapping);
+                    }
+                } else{
+                    fieldValueMapping = nextField;
+                }
             } else {
 
                 if (fullFieldName.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {

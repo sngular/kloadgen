@@ -298,11 +298,11 @@ public class JSONSchemaParser implements SchemaParser {
       result = buildField(fieldName, jsonNode, required);
     } else if (isCombine(jsonNode)) {
       if (Objects.nonNull(jsonNode.get(ANY_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ANY_OF, required);
+        result = chooseAnyOf(fieldName, jsonNode, ANY_OF);
       } else if (Objects.nonNull(jsonNode.get(ALL_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ALL_OF, required);
+        result = chooseAnyOf(fieldName, jsonNode, ALL_OF);
       } else {
-        result = chooseAnyOf(fieldName, jsonNode, ONE_OF, required);
+        result = chooseAnyOf(fieldName, jsonNode, ONE_OF);
       }
     } else if (hasProperties(jsonNode)){
       result = buildObjectField(fieldName, jsonNode, required);
@@ -411,10 +411,6 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field chooseAnyOf(String fieldName, JsonNode jsonNode, String type) {
-    return chooseAnyOf(fieldName, jsonNode, type, null);
-  }
-
-  private Field chooseAnyOf(String fieldName, JsonNode jsonNode, String type, Boolean required) {
     List<JsonNode> properties = IteratorUtils.toList(jsonNode.get(type).elements());
     int optionsNumber = properties.size();
     Field resultObject;
@@ -540,7 +536,6 @@ public class JSONSchemaParser implements SchemaParser {
     List<String> strRequired = new ArrayList<>();
     requiredList.elements().forEachRemaining((elm) -> strRequired.add(elm.textValue()));
 
-    //List<String> strRequired = jsonNode.findValuesAsText(REQUIRED);
     CollectionUtils.filter(strRequired, StringUtils::isNotEmpty);
     if (!isCombine(jsonNode)) {
       if (jsonNode.path(ADDITIONAL_PROPERTIES).isNull() || jsonNode.path(ADDITIONAL_PROPERTIES).isEmpty()){
@@ -560,11 +555,11 @@ public class JSONSchemaParser implements SchemaParser {
     } else {
       Field result;
       if (Objects.nonNull(jsonNode.get(ANY_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ANY_OF, required);
+        result = chooseAnyOf(fieldName, jsonNode, ANY_OF);
       } else if (Objects.nonNull(jsonNode.get(ALL_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ALL_OF, required);
+        result = chooseAnyOf(fieldName, jsonNode, ALL_OF);
       } else {
-        result = chooseAnyOf(fieldName, jsonNode, ONE_OF, required);
+        result = chooseAnyOf(fieldName, jsonNode, ONE_OF);
       }
       return result;
     }

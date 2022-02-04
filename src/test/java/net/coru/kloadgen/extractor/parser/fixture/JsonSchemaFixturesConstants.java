@@ -13,8 +13,6 @@ import net.coru.kloadgen.model.json.ObjectField;
 import net.coru.kloadgen.model.json.Schema;
 import net.coru.kloadgen.model.json.StringField;
 
-import java.util.Arrays;
-
 public class JsonSchemaFixturesConstants {
 
   public static final Schema SIMPLE_SCHEMA =
@@ -22,7 +20,7 @@ public class JsonSchemaFixturesConstants {
                 .id("https://example.com/person.schema.json")
                 .name("http://json-schema.org/draft-07/schema#")
                 .type("object")
-                .requiredFields(Arrays.asList("lastName", "age"))
+                .requiredFields(asList("lastName", "age"))
                 .property(StringField.builder().name("firstName").build())
                 .property(StringField.builder().name("lastName").build())
                 .property(IntegerField.builder().name("age").build())
@@ -33,7 +31,7 @@ public class JsonSchemaFixturesConstants {
                 .id("https://example.com/geographical-location.schema.json")
                 .name("http://json-schema.org/draft-07/schema#")
                 .type("object")
-                .requiredFields(Arrays.asList("latitude", "longitude"))
+                .requiredFields(asList("latitude", "longitude"))
                 .property(NumberField
                     .builder()
                     .name("latitude")
@@ -82,7 +80,7 @@ public class JsonSchemaFixturesConstants {
           .id("")
           .name("http://json-schema.org/draft-04/schema#")
           .type("object")
-              .requiredFields(Arrays.asList("_id", "userId", "storeId", "snapshotId", "addressId", "addressLine", "alias", "contactInformation", "countryCode", "geopoliticalSubdivisions", "_metadata", "_entity", "_class", "contactInformation.email", "contactInformation.firstName", "contactInformation.phones", "geopoliticalSubdivisions.level1", "_metadata.createdAt", "_metadata.createdBy", "_metadata.lastUpdatedAt", "_metadata.lastUpdatedBy", "_metadata.projectVersion", "_metadata.projectName", "_metadata.schema"))
+              .requiredFields(asList("_id", "userId", "storeId", "snapshotId", "addressId", "addressLine", "alias", "contactInformation", "countryCode", "geopoliticalSubdivisions", "_metadata", "_entity", "_class", "contactInformation.email", "contactInformation.firstName", "contactInformation.phones", "geopoliticalSubdivisions.level1", "_metadata.createdAt", "_metadata.createdBy", "_metadata.lastUpdatedAt", "_metadata.lastUpdatedBy", "_metadata.projectVersion", "_metadata.projectName", "_metadata.schema"))
           .property(StringField.builder().name("_id").build())
           .property(NumberField.builder().name("userId").minimum(1).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
           .property(NumberField.builder().name("storeId").minimum(0).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
@@ -105,12 +103,12 @@ public class JsonSchemaFixturesConstants {
                       .builder()
                       .property(StringField.builder().name("prefix").maxlength(3).minLength(2).build())
                       .property(StringField.builder().name("number").maxlength(6).build())
-                      .required(Arrays.asList("prefix", "number"))
+                      .required(asList("prefix", "number"))
                       .isFieldRequired(true)
                       .build())
                   .isFieldRequired(true)
                   .build())
-              .required(Arrays.asList("email", "firstName", "phones"))
+              .required(asList("email", "firstName", "phones"))
               .isFieldRequired(true)
               .build())
           .property(StringField.builder().name("countryCode").maxlength(2).minLength(2).regex("^[a-zA-Z]{2}$").build())
