@@ -49,10 +49,7 @@ public class AvroGeneratorTool {
     return randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
   }
 
-  public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer)seqObject) + 1) % fieldValueList.size());
-    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
-  }
+
 
 
   public Object generateObject(Field field, String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constrains) {
@@ -79,7 +76,7 @@ public class AvroGeneratorTool {
     } else if ("seq".equalsIgnoreCase(fieldType)) {
       if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
         fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
-        return generateSequenceForFieldValueList(fieldValuesList.get(0), fieldType, fieldValuesList, context);
+        return randomObject.generateSequenceForFieldValueList(fieldValuesList.get(0), fieldType, fieldValuesList, context);
       }else {
         value = randomObject.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
       }
@@ -155,7 +152,7 @@ public class AvroGeneratorTool {
       } else {
         if ('{'== parameterList.get(0).charAt(0)) {
           parameterList.set(0, parameterList.get(0).substring(1));
-          value = new GenericData.EnumSymbol(schema, generateSequenceForFieldValueList(parameterList.get(0),fieldType,parameterList,context));
+          value = new GenericData.EnumSymbol(schema, randomObject.generateSequenceForFieldValueList(parameterList.get(0),fieldType,parameterList,context));
         } else {
           value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
         }
