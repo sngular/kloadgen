@@ -68,50 +68,78 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         GenericRecord entity = new GenericData.Record(schema);
         if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
             ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
+            ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExprMappings);
+            fieldExpMappingsQueueCopy.poll();
             FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+
+            int generatedProperties = 0;
+            int elapsedProperties = 0;
+
             while (!fieldExpMappingsQueue.isEmpty()) {
                 String cleanPath = cleanUpPath(fieldValueMapping, "");
                 String fieldName = getCleanMethodName(fieldValueMapping, "");
                 String fullFieldName = getFullMethodName(fieldValueMapping, "");
-                if (fullFieldName.contains("][")) {
-                    if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfIsRecordMapArray(cleanPath)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfIsRecordArrayMap(cleanPath)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else {
-                        throw new KLoadGenException("Wrong configuration Map - Array");
-                    }
-                } else if (fullFieldName.endsWith("]")) {
-                    if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfArray(fieldValueMapping.getFieldType())) {
-                        fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfRecordArray(cleanPath)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, entity, fieldName);
-                    } else if (checkIfRecordMap(cleanPath)) {
-                        fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, entity, fieldName);
-                    } else {
-                        throw new KLoadGenException("Wrong configuration Map - Array");
-                    }
-                } else if (cleanPath.contains(".")) {
-                    entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
-                    fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+
+                if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
+                    && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()){
+                    fieldValueMapping.setRequired(true);
+                    List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+                    temporalFieldValueList.remove("null");
+                    fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+                    fieldExpMappingsQueueCopy.poll();
                 } else {
-                    entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
-                            avroGeneratorTool.generateObject(
-                                    entity.getSchema().getField(fieldName),
-                                    fieldValueMapping.getFieldType(),
-                                    fieldValueMapping.getValueLength(),
-                                    fieldValueMapping.getFieldValuesList(),
-                                    extractConstraints(schema.getField(fieldValueMapping.getFieldName()))
-                            )
-                    );
+                    generatedProperties = 0;
+                    elapsedProperties = 0;
+                    fieldExpMappingsQueueCopy.poll();
+                }
+                generatedProperties++;
+
+                if (isOptionalField(schema.getField(fieldName)) && !fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")){
+                    elapsedProperties++;
                     fieldExpMappingsQueue.remove();
                     fieldValueMapping = fieldExpMappingsQueue.peek();
+                } else {
+
+                    if (fullFieldName.contains("][")) {
+                        if (checkIfArrayMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
+                            fieldValueMapping = processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, entity, fieldName);
+                        } else if (checkIfMapArray(fieldValueMapping.getFieldType())) {
+                            fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, entity, fieldName);
+                        } else if (checkIfIsRecordMapArray(cleanPath)) {
+                            fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, entity, fieldName);
+                        } else if (checkIfIsRecordArrayMap(cleanPath)) {
+                            fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, entity, fieldName);
+                        } else {
+                            throw new KLoadGenException("Wrong configuration Map - Array");
+                        }
+                    } else if (fullFieldName.endsWith("]")) {
+                        if (checkIfMap(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
+                            fieldValueMapping = processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, entity, fieldName);
+                        } else if (checkIfArray(fieldValueMapping.getFieldType())) {
+                            fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, entity, fieldName);
+                        } else if (checkIfRecordArray(cleanPath)) {
+                            fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, entity, fieldName);
+                        } else if (checkIfRecordMap(cleanPath)) {
+                            fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, entity, fieldName);
+                        } else {
+                            throw new KLoadGenException("Wrong configuration Map - Array");
+                        }
+                    } else if (cleanPath.contains(".")) {
+                        entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
+                        fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+                    } else {
+                        entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
+                                avroGeneratorTool.generateObject(
+                                        entity.getSchema().getField(fieldName),
+                                        fieldValueMapping.getFieldType(),
+                                        fieldValueMapping.getValueLength(),
+                                        fieldValueMapping.getFieldValuesList(),
+                                        extractConstraints(schema.getField(fieldValueMapping.getFieldName()))
+                                )
+                        );
+                        fieldExpMappingsQueue.remove();
+                        fieldValueMapping = fieldExpMappingsQueue.peek();
+                    }
                 }
             }
         }
@@ -231,6 +259,13 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return realField;
     }
 
+    private Boolean isOptionalField(Field field){
+        if (UNION.equals(field.schema().getType())) {
+            return IteratorUtils.matchesAny(field.schema().getTypes().iterator(), type -> type.getType() == NULL);
+        }
+        return false;
+    }
+
     private GenericRecord createObject(final Schema subSchema, final String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
         Schema innerSchema = subSchema;
         if (subSchema.getType().equals(MAP)) {
@@ -245,6 +280,10 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             subEntity.getSchema();
         }
         FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+
+        int generatedProperties = 0;
+        int elapsedProperties = 0;
+
         while (!fieldExpMappingsQueue.isEmpty()
                 && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + rootFieldName + "$")
                 || fieldValueMapping.getFieldName().matches(rootFieldName + "\\..*")
@@ -253,46 +292,78 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             String cleanPath = cleanUpPath(fieldValueMapping, rootFieldName);
             String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, rootFieldName);
             String fullFieldName = getFullMethodName(fieldValueMapping, rootFieldName);
-            if (fullFieldName.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
-                if (checkIfMapArray(fieldValueMapping.getFieldType())) {
-                    processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
-                    String mapFieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, rootFieldName);
-                    processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
-                } else if (checkIfIsRecordMapArray(cleanPath)) {
-                    processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfIsRecordArrayMap(cleanPath)) {
-                    processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+
+            generatedProperties++;
+
+            if (((subSchema.getType().equals(RECORD) && isOptionalField(subSchema.getField(fieldNameSubEntity)))  ||
+                 (subSchema.getType().equals(ARRAY) && isOptionalField(subSchema.getField(fieldNameSubEntity))) ||
+                 (subSchema.getType().equals(MAP) && isOptionalField(subSchema.getValueType().getField(fieldNameSubEntity))))
+                && fieldValueMapping.getFieldValuesList().contains("null")){
+
+                elapsedProperties++;
+                FieldValueMapping actualField = fieldExpMappingsQueue.peek();
+                fieldExpMappingsQueue.remove();
+                FieldValueMapping nextField = fieldExpMappingsQueue.peek();
+
+                if (((fieldExpMappingsQueue.peek() != null && !Objects.requireNonNull(nextField).getFieldName().contains(rootFieldName))
+                    || fieldExpMappingsQueue.peek() == null)
+                    && actualField.getParentRequired()
+                    && (generatedProperties == elapsedProperties && generatedProperties>0)){
+
+                    fieldValueMapping = actualField;
+                    fieldValueMapping.setRequired(true);
+                    List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+                    temporalFieldValueList.remove("null");
+                    fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+                    if (fieldExpMappingsQueue.peek() == null){
+                        fieldExpMappingsQueue.add(fieldValueMapping);
+                    }
+                } else{
+                    fieldValueMapping = nextField;
                 }
-            } else if (fullFieldName.endsWith("]")) {
-                if (checkIfMap(fieldValueMapping.getFieldType())) {
-                    String mapFieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, rootFieldName);
-                    processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
-                } else if (checkIfArray(fieldValueMapping.getFieldType())) {
-                    processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfRecordMap(cleanPath)) {
-                    processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else if (checkIfRecordArray(cleanPath)) {
-                    processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
-                } else {
-                    throw new KLoadGenException("Wrong configuration Map - Array");
-                }
-            } else if (cleanPath.contains(".")) {
-                subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
-                        fieldNameSubEntity,
-                        fieldExpMappingsQueue));
             } else {
-                fieldExpMappingsQueue.poll();
-                subEntity.put(fieldNameSubEntity, avroGeneratorTool.generateObject(
-                                subEntity.getSchema().getField(fieldNameSubEntity),
-                                fieldValueMapping.getFieldType(),
-                                fieldValueMapping.getValueLength(),
-                                fieldValueMapping.getFieldValuesList(),
-                                extractConstraints(subEntity.getSchema().getField(fieldNameSubEntity))
-                        )
-                );
+
+                if (fullFieldName.contains("][") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")) {
+                    if (checkIfMapArray(fieldValueMapping.getFieldType())) {
+                        processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    } else if (checkIfArrayMap(fieldValueMapping.getFieldType())) {
+                        String mapFieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, rootFieldName);
+                        processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
+                    } else if (checkIfIsRecordMapArray(cleanPath)) {
+                        processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    } else if (checkIfIsRecordArrayMap(cleanPath)) {
+                        processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    }
+                } else if (fullFieldName.endsWith("]")) {
+                    if (checkIfMap(fieldValueMapping.getFieldType())) {
+                        String mapFieldNameSubEntity = getMapCleanMethodName(fieldValueMapping, rootFieldName);
+                        processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
+                    } else if (checkIfArray(fieldValueMapping.getFieldType())) {
+                        processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    } else if (checkIfRecordMap(cleanPath)) {
+                        processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    } else if (checkIfRecordArray(cleanPath)) {
+                        processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+                    } else {
+                        throw new KLoadGenException("Wrong configuration Map - Array");
+                    }
+                } else if (cleanPath.contains(".")) {
+                    subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
+                            fieldNameSubEntity,
+                            fieldExpMappingsQueue));
+                } else {
+                    fieldExpMappingsQueue.poll();
+                    subEntity.put(fieldNameSubEntity, avroGeneratorTool.generateObject(
+                                    subEntity.getSchema().getField(fieldNameSubEntity),
+                                    fieldValueMapping.getFieldType(),
+                                    fieldValueMapping.getValueLength(),
+                                    fieldValueMapping.getFieldValuesList(),
+                                    extractConstraints(subEntity.getSchema().getField(fieldNameSubEntity))
+                            )
+                    );
+                }
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
             }
-            fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
         }
         return subEntity;
     }

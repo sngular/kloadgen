@@ -46,6 +46,7 @@ public class RandomMap {
             case ValidTypeConstants.SHORT_MAP:
                 value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, mapSize, constrains);
                 break;
+            case ValidTypeConstants.NUMBER_MAP:
             case ValidTypeConstants.FLOAT_MAP:
                 value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, mapSize, constrains);
                 break;
