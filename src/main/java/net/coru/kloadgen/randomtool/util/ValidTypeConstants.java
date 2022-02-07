@@ -36,6 +36,8 @@ public class ValidTypeConstants {
 
   public static final String SHORT_MAP = "short-map";
 
+  public static final String NUMBER_MAP = "number-map";
+
   public static final String FLOAT_MAP = "float-map";
 
   public static final String STRING_MAP = "string-map";
@@ -46,6 +48,8 @@ public class ValidTypeConstants {
 
   // Object values
   public static final String FLOAT = "float";
+
+  public static final String NUMBER = "number";
 
   public static final String ARRAY = "array";
 

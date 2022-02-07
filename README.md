@@ -275,7 +275,50 @@ Example:
 
 #### Special types
 
-There are two special types, first, a mix of map and array, ( * )-map-array which will generate an array of maps. This special type have a way to specify the size of both collections. The size of the array will be placed in braces that do not have colon "[8]", the size of the map will be located to the left of the colon "[8:]" in the braces that have it. The resulting structure follows this pattern: ArrayOfMap[ArraySize][MapSize:]. Secondly, the other special type is the (*)-array-map which will generate a map of arrays, it follows this pattern: MapOfArray[MapSize:][ArraySize]. 
+There are two special types, first, a mix of map and array, ( * )-map-array which will generate an array of maps. This special type have a way to specify the size of both collections. The size of the array will be placed in braces that do not have colon "[8]", the size of the map will be located to the left of the colon "[8:]" in the braces that have it. The resulting structure follows this pattern: ArrayOfMap[ArraySize][MapSize:]. Secondly, the other special type is the (*)-array-map which will generate a map of arrays, it follows this pattern: MapOfArray[MapSize:][ArraySize].
+
+#### Null values
+
+KLoadGen supports the use of null values in FieldValueList for any optional field defined in a schema.
+
+This applies to any field defined as `"type": ["null", AnyType]`  in an AVRO schema, or any field not included in the `required` array in a Json schema, that **has `null` included** in the corresponding FieldValueList.
+
+This feature works with a simple field, a `string` for example, and also with further complex structures, as a `string` field inside a `record` field, with **only one exception**.
+
+In case you have a complex object, as a map, array or record, defined as **required** and **all of its children fields are optional**, there could be a conflict. If all the children fields receives `null` in their FieldValueList, all of them will be null, and since an object with all of its fields set to null is equivalent to a null object, this situation will be violating the **required** status of the outer object.
+
+To solve this, when this situation appears, the last child of the object will be generated as it would without receiving `null` in FieldValueList. 
+
+```
+O1-Not Required{
+    C1-Not Required,
+    C2-Not Required
+}
+```
+
+Using the above example, in the case of 'O1', if both of its children fields, 'C1' and 'C2' receives `null` in their FieldValuesList, the result will be `O1: null` because all the involved fields are not required.
+
+```
+O2-Required{
+    C3-Not Required
+    C4-Not Required
+}
+```
+ 
+Otherwise, in the case of 'O2', if 'C3' and 'C4' receives `null` it will **violate the required status** of 'O2'. In this situation, the **last child will be force generated**, as if it didn't received `null`, so the final result will be like `O2: {C3: null, C4: ramdonValue}`.
+
+```
+O3-Required{
+    C5-Not Required
+    O4-Not Required{
+        C6-Not Required
+        C7-Not Required
+    }
+}
+```
+
+This will work the same trough objects with more than one level, so the generated field will always be the last child of the last child on each level, in the last example `C7`. The result then will be like `O3: {C5: null, O4: {C6: null, C7: ramdonValue}}`.
+
 ## Special functions
 
 | Type | Details |  Returns |

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -35,8 +36,19 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL_FIELDS;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL_FIELDS;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL_FIELDS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AvroSchemaProcessorTest {
@@ -338,4 +350,33 @@ class AvroSchemaProcessorTest {
         assertThat(result).hasSize(2).containsEntry("n", "1").containsEntry("t", "2");
     }
 
+
+    private static Stream<Object> parametersForTestNullOnOptionalField(){
+        return Stream.of(
+            Arguments.of(BASIC_STRING_ARRAY_MAP_NULL, BASIC_STRING_ARRAY_MAP_NULL_FIELDS),
+            Arguments.of(ARRAY_OPTIONAL_NULL, ARRAY_OPTIONAL_NULL_FIELDS),
+            Arguments.of(MAP_OPTIONAL_NULL, MAP_OPTIONAL_NULL_FIELDS)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("parametersForTestNullOnOptionalField")
+    void testNullOnOptionalField(Schema schema, List<FieldValueMapping> fieldValueMapping){
+        SchemaMetadata metadata = new SchemaMetadata(1, 1, "");
+
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        avroSchemaProcessor.processSchema(schema, metadata, fieldValueMapping);
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message)
+            .isNotNull()
+            .isInstanceOf(EnrichedRecord.class)
+            .extracting(EnrichedRecord::getGenericRecord)
+            .isNotNull();
+
+        GenericRecord record = (GenericRecord) message.getGenericRecord();
+        assertThat(record.get(0)).isNotNull();
+        assertThat(record.get(1)).isNull();
+
+    }
 }

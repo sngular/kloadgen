@@ -9,10 +9,15 @@ import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.MULTIPLE_OF;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -40,6 +45,14 @@ public class JsonExtractor {
     List<FieldValueMapping> attributeList = new ArrayList<>();
 
     schema.getProperties().forEach(field -> attributeList.addAll(processField(field)));
+
+    Set<String> requiredFields = new HashSet<String>(schema.getRequiredFields());
+
+    for (FieldValueMapping field: attributeList){
+      if (!field.getFieldName().contains("[]")){
+        field.setRequired(requiredFields.contains(field.getFieldName()));
+      }
+    }
     return attributeList;
   }
 
@@ -66,7 +79,7 @@ public class JsonExtractor {
   private List<FieldValueMapping> processField(Field innerField) {
     List<FieldValueMapping> completeFieldList = new ArrayList<>();
     if (innerField instanceof ObjectField) {
-      processRecordFieldList(innerField.getName(), ".", extractInternalFields((ObjectField)innerField), completeFieldList);
+      processRecordFieldList(innerField.getName(), ".", extractInternalFields((ObjectField)innerField), completeFieldList, ((ObjectField) innerField).isFieldRequired());
     } else if (innerField instanceof ArrayField) {
       completeFieldList.addAll(extractArrayInternalFields((ArrayField) innerField));
     } else if (innerField instanceof EnumField) {
@@ -128,9 +141,15 @@ public class JsonExtractor {
     List<FieldValueMapping> completeFieldList = new ArrayList<>();
     for (Field value : innerField.getValues()) {
       if (value instanceof ObjectField) {
+        boolean isFieldRequired = ((ObjectField) value).isFieldRequired();
+        List<String> requiredInternalFields = ((ObjectField) value).getRequired();
         for (Field arrayElementField : value.getProperties()) {
+          List<FieldValueMapping> processedField = processField(arrayElementField);
+          processedField.get(0).setParentRequired(isFieldRequired);
+          processedField.get(0).setRequired(requiredInternalFields.contains(processedField.get(0).getFieldName()));
+
           CollectionUtils.collect(
-              processField(arrayElementField),
+              processedField,
               fixName(innerField.getName(), "[]."),
               completeFieldList);
         }
@@ -152,17 +171,24 @@ public class JsonExtractor {
             completeFieldList);
       }
     } else {
-      completeFieldList.add(FieldValueMapping.builder().fieldName(innerField.getName() + "[]").fieldType(value.getType() + "-map").build());
+      completeFieldList.add(FieldValueMapping.builder().fieldName(innerField.getName() + "[]").fieldType(value.getType() + "-map")
+              .required(innerField.isFieldRequired()).build());
     }
     return completeFieldList;
   }
 
-  private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields, List<FieldValueMapping> completeFieldList) {
+  private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields, List<FieldValueMapping> completeFieldList, boolean isParentRequired) {
     internalFields.forEach(internalField -> {
       if (Objects.nonNull(internalField.getFieldName())) {
         internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
       } else {
         internalField.setFieldName(fieldName);
+      }
+      String[] splittedName = internalField.getFieldName().split("\\.");
+      String parentName = splittedName[splittedName.length-2];
+      parentName = parentName.replace("[]","");
+      if (fieldName.equals(parentName)){
+        internalField.setParentRequired(isParentRequired);
       }
       completeFieldList.add(internalField);
     });
