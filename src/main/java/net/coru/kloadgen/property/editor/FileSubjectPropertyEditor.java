@@ -51,7 +51,7 @@ import org.apache.jmeter.util.JMeterUtils;
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private static ParsedSchema parserSchema;
+  private ParsedSchema parserSchema;
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
@@ -64,8 +64,6 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   private JComboBox<String> schemaTypeComboBox;
 
   private JComboBox<String> subjectNameComboBox;
-
-  private PropertyDescriptor propertyDescriptor;
 
   public FileSubjectPropertyEditor() {
     this.init();
@@ -118,16 +116,14 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   public FileSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
     this.init();
   }
 
   @Override
   public void actionPerformed(ActionEvent event) {
     if (subjectNameComboBox.getItemCount() != 0) {
-      String schemaType = schemaTypeComboBox.getSelectedItem().toString();
-      String selectedItem = (String) subjectNameComboBox.getSelectedItem();
-      ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
+      String schemaType = Objects.requireNonNull(schemaTypeComboBox.getSelectedItem()).toString();
+      ParsedSchema selectedSchema = getSelectedSchema();
       List<FieldValueMapping> attributeList = getAttributeList(selectedSchema);
 
       if (!attributeList.isEmpty()) {
@@ -172,7 +168,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
+  public ParsedSchema getSelectedSchema() {return parserSchema;}
 
   public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
     if (Objects.nonNull(selectedSchema)) {
@@ -187,23 +183,12 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
+  public void setDescriptor(final PropertyDescriptor propertyDescriptor) {
+    super.setSource(propertyDescriptor);
   }
 
-  class ComboFiller implements FocusListener {
 
-    @Override
-    public void focusGained(FocusEvent e) {
-      String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
-      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
-    }
-
-    @Override
-    public void focusLost(FocusEvent e) {
-      // Override but not used. Implementation not needed.
-    }
-  }  @Override
+  @Override
   public String getAsText() {
     return Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
   }
@@ -216,15 +201,13 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   @Override
   public void setAsText(String text) throws IllegalArgumentException {
     this.subjectNameComboBox.setSelectedItem(text);
+    super.setValue(text);
   }
 
   @Override
   public void setValue(Object value) {
-    if (value != null) {
-      this.subjectNameComboBox.setSelectedItem(value);
-    } else {
-      this.subjectNameComboBox.setSelectedItem("");
-    }
+    this.subjectNameComboBox.setSelectedItem(Objects.requireNonNullElse(value, ""));
+    super.setValue(value);
   }
 
   @Override
@@ -237,6 +220,16 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     return true;
   }
 
+  class ComboFiller implements FocusListener {
+    @Override
+    public void focusGained(FocusEvent e) {
+      String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
+      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
+    }
 
-
+    @Override
+    public void focusLost(FocusEvent e) {
+      // Override but not used. Implementation not needed.
+    }
+  }
 }
