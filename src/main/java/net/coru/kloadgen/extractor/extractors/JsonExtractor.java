@@ -9,9 +9,14 @@ import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.MULTIPLE_OF;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.*;
 
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
