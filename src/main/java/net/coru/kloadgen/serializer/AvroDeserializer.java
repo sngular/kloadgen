@@ -6,6 +6,7 @@
 
 package net.coru.kloadgen.serializer;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -68,11 +69,13 @@ public class AvroDeserializer implements Deserializer<Object> {
       ByteBuffer buffer = getByteBuffer(data);
       DatumReader<?> reader = new GenericDatumReader<GenericRecord>(avroSchema);
 
-      int length = buffer.limit() - 1 - 4;
-      int start = buffer.position() + buffer.arrayOffset();
+      /*int length = buffer.limit() - 1 - 4;
+      int start = buffer.position() + buffer.arrayOffset();*/
 
       try {
-        decoder = DecoderFactory.get().binaryDecoder(buffer.array(), start, length, null);
+       /* decoder = DecoderFactory.get().binaryDecoder(buffer.array(), start, buffer.limit(), null);*/
+        ByteArrayInputStream bufferArrayInputStream = new ByteArrayInputStream(data);
+        decoder = DecoderFactory.get().binaryDecoder(bufferArrayInputStream,null);
         result = reader.read(null, decoder);
       } catch (RuntimeException | IOException ex) {
         throw new SerializationException("Error deserializing Avro message");
