@@ -14,18 +14,14 @@ import org.apache.commons.lang3.RandomUtils;
 
 public class ProtoBufGeneratorTool {
 
-  private final static RandomObject RANDOM_OBJECT = new RandomObject();
-
-  private final String ENUM = "enum";
-
-  private final String ENUM_ARRAY = "enum-array";
+  private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
   public Object generateObject(Descriptors.EnumDescriptor descriptor, String fieldType, int arraySize, List<String> fieldValuesList) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     Object value = new Object();
-    if (ENUM.equalsIgnoreCase(fieldType)) {
+    if ("enum".equalsIgnoreCase(fieldType)) {
       value = getEnumOrGenerate(descriptor, fieldType, parameterList);
-    } else if (ENUM_ARRAY.equalsIgnoreCase(fieldType)) {
+    } else if ("enum-array".equalsIgnoreCase(fieldType)) {
       value = getArrayEnumOrGenerate(descriptor, fieldType, arraySize, parameterList);
     }
     return value;

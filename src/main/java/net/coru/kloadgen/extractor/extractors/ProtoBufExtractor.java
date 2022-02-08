@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.squareup.wire.schema.Field;
+import com.squareup.wire.schema.internal.parser.EnumConstantElement;
 import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
@@ -19,7 +20,9 @@ import com.squareup.wire.schema.internal.parser.TypeElement;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.ProtobufHelper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class ProtoBufExtractor {
@@ -28,11 +31,7 @@ public class ProtoBufExtractor {
 
   public static final String MAP_POSTFIX = "-map";
 
-  public ProtobufHelper protobufHelper;
-
-  public ProtoBufExtractor() {
-    protobufHelper = new ProtobufHelper();
-  }
+  public static final String UNSUPPORTED_TYPE_OF_VALUE = "Something Odd Just Happened: Unsupported type of value";
 
   public List<FieldValueMapping> processSchema(ProtoFileElement schema) {
     List<FieldValueMapping> attributeList = new ArrayList<>();
@@ -50,37 +49,36 @@ public class ProtoBufExtractor {
     HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     fillNestedTypes(field, nestedTypes);
     if (field instanceof MessageElement) {
-      if (!((MessageElement) field).getOneOfs().isEmpty()) {
+      var messageField = (MessageElement) field;
+      if (!messageField.getOneOfs().isEmpty()) {
         extractOneOfs((MessageElement) field, completeFieldList, nestedTypes);
       }
-      ((MessageElement) field).getFields()
-                              .forEach(
-                                  subfield -> {
-                                    Field.Label label = checkNullLabel(subfield);
-                                    boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
-                                    boolean isMap = subfield.getType().startsWith("map");
-                                    if (protobufHelper.isValidType(subfield.getType())) {
-                                      extractPrimitiveTypes(field, completeFieldList, subfield, isArray);
-                                    } else if (isMap) {
-                                      extractMapType(field, completeFieldList, nestedTypes, subfield, imports);
-                                    } else if (!protobufHelper.isValidType(subfield.getType())) {
-                                      String dotType = checkDotType(subfield.getType(), imports);
-                                      if (nestedTypes.containsKey(subfield.getType())) {
-                                        extractNestedTypes(field, completeFieldList, nestedTypes, subfield, isArray, imports);
-                                      } else if (nestedTypes.containsKey(dotType)) {
-                                        extractDotTypesWhenIsInNestedType(field, completeFieldList, nestedTypes, subfield, isArray, dotType, imports);
-                                      } else {
-                                        extractDotTypeWhenNotNestedType(field, completeFieldList, subfield, isArray, dotType);
-                                      }
-                                    } else {
-                                      throw new KLoadGenException("Something Odd Just Happened: Unsupported type of value");
-                                    }
-                                  }
-                              );
+      for (var subfield : messageField.getFields()) {
+        Field.Label label = checkNullLabel(subfield);
+        boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
+        boolean isMap = subfield.getType().startsWith("map");
+        if (ProtobufHelper.isValidType(subfield.getType())) {
+          extractPrimitiveTypes(completeFieldList, subfield, isArray);
+        } else if (isMap) {
+          extractMapType(completeFieldList, nestedTypes, subfield, imports);
+        } else {
+          String dotType = checkDotType(subfield.getType(), imports);
+          if (nestedTypes.containsKey(subfield.getType())) {
+            extractNestedTypes(completeFieldList, nestedTypes, subfield, isArray, imports);
+          } else if (nestedTypes.containsKey(dotType)) {
+            extractDotTypesWhenIsInNestedType(completeFieldList, nestedTypes, subfield, isArray, dotType, imports);
+          } else {
+            extractDotTypeWhenNotNestedType(completeFieldList, subfield, isArray, dotType);
+          }
+        }
+      }
     } else if (field instanceof EnumElement) {
-      extractEnums((EnumElement) field, completeFieldList);
+      var values = extractEnums((EnumElement) field);
+      if (StringUtils.isNotEmpty(values)) {
+        completeFieldList.add(new FieldValueMapping("", "enum", 0, values));
+      }
     } else {
-      throw new KLoadGenException("Something Odd Just Happened: Unsupported type of value");
+      throw new KLoadGenException(UNSUPPORTED_TYPE_OF_VALUE);
     }
   }
 
@@ -89,149 +87,136 @@ public class ProtoBufExtractor {
     for (OneOfElement oneOfElement : oneOfs) {
       if (!oneOfElement.getFields().isEmpty()) {
         FieldElement subField = oneOfElement.getFields().get(RandomUtils.nextInt(0, oneOfElement.getFields().size()));
-        if (protobufHelper.isValidType(subField.getType())) {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subField.getName(), protobufHelper.translateType(subField.getType()), 0, ""));
+        if (ProtobufHelper.isValidType(subField.getType())) {
+          completeFieldList.add(new FieldValueMapping(subField.getName(), ProtobufHelper.translateType(subField.getType()), 0, ""));
         } else if (nestedTypes.containsKey(subField.getType())) {
           MessageElement clonedField = new MessageElement(field.getLocation(), field.getName(), field.getDocumentation(),
                                                           field.getNestedTypes(), field.getOptions(), field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(),
                                                           field.getExtensions(), field.getGroups());
           processField(clonedField, completeFieldList, Collections.emptyList());
         } else {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subField.getName(), subField.getType(), 0, ""));
+          completeFieldList.add(new FieldValueMapping(subField.getName(), subField.getType(), 0, ""));
         }
 
       }
     }
   }
 
-  private void extractDotTypeWhenNotNestedType(TypeElement field, List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray, String dotType) {
+  private void extractDotTypeWhenNotNestedType(List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray, String dotType) {
     if (isArray) {
       completeFieldList
-          .add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", dotType + ARRAY_POSTFIX, 0, ""));
+          .add(new FieldValueMapping(subfield.getName() + "[]", dotType + ARRAY_POSTFIX, 0, ""));
     } else {
       completeFieldList
-          .add(new FieldValueMapping(field.getName() + "." + subfield.getName(), dotType, 0, ""));
+          .add(new FieldValueMapping(subfield.getName(), dotType, 0, ""));
     }
   }
 
   private void extractMapType(
-      TypeElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports) {
     String subFieldType = extractInternalMapFields(subfield);
     String dotTypeMap = checkDotType(subFieldType, imports);
-    if (protobufHelper.isValidType(subFieldType)) {
-      completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]", subFieldType.replace(subFieldType,
-                                                                                                                           protobufHelper.translateType(subFieldType)) +
+    if (ProtobufHelper.isValidType(subFieldType)) {
+      completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]",
+                                                  subFieldType.replace(subFieldType, ProtobufHelper.translateType(subFieldType)) +
                                                                                                       MAP_POSTFIX, 0, ""));
     } else if (nestedTypes.containsKey(subFieldType)) {
-      extractNestedTypesMap(field, completeFieldList, nestedTypes, subfield, imports);
+      extractNestedTypesMap(completeFieldList, nestedTypes, subfield, imports);
     } else if (nestedTypes.containsKey(dotTypeMap)) {
-      extractDotTypesMap(field, completeFieldList, nestedTypes, subfield, dotTypeMap, imports);
+      extractDotTypesMap(completeFieldList, nestedTypes, subfield, dotTypeMap, imports);
     } else if (!imports.isEmpty() && isExternalType(imports, dotTypeMap)) {
-      completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]", protobufHelper.translateType("string") + MAP_POSTFIX, 0, ""));
+      completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]", ProtobufHelper.translateType("string") + MAP_POSTFIX, 0, ""));
     } else {
-      throw new KLoadGenException("Something Odd Just Happened: Unsupported type of value");
+      throw new KLoadGenException(UNSUPPORTED_TYPE_OF_VALUE);
     }
   }
 
-  @NotNull
   private String extractInternalMapFields(FieldElement subfield) {
     String[] mapSplit = subfield.getType().split(",");
     return mapSplit[1].replace(">", "").trim();
   }
 
-  private void extractPrimitiveTypes(TypeElement field, List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray) {
+  private void extractPrimitiveTypes(List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray) {
     if (isArray) {
       completeFieldList
-          .add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", subfield.getType().replace(subfield.getType(),
-                                                                                                                   protobufHelper.translateType(subfield.getType())) +
+          .add(new FieldValueMapping(subfield.getName() + "[]", subfield.getType().replace(subfield.getType(),
+                                                                                           ProtobufHelper.translateType(subfield.getType())) +
                                                                                         ARRAY_POSTFIX, 0, ""));
     } else {
       completeFieldList
-          .add(new FieldValueMapping(field.getName() + "." + subfield.getName(), subfield.getType().replace(subfield.getType(),
-                                                                                                            protobufHelper.translateType(subfield.getType())), 0, ""));
+          .add(new FieldValueMapping(subfield.getName(), subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())), 0, ""));
     }
   }
 
-  private void extractDotTypesWhenIsInNestedType(
-      TypeElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, String dotType,
+  private void extractDotTypesWhenIsInNestedType(List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, String dotType,
       List<String> imports) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(dotType), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
-      String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
-      if ("enum".equals(fieldValueMapping.getFieldType())) {
-        if (isArray) {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", fieldValueMapping.getFieldType() + ARRAY_POSTFIX, 0,
-                                                      fieldValueMapping.getFieldValuesList().toString()));
-        } else {
-          completeFieldList.add(
-              new FieldValueMapping(field.getName() + "." + subfield.getName(), fieldValueMapping.getFieldType(), 0, fieldValueMapping.getFieldValuesList().toString()));
-        }
+      if (isArray) {
+        completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."),
+                                                    fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping)));
       } else {
-        if (isArray) {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
-        } else {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
-        }
+        completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."),
+                                                    fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping)));
       }
     }
   }
 
   private void extractNestedTypes(
-      TypeElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, List<String> imports) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(subfield.getType()), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if ("enum".equals(fieldValueMapping.getFieldType())) {
         if (isArray) {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]", fieldValueMapping.getFieldType() + ARRAY_POSTFIX, 0,
-                                                      fieldValueMapping.getFieldValuesList().toString()));
+          completeFieldList.add(new FieldValueMapping( subfield.getName() + "[]", fieldValueMapping.getFieldType() + ARRAY_POSTFIX, 0,
+                                                       getValueList(fieldValueMapping)));
         } else {
           completeFieldList.add(
-              new FieldValueMapping(field.getName() + "." + subfield.getName(), fieldValueMapping.getFieldType(), 0, fieldValueMapping.getFieldValuesList().toString()));
+              new FieldValueMapping(subfield.getName(), fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping)));
         }
       } else {
-        String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
         if (isArray) {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+          completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."), fieldValueMapping.getFieldType(), 0, ""));
         } else {
-          completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+          completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."), fieldValueMapping.getFieldType(), 0, ""));
         }
       }
     }
+  }
+
+  private String buildFieldName(String fieldName, String lastFieldName, String splitter) {
+    return StringUtils.isNotEmpty(lastFieldName) ? fieldName + splitter + lastFieldName : fieldName;
   }
 
   private void extractNestedTypesMap(
-      TypeElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(extractInternalMapFields(subfield)), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
-      String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
       if ("enum".equals(fieldValueMapping.getFieldType())) {
-        completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]"
-                                                    + fieldValueMappingPrepared, fieldValueMapping.getFieldType() + MAP_POSTFIX, 0,
-                                                    fieldValueMapping.getFieldValuesList().toString()));
+        completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]", fieldValueMapping.getFieldType() + MAP_POSTFIX, 0, getValueList(fieldValueMapping)));
       } else {
-        completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+        completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."), fieldValueMapping.getFieldType(), 0, ""));
       }
     }
   }
 
+  private String getValueList(final FieldValueMapping fieldValueMapping) {
+    var valueList = fieldValueMapping.getFieldValuesList().toString();
+    return "[]".equalsIgnoreCase(valueList) ? "" : valueList;
+  }
+
   private void extractDotTypesMap(
-      TypeElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, String dotType, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, String dotType, List<String> imports) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(dotType), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
-      String fieldValueMappingPrepared = getFieldValueMappingPrepared(fieldValueMapping);
-      completeFieldList.add(new FieldValueMapping(field.getName() + "." + subfield.getName() + "[:]." + fieldValueMappingPrepared, fieldValueMapping.getFieldType(), 0, ""));
+      completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."), fieldValueMapping.getFieldType(), 0, ""));
 
     }
   }
 
-  private void extractEnums(EnumElement field, List<FieldValueMapping> completeFieldList) {
-    String fieldValueList;
-    List<String> EnumConstantList = new ArrayList<>();
-    field.getConstants().forEach(constant -> EnumConstantList.add(constant.getName()));
-    fieldValueList = String.join(",", EnumConstantList);
-    if (!"".equals(fieldValueList)) {
-      completeFieldList.add(new FieldValueMapping(field.getName(), "enum", 0, fieldValueList));
-    }
+  private String extractEnums(EnumElement field) {
+    var enumConstantList = CollectionUtils.collect(field.getConstants(), EnumConstantElement::getName);
+    return String.join(",", enumConstantList);
   }
 
   @NotNull
@@ -295,9 +280,9 @@ public class ProtoBufExtractor {
 
   private void fillNestedTypes(TypeElement field, HashMap<String, TypeElement> nestedTypes) {
     if (!field.getNestedTypes().isEmpty()) {
-      field.getNestedTypes().forEach(nestedType ->
-                                         nestedTypes.put(nestedType.getName(), nestedType)
-      );
+      for (var nestedField : field.getNestedTypes()) {
+        nestedTypes.put(nestedField.getName(), nestedField);
+      }
     }
   }
 }

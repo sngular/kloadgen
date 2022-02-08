@@ -15,6 +15,7 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class ProtobufExtractorTest {
@@ -34,162 +35,221 @@ class ProtobufExtractorTest {
   }
 
   @Test
+  @DisplayName("Test Extractor with simple proto file")
   void testFlatProperties() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("Address.street", "string", 0, ""),
-            new FieldValueMapping("Address.number[]", "int-array", 0, ""),
-            new FieldValueMapping("Address.zipcode", "long", 0, "")
+            new FieldValueMapping("street", "string", 0, ""),
+            new FieldValueMapping("number[]", "int-array", 0, ""),
+            new FieldValueMapping("zipcode", "long", 0, "")
         );
   }
 
   @Test
+  @DisplayName("Test Extractor with data structure map and array")
   void testEmbeddedTypes() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
         .hasSize(1)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("Person.phones[:].addressesPhone[:].id[]", "string-array", 0, "")
+            new FieldValueMapping("phones[:].addressesPhone[:].id[]", "string-array", 0, "")
         );
   }
 
   @Test
+  @DisplayName("Test Extractor with data structure enums and collections")
   void testEnumType() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/enumTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("Person.phoneTypes", "enum", 0, "[MOBILE, HOME, WORK]"),
-            new FieldValueMapping("Person.phoneTypesArray[]", "enum-array", 0, "[MOBILE, HOME, WORK]"),
-            new FieldValueMapping("Person.phoneTypesMap[:]", "enum-map", 0, "[MOBILE, HOME, WORK]")
+            new FieldValueMapping("phoneTypes", "enum", 0, "[MOBILE, HOME, WORK]"),
+            new FieldValueMapping("phoneTypesArray[]", "enum-array", 0, "[MOBILE, HOME, WORK]"),
+            new FieldValueMapping("phoneTypesMap[:]", "enum-map", 0, "[MOBILE, HOME, WORK]")
         );
   }
 
   @Test
+  @DisplayName("Test Extractor with data structure Any of")
   void testOneOfsType() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/oneOfTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
         .hasSize(4)
         .contains(
-            new FieldValueMapping("Address.type.street", "string", 0, ""),
-            new FieldValueMapping("Address.type.number", "int", 0, ""),
-            new FieldValueMapping("Address.type.test", "string", 0, "")
+            new FieldValueMapping("type.street", "string", 0, ""),
+            new FieldValueMapping("type.number", "int", 0, ""),
+            new FieldValueMapping("type.test", "string", 0, "")
         )
         .containsAnyOf(
-            new FieldValueMapping("Address.optionString", "string", 0, ""),
-            new FieldValueMapping("Address.optionLong", "long", 0, ""),
-            new FieldValueMapping("Address.optionInt", "int", 0, "")
+            new FieldValueMapping("optionString", "string", 0, ""),
+            new FieldValueMapping("optionLong", "long", 0, ""),
+            new FieldValueMapping("optionInt", "int", 0, "")
         );
   }
 
   @Test
+  @DisplayName("Test Extractor with complex structure")
   void testComplexProto() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUFF"));
     assertThat(fieldValueMappingList)
         .hasSize(13)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("Test.phone_types[].phone", "long", 0, ""),
-            new FieldValueMapping("Test.phone_types[].principal", "boolean", 0, ""),
-            new FieldValueMapping("Test.name", "string", 0, ""),
-            new FieldValueMapping("Test.age", "int", 0, ""),
-            new FieldValueMapping("Test.address[].street[]", "string-array", 0, ""),
-            new FieldValueMapping("Test.address[].number_street", "int", 0, ""),
-            new FieldValueMapping("Test.pets[:].pet_name", "string", 0, ""),
-            new FieldValueMapping("Test.pets[:].pet_age", "int", 0, ""),
-            new FieldValueMapping("Test.pets[:].owner", "string", 0, ""),
-            new FieldValueMapping("Test.descriptors[:]", "string-map", 0, ""),
-            new FieldValueMapping("Test.dates[]", "string-array", 0, ""),
-            new FieldValueMapping("Test.response", "string", 0, ""),
-            new FieldValueMapping("Test.presents[:].options[]", "string-array", 0, "")
+            new FieldValueMapping("phone_types[].phone", "long", 0, ""),
+            new FieldValueMapping("phone_types[].principal", "boolean", 0, ""),
+            new FieldValueMapping("name", "string", 0, ""),
+            new FieldValueMapping("age", "int", 0, ""),
+            new FieldValueMapping("address[].street[]", "string-array", 0, ""),
+            new FieldValueMapping("address[].number_street", "int", 0, ""),
+            new FieldValueMapping("pets[:].pet_name", "string", 0, ""),
+            new FieldValueMapping("pets[:].pet_age", "int", 0, ""),
+            new FieldValueMapping("pets[:].owner", "string", 0, ""),
+            new FieldValueMapping("descriptors[:]", "string-map", 0, ""),
+            new FieldValueMapping("dates[]", "string-array", 0, ""),
+            new FieldValueMapping("response", "string", 0, ""),
+            new FieldValueMapping("presents[:].options[]", "string-array", 0, "")
         );
   }
 
   @Test
+  @DisplayName("Test Extractor with real proto")
   void testProvided() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/providedTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
         .hasSize(32)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("IncidentEvent.id", "int", 0, ""),
-            new FieldValueMapping("IncidentEvent.occurrence_id", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.load_number", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.claim_type.code", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.claim_type.description", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.collision_type.code", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.collision_type.description", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_cause_type.code", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_cause_type.description", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_type.code", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_type.description", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.review_status_type.code", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.review_status_type.description", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_latitude", "double", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_longitude", "double", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_date", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_time", ".google.protobuf.Timestamp", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_city", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_state", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.location_description", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_number", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_type", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.incident_equipment_details[].equipment_prefix", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.driver.driver_id", "int", 0, ""),
-            new FieldValueMapping("IncidentEvent.driver.driver_first_name", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.driver.driver_last_name", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.dot_accident_indicator", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.drug_test_required_indicator", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.hazardous_material_indicator", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.preventable_indicator", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.report_by_name", "string", 0, ""),
-            new FieldValueMapping("IncidentEvent.create_user_id", "string", 0, "")
+            new FieldValueMapping("id", "int", 0, ""),
+            new FieldValueMapping("occurrence_id", "string", 0, ""),
+            new FieldValueMapping("load_number", "string", 0, ""),
+            new FieldValueMapping("claim_type.code", "string", 0, ""),
+            new FieldValueMapping("claim_type.description", "string", 0, ""),
+            new FieldValueMapping("collision_type.code", "string", 0, ""),
+            new FieldValueMapping("collision_type.description", "string", 0, ""),
+            new FieldValueMapping("incident_cause_type.code", "string", 0, ""),
+            new FieldValueMapping("incident_cause_type.description", "string", 0, ""),
+            new FieldValueMapping("incident_type.code", "string", 0, ""),
+            new FieldValueMapping("incident_type.description", "string", 0, ""),
+            new FieldValueMapping("review_status_type.code", "string", 0, ""),
+            new FieldValueMapping("review_status_type.description", "string", 0, ""),
+            new FieldValueMapping("incident_latitude", "double", 0, ""),
+            new FieldValueMapping("incident_longitude", "double", 0, ""),
+            new FieldValueMapping("incident_date", "string", 0, ""),
+            new FieldValueMapping("incident_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("incident_city", "string", 0, ""),
+            new FieldValueMapping("incident_state", "string", 0, ""),
+            new FieldValueMapping("location_description", "string", 0, ""),
+            new FieldValueMapping("incident_equipment_details[].equipment_number", "string", 0, ""),
+            new FieldValueMapping("incident_equipment_details[].equipment_type", "string", 0, ""),
+            new FieldValueMapping("incident_equipment_details[].equipment_prefix", "string", 0, ""),
+            new FieldValueMapping("driver.driver_id", "int", 0, ""),
+            new FieldValueMapping("driver.driver_first_name", "string", 0, ""),
+            new FieldValueMapping("driver.driver_last_name", "string", 0, ""),
+            new FieldValueMapping("dot_accident_indicator", "string", 0, ""),
+            new FieldValueMapping("drug_test_required_indicator", "string", 0, ""),
+            new FieldValueMapping("hazardous_material_indicator", "string", 0, ""),
+            new FieldValueMapping("preventable_indicator", "string", 0, ""),
+            new FieldValueMapping("report_by_name", "string", 0, ""),
+            new FieldValueMapping("create_user_id", "string", 0, "")
 
         );
   }
 
   @Test
+  @DisplayName("Test Extractor with data structure maps")
   void testMap() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
         .hasSize(7)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("Person.name[:]", "string-map", 0, ""),
-            new FieldValueMapping("Person.addresses[:].street", "string", 0, ""),
-            new FieldValueMapping("Person.addresses[:].number", "int", 0, ""),
-            new FieldValueMapping("Person.addresses[:].zipcode", "int", 0, ""),
-            new FieldValueMapping("Person.addressesNoDot[:].street", "string", 0, ""),
-            new FieldValueMapping("Person.addressesNoDot[:].number", "int", 0, ""),
-            new FieldValueMapping("Person.addressesNoDot[:].zipcode", "int", 0, "")
+            new FieldValueMapping("name[:]", "string-map", 0, ""),
+            new FieldValueMapping("addresses[:].street", "string", 0, ""),
+            new FieldValueMapping("addresses[:].number", "int", 0, ""),
+            new FieldValueMapping("addresses[:].zipcode", "int", 0, ""),
+            new FieldValueMapping("addressesNoDot[:].street", "string", 0, ""),
+            new FieldValueMapping("addressesNoDot[:].number", "int", 0, ""),
+            new FieldValueMapping("addressesNoDot[:].zipcode", "int", 0, "")
         );
   }
 
   @Test
+  @DisplayName("Test Extractor with multi types")
   void completeTest() throws IOException {
     File testFile = fileHelper.getFile("/proto-files/completeProto.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
         .hasSize(11)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("Person.name", "string", 0, ""),
-            new FieldValueMapping("Person.id", "int", 0, ""),
-            new FieldValueMapping("Person.addressesArray[].id[]", "string-array", 0, ""),
-            new FieldValueMapping("Person.addressesArray[].zipcode", "long", 0, ""),
-            new FieldValueMapping("Person.addressesDot[].id[]", "string-array", 0, ""),
-            new FieldValueMapping("Person.addressesDot[].zipcode", "long", 0, ""),
-            new FieldValueMapping("Person.addressesMap[:].id[]", "string-array", 0, ""),
-            new FieldValueMapping("Person.addressesMap[:].zipcode", "long", 0, ""),
-            new FieldValueMapping("Person.addressesNoDotMap[:].id[]", "string-array", 0, ""),
-            new FieldValueMapping("Person.addressesNoDotMap[:].zipcode", "long", 0, ""),
-            new FieldValueMapping("Person.phones[]", "enum-array", 0, "[MOBILE, HOME, WORK]")
+            new FieldValueMapping("name", "string", 0, ""),
+            new FieldValueMapping("id", "int", 0, ""),
+            new FieldValueMapping("addressesArray[].id[]", "string-array", 0, ""),
+            new FieldValueMapping("addressesArray[].zipcode", "long", 0, ""),
+            new FieldValueMapping("addressesDot[].id[]", "string-array", 0, ""),
+            new FieldValueMapping("addressesDot[].zipcode", "long", 0, ""),
+            new FieldValueMapping("addressesMap[:].id[]", "string-array", 0, ""),
+            new FieldValueMapping("addressesMap[:].zipcode", "long", 0, ""),
+            new FieldValueMapping("addressesNoDotMap[:].id[]", "string-array", 0, ""),
+            new FieldValueMapping("addressesNoDotMap[:].zipcode", "long", 0, ""),
+            new FieldValueMapping("phones[]", "enum-array", 0, "[MOBILE, HOME, WORK]")
         );
   }
 
+  @Test
+  void testFailing() throws IOException {
+    File testFile = fileHelper.getFile("/proto-files/deveTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+    assertThat(fieldValueMappingList)
+        .hasSize(26)
+        .containsExactlyInAnyOrder(
+            new FieldValueMapping("load_type", "string", 0, ""),
+            new FieldValueMapping("shipment.carrier_identifier.type", "enum", 0, "[CARRIER_IDENTIFIER_TYPE_UNSPECIFIED, CARRIER_IDENTIFIER_TYPE_DOT_NUMBER]"),
+            new FieldValueMapping("shipment.carrier_identifier.value", "string", 0, ""),
+            new FieldValueMapping("shipment.shipment_identifiers[].type", "enum", 0, "[SHIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
+                                                                                                     "SHIPMENT_IDENTIFIER_TYPE_BILL_OF_LADING, SHIPMENT_IDENTIFIER_TYPE_ORDER]"),
+            new FieldValueMapping("shipment.shipment_identifiers[].value", "string", 0, ""),
+            new FieldValueMapping("shipment.equipment_identifiers[].type", "enum", 0, "[EQUIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
+                                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_MOBILE_PHONE_NUMBER, " +
+                                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_VEHICLE_ID, " +
+                                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_LICENSE_PLATE, " +
+                                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_SENSITECH_DEVICE_ID, " +
+                                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_EMERSON_DEVICE_ID, " +
+                                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_TIVE_DEVICE_ID, " +
+                                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_CONTAINER_ID]"),
+            new FieldValueMapping("shipment.equipment_identifiers[].value", "string", 0, ""),
+            new FieldValueMapping("shipment.attributes[]", "string-array", 0, ""),
+            new FieldValueMapping("latest_status_update.timestamp", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_status_update.stop_number", "int", 0, ""),
+            new FieldValueMapping("latest_status_update.status_code", "enum", 0, "[STATUS_UPDATE_CODE_UNSPECIFIED, STATUS_UPDATE_CODE_DISPATCHED, STATUS_UPDATE_CODE_IN_TRANSIT, " +
+                                                                                 "STATUS_UPDATE_CODE_AT_STOP, STATUS_UPDATE_CODE_COMPLETED, STATUS_UPDATE_CODE_TRACKING_FAILED, " +
+                                                                                 "STATUS_UPDATE_CODE_INFO, STATUS_UPDATE_CODE_DELETED]"),
+            new FieldValueMapping("latest_status_update.status_reason", "enum", 0, "[STATUS_UPDATE_REASON_UNSPECIFIED, STATUS_UPDATE_REASON_PENDING_TRACKING_METHOD, " +
+                                                                                   "STATUS_UPDATE_REASON_SCHEDULED, STATUS_UPDATE_REASON_PENDING_APPROVAL, " +
+                                                                                   "STATUS_UPDATE_REASON_ACQUIRING_LOCATION, STATUS_UPDATE_REASON_PENDING_CARRIER, STATUS_UPDATE_REASON_IN_MOTION, STATUS_UPDATE_REASON_IDLE, STATUS_UPDATE_REASON_APPROVAL_DENIED, STATUS_UPDATE_REASON_TIMED_OUT, STATUS_UPDATE_REASON_CANCELED, STATUS_UPDATE_REASON_DEPARTED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FAILED_TO_ACQUIRE_LOCATION, STATUS_UPDATE_REASON_INFO]"),
+            new FieldValueMapping("latest_status_update.geo_coordinates.latitude", "double", 0, ""),
+            new FieldValueMapping("latest_status_update.geo_coordinates.longitude", "double", 0, ""),
+            new FieldValueMapping("latest_status_update.address.postal_code", "string", 0, ""),
+            new FieldValueMapping("latest_status_update.address.address_lines[]", "string-array", 0, ""),
+            new FieldValueMapping("latest_status_update.address.city", "string", 0, ""),
+            new FieldValueMapping("latest_status_update.address.state", "string", 0, ""),
+            new FieldValueMapping("latest_status_update.address.country", "string", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].stop_number", "int", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].status_code", "enum", 0, "[STOP_STATUS_CODE_UNSPECIFIED, STOP_STATUS_CODE_UNKNOWN, STOP_STATUS_CODE_EN_ROUTE, " +
+                                                                                   "STOP_STATUS_CODE_ARRIVED, STOP_STATUS_CODE_DEPARTED]"),
+            new FieldValueMapping("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.start_date_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.end_date_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].arrival_estimate.last_calculated_date_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].arrival_code", "enum", 0, "[ARRIVAL_CODE_UNSPECIFIED, ARRIVAL_CODE_UNKNOWN, ARRIVAL_CODE_EARLY, ARRIVAL_CODE_ON_TIME, " +
+                                                                                    "ARRIVAL_CODE_LATE]"),
+            new FieldValueMapping("latest_stop_statuses[].additional_appointment_window_statuses[]", "string-array", 0, "")
+
+
+        );
+  }
 }
