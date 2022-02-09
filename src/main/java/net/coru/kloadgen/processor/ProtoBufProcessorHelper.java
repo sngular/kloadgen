@@ -26,8 +26,6 @@ public class ProtoBufProcessorHelper {
 
   private static final String OPTIONAL = "optional";
 
-  private final ProtobufHelper protobufHelper = new ProtobufHelper();
-
   Descriptors.Descriptor buildDescriptor(ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
 
     DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
@@ -159,7 +157,7 @@ public class ProtoBufProcessorHelper {
     MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
     while (messageLines.hasNext()) {
       var field = messageLines.next().trim().split("\\s");
-      if (protobufHelper.isValidType(field[0])) {
+      if (ProtobufHelper.isValidType(field[0])) {
         messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
       } else if (ProtobufHelper.LABEL.contains(field[0])) {
         messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));

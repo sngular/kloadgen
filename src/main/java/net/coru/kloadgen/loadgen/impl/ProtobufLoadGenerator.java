@@ -48,14 +48,8 @@ public class ProtobufLoadGenerator extends AbstractLoadGenerator implements Base
 
   @Override
   public EnrichedRecord nextMessage() {
-    try {
+
       return protobufSchemaProcessor.next();
-    } catch (DescriptorValidationException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 
 }
