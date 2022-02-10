@@ -171,6 +171,12 @@
     </dependency>
     <!-- Options -->
     <dependency>
+      <groupId>com.github.charithe</groupId>
+      <artifactId>kafka-junit</artifactId>
+      <version>4.2.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka_2.13</artifactId>
       <version>${kafka.version}</version>
@@ -261,6 +267,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <repositories>
     <repository>
       <id>confluent</id>

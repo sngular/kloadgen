@@ -16,9 +16,17 @@
       "description": "Age in years which must be equal to or greater than zero.",
       "type": "integer",
       "minimum": 0
+    },
+    "testMap":{
+        "type": "object",
+          "properties": {
+            "itemType": {"type": "object", "additionalProperties": {"type": "integer"}},
+            "itemTipo": {"type": "object", "additionalProperties": {"type": "string"}}
+          }
     }
   }, "required": [
     "lastName",
-    "age"
+    "age",
+    "testMap"
   ]
 }

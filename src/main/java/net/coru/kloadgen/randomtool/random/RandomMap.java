@@ -6,16 +6,16 @@
 
 package net.coru.kloadgen.randomtool.random;
 
+import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
+import org.apache.commons.lang3.RandomUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-import org.apache.commons.lang3.RandomUtils;
 
 public class RandomMap {
 
@@ -34,35 +34,36 @@ public class RandomMap {
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
 
-    switch (fieldType) {
-      case ValidTypeConstants.INT_MAP:
-        value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, mapSize, constrains);
-        break;
-      case ValidTypeConstants.LONG_MAP:
-        value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, mapSize, constrains);
-        break;
-      case ValidTypeConstants.DOUBLE_MAP:
-        value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
-        break;
-      case ValidTypeConstants.SHORT_MAP:
-        value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, mapSize, constrains);
-        break;
-      case ValidTypeConstants.FLOAT_MAP:
-        value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, mapSize, constrains);
-        break;
-      case ValidTypeConstants.STRING_MAP:
-        value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, mapSize, constrains);
-        break;
-      case ValidTypeConstants.UUID_MAP:
-        value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
-        break;
-      case ValidTypeConstants.BOOLEAN_MAP:
-        value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
-        break;
-      default:
-        value = fieldType;
-        break;
-    }
+        switch (fieldType) {
+            case ValidTypeConstants.INT_MAP:
+                value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, mapSize, constrains);
+                break;
+            case ValidTypeConstants.LONG_MAP:
+                value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, mapSize, constrains);
+                break;
+            case ValidTypeConstants.DOUBLE_MAP:
+                value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
+                break;
+            case ValidTypeConstants.SHORT_MAP:
+                value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, mapSize, constrains);
+                break;
+            case ValidTypeConstants.NUMBER_MAP:
+            case ValidTypeConstants.FLOAT_MAP:
+                value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, mapSize, constrains);
+                break;
+            case ValidTypeConstants.STRING_MAP:
+                value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, mapSize, constrains);
+                break;
+            case ValidTypeConstants.UUID_MAP:
+                value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+                break;
+            case ValidTypeConstants.BOOLEAN_MAP:
+                value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+                break;
+            default:
+                value = fieldType;
+                break;
+        }
 
     if (fieldType.endsWith("array")) {
       value = generateRandomMapArray(fieldType, mapSize, fieldValueList, mapSize, arraySize, constrains);

@@ -1,4 +1,3 @@
-
 /*
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,6 +6,7 @@
 
 package net.coru.kloadgen.randomtool.random;
 
+import com.github.curiousoddman.rgxgen.RgxGen;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.github.curiousoddman.rgxgen.RgxGen;
+
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
@@ -179,123 +179,118 @@ public class RandomObject {
         fieldType);
   }
 
-  private Long getSafeValue(List<String> fieldValueList) {
-    return fieldValueList.isEmpty() ? 1L : Long.parseLong(fieldValueList.get(0));
-  }
 
   public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    return ValueUtils.castValue(
-        context.compute(fieldName, (
-            fieldNameMap,
-            seqObject) -> seqObject == null ? fieldValueList.get(0)
-            : seqObject.toString().equals(fieldValueList.get(fieldValueList.size() - 1)) ? fieldValueList.get(0) : fieldValueList.get(fieldValueList.indexOf(seqObject) + 1)),
-        fieldType);
+    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer)seqObject) + 1) % fieldValueList.size());
+    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
   }
 
-  public Object generateRandom(
-      String fieldType, Integer valueLength, List<String> fieldValueList,
+
+
+  public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
-    if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0)) && fieldValueList.get(0).charAt(0) == "{".charAt(0)) {
-      fieldValueList.set(0, fieldValueList.get(0).substring(1));
-      return generateSequenceForFieldValueList(fieldValueList.get(0), fieldType, fieldValueList, context);
-    }
-    switch (fieldType.toLowerCase(Locale.ROOT)) {
-      case ValidTypeConstants.STRING:
-        value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
-        break;
-      case ValidTypeConstants.INT:
-        try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).intValueExact();
-        } catch (ArithmeticException exception) {
-          value = Integer.MAX_VALUE;
+        switch (fieldType) {
+          case ValidTypeConstants.STRING:
+            value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
+            break;
+          case ValidTypeConstants.INT:
+            try {
+              value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).intValueExact();
+            } catch (ArithmeticException exception) {
+              value = Integer.MAX_VALUE;
+            }
+            break;
+          case ValidTypeConstants.LONG:
+            try {
+              value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).longValueExact();
+            } catch (ArithmeticException exception) {
+              value = Long.MAX_VALUE;
+            }
+            break;
+          case ValidTypeConstants.SHORT:
+            try {
+              value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).shortValueExact();
+            } catch (ArithmeticException exception) {
+              value = Short.MAX_VALUE;
+            }
+            break;
+          case ValidTypeConstants.DOUBLE:
+            try {
+              value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).doubleValue();
+            } catch (ArithmeticException exception) {
+              value = Double.MAX_VALUE;
+            }
+            break;
+          case ValidTypeConstants.NUMBER:
+          case ValidTypeConstants.FLOAT:
+            try {
+              value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();
+            } catch (ArithmeticException exception) {
+              value = Float.MAX_VALUE;
+            }
+            break;
+          case ValidTypeConstants.BYTES:
+            try {
+              value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
+            } catch (ArithmeticException exception) {
+              value = Byte.MAX_VALUE;
+            }
+            break;
+          case ValidTypeConstants.TIMESTAMP:
+          case ValidTypeConstants.LONG_TIMESTAMP:
+          case ValidTypeConstants.STRING_TIMESTAMP:
+            value = getTimestampValueOrRandom(fieldType, fieldValueList);
+            break;
+          case ValidTypeConstants.UUID:
+            value = getUUIDValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.BOOLEAN:
+            value = getBooleanValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.ENUM:
+            value = getEnumValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.INT_DATE:
+            value = getDateValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.INT_TIME_MILLIS:
+            value = getTimeMillisValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.LONG_TIME_MICROS:
+            value = getTimeMicrosValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.LONG_TIMESTAMP_MILLIS:
+            value = getTimestampMillisValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.LONG_TIMESTAMP_MICROS:
+            value = getTimestampMicrosValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
+            value = getLocalTimestampMillisValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
+            value = getLocalTimestampMicrosValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.STRING_UUID:
+            value = getUUIDValueOrRandom(fieldValueList);
+            break;
+          case ValidTypeConstants.BYTES_DECIMAL:
+            value = getDecimalValueOrRandom(fieldValueList, constrains);
+            break;
+          case ValidTypeConstants.FIXED_DECIMAL:
+            value = getDecimalValueOrRandom(fieldValueList, constrains);
+            break;
+          default:
+            value = fieldType;
+            break;
         }
-        break;
-      case ValidTypeConstants.LONG:
-        try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).longValueExact();
-        } catch (ArithmeticException exception) {
-          value = Long.MAX_VALUE;
-        }
-        break;
-      case ValidTypeConstants.SHORT:
-        try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).shortValueExact();
-        } catch (ArithmeticException exception) {
-          value = Short.MAX_VALUE;
-        }
-        break;
-      case ValidTypeConstants.DOUBLE:
-        try {
-          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).doubleValue();
-        } catch (ArithmeticException exception) {
-          value = Double.MAX_VALUE;
-        }
-        break;
-      case ValidTypeConstants.FLOAT:
-        try {
-          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();
-        } catch (ArithmeticException exception) {
-          value = Float.MAX_VALUE;
-        }
-        break;
-      case ValidTypeConstants.BYTES:
-        try {
-          value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
-        } catch (ArithmeticException exception) {
-          value = Byte.MAX_VALUE;
-        }
-        break;
-      case ValidTypeConstants.TIMESTAMP:
-      case ValidTypeConstants.LONG_TIMESTAMP:
-      case ValidTypeConstants.STRING_TIMESTAMP:
-        value = getTimestampValueOrRandom(fieldType, fieldValueList);
-        break;
-      case ValidTypeConstants.UUID:
-        value = getUUIDValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.BOOLEAN:
-        value = getBooleanValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.ENUM:
-        value = getEnumValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.INT_DATE:
-        value = getDateValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.INT_TIME_MILLIS:
-        value = getTimeMillisValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_TIME_MICROS:
-        value = getTimeMicrosValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_TIMESTAMP_MILLIS:
-        value = getTimestampMillisValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_TIMESTAMP_MICROS:
-        value = getTimestampMicrosValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
-        value = getLocalTimestampMillisValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
-        value = getLocalTimestampMicrosValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.STRING_UUID:
-        value = getUUIDValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.BYTES_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList, constrains);
-        break;
-      case ValidTypeConstants.FIXED_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList, constrains);
-        break;
-      default:
-        value = buildFromClasspath(fieldType);
-        break;
-    }
 
     return value;
+  }
+
+  private Long getSafeValue(List<String> fieldValueList) {
+    return fieldValueList.isEmpty() ? 1L : Long.parseLong(fieldValueList.get(0));
   }
 
   private Object buildFromClasspath(String fieldType) {
@@ -449,6 +444,98 @@ public class RandomObject {
       minimum = Long.parseLong(StringUtils.rightPad("1", valueLength, '0'));
     }
     return minimum;
+  }
+
+  private static LocalDate getDateValueOrRandom(List<String> fieldValueList) {
+    LocalDate resultDate;
+    int minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
+    int maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();
+    long randomDay = minDay + RandomUtils.nextInt(0,maxDay - minDay);
+    if (fieldValueList.isEmpty()){
+      resultDate = LocalDate.ofEpochDay(randomDay);
+    } else {
+      resultDate = LocalDate.parse(fieldValueList.get(RandomUtils.nextInt(0,fieldValueList.size())).trim());
+    }
+    return resultDate;
+  }
+
+  private static LocalTime getRandomLocalTime(List<String> fieldValueList){
+    long nanoMin = 0;
+    long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
+    if (fieldValueList.isEmpty()){
+      return LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
+    } else {
+      return LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0,fieldValueList.size())).trim());
+    }
+  }
+
+  private static LocalTime getTimeMillisValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalTime(fieldValueList);
+  }
+
+  private static LocalTime getTimeMicrosValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalTime(fieldValueList);
+  }
+
+  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList){
+    long minDay = LocalDateTime.of(1900,1,1,0,0).toEpochSecond(ZoneOffset.UTC);
+    long maxDay = LocalDateTime.of(2100,1,1,0,0).toEpochSecond(ZoneOffset.UTC);
+    long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
+
+    if (fieldValueList.isEmpty()){
+      return LocalDateTime.ofEpochSecond(randomSeconds,RandomUtils.nextInt(0, 1_000_000_000 - 1),ZoneOffset.UTC);
+    } else {
+      return LocalDateTime.parse(fieldValueList.get(RandomUtils.nextInt(0,fieldValueList.size())).trim());
+    }
+  }
+
+  private static Instant getTimestampMillisValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
+  }
+
+  private static Instant getTimestampMicrosValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
+  }
+
+  private static LocalDateTime getLocalTimestampMillisValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList);
+  }
+
+  private static LocalDateTime getLocalTimestampMicrosValueOrRandom(List<String> fieldValueList) {
+    return getRandomLocalDateTime(fieldValueList);
+  }
+
+  private static long randomNumberWithLength(int n) {
+    long min = (long) Math.pow(10, n - 1);
+    return RandomUtils.nextLong(min, min * 10);
+  }
+
+   private static BigDecimal getDecimalValueOrRandom(List<String> fieldValueList,
+                                                     Map<ConstraintTypeEnum, String> constrains){
+    int scale;
+    int precision;
+
+    if (Objects.nonNull(constrains.get(ConstraintTypeEnum.PRECISION))){
+      precision = Integer.parseInt(constrains.get(ConstraintTypeEnum.PRECISION));
+      scale = Objects.nonNull(constrains.get(ConstraintTypeEnum.SCALE)) ?
+              Integer.parseInt(constrains.get(ConstraintTypeEnum.SCALE)) : 0;
+
+      if (precision <= 0){
+        throw new KLoadGenException("Decimal precision must be greater dan 0");
+      }
+      if (scale < 0 || scale > precision){
+        throw new KLoadGenException("Scale must be zero or a positive integer less than or equal to the precision");
+      }
+
+      if (fieldValueList.isEmpty()){
+        return BigDecimal.valueOf(randomNumberWithLength(precision),scale);
+      } else {
+        return new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      }
+
+    } else {
+      throw new KLoadGenException("Missing decimal precision");
+    }
   }
 
 }
