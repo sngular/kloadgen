@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
@@ -35,13 +36,17 @@ public class AvroGeneratorTool {
 
   private final RandomObject randomObject = new RandomObject();
 
-  public Object generateObject(Field field, String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constrains) {
+  public Object generateObject(Field field, FieldValueMapping fieldValueMapping, Map<ConstraintTypeEnum, String> constrains) {
+    String fieldType = fieldValueMapping.getFieldType();
+    Integer valueLength = fieldValueMapping.getValueLength();
+    List<String> fieldValuesList = fieldValueMapping.getFieldValuesList();
+
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     boolean logicalType = Objects.nonNull(field.schema().getLogicalType());
 
     Object value;
     if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(field.name(), fieldType, field.schema(), parameterList);
+      value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, field.schema(), parameterList);
     }else if (UNION == field.schema().getType()) {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
@@ -49,7 +54,7 @@ public class AvroGeneratorTool {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
         value = ValueUtils.castValue(value, field.schema().getType().getName());
       } else if (ENUM == safeSchema.getType()) {
-        value = getEnumOrGenerate(field.name(), fieldType, safeSchema, parameterList);
+        value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, safeSchema, parameterList);
       } else {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
         if ("null".equalsIgnoreCase(value.toString())) {
@@ -59,7 +64,7 @@ public class AvroGeneratorTool {
     } else if ("seq".equalsIgnoreCase(fieldType)) {
       if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
         fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
-        return randomObject.generateSequenceForFieldValueList(field.name(), fieldType, fieldValuesList, context);
+        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), fieldType, fieldValuesList, context);
       }else {
         value = randomObject.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
       }
