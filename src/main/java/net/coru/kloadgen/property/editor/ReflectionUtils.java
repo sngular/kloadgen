@@ -21,7 +21,7 @@ final class ReflectionUtils {
   private ReflectionUtils() {
   }
 
-  protected static void extractSerializers(JComboBox<String> serializerComboBox, Reflections reflections, Class reflectedClass) {
+  static void extractSerializers(JComboBox<String> serializerComboBox, Reflections reflections, Class reflectedClass) {
     Set<Class<? extends Serializer>> subTypes = reflections.getSubTypesOf(reflectedClass);
     List<String> classList = new ArrayList<>();
 

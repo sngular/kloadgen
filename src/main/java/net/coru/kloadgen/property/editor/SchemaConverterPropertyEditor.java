@@ -52,12 +52,12 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
     propertyDescriptor = descriptor;
-  }  @Override
+  }
+
+  @Override
   public Component getCustomEditor() {
     return this.panel;
   }
-
-
 
   @Override
   public String getAsText() {
@@ -79,7 +79,7 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public Object getValue() {
-    return schemaAsString;
+    return getAsText();
   }
 
   @Override

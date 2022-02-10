@@ -37,6 +37,17 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
     this.init();
   }
 
+  public KeySerializerPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public KeySerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
+
   private void init() {
 
     fillSerializer(new JComboBox<>());
@@ -47,21 +58,11 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
 
   private void fillSerializer(JComboBox<String> objectJComboBox) {
     serializerComboBox = objectJComboBox;
-    Reflections reflections = new Reflections(new ConfigurationBuilder()
-                                                  .addUrls(ClasspathHelper.forClass(Serializer.class))
-                                                  .setScanners(SubTypes));
+    Reflections reflections = new Reflections(
+        new ConfigurationBuilder()
+            .addUrls(ClasspathHelper.forClass(Serializer.class))
+            .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
-  }
-
-  public KeySerializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public KeySerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
   }
 
   @Override

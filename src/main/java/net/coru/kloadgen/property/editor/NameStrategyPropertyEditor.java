@@ -37,6 +37,17 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     this.init();
   }
 
+  public NameStrategyPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public NameStrategyPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
+
   private void init() {
     fillSerializer(new JComboBox<>());
     panel.setLayout(new BorderLayout());
@@ -51,17 +62,6 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
             .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
-  }
-
-  public NameStrategyPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public NameStrategyPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
   }
 
   @Override

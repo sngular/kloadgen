@@ -24,10 +24,6 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   private final JPanel panel = new JPanel();
 
-  private PropertyDescriptor propertyDescriptor;
-
-  private String schemaType;
-
   public SchemaTypePropertyEditor() {
   }
 
@@ -38,7 +34,6 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   public SchemaTypePropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
   }
 
   @Override
@@ -51,23 +46,22 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
-  }  @Override
+    setSource(descriptor);
+  }
+
+  @Override
   public Component getCustomEditor() {
     return this.panel;
   }
 
-
-
   @Override
   public String getAsText() {
-    return schemaType;
+    return super.getAsText();
   }
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
-    propertyDescriptor.setValue("schemaType", value);
-    schemaType = value;
+    setValue(value);
   }
 
   @Override
@@ -79,7 +73,7 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   @Override
   public Object getValue() {
-    return schemaType;
+    return super.getValue();
   }
 
   @Override

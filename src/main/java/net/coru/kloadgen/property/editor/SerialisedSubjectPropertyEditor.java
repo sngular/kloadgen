@@ -55,8 +55,6 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
 
   private JComboBox<String> subjectNameComboBox;
 
-  private PropertyDescriptor propertyDescriptor;
-
   public SerialisedSubjectPropertyEditor() {
     this.init();
   }
@@ -78,7 +76,6 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
 
   public SerialisedSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
     this.init();
   }
 
@@ -118,48 +115,6 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     }
   }
 
-  @SuppressWarnings("unchecked")
-  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
-
-    if (!(tableEditorValue instanceof ArrayList<?>)) {
-      log.error("Table Editor is not array list");
-      return attributeList;
-    }
-
-    List<FieldValueMapping> fieldValueList;
-    try {
-      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
-    } catch (Exception e) {
-      log.error("Table Editor is not FieldValueMapping list", e);
-      return attributeList;
-    }
-
-    if (CollectionUtils.isEmpty(fieldValueList)) {
-      return attributeList;
-    }
-
-    List<FieldValueMapping> result = new ArrayList<>();
-    for (FieldValueMapping fieldValue : attributeList) {
-
-      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
-
-      if (existsValue != null) {
-        result.add(existsValue);
-      } else {
-        result.add(fieldValue);
-      }
-
-    }
-
-    return result;
-  }
-
-  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
-
-    return IterableUtils.find(fieldValueList,
-                              v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
-  }
-
   @Override
   public void clearGui() {
 
@@ -167,7 +122,7 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
 
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
+    super.setSource(descriptor);
   }
 
   @Override
@@ -214,6 +169,48 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
   @Override
   public boolean supportsCustomEditor() {
     return true;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
+
+    if (!(tableEditorValue instanceof ArrayList<?>)) {
+      log.error("Table Editor is not array list");
+      return attributeList;
+    }
+
+    List<FieldValueMapping> fieldValueList;
+    try {
+      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
+    } catch (Exception e) {
+      log.error("Table Editor is not FieldValueMapping list", e);
+      return attributeList;
+    }
+
+    if (CollectionUtils.isEmpty(fieldValueList)) {
+      return attributeList;
+    }
+
+    List<FieldValueMapping> result = new ArrayList<>();
+    for (FieldValueMapping fieldValue : attributeList) {
+
+      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
+
+      if (existsValue != null) {
+        result.add(existsValue);
+      } else {
+        result.add(fieldValue);
+      }
+
+    }
+
+    return result;
+  }
+
+  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
+
+    return IterableUtils.find(fieldValueList,
+                              v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
   }
 
 }

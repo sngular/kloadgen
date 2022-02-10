@@ -51,8 +51,6 @@ import org.apache.jmeter.util.JMeterUtils;
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private ParsedSchema parserSchema;
-
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
   private final JPanel panel = new JPanel();
@@ -61,11 +59,24 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private final JButton openFileDialogButton = new JButton(JMeterUtils.getResString("file_visualizer_open"));
 
+  private ParsedSchema parserSchema;
+
   private JComboBox<String> schemaTypeComboBox;
 
   private JComboBox<String> subjectNameComboBox;
 
   public FileSubjectPropertyEditor() {
+    this.init();
+  }
+
+  public FileSubjectPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public FileSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
     this.init();
   }
 
@@ -101,29 +112,28 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         subjectNameComboBox.setSelectedItem(parserSchema.name());
       } catch (IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-                                      JOptionPane.ERROR_MESSAGE);
+            JOptionPane.ERROR_MESSAGE);
         log.error(e.getMessage(), e);
       }
       subjectNameComboBox.addFocusListener(new ComboFiller());
     }
   }
 
-  public FileSubjectPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
+  public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
 
-  public FileSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
+  public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
+    if(Objects.nonNull(selectedSchema)) {
+      return schemaExtractor.flatPropertiesList(selectedSchema);
+    }
+    return new ArrayList<>();
   }
 
   @Override
   public void actionPerformed(ActionEvent event) {
     if (subjectNameComboBox.getItemCount() != 0) {
-      String schemaType = Objects.requireNonNull(schemaTypeComboBox.getSelectedItem()).toString();
-      ParsedSchema selectedSchema = getSelectedSchema();
+      String schemaType =  schemaTypeComboBox.getSelectedItem().toString();
+      String selectedItem = (String) subjectNameComboBox.getSelectedItem();
+      ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
       List<FieldValueMapping> attributeList = getAttributeList(selectedSchema);
 
       if (!attributeList.isEmpty()) {
@@ -152,29 +162,20 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         } catch (NoSuchFieldException | IllegalAccessException e) {
           JOptionPane
               .showMessageDialog(panel, "Failed to retrieve schema : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-                                 JOptionPane.ERROR_MESSAGE);
+                  JOptionPane.ERROR_MESSAGE);
           log.error(e.getMessage(), e);
         } catch (AvroRuntimeException ex) {
           JOptionPane
               .showMessageDialog(panel, "Failed to process schema : " + ex.getMessage(), "ERROR: Failed to retrieve properties!",
-                                 JOptionPane.ERROR_MESSAGE);
+                  JOptionPane.ERROR_MESSAGE);
           log.error(ex.getMessage(), ex);
         }
       } else {
         JOptionPane
             .showMessageDialog(panel, "No schema has been loaded, we cannot extract properties", "ERROR: Failed to retrieve properties!",
-                               JOptionPane.WARNING_MESSAGE);
+                JOptionPane.WARNING_MESSAGE);
       }
     }
-  }
-
-  public ParsedSchema getSelectedSchema() {return parserSchema;}
-
-  public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
-    if (Objects.nonNull(selectedSchema)) {
-      return schemaExtractor.flatPropertiesList(selectedSchema);
-    }
-    return new ArrayList<>();
   }
 
   @Override
@@ -186,7 +187,6 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   public void setDescriptor(final PropertyDescriptor propertyDescriptor) {
     super.setSource(propertyDescriptor);
   }
-
 
   @Override
   public String getAsText() {
@@ -221,6 +221,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   class ComboFiller implements FocusListener {
+
     @Override
     public void focusGained(FocusEvent e) {
       String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
@@ -232,4 +233,5 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
       // Override but not used. Implementation not needed.
     }
   }
+
 }

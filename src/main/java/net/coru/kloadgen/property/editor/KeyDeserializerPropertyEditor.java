@@ -38,6 +38,17 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
     this.init();
   }
 
+  public KeyDeserializerPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public KeyDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
+
   private void init() {
 
     fillDeserializer(new JComboBox<>());
@@ -48,24 +59,14 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
 
   private void fillDeserializer(JComboBox<String> objectJComboBox) {
     deserializerComboBox = objectJComboBox;
-    Reflections reflections = new Reflections(new ConfigurationBuilder()
-                                                  .addUrls(ClasspathHelper.forClass(Deserializer.class))
-                                                  .filterInputsBy(new FilterBuilder()
-                                                                      .includePackage("net.coru.kloadgen.serializer")
-                                                                      .includePackage("io.confluent.kafka.serializers"))
-                                                  .setScanners(SubTypes));
+    Reflections reflections = new Reflections(
+        new ConfigurationBuilder()
+          .addUrls(ClasspathHelper.forClass(Deserializer.class))
+          .filterInputsBy(new FilterBuilder()
+                              .includePackage("net.coru.kloadgen.serializer")
+                              .includePackage("io.confluent.kafka.serializers"))
+          .setScanners(SubTypes));
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections);
-  }
-
-  public KeyDeserializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public KeyDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
   }
 
   @Override

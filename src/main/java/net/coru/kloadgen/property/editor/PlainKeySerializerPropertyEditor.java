@@ -38,6 +38,17 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
     this.init();
   }
 
+  public PlainKeySerializerPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public PlainKeySerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
+
   private void init() {
     fillSerializer(new JComboBox<>());
     panel.setLayout(new BorderLayout());
@@ -54,17 +65,6 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
                                                 .includePackage("org.apache.kafka.common.serialization"))
                             .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
-  }
-
-  public PlainKeySerializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public PlainKeySerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
   }
 
   @Override
