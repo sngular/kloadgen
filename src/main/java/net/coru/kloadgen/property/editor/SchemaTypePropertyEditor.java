@@ -61,13 +61,13 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
-    setValue(value);
+    super.setValue(value);
   }
 
   @Override
   public void setValue(Object value) {
     if (Objects.nonNull(value)) {
-      setAsText(value.toString());
+      super.setValue(value);
     }
   }
 

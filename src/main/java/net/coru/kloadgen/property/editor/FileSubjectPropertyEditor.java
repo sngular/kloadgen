@@ -119,7 +119,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public ParsedSchema getSelectedSchema(String name) {return parserSchema;}
+  public ParsedSchema getSelectedSchema(String name) {
+    return parserSchema;
+  }
 
   public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
     if(Objects.nonNull(selectedSchema)) {
