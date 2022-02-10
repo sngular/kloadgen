@@ -131,9 +131,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                         entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
                                 avroGeneratorTool.generateObject(
                                         entity.getSchema().getField(fieldName),
-                                        fieldValueMapping.getFieldType(),
-                                        fieldValueMapping.getValueLength(),
-                                        fieldValueMapping.getFieldValuesList(),
+                                        fieldValueMapping,
                                         extractConstraints(schema.getField(fieldValueMapping.getFieldName()))
                                 )
                         );
@@ -355,9 +353,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
                     fieldExpMappingsQueue.poll();
                     subEntity.put(fieldNameSubEntity, avroGeneratorTool.generateObject(
                                     subEntity.getSchema().getField(fieldNameSubEntity),
-                                    fieldValueMapping.getFieldType(),
-                                    fieldValueMapping.getValueLength(),
-                                    fieldValueMapping.getFieldValuesList(),
+                                    fieldValueMapping,
                                     extractConstraints(subEntity.getSchema().getField(fieldNameSubEntity))
                             )
                     );
