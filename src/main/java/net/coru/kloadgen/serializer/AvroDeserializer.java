@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
@@ -58,7 +59,7 @@ public class AvroDeserializer implements Deserializer<Object> {
       DatumReader<?> reader = new GenericDatumReader<GenericRecord>(avroSchema);
 
       try {
-        log.info("[AvroDeserializer] to deserialize = {}", data);
+        log.info("[AvroDeserializer] to deserialize = {}", DatatypeConverter.printHexBinary(data));
 
         ByteArrayInputStream bufferArrayInputStream = new ByteArrayInputStream(data);
         decoder = DecoderFactory.get().binaryDecoder(bufferArrayInputStream,null);

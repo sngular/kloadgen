@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -42,10 +43,10 @@ class AvroDeserializerTest {
     var SCHEMA = new FileHelper().getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
     var SCHEMA_STR = readSchema(SCHEMA);
     var fieldValueMappings = asList(
-        new FieldValueMapping("subEntity.anotherLevel.subEntityIntArray[2]", "int-array", 0, "[1]"),
-        new FieldValueMapping("subEntity.anotherLevel.subEntityRecordArray[2].name", "string", 0, "[1]"),
-        new FieldValueMapping("topLevelIntArray[3]", "int-array", 0, "[2]"),
-        new FieldValueMapping("topLevelRecordArray[3].name", "string", 0, "[2]")
+        new FieldValueMapping("subEntity.anotherLevel.subEntityIntArray[2]", "int-array", 0, "[1,2]"),
+        new FieldValueMapping("subEntity.anotherLevel.subEntityRecordArray[2].name", "string", 0, "[1,3]"),
+        new FieldValueMapping("topLevelIntArray[3]", "int-array", 0, "[2,4,5]"),
+        new FieldValueMapping("topLevelRecordArray[3].name", "string", 0, "[7,8,9]")
     );
     var metadata = new SchemaMetadata(1, 1, SCHEMA_STR);
 
@@ -63,7 +64,7 @@ class AvroDeserializerTest {
                                  .schemaMetadata(record.getSchemaMetadata())
                                  .build());
 
-    log.info("[AvroDeserializer] to deserialize = {}", message);
+    log.info("[AvroDeserializer] to deserialize = {}", DatatypeConverter.printHexBinary(message));
 
     var result = avroDeserializer.deserialize("the-topic", message);
 
