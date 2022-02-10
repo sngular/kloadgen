@@ -39,6 +39,7 @@ public class JsonLoadGenerator implements BaseLoadGenerator {
 
   public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
     try {
+      metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSchemaName);
       this.jsonSchemaProcessor.processSchema(fieldExprMappings);
     } catch (Exception exc){
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
@@ -56,17 +57,6 @@ public class JsonLoadGenerator implements BaseLoadGenerator {
   }
 
   public EnrichedRecord nextMessage() {
-    return new EnrichedRecord(metadata, jsonSchemaProcessor.next());
-  }
-
-  private ParsedSchema retrieveSchema(Map<String, String> originals, String avroSchemaName) throws IOException, RestClientException {
-    schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000, List.of(new JsonSchemaProvider()), originals);
-
-    return getSchemaBySubject(avroSchemaName);
-  }
-
-  private ParsedSchema getSchemaBySubject(String avroSubjectName) throws IOException, RestClientException {
-    metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSubjectName);
-    return schemaRegistryClient.getSchemaBySubjectAndId(avroSubjectName, metadata.getId());
+    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(jsonSchemaProcessor.next()).build();
   }
 }

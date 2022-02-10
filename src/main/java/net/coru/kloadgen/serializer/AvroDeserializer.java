@@ -8,7 +8,6 @@ package net.coru.kloadgen.serializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,16 +42,6 @@ public class AvroDeserializer implements Deserializer<Object> {
     this.isKey = isKey;
   }
 
-  private ByteBuffer getByteBuffer(byte[] payload) {
-    ByteBuffer buffer = ByteBuffer.wrap(payload);
-    if (buffer.get() != MAGIC_BYTE) {
-      throw new SerializationException("Unknown magic byte!");
-    } else {
-      buffer.position(buffer.position() + ID_SIZE);
-      return buffer;
-    }
-  }
-
   @Override
   public Object deserialize(String topic, byte[] data) {
 
@@ -66,17 +55,15 @@ public class AvroDeserializer implements Deserializer<Object> {
       Schema.Parser parser = new Schema.Parser();
       Schema avroSchema = parser.parse(schemaString);
 
-      ByteBuffer buffer = getByteBuffer(data);
       DatumReader<?> reader = new GenericDatumReader<GenericRecord>(avroSchema);
 
-      /*int length = buffer.limit() - 1 - 4;
-      int start = buffer.position() + buffer.arrayOffset();*/
-
       try {
-       /* decoder = DecoderFactory.get().binaryDecoder(buffer.array(), start, buffer.limit(), null);*/
+        log.info("[AvroDeserializer] to deserialize = {}", data);
+
         ByteArrayInputStream bufferArrayInputStream = new ByteArrayInputStream(data);
         decoder = DecoderFactory.get().binaryDecoder(bufferArrayInputStream,null);
         result = reader.read(null, decoder);
+        log.info("[AvroDeserializer] retrieved = {}", result);
       } catch (RuntimeException | IOException ex) {
         throw new SerializationException("Error deserializing Avro message");
       }
@@ -97,4 +84,5 @@ public class AvroDeserializer implements Deserializer<Object> {
   public void close() {
 
   }
+
 }

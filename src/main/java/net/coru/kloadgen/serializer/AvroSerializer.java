@@ -31,7 +31,7 @@ public class AvroSerializer<T extends EnrichedRecord>  implements Serializer<T> 
       byte[] result = null;
 
       if (data != null) {
-        log.debug("data='{}'", data);
+        log.info("[AvroSerializer] data='{}'", data);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
@@ -40,11 +40,11 @@ public class AvroSerializer<T extends EnrichedRecord>  implements Serializer<T> 
         DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(((GenericRecord)data.getGenericRecord()).getSchema());
         datumWriter.write((GenericRecord)data.getGenericRecord(), binaryEncoder);
 
+        result = byteArrayOutputStream.toByteArray();
+
         binaryEncoder.flush();
         byteArrayOutputStream.close();
-
-        result = byteArrayOutputStream.toByteArray();
-        log.debug("serialized data='{}'", DatatypeConverter.printHexBinary(result));
+        log.info("[AvroSerializer] serialized data='{}'", DatatypeConverter.printHexBinary(result));
       }
       return result;
     } catch (IOException ex) {
