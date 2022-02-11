@@ -251,14 +251,31 @@ public final class SamplerUtil {
   }
 
   public static void setupConsumerSchemaRegistryProperties(JavaSamplerContext context, Properties props) {
-    if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
-      props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
-    }
+    Map<String, String> originals = new HashMap<>();
+    setupSchemaRegistryAuthenticationProperties(context.getJMeterVariables(), originals);
+    props.putAll(originals);
+
     if (Objects.nonNull(context.getJMeterVariables().get(VALUE_NAME_STRATEGY))) {
       props.put(VALUE_NAME_STRATEGY, context.getJMeterVariables().get(VALUE_NAME_STRATEGY));
     }
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_NAME_STRATEGY))) {
       props.put(KEY_NAME_STRATEGY, context.getJMeterVariables().get(KEY_NAME_STRATEGY));
+    }
+  }
+
+  private static void setupSchemaRegistryAuthenticationProperties(JMeterVariables context, Map<String, String> props) {
+    if (Objects.nonNull(context.get(SCHEMA_REGISTRY_URL))) {
+      props.put(SCHEMA_REGISTRY_URL, context.get(SCHEMA_REGISTRY_URL));
+
+      if (FLAG_YES.equals(context.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+          props.put(BASIC_AUTH_CREDENTIALS_SOURCE, context.get(BASIC_AUTH_CREDENTIALS_SOURCE));
+          props.put(USER_INFO_CONFIG, context.get(USER_INFO_CONFIG));
+        } else {
+          props.put(BEARER_AUTH_CREDENTIALS_SOURCE, context.get(BEARER_AUTH_CREDENTIALS_SOURCE));
+          props.put(BEARER_AUTH_TOKEN_CONFIG, context.get(BEARER_AUTH_TOKEN_CONFIG));
+        }
+      }
     }
   }
 
@@ -377,17 +394,7 @@ public final class SamplerUtil {
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
-      originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
-
-      if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
-          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
-          originals.put(USER_INFO_CONFIG, jMeterVariables.get(USER_INFO_CONFIG));
-        } else {
-          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
-          originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
-        }
-      }
+      setupSchemaRegistryAuthenticationProperties(jMeterVariables, originals);
 
       props.putAll(originals);
 
