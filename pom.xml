@@ -408,8 +408,8 @@
                   </excludes>
                 </filter>
               </filters>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
               <shadedClassifierName>${lane}</shadedClassifierName>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
             </configuration>
             <executions>
               <execution>
