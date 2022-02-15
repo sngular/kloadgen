@@ -86,6 +86,7 @@ public class JSONSchemaParser implements SchemaParser {
     JsonNode schemaName = jsonNode.path("$schema");
     JsonNode requiredList = jsonNode.path(REQUIRED);
     JsonNode type = jsonNode.path(TYPE);
+    String schemaType = getSafeType(jsonNode).toLowerCase();
 
     List<String> requiredFields = new ArrayList<>();
     requiredList.elements().forEachRemaining((elm) -> requiredFields.add(elm.textValue()));
@@ -94,8 +95,9 @@ public class JSONSchemaParser implements SchemaParser {
             forEachRemaining((elm) -> requiredFields.add(field.getKey() + "." + elm.textValue())));
 
     CollectionUtils.collect(jsonNode.path(PROPERTIES).fieldNames(),
-        fieldName -> buildProperty(fieldName, jsonNode.path(PROPERTIES).get(fieldName), requiredFields.contains(fieldName)),
-        fields);
+        fieldName -> buildProperty(fieldName, jsonNode.path(PROPERTIES).get(fieldName), requiredFields.contains(fieldName),
+        Objects.nonNull(schemaType) && schemaType.equals("object")), fields);
+
     schema = Schema.builder()
             .id(schemaId.asText())
             .name(schemaName.asText())
@@ -242,17 +244,20 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildDefinitionArrayField(String fieldName, JsonNode jsonNode, JsonNode definitions) {
-    return buildArrayField(fieldName, jsonNode, buildDefinition(null, jsonNode.path("items"), definitions));
+    return buildArrayField(fieldName, jsonNode, buildDefinition(null, jsonNode.path("items"), definitions), true);
   }
 
   private Field buildDefinitionObjectField(String fieldName, JsonNode jsonNode, JsonNode definitions) {
     List<Field> properties = new ArrayList<>();
     if (Objects.nonNull(jsonNode.get(PROPERTIES))) {
-      CollectionUtils.collect(jsonNode.path(PROPERTIES).fields(),
-                              field -> buildDefinition(field.getKey(), field.getValue(), definitions), properties);
+      CollectionUtils.collect(jsonNode.path(PROPERTIES).fields() ,
+                              field -> buildDefinition(field.getKey() , field.getValue() , definitions) , properties);
       List<String> strRequired = jsonNode.findValuesAsText(REQUIRED);
-      CollectionUtils.filter(strRequired, StringUtils::isNotEmpty);
+      CollectionUtils.filter(strRequired , StringUtils::isNotEmpty);
       return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).build();
+    } else if (!jsonNode.path(ADDITIONAL_PROPERTIES).isNull() && !jsonNode.path(ADDITIONAL_PROPERTIES).isEmpty()) {
+      Field internalMapField = buildDefinition("internalMapField" , jsonNode.path(ADDITIONAL_PROPERTIES), definitions);
+      return MapField.builder().name(fieldName).mapType(internalMapField).isFieldRequired(true).build();
     } else if (Objects.nonNull(jsonNode.get("$ref"))) {
       String referenceName = extractRefName(jsonNode);
       if (definitionsMap.containsKey(referenceName)) {
@@ -289,16 +294,20 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildProperty(String fieldName, JsonNode jsonNode) {
-    return buildProperty(fieldName, jsonNode, null);
+    return buildProperty(fieldName, jsonNode, null, null);
   }
 
   private Field buildProperty(String fieldName, JsonNode jsonNode, Boolean required) {
+    return buildProperty(fieldName, jsonNode, required, null);
+  }
+
+  private Field buildProperty(String fieldName, JsonNode jsonNode, Boolean required, Boolean isParentObject) {
     Field result;
     if (isRefNode(jsonNode)) {
       if (isRefNodeSupported(jsonNode)) {
         String referenceName = extractRefName(jsonNode);
         if ("array".equalsIgnoreCase(jsonNode.findPath(TYPE).textValue())) {
-          result = buildArrayField(fieldName, jsonNode, definitionsMap.get(referenceName).cloneField(null), required);
+          result = buildArrayField(fieldName, jsonNode, definitionsMap.get(referenceName).cloneField(null), checkRequiredCollection(isParentObject,required));
         } else {
           result = definitionsMap.get(referenceName).cloneField(fieldName);
         }
@@ -306,7 +315,7 @@ public class JSONSchemaParser implements SchemaParser {
         throw new KLoadGenException(String.format("Reference not Supported: %s", extractRefName(jsonNode)));
       }
     } else if (isAnyType(jsonNode)) {
-      result = buildField(fieldName, jsonNode, required);
+      result = buildField(fieldName, jsonNode, required,isParentObject);
     } else if (isCombine(jsonNode)) {
       if (Objects.nonNull(jsonNode.get(ANY_OF))) {
         result = chooseAnyOf(fieldName, jsonNode, ANY_OF);
@@ -328,6 +337,10 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildField(String fieldName, JsonNode jsonNode, Boolean required) {
+    return buildField(fieldName, jsonNode, null, null);
+  }
+
+  private Field buildField(String fieldName, JsonNode jsonNode, Boolean required, Boolean isParentObject) {
     Field result;
     String nodeType = getSafeType(jsonNode).toLowerCase();
     if (Objects.nonNull(nodeType)) {
@@ -339,10 +352,10 @@ public class JSONSchemaParser implements SchemaParser {
           result = buildNumberField(fieldName, jsonNode);
           break;
         case "array":
-          result = buildArrayField(fieldName, jsonNode, required);
+          result = buildArrayField(fieldName, jsonNode, checkRequiredCollection(isParentObject,required));
           break;
         case "object":
-          result = buildObjectField(fieldName, jsonNode, required);
+          result = buildObjectField(fieldName, jsonNode, required,isParentObject);
           break;
         case "boolean":
           result = buildBooleanField(fieldName);
@@ -517,7 +530,7 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildArrayField(String fieldName, JsonNode jsonNode, Boolean required) {
-    return buildArrayField(fieldName, jsonNode, buildProperty(null, jsonNode.path("items"), required), required);
+    return buildArrayField(fieldName, jsonNode, buildProperty(null, jsonNode.path("items"), false), required);
   }
 
   private Field buildArrayField(String fieldName, JsonNode jsonNode, Field value) {
@@ -541,7 +554,11 @@ public class JSONSchemaParser implements SchemaParser {
     return buildObjectField(fieldName, jsonNode, null);
   }
 
-  private Field buildObjectField(String fieldName, JsonNode jsonNode, Boolean required) {
+  private Field buildObjectField(String fieldName, JsonNode jsonNode,Boolean required) {
+    return buildObjectField(fieldName, jsonNode, required,null);
+  }
+
+  private Field buildObjectField(String fieldName, JsonNode jsonNode, Boolean required,Boolean isParentObject) {
     List<Field> properties = new ArrayList<>();
     JsonNode requiredList = jsonNode.path(REQUIRED);
     List<String> strRequired = new ArrayList<>();
@@ -550,7 +567,9 @@ public class JSONSchemaParser implements SchemaParser {
     CollectionUtils.filter(strRequired, StringUtils::isNotEmpty);
     if (!isCombine(jsonNode)) {
       if (jsonNode.path(ADDITIONAL_PROPERTIES).isNull() || jsonNode.path(ADDITIONAL_PROPERTIES).isEmpty()){
-        CollectionUtils.collect(jsonNode.path(PROPERTIES).fields(), field -> buildProperty(field.getKey(), field.getValue(), strRequired.contains(field.getKey())), properties);
+        CollectionUtils.collect(jsonNode.path(PROPERTIES).fields(),
+                                field -> buildProperty(field.getKey(), field.getValue(), strRequired.contains(field.getKey()),true),
+                                properties);
         if (required != null){
           return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).isFieldRequired(required).build();
         }else {
@@ -559,7 +578,7 @@ public class JSONSchemaParser implements SchemaParser {
       } else{
         JsonNode fieldReaded = jsonNode.path(ADDITIONAL_PROPERTIES);
         Field field2 = buildProperty("internalMapField", fieldReaded, false);
-        return MapField.builder().name(fieldName).mapType(field2).isFieldRequired(required != null ? required : false).build();
+        return MapField.builder().name(fieldName).mapType(field2).isFieldRequired(checkRequiredCollection(isParentObject,required)).build();
       }
 
 
@@ -587,4 +606,10 @@ public class JSONSchemaParser implements SchemaParser {
   private Field buildBooleanField(String fieldName) {
     return BooleanField.builder().name(fieldName).build();
   }
+
+  private Boolean checkRequiredCollection(Boolean isParentObject, Boolean required){
+    boolean isRequired = required != null ? required : false;
+    return isParentObject != null && isParentObject ? true: isRequired;
+  }
+
 }

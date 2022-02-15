@@ -1,0 +1,142 @@
+{
+  "$id": "https://example.com/collection-complex.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "complex collections",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "arrayOfMapsOfStrings": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+    "arrayOfMapsOfObjects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "stringObject": {
+              "type": "string"
+            },
+            "numberObject": {
+              "type": "integer"
+            }
+          },
+          "required": ["numberObject"]
+        }
+      }
+    },
+    "arrayOfArraysOfStrings": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "arrayOfArraysOfObjects": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name2Object": {
+              "type": "string"
+            },
+            "number2Object": {
+              "type": "integer"
+            }
+          },
+          "required": ["name2ArraysObject"]
+        }
+      }
+    },
+    "mapOfArraysOfStrings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "mapOfArraysOfObjects": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name3Object": {
+              "type": "string"
+            },
+            "number3Object": {
+              "type": "integer"
+            }
+          },
+          "required": ["name3Object"]
+        }
+      }
+    },
+    "mapOfMapsOfStrings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    },
+    "mapOfMapsOfObjects": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "name4Object": {
+              "type": "string"
+            },
+            "number4Object": {
+              "type": "integer"
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    "mapOfMapsOfObjectsOfArrayOfArrayOfStrings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "stringControlObject": {
+              "type": "string"
+            },
+            "arrayOfArraysOfStrings": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "required": ["stringControlObject"]
+        }
+      }
+    }
+  },
+  "required": []
+}

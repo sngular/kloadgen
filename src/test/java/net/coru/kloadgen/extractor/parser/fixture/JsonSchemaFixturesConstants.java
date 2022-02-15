@@ -57,7 +57,7 @@ public class JsonSchemaFixturesConstants {
                 .id("https://example.com/arrays.schema.json")
                 .name("http://json-schema.org/draft-07/schema#")
                 .type("object")
-                .property(ArrayField.builder().name("fruits").value(StringField.builder().build()).build())
+                .property(ArrayField.builder().name("fruits").value(StringField.builder().build()).isFieldRequired(true).build())
                 .property(ArrayField
                       .builder()
                       .name("vegetables")
@@ -65,13 +65,16 @@ public class JsonSchemaFixturesConstants {
                              .builder()
                              .property(StringField.builder().name("veggieName").build())
                              .property(BooleanField.builder().name("veggieLike").build())
+                             .isFieldRequired(false)
                              .build())
+                      .isFieldRequired(true)
                       .build())
                 .description(ObjectField
                     .builder()
                     .name("veggie")
                     .property(StringField.builder().name("veggieName").build())
                     .property(BooleanField.builder().name("veggieLike").build())
+                    .isFieldRequired(false)
                     .build())
                 .build();
 
@@ -104,7 +107,7 @@ public class JsonSchemaFixturesConstants {
                       .property(StringField.builder().name("prefix").maxlength(3).minLength(2).build())
                       .property(StringField.builder().name("number").maxlength(6).build())
                       .required(asList("prefix", "number"))
-                      .isFieldRequired(true)
+                      .isFieldRequired(false)
                       .build())
                   .isFieldRequired(true)
                   .build())
@@ -317,7 +320,7 @@ public class JsonSchemaFixturesConstants {
                      .property(StringField.builder().name("receiverPhoneNumber").regex("^(.*)$").build())
                      .build())
                   .required(asList("id", "type", "pvpAmount", "promotions"))
-                  .isFieldRequired(true)
+                  .isFieldRequired(false)
                   .build())
               .isFieldRequired(true)
               .build())
