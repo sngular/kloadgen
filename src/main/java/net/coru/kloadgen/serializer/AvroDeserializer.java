@@ -56,7 +56,7 @@ public class AvroDeserializer implements Deserializer<Object> {
       Schema avroSchema = parser.parse(schemaString);
 
       ByteBuffer buffer = getByteBuffer(data);
-      DatumReader<?> reader = new GenericDatumReader<GenericRecord>(avroSchema);
+      DatumReader<GenericRecord> reader = new GenericDatumReader<>(avroSchema);
 
       int length = buffer.limit() - 1 - 4;
       int start = buffer.position() + buffer.arrayOffset();
@@ -92,6 +92,6 @@ public class AvroDeserializer implements Deserializer<Object> {
 
   @Override
   public void close() {
-
+    // No need to be implemented
   }
 }

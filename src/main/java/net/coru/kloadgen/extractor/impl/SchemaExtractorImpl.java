@@ -93,7 +93,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
       attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
     } else if ("PROTOBUF".equalsIgnoreCase(schema.schemaType())) {
       com.squareup.wire.schema.internal.parser.ProtoFileElement protoFileElement = (((ProtobufSchema) schema).rawSchema());
-      protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports()));
+      protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false));
     } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schema.schemaType()));
     }
@@ -110,7 +110,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     ParsedSchema parsedSchema;
     if ("AVRO".equalsIgnoreCase(schemaType)) {
       parsedSchema = avroExtractor.getParsedSchema(readLineByLine(schemaFile.getPath()));
-    } else if ("Json-schema".equalsIgnoreCase(schemaType)) {
+    } else if ("JSON".equalsIgnoreCase(schemaType)) {
       parsedSchema = new JsonSchema(readLineByLine(schemaFile.getPath()));
     } else {
       parsedSchema = new ProtobufSchema(readLineByLine(schemaFile.getPath()));

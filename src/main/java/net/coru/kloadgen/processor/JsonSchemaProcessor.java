@@ -65,8 +65,6 @@ public class JsonSchemaProcessor {
         }
          generatedProperties++;
 
-        //Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName);
-
         if (!fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")
         && (!cleanUpPath(fieldValueMapping, "").contains(".") ||
                 (cleanUpPath(fieldValueMapping, "").contains(".") &&
@@ -179,7 +177,6 @@ public class JsonSchemaProcessor {
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
         } else{
-          //fieldExpMappingsQueue.remove();
           fieldValueMapping = nextField;
         }
       } else {

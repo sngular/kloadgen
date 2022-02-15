@@ -35,40 +35,35 @@ public class ProtoBufExtractor {
 
   public List<FieldValueMapping> processSchema(ProtoFileElement schema) {
     List<FieldValueMapping> attributeList = new ArrayList<>();
-    schema.getTypes().forEach(field -> processField(field, attributeList, schema.getImports()));
+    schema.getTypes().forEach(field -> processField(field, attributeList, schema.getImports(), true));
     return attributeList;
   }
 
-  private List<FieldValueMapping> processFieldList(TypeElement fieldList, List<String> imports) {
-    List<FieldValueMapping> completeFieldList = new ArrayList<>();
-    processField(fieldList, completeFieldList, imports);
-    return completeFieldList;
-  }
-
-  public void processField(TypeElement field, List<FieldValueMapping> completeFieldList, List<String> imports) {
+  public void processField(TypeElement field, List<FieldValueMapping> completeFieldList, List<String> imports, final boolean isParentRequired) {
     HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     fillNestedTypes(field, nestedTypes);
     if (field instanceof MessageElement) {
       var messageField = (MessageElement) field;
       if (!messageField.getOneOfs().isEmpty()) {
-        extractOneOfs((MessageElement) field, completeFieldList, nestedTypes);
+        extractOneOfs((MessageElement) field, completeFieldList, nestedTypes, isParentRequired);
       }
       for (var subfield : messageField.getFields()) {
         Field.Label label = checkNullLabel(subfield);
         boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
+        boolean isOptional = "optional".equals(Objects.requireNonNull(label.toString()));
         boolean isMap = subfield.getType().startsWith("map");
         if (ProtobufHelper.isValidType(subfield.getType())) {
-          extractPrimitiveTypes(completeFieldList, subfield, isArray);
+          extractPrimitiveTypes(completeFieldList, subfield, isArray, !isOptional, isParentRequired);
         } else if (isMap) {
-          extractMapType(completeFieldList, nestedTypes, subfield, imports);
+          extractMapType(completeFieldList, nestedTypes, subfield, imports, !isOptional, isParentRequired);
         } else {
           String dotType = checkDotType(subfield.getType(), imports);
           if (nestedTypes.containsKey(subfield.getType())) {
-            extractNestedTypes(completeFieldList, nestedTypes, subfield, isArray, imports);
+            extractNestedTypes(completeFieldList, nestedTypes, subfield, isArray, imports, !isOptional, isParentRequired);
           } else if (nestedTypes.containsKey(dotType)) {
-            extractDotTypesWhenIsInNestedType(completeFieldList, nestedTypes, subfield, isArray, dotType, imports);
+            extractDotTypesWhenIsInNestedType(completeFieldList, nestedTypes, subfield, isArray, dotType, imports, !isOptional, isParentRequired);
           } else {
-            extractDotTypeWhenNotNestedType(completeFieldList, subfield, isArray, dotType);
+            extractDotTypeWhenNotNestedType(completeFieldList, subfield, isArray, dotType, !isOptional, isParentRequired);
           }
         }
       }
@@ -82,50 +77,60 @@ public class ProtoBufExtractor {
     }
   }
 
-  private void extractOneOfs(MessageElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes) {
+  private List<FieldValueMapping> processFieldList(TypeElement fieldList, List<String> imports) {
+    List<FieldValueMapping> completeFieldList = new ArrayList<>();
+    processField(fieldList, completeFieldList, imports, false);
+    return completeFieldList;
+  }
+
+  private void extractOneOfs(MessageElement field, List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, final boolean isParentRequired) {
     List<OneOfElement> oneOfs = new ArrayList<>(field.getOneOfs());
     for (OneOfElement oneOfElement : oneOfs) {
       if (!oneOfElement.getFields().isEmpty()) {
         FieldElement subField = oneOfElement.getFields().get(RandomUtils.nextInt(0, oneOfElement.getFields().size()));
         if (ProtobufHelper.isValidType(subField.getType())) {
-          completeFieldList.add(new FieldValueMapping(subField.getName(), ProtobufHelper.translateType(subField.getType()), 0, ""));
+          completeFieldList.add(new FieldValueMapping(subField.getName(), ProtobufHelper.translateType(subField.getType()), 0, "", true, isParentRequired));
         } else if (nestedTypes.containsKey(subField.getType())) {
           MessageElement clonedField = new MessageElement(field.getLocation(), field.getName(), field.getDocumentation(),
                                                           field.getNestedTypes(), field.getOptions(), field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(),
                                                           field.getExtensions(), field.getGroups());
-          processField(clonedField, completeFieldList, Collections.emptyList());
+          processField(clonedField, completeFieldList, Collections.emptyList(), isParentRequired);
         } else {
-          completeFieldList.add(new FieldValueMapping(subField.getName(), subField.getType(), 0, ""));
+          completeFieldList.add(new FieldValueMapping(subField.getName(), subField.getType(), 0, "", true, isParentRequired));
         }
 
       }
     }
   }
 
-  private void extractDotTypeWhenNotNestedType(List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray, String dotType) {
+  private void extractDotTypeWhenNotNestedType(
+      List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray, String dotType, final boolean isRequired, final boolean isParentRequired) {
     if (isArray) {
       completeFieldList
-          .add(new FieldValueMapping(subfield.getName() + "[]", dotType + ARRAY_POSTFIX, 0, ""));
+          .add(new FieldValueMapping(subfield.getName() + "[]", dotType + ARRAY_POSTFIX, 0, "", isRequired, isParentRequired));
     } else {
       completeFieldList
-          .add(new FieldValueMapping(subfield.getName(), dotType, 0, ""));
+          .add(new FieldValueMapping(subfield.getName(), dotType, 0, "", isRequired, isParentRequired));
     }
   }
 
   private void extractMapType(
-      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports, final boolean isRequired,
+      final boolean isParentRequired) {
     String subFieldType = extractInternalMapFields(subfield);
     String dotTypeMap = checkDotType(subFieldType, imports);
     if (ProtobufHelper.isValidType(subFieldType)) {
       completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]",
-                                                  subFieldType.replace(subFieldType, ProtobufHelper.translateType(subFieldType)) +
-                                                                                                      MAP_POSTFIX, 0, ""));
+                                                  subFieldType.replace(subFieldType, ProtobufHelper.translateType(subFieldType)) + MAP_POSTFIX,
+                                                  0, "", isRequired, isParentRequired));
     } else if (nestedTypes.containsKey(subFieldType)) {
-      extractNestedTypesMap(completeFieldList, nestedTypes, subfield, imports);
+      extractNestedTypesMap(completeFieldList, nestedTypes, subfield, imports, isRequired, isParentRequired);
     } else if (nestedTypes.containsKey(dotTypeMap)) {
-      extractDotTypesMap(completeFieldList, nestedTypes, subfield, dotTypeMap, imports);
+      extractDotTypesMap(completeFieldList, nestedTypes, subfield, dotTypeMap, imports, isRequired, isParentRequired);
     } else if (!imports.isEmpty() && isExternalType(imports, dotTypeMap)) {
-      completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]", ProtobufHelper.translateType("string") + MAP_POSTFIX, 0, ""));
+      completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]",
+                                                  ProtobufHelper.translateType("string") + MAP_POSTFIX,
+                                                  0, "", isRequired, isParentRequired));
     } else {
       throw new KLoadGenException(UNSUPPORTED_TYPE_OF_VALUE);
     }
@@ -136,49 +141,57 @@ public class ProtoBufExtractor {
     return mapSplit[1].replace(">", "").trim();
   }
 
-  private void extractPrimitiveTypes(List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray) {
+  private void extractPrimitiveTypes(List<FieldValueMapping> completeFieldList, FieldElement subfield, boolean isArray, final boolean isRequired, final boolean isParentRequired) {
     if (isArray) {
       completeFieldList
-          .add(new FieldValueMapping(subfield.getName() + "[]", subfield.getType().replace(subfield.getType(),
-                                                                                           ProtobufHelper.translateType(subfield.getType())) +
-                                                                                        ARRAY_POSTFIX, 0, ""));
+          .add(new FieldValueMapping(subfield.getName() + "[]",
+                                     subfield.getType().replace(subfield.getType(),
+                                     ProtobufHelper.translateType(subfield.getType())) + ARRAY_POSTFIX,
+                                     0, "", isRequired, isParentRequired));
     } else {
       completeFieldList
-          .add(new FieldValueMapping(subfield.getName(), subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())), 0, ""));
+          .add(new FieldValueMapping(subfield.getName(),
+                                     subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())),
+                                     0, "", isRequired, isParentRequired));
     }
   }
 
-  private void extractDotTypesWhenIsInNestedType(List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, String dotType,
-      List<String> imports) {
+  private void extractDotTypesWhenIsInNestedType(
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, String dotType,
+      List<String> imports, final boolean isRequired, final boolean isParentRequired) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(dotType), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if (isArray) {
         completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."),
-                                                    fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping)));
+                                                    fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping), isRequired, isParentRequired));
       } else {
         completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."),
-                                                    fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping)));
+                                                    fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping), isRequired, isParentRequired));
       }
     }
   }
 
   private void extractNestedTypes(
-      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, boolean isArray, List<String> imports, final boolean isRequired,
+      final boolean isParentRequired) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(subfield.getType()), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if ("enum".equals(fieldValueMapping.getFieldType())) {
         if (isArray) {
-          completeFieldList.add(new FieldValueMapping( subfield.getName() + "[]", fieldValueMapping.getFieldType() + ARRAY_POSTFIX, 0,
-                                                       getValueList(fieldValueMapping)));
+          completeFieldList.add(new FieldValueMapping( subfield.getName() + "[]",
+                                                       fieldValueMapping.getFieldType() + ARRAY_POSTFIX,
+                                                       0, getValueList(fieldValueMapping), isRequired, isParentRequired));
         } else {
           completeFieldList.add(
-              new FieldValueMapping(subfield.getName(), fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping)));
+              new FieldValueMapping(subfield.getName(), fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping), isRequired, isParentRequired));
         }
       } else {
         if (isArray) {
-          completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."), fieldValueMapping.getFieldType(), 0, ""));
+          completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."),
+                                                      fieldValueMapping.getFieldType(), 0, "", isRequired, isParentRequired));
         } else {
-          completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."), fieldValueMapping.getFieldType(), 0, ""));
+          completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."),
+                                                      fieldValueMapping.getFieldType(), 0, "", isRequired, isParentRequired));
         }
       }
     }
@@ -189,13 +202,17 @@ public class ProtoBufExtractor {
   }
 
   private void extractNestedTypesMap(
-      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, List<String> imports, final boolean isRequired,
+      final boolean isParentRequired) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(extractInternalMapFields(subfield)), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if ("enum".equals(fieldValueMapping.getFieldType())) {
-        completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]", fieldValueMapping.getFieldType() + MAP_POSTFIX, 0, getValueList(fieldValueMapping)));
+        completeFieldList.add(new FieldValueMapping(subfield.getName() + "[:]",
+                                                    fieldValueMapping.getFieldType() + MAP_POSTFIX,
+                                                    0, getValueList(fieldValueMapping), isRequired, isParentRequired));
       } else {
-        completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."), fieldValueMapping.getFieldType(), 0, ""));
+        completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."),
+                                                    fieldValueMapping.getFieldType(), 0, "", isRequired, isParentRequired));
       }
     }
   }
@@ -206,10 +223,12 @@ public class ProtoBufExtractor {
   }
 
   private void extractDotTypesMap(
-      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, String dotType, List<String> imports) {
+      List<FieldValueMapping> completeFieldList, HashMap<String, TypeElement> nestedTypes, FieldElement subfield, String dotType, List<String> imports, final boolean isRequired,
+      final boolean isParentRequired) {
     List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(dotType), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
-      completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."), fieldValueMapping.getFieldType(), 0, ""));
+      completeFieldList.add(new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."),
+                                                  fieldValueMapping.getFieldType(), 0, "", isRequired, isParentRequired));
 
     }
   }

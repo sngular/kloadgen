@@ -342,4 +342,73 @@ class ProtobufSchemaProcessorTest {
                               "company.IncidentEvent.create_user_id");
     assertThat(assertValues).isNotNull().hasSize(23);
   }
+
+  @Test
+  void testFailing() throws IOException, DescriptorValidationException {
+    File testFile = fileHelper.getFile("/proto-files/deveTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = asList(
+            new FieldValueMapping("load_type", "string", 0, ""),
+            new FieldValueMapping("shipment.carrier_identifier.type", "enum", 0, "[CARRIER_IDENTIFIER_TYPE_UNSPECIFIED, CARRIER_IDENTIFIER_TYPE_DOT_NUMBER]"),
+            new FieldValueMapping("shipment.carrier_identifier.value", "string", 0, ""),
+            new FieldValueMapping("shipment.shipment_identifiers[].type", "enum", 0, "[SHIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
+                                                                                     "SHIPMENT_IDENTIFIER_TYPE_BILL_OF_LADING, SHIPMENT_IDENTIFIER_TYPE_ORDER]"),
+            new FieldValueMapping("shipment.shipment_identifiers[].value", "string", 0, ""),
+            new FieldValueMapping("shipment.equipment_identifiers[].type", "enum", 0, "[EQUIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
+                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_MOBILE_PHONE_NUMBER, " +
+                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_VEHICLE_ID, " +
+                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_LICENSE_PLATE, " +
+                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_SENSITECH_DEVICE_ID, " +
+                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_EMERSON_DEVICE_ID, " +
+                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_TIVE_DEVICE_ID, " +
+                                                                                      "EQUIPMENT_IDENTIFIER_TYPE_CONTAINER_ID]"),
+            new FieldValueMapping("shipment.equipment_identifiers[].value", "string", 0, ""),
+            new FieldValueMapping("shipment.attributes[]", "string-array", 0, ""),
+            new FieldValueMapping("latest_status_update.timestamp", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_status_update.stop_number", "int", 0, ""),
+            new FieldValueMapping("latest_status_update.status_code", "enum", 0, "[STATUS_UPDATE_CODE_UNSPECIFIED, STATUS_UPDATE_CODE_DISPATCHED, STATUS_UPDATE_CODE_IN_TRANSIT, " +
+                                                                                 "STATUS_UPDATE_CODE_AT_STOP, STATUS_UPDATE_CODE_COMPLETED, STATUS_UPDATE_CODE_TRACKING_FAILED, " +
+                                                                                 "STATUS_UPDATE_CODE_INFO, STATUS_UPDATE_CODE_DELETED]"),
+            new FieldValueMapping("latest_status_update.status_reason", "enum", 0, "[STATUS_UPDATE_REASON_UNSPECIFIED, STATUS_UPDATE_REASON_PENDING_TRACKING_METHOD, " +
+                                                                                   "STATUS_UPDATE_REASON_SCHEDULED, STATUS_UPDATE_REASON_PENDING_APPROVAL, " +
+                                                                                   "STATUS_UPDATE_REASON_ACQUIRING_LOCATION, STATUS_UPDATE_REASON_PENDING_CARRIER, STATUS_UPDATE_REASON_IN_MOTION, STATUS_UPDATE_REASON_IDLE, STATUS_UPDATE_REASON_APPROVAL_DENIED, STATUS_UPDATE_REASON_TIMED_OUT, STATUS_UPDATE_REASON_CANCELED, STATUS_UPDATE_REASON_DEPARTED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FAILED_TO_ACQUIRE_LOCATION, STATUS_UPDATE_REASON_INFO]"),
+            new FieldValueMapping("latest_status_update.geo_coordinates.latitude", "double", 0, ""),
+            new FieldValueMapping("latest_status_update.geo_coordinates.longitude", "double", 0, ""),
+            new FieldValueMapping("latest_status_update.address.postal_code", "string", 0, ""),
+            new FieldValueMapping("latest_status_update.address.address_lines[]", "string-array", 0, ""),
+            new FieldValueMapping("latest_status_update.address.city", "string", 0, ""),
+            new FieldValueMapping("latest_status_update.address.state", "string", 0, ""),
+            new FieldValueMapping("latest_status_update.address.country", "string", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].stop_number", "int", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].status_code", "enum", 0, "[STOP_STATUS_CODE_UNSPECIFIED, STOP_STATUS_CODE_UNKNOWN, STOP_STATUS_CODE_EN_ROUTE, " +
+                                                                                   "STOP_STATUS_CODE_ARRIVED, STOP_STATUS_CODE_DEPARTED]"),
+            new FieldValueMapping("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.start_date_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.end_date_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].arrival_estimate.last_calculated_date_time", ".google.protobuf.Timestamp", 0, ""),
+            new FieldValueMapping("latest_stop_statuses[].arrival_code", "enum", 0, "[ARRIVAL_CODE_UNSPECIFIED, ARRIVAL_CODE_UNKNOWN, ARRIVAL_CODE_EARLY, ARRIVAL_CODE_ON_TIME, " +
+                                                                                    "ARRIVAL_CODE_LATE]"),
+            new FieldValueMapping("latest_stop_statuses[].additional_appointment_window_statuses[]", "string-array", 0, "")
+        );
+
+    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = protobufSchemaProcessor.next();
+    DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+    List<String> assertKeys = new ArrayList<>();
+    List<Object> assertValues = new ArrayList<>();
+    Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+    map.forEach((key, value) ->
+                {
+                  assertKeys.add(key.getFullName());
+                  assertValues.add(value);
+                }
+    );
+
+    assertThat(message).isNotNull()
+                       .isInstanceOf(EnrichedRecord.class)
+                       .extracting(EnrichedRecord::getGenericRecord)
+                       .isNotNull();
+
+    assertThat(assertKeys).hasSize(4);
+
+  }
 }

@@ -8,9 +8,11 @@ option java_outer_classname = "AddressBookProtos";
 
 message Person {
   map<string, PhoneNumber> phones = 1;
+
   message PhoneNumber {
 
     map<string, Address> addressesPhone = 1;
+
     message Address{
       repeated string id = 1;
     }

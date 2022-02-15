@@ -41,7 +41,7 @@ public class FieldValueMapping extends AbstractTestElement {
     private String fieldName;
     private String fieldType;
     private Integer valueLength;
-    private String fieldValueList;
+    private String fieldValueList = "";
     private Boolean required = true;
     private Boolean isParentRequired = true;
 

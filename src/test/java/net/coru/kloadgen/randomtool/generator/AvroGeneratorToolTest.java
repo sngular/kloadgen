@@ -1,7 +1,7 @@
 /*
  *  This Source Code Form is subject to the terms of the Mozilla Public
- *  * License, v. 2.0. If a copy of the MPL was not distributed with this
- *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
 package net.coru.kloadgen.randomtool.generator;
@@ -75,6 +75,14 @@ class AvroGeneratorToolTest {
     );
   }
 
+  @ParameterizedTest
+  @DisplayName("Testing Random Value for Field")
+  @MethodSource("parametersForGenerateRandomValueForField")
+  void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
+  }
+
   private static Stream<Arguments> parametersForGenerateRandomValueForFieldLogicalTypes() {
     Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
     Schema decimalSchemaFixed = SchemaBuilder.builder().fixed("decimal").size(5);
@@ -108,14 +116,6 @@ class AvroGeneratorToolTest {
             Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new Field(
                     "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
     );
-  }
-
-  @ParameterizedTest
-  @DisplayName("Testing Random Value for Field")
-  @MethodSource("parametersForGenerateRandomValueForField")
-  void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest

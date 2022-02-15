@@ -25,6 +25,7 @@ import org.apache.commons.collections4.IteratorUtils;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -145,7 +146,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
     }
 
     private Map<ConstraintTypeEnum, String> extractConstraints(Schema.Field field) {
-        Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
+        Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
 
         if (Objects.nonNull(field.schema().getObjectProp("precision")))
             constrains.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
@@ -293,20 +294,18 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
 
             generatedProperties++;
 
-            if (((subSchema.getType().equals(RECORD) && isOptionalField(subSchema.getField(fieldNameSubEntity)))  ||
-                 (subSchema.getType().equals(ARRAY) && isOptionalField(subSchema.getField(fieldNameSubEntity))) ||
-                 (subSchema.getType().equals(MAP) && isOptionalField(subSchema.getValueType().getField(fieldNameSubEntity))))
-                && fieldValueMapping.getFieldValuesList().contains("null")){
+            if ((((RECORD.equals(subSchema.getType()) || ARRAY.equals(subSchema.getType())) && isOptionalField(subSchema.getField(fieldNameSubEntity)))  ||
+                 (MAP.equals(subSchema.getType()) && isOptionalField(subSchema.getValueType().getField(fieldNameSubEntity))))
+                && fieldValueMapping.getFieldValuesList().contains("null")) {
 
                 elapsedProperties++;
                 FieldValueMapping actualField = fieldExpMappingsQueue.peek();
                 fieldExpMappingsQueue.remove();
                 FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
-                if (((fieldExpMappingsQueue.peek() != null && !Objects.requireNonNull(nextField).getFieldName().contains(rootFieldName))
-                    || fieldExpMappingsQueue.peek() == null)
-                    && actualField.getParentRequired()
-                    && (generatedProperties == elapsedProperties && generatedProperties>0)){
+                if (Boolean.TRUE.equals((fieldExpMappingsQueue.peek() == null || !Objects.requireNonNull(nextField).getFieldName().contains(rootFieldName))
+                    && Objects.requireNonNull(actualField).getParentRequired())
+                    && (generatedProperties == elapsedProperties && generatedProperties > 0)) {
 
                     fieldValueMapping = actualField;
                     fieldValueMapping.setRequired(true);
@@ -364,18 +363,6 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return subEntity;
     }
 
-    private Schema extractRecordSchema(Field field) {
-        if (ARRAY == field.schema().getType()) {
-            return field.schema().getElementType();
-        } else if (MAP == field.schema().getType()) {
-            return field.schema().getValueType();
-        } else if (UNION == field.schema().getType()) {
-            return getRecordUnion(field.schema().getTypes());
-        } else if (typesSet.contains(field.schema().getType())) {
-            return getRecordUnion(field.schema().getTypes());
-        } else return null;
-    }
-
     private GenericRecord createRecord(Schema schema) {
         if (RECORD == schema.getType()) {
             return new GenericData.Record(schema);
@@ -398,29 +385,6 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
             }
         }
         return isRecord;
-    }
-
-    private Object createArray(Schema subSchema, String fieldName, Integer arraySize, Integer fieldValueLength, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-        if (ARRAY.equals(subSchema.getType())) {
-            if (typesSet.contains(subSchema.getElementType().getType())) {
-                return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-            } else if (MAP.equals(subSchema.getElementType().getType())) {
-                fieldExpMappingsQueue.remove();
-                return createSimpleTypeMap(fieldName, subSchema.getElementType().getValueType().getType().getName(), arraySize, fieldValueLength, Collections.emptyList());
-            } else {
-                return createObjectArray(subSchema.getElementType(), fieldName, arraySize, fieldExpMappingsQueue);
-            }
-        } else if (MAP.equals(subSchema.getType())) {
-            if (ARRAY.equals(subSchema.getValueType().getType())) {
-                return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-            } else {
-                return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-            }
-        } else if (typesSet.contains(subSchema.getType())) {
-            return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-        } else {
-            return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-        }
     }
 
     private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
