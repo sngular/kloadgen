@@ -6,20 +6,18 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
+import static net.coru.kloadgen.randomtool.util.ValueUtils.getValidTypeFromSchema;
 import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.FIXED;
 import static org.apache.avro.Schema.Type.NULL;
 import static org.apache.avro.Schema.Type.UNION;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.random.RandomArray;
-import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.avro.Schema;
@@ -64,9 +62,9 @@ public class AvroGeneratorTool {
     } else if ("seq".equalsIgnoreCase(fieldType)) {
       if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
         fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
-        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), fieldType, fieldValuesList, context);
+        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), getValidTypeFromSchema(field.schema()), fieldValuesList, context);
       }else {
-        value = randomObject.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
+        value = randomObject.generateSeq(field.name(), getValidTypeFromSchema(field.schema()), parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
 

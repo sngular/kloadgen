@@ -400,29 +400,6 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         return isRecord;
     }
 
-    private Object createArray(Schema subSchema, String fieldName, Integer arraySize, Integer fieldValueLength, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-        if (ARRAY.equals(subSchema.getType())) {
-            if (typesSet.contains(subSchema.getElementType().getType())) {
-                return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-            } else if (MAP.equals(subSchema.getElementType().getType())) {
-                fieldExpMappingsQueue.remove();
-                return createSimpleTypeMap(fieldName, subSchema.getElementType().getValueType().getType().getName(), arraySize, fieldValueLength, Collections.emptyList());
-            } else {
-                return createObjectArray(subSchema.getElementType(), fieldName, arraySize, fieldExpMappingsQueue);
-            }
-        } else if (MAP.equals(subSchema.getType())) {
-            if (ARRAY.equals(subSchema.getValueType().getType())) {
-                return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-            } else {
-                return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-            }
-        } else if (typesSet.contains(subSchema.getType())) {
-            return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-        } else {
-            return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-        }
-    }
-
     private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
         List<GenericRecord> objectArray = new ArrayList<>(arraySize);
         for (int i = 0; i < arraySize - 1; i++) {

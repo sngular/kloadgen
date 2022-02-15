@@ -34,8 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class RandomObject {
 
-  private static final Map<String, Object> context = new HashMap<>();
-
   public boolean isTypeValid(String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
   }
