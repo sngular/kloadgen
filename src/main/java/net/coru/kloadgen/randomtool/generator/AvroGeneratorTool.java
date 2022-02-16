@@ -63,7 +63,7 @@ public class AvroGeneratorTool {
       if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
         fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
         return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), getValidTypeFromSchema(field.schema()), fieldValuesList, context);
-      }else {
+      } else {
         value = randomObject.generateSeq(field.name(), getValidTypeFromSchema(field.schema()), parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {

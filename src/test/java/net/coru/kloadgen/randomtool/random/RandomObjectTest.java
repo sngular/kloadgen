@@ -13,16 +13,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import org.apache.groovy.util.Maps;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -35,16 +32,6 @@ class RandomObjectTest {
   private static final String TIMESTAMP_STRING = "2019-12-06T10:15:30";
   private static final String DATE_STRING = "2019-12-06";
   private static final String TIME_STRING = "10:15:30";
-
-  private static long getMillisFromDate (LocalDateTime localDateTime){
-    return TimeUnit.MILLISECONDS.convert(localDateTime.toEpochSecond(ZoneOffset.UTC), TimeUnit.SECONDS) +
-            TimeUnit.MILLISECONDS.convert(localDateTime.getNano(), TimeUnit.NANOSECONDS);
-  }
-
-  private static long getMicrosFromDate (LocalDateTime localDateTime){
-    return TimeUnit.MICROSECONDS.convert(localDateTime.toEpochSecond(ZoneOffset.UTC), TimeUnit.SECONDS) +
-            TimeUnit.MICROSECONDS.convert(localDateTime.getNano(), TimeUnit.NANOSECONDS);
-  }
 
   private static Stream<Arguments> parametersForGenerateSingleRandomValue() {
     return Stream.of(
@@ -121,5 +108,27 @@ class RandomObjectTest {
 
     assertThat(new RandomObject().generateSeq(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedTyped);
     assertThat(context).containsEntry(fieldName,expectedStored);
+  }
+
+  private static Stream<Arguments> parametersForGenerateRandomValueWithList() {
+    return Stream.of(
+            Arguments.of(18,
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")),
+            Arguments.of(20,
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20", "1", "2")));
+  }
+
+  @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value With a List of Values")
+  @MethodSource("parametersForGenerateRandomValueWithList")
+  void testGenerateRandomValueWithList(int size, List<String> values, List<String> expected) {
+    var intList = new ArrayList<>();
+    var context = new HashMap<String, Object>();
+    for (int i=0; i <= size; i++) {
+      intList.add(new RandomObject().generateSequenceForFieldValueList("ClientCode", "seq", values, context));
+    }
+    assertThat(intList).containsExactlyElementsOf(expected);
   }
 }
