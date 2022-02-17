@@ -1,13 +1,11 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/85c9817742944668b5cc75e3fa1cdb23)](https://app.codacy.com/gh/corunet/kloadgen?utm_source=github.com&utm_medium=referral&utm_content=corunet/kloadgen&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://api.travis-ci.org/corunet/kloadgen.svg?branch=master)](https://travis-ci.org/corunet/kloadgen)
 
-> *¿Tenemos logo de KLoadGen?*
-
-[Summary](#) · [Getting started](#) · [Usage](#) · [Support](#) · [Special thanks](#) 
+[Summary](#summary) · [Getting started](#getting-started) · [Usage](#usage) · [Support](#support) · [Special thanks](#special-thanks) 
 
 ## 📜 Summary
 
-KLoadGen is a Kafka load generator plugin for JMeter designed to work with AVRO and JSON schemas. It allows to send Kafka messages with a structure defined as an AVRO schema or a JSON schema. It connects to the Scheme Registry server, retrieves the subject to send, and generates a random message every time.
+KLoadGen is a Kafka load generator plugin for JMeter designed to work with AVRO and JSON schemas. It allows to send Kafka messages with a structure defined as an AVRO schema or a JSON schema. It connects to the Schema Registry server, retrieves the subject to send, and generates a random message every time.
 
 ### Documentation
 
@@ -30,7 +28,7 @@ Check our [Getting Started](https://github.com/corunet/kloadgen/wiki#getting-sta
 
 ### Configuration
 
-See the sections [Producer setup](https://github.com/corunet/kloadgen/wiki#producer-setup) and [Consumer setup](https://github.com/corunet/kloadgen/wiki#consumer-setup) on our wiki for details on how to set up this plugin.
+See the sections [Producer setup](https://github.com/corunet/kloadgen/wiki#producer-setup) and [Consumer setup](https://github.com/corunet/kloadgen/wiki#consumer-setup) on our wiki for details on how to set up both ends of the message, producer and consumer, for this plugin.
 
 ### Deployment
 
