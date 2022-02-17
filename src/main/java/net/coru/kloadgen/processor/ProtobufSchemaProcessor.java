@@ -2,9 +2,6 @@ package net.coru.kloadgen.processor;
 
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.ENUM;
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
-import static org.apache.avro.Schema.Type.ARRAY;
-import static org.apache.avro.Schema.Type.MAP;
-import static org.apache.avro.Schema.Type.RECORD;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -84,7 +81,6 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
       while (!fieldExpMappingsQueue.isEmpty()) {
         String methodName = cleanUpPath(fieldValueMapping, "");
         String fieldName = getCleanMethodName(fieldValueMapping, "");
-        String collectionTail = fieldValueMapping.getFieldName().substring(fieldValueMapping.getFieldName().lastIndexOf(".") + 1);
         String typeFilter = methodName.replaceAll(fieldName, "");
         String fieldType = fieldValueMapping.getFieldType();
 
@@ -419,7 +415,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     builder.setField(keyFieldDescriptor,
                      randomObject.generateRandom(STRING_TYPE, 10, Collections.emptyList(), Collections.emptyMap()));
     Descriptors.FieldDescriptor valueFieldDescriptor = descriptor.getMessageType().findFieldByName("value");
-    if (valueFieldDescriptor.getType().equals(Descriptors.FieldDescriptor.Type.ENUM)) {
+    if (valueFieldDescriptor.getType().equals(ENUM)) {
       List<String> fieldValueMappings = new ArrayList<>();
       for (Descriptors.EnumValueDescriptor value : valueFieldDescriptor.getEnumType().getValues()) {
         fieldValueMappings.add(value.getName());
@@ -441,7 +437,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     builder.setField(keyFieldDescriptor,
                      randomObject.generateRandom(STRING_TYPE, 10, Collections.emptyList(), Collections.emptyMap()));
     Descriptors.FieldDescriptor valueFieldDescriptor = descriptor.getMessageType().findFieldByName("value");
-    if (valueFieldDescriptor.getType().equals(Descriptors.FieldDescriptor.Type.ENUM)) {
+    if (valueFieldDescriptor.getType().equals(ENUM)) {
       List<String> fieldValueMappings = new ArrayList<>();
       for (Descriptors.EnumValueDescriptor value : valueFieldDescriptor.getEnumType().getValues()) {
         fieldValueMappings.add(value.getName());

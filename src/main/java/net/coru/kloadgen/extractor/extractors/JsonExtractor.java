@@ -1,6 +1,7 @@
 package net.coru.kloadgen.extractor.extractors;
 
 import static java.lang.String.join;
+
 import static net.coru.kloadgen.model.ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.FORMAT;
@@ -16,8 +17,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;

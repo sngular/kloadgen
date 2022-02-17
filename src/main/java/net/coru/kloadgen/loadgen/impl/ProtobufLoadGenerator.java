@@ -1,11 +1,9 @@
 package net.coru.kloadgen.loadgen.impl;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.protobuf.Descriptors.DescriptorValidationException;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.extern.slf4j.Slf4j;
