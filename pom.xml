@@ -5,7 +5,7 @@
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
-  <version>4.1.0</version>
+  <version>4.0.0</version>
 
   <properties>
     <assertj-core.version>3.22.0</assertj-core.version>

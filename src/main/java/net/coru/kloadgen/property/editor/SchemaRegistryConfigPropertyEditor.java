@@ -42,6 +42,7 @@ import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaProvider;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -179,7 +180,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
           originals.put(USER_INFO_CONFIG, schemaProperties.get(SCHEMA_REGISTRY_USERNAME_KEY) + ":" + schemaProperties.get(SCHEMA_REGISTRY_PASSWORD_KEY));
         }
       }
-      SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider()),
+      SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000, List.of(new AvroSchemaProvider(), new JsonSchemaProvider(),
+                                                                                                                     new ProtobufSchemaProvider()),
                                                                                  originals);
 
       List<String> subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());

@@ -39,7 +39,7 @@ public class ProtobufLoadGenerator extends AbstractLoadGenerator implements Base
   public void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings) {
     try {
       ProtobufSchema protobufSchema = new ProtobufSchema(schema);
-      this.protobufSchemaProcessor.processSchema(protobufSchema, new SchemaMetadata(1, 1, "PROTO", Collections.emptyList(), schema), fieldExprMappings);
+      this.protobufSchemaProcessor.processSchema(protobufSchema, new SchemaMetadata(1, 1, "PROTOBUF", Collections.emptyList(), schema), fieldExprMappings);
     } catch (Exception exc) {
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);

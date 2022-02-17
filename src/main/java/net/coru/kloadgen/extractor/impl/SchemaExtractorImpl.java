@@ -41,6 +41,7 @@ import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientExcept
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaProvider;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.extractors.AvroExtractor;
@@ -83,7 +84,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
     SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000,
-                                                                               List.of(new AvroSchemaProvider(), new JsonSchemaProvider()), originals);
+                                                                               List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), originals);
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
