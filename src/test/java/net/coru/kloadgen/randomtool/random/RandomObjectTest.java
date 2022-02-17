@@ -60,20 +60,20 @@ class RandomObjectTest {
     decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
     decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
     return Stream.of(
-            Arguments.of("int_date", 1, singletonList(DATE_STRING), FIXED_DATE, Collections.emptyMap()),
-            Arguments.of("int_time-millis", 1, singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
-            Arguments.of("long_time-micros", 1, singletonList(TIME_STRING), FIXED_TIME, Collections.emptyMap()),
+            Arguments.of("int_date", 1, singletonList(DATE_STRING), FIXED_DATE, emptyMap()),
+            Arguments.of("int_time-millis", 1, singletonList(TIME_STRING), FIXED_TIME, emptyMap()),
+            Arguments.of("long_time-micros", 1, singletonList(TIME_STRING), FIXED_TIME, emptyMap()),
             Arguments.of("long_timestamp-millis", 1, singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), emptyMap()),
             Arguments.of("long_timestamp-micros", 1, singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+                    FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), emptyMap()),
             Arguments.of("long_local-timestamp-millis", 1, singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP, Collections.emptyMap()),
+                    FIXED_TIMESTAMP, emptyMap()),
             Arguments.of("long_local-timestamp-micros", 1, singletonList(TIMESTAMP_STRING),
-                    FIXED_TIMESTAMP, Collections.emptyMap()),
+                    FIXED_TIMESTAMP, emptyMap()),
             Arguments.of(
                     "string_uuid", 1, singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
-                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"), Collections.emptyMap()
+                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"), emptyMap()
             ),
             Arguments.of("bytes_decimal", 1, singletonList("55.555"), new BigDecimal("55.555"),
                     decimalConstrains),
@@ -86,7 +86,7 @@ class RandomObjectTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateSingleRandomValue")
   void generateSingleRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat(new RandomObject().generateRandom(fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expected);
+    assertThat(new RandomObject().generateRandom(fieldType, valueLength, fieldValuesList, emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest
