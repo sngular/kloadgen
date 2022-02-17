@@ -69,8 +69,18 @@ public class JsonExtractor {
   }
 
   private Transformer<FieldValueMapping, FieldValueMapping> fixName(String fieldName , String splitter) {
+    String[] fieldNameClean = new String[1];
     return fieldValue -> {
-      fieldValue.setFieldName(fieldName + splitter + fieldValue.getFieldName());
+      if(fieldName.endsWith("[][]") || fieldName.endsWith("[:][]")){
+        fieldNameClean[0] = fieldName.substring(0,fieldName.length()-2);
+      }
+      else if(fieldName.endsWith("[][:]") || fieldName.endsWith("[:][:]")){
+        fieldNameClean[0] = fieldName.substring(0,fieldName.length()-3);
+      }else{
+        fieldNameClean[0] = fieldName;
+      }
+
+      fieldValue.setFieldName(fieldNameClean[0] + splitter + fieldValue.getFieldName());
       return fieldValue;
     };
   }
@@ -170,7 +180,8 @@ public class JsonExtractor {
           processedField.get(0).setRequired(checkRequiredByType(propertiesField , requiredInternalFields , processedField.get(0)));
           CollectionUtils.collect(
               processedField ,
-              fixName(StringUtils.isNotEmpty(breadCrumb) ? breadCrumb : innerField.getName() + "[]", "[]."),
+              fixName(StringUtils.isNotEmpty(breadCrumb) ? breadCrumb + "[]" : innerField.getName() , "[]."), //tocado aqui añadiendo a breadbrumb + [] y quitándolo del
+              // otro lado de la condición
               completeFieldList);
         }
 
@@ -215,10 +226,10 @@ public class JsonExtractor {
         List<FieldValueMapping> processedField = processField(propertiesField,false,isAncestorRequired);
         processedField.get(0).setParentRequired(isAncestorRequired != null && isAncestorRequired);
         processedField.get(0).setRequired(checkRequiredByType(propertiesField,requiredInternalFields,processedField.get(0)));
-
         CollectionUtils.collect(
             processedField ,
-            fixName(StringUtils.isNotEmpty(breadCrumb) ? breadCrumb : innerField.getName() + "[:]", "[:]."),
+            fixName(StringUtils.isNotEmpty(breadCrumb) ? breadCrumb + "[:]" : innerField.getName(), "[:]."), //tocado aqui añadiendo a breadbrumb + [:] y quitándolo del
+            // otro lado de la condición
             completeFieldList);
       }
     } else if(value instanceof ArrayField) {
