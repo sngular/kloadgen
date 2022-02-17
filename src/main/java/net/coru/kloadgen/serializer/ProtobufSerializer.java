@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import com.google.protobuf.DynamicMessage;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
