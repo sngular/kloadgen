@@ -1,0 +1,143 @@
+{
+  "$id": "https://example.com/complex-definitions.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "basic collections",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "objectOfDefinitions":{
+      "type": "object",
+      "properties": {
+        "stringControl": {"type": "string"},
+        "arrayOfStrings": {"$ref": "#/definitions/arrayOfStringsDef"},
+        "mapOfStrings" :{"$ref": "#/definitions/mapOfStringsDef"}
+      },
+      "required": ["stringControl","arrayOfStrings"]
+    },
+    "arrayOfObjectsDef": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/arrayDef"
+      },
+      "minItems": 0
+    },
+    "mapOfObjectsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/objectOfArraysDef"
+      }
+    },
+    "mapOfMapsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/mapOfObjectsDef"
+      }
+    },
+    "mapOfObjectsOfCollectionsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/objectOfCollectionsDef"
+      }
+    },
+    "arrayOfObjectsOfCollectionsDef": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/objectOfCollectionsDef"
+      },
+      "minItems": 1
+    }
+  },
+  "definitions": {
+    "objectOfCollectionsDef": {
+      "type": "object",
+      "properties": {
+        "stringControlObject": {
+          "type": "string"
+        },
+        "arrayOfArraysOfStrings": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minItems": 2
+        },
+        "arrayOfMapsOfStrings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": ["stringControlObject","arrayOfMapsOfStrings"]
+    },
+    "mapOfObjectsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "stringControlObject": {
+            "type": "string"
+          },
+          "arrayOfArraysOfStrings": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "required": ["stringControlObject"]
+      }
+    },
+    "arrayDef": {
+      "type": "object",
+      "properties": {
+        "stringOfObject": {
+          "type": "string"
+        },
+        "numberOfObject": {
+          "type": "integer"
+        }
+      },
+      "required": ["numberOfObject"]
+    },
+    "objectOfArraysDef": {
+      "type": "object",
+      "properties": {
+        "arrayOfInternalObject": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["arrayOfInternalObject"]
+    },
+    "arrayOfStringsDef": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "mapOfStringsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "objectOfDefinitions"
+  ]
+
+}

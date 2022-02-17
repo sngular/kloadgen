@@ -1,6 +1,6 @@
 {
-  "$id": "https://example.com/collection.schema.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/collections.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "basic collections",
   "type": "object",
   "additionalProperties": false,
@@ -12,24 +12,44 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "minItems": 1
     },
     "arrayOfObjectsOfBasicTypes": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/objArrayDefinition"
+        "type": "object",
+        "properties": {
+          "stringOfObject": {
+            "type": "string"
+          },
+          "numberOfObject": {
+            "type": "integer"
+          }
+        },
+        "required": ["numberOfObject"]
       }
     },
     "mapOfStrings": {
       "type": "object",
       "additionalProperties": {
         "type": "string"
-      }
+      },
+      "minProperties": 1
     },
     "mapOfObjectsOfBasicTypes": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/objMapDefinition"
+        "type": "object",
+        "properties": {
+          "arrayOfInternalObject": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["arrayOfInternalObject"]
       }
     },
     "objectOfArraysOfBasicTypes":{
@@ -117,31 +137,8 @@
       "required": ["stringControl","mapOfObjectsPerson"]
     }
   },
-  "definitions": {
-    "objArrayDefinition": {
-      "type": "object",
-      "properties": {
-        "stringOfObject": {
-          "type": "string"
-        },
-        "numberOfObject": {
-          "type": "integer"
-        }
-      },
-      "required": []
-    },
-    "objMapDefinition": {
-      "type": "object",
-      "properties": {
-        "arrayOfInternalObject": {"type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    }
-  },
-  "required": ["controlString",
+  "required": [
+    "controlString",
     "arrayOfStrings",
     "mapOfStrings",
     "mapOfObjectsOfBasicTypes",

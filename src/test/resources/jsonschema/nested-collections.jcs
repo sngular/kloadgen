@@ -1,6 +1,6 @@
 {
-  "$id": "https://example.com/collection-complex.schema.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/nested-collections.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "complex collections",
   "type": "object",
   "additionalProperties": false,
@@ -11,7 +11,8 @@
       "type": "object",
       "additionalProperties": {
         "type": "string"
-      }
+      },
+      "minItems": 0
     }
   },
     "arrayOfMapsOfObjects": {
@@ -30,7 +31,8 @@
           },
           "required": ["numberObject"]
         }
-      }
+      },
+      "minItems": 1
     },
     "arrayOfArraysOfStrings": {
       "type": "array",
@@ -38,7 +40,8 @@
         "type": "array",
         "items": {
           "type": "string"
-        }
+        },
+        "minItems": 1
       }
     },
     "arrayOfArraysOfObjects": {
@@ -57,7 +60,8 @@
           },
           "required": ["name2ArraysObject"]
         }
-      }
+      },
+      "minItems": 1
     },
     "mapOfArraysOfStrings": {
       "type": "object",
@@ -108,8 +112,7 @@
             "number4Object": {
               "type": "integer"
             }
-          },
-          "required": []
+          }
         }
       }
     },
@@ -136,7 +139,38 @@
           "required": ["stringControlObject"]
         }
       }
+    },
+    "mapOfObjectsOfCollections": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "stringControlObject": {
+            "type": "string"
+          },
+          "arrayOfArraysOfStrings": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "minItems": 1
+          },
+          "arrayOfMapsOfStrings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": ["stringControlObject","arrayOfMapsOfStrings"]
+      }
     }
   },
-  "required": []
+  "required": ["arrayOfMapsOfStrings"]
 }

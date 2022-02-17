@@ -530,7 +530,10 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildArrayField(String fieldName, JsonNode jsonNode, Boolean required) {
-    return buildArrayField(fieldName, jsonNode, buildProperty(null, jsonNode.path("items"), false), required);
+    ///evaulacion minItem dependieno de isPrentObjec
+    return buildArrayField(fieldName, jsonNode, buildProperty(null, jsonNode.path("items"),
+                                                              !StringUtils.isBlank(jsonNode.path("minItems").asText()) &&
+                                                              !jsonNode.path("minItems").asText().equals("0")), required);
   }
 
   private Field buildArrayField(String fieldName, JsonNode jsonNode, Field value) {
