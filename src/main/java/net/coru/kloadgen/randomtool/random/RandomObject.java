@@ -173,31 +173,30 @@ public class RandomObject {
     }
   }
 
-  private Object addOneCasted(Object seqObject, String fieldType){
+  private Object addOneCasted(Object seqObject, String fieldType) {
     Object castValue;
     switch (fieldType) {
       case ValidTypeConstants.INT:
-        castValue = (Integer) seqObject + 1;
+        castValue = Integer.parseInt(seqObject.toString()) + 1;
         break;
       case ValidTypeConstants.DOUBLE:
-        castValue = (Double) seqObject + 1;
+        castValue = Double.parseDouble(seqObject.toString()) + 1;
         break;
       case ValidTypeConstants.LONG:
-        castValue = (Long) seqObject + 1;
+        castValue = Long.parseLong(seqObject.toString()) + 1;
         break;
       case ValidTypeConstants.FLOAT:
-        castValue = (Float) seqObject + 1;
+        castValue = Float.parseFloat(seqObject.toString()) + 1;
         break;
       case ValidTypeConstants.SHORT:
-        castValue = (Short) seqObject + 1;
+        castValue = Short.parseShort(seqObject.toString()) + 1;
         break;
       case ValidTypeConstants.BYTES_DECIMAL:
       case ValidTypeConstants.FIXED_DECIMAL:
       default:
-        castValue = ((BigDecimal) seqObject).add(BigDecimal.ONE);
+        castValue = new BigDecimal(seqObject.toString()).add(BigDecimal.ONE);
         break;
-    }
-    return castValue;
+    } return castValue;
   }
 
   private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
