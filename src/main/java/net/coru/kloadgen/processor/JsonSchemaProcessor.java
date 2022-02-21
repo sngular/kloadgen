@@ -78,44 +78,153 @@ public class JsonSchemaProcessor {
           fieldValueMapping = fieldExpMappingsQueue.peek();
         } else {
           if (cleanUpPath(fieldValueMapping, "").contains("[")) {
-            if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
-              String fieldCleanUpPath = cleanUpPath(fieldValueMapping, fieldName).replace("[]","");
-              fieldExpMappingsQueue.poll();
-              entity.putPOJO(fieldCleanUpPath, createBasicMap(fieldValueMapping.getFieldType(),
-                      calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                      fieldValueMapping.getFieldValuesList()));
-            } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
-              fieldExpMappingsQueue.poll();
-              entity.putPOJO(fieldName, createObjectMapArray(fieldValueMapping.getFieldType(),
-                      calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                      fieldValueMapping.getValueLength(),
-                      fieldValueMapping.getFieldValuesList()));
-            } else if (cleanUpPath(fieldValueMapping, "").contains("][]")) {
-              entity.putArray(fieldName).addAll(
+
+            String nombreCompleto = fieldValueMapping.getFieldName().matches("[\\w\\d]*[\\[\\:*\\]]*\\[\\:*\\]\\.[\\w\\d]*.*") ?
+            fieldValueMapping.getFieldName().substring(0,fieldValueMapping.getFieldName().indexOf(".") + 1) : fieldValueMapping.getFieldName();
+
+            //comprobamso si es array/map y objeto, sellamara en todos lo0s casos a createObject
+            if (nombreCompleto.contains("].")) {
+              if(nombreCompleto.contains("][")){
+                //map-map, array-array y combinaciones (4) con objetos
+                System.out.println("HAY MAPA/ARRAY CON OBJETO");
+                if(nombreCompleto.contains("[:][:].")){
+                   nombreCompleto =  nombreCompleto.replace("[:][:]." , "");
+                  entity.putPOJO(nombreCompleto,
+                                 createObjectMapMap(
+                                     fieldName,
+                                     calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                     fieldExpMappingsQueue));
+                  fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+                }
+
+
+
+              } else {
+                //simple map o array con objeto
+                if(nombreCompleto.contains("[:]")){
+                 nombreCompleto =  nombreCompleto.replace("[:]." , "");
+                  entity.putPOJO(nombreCompleto,
                       createObjectMap(
-                              fieldName,
-                              calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                              fieldExpMappingsQueue));
-              fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-            } else if (isBasicArray(fieldValueMapping.getFieldType())) {
-              fieldExpMappingsQueue.poll();
-              entity
-                      .putArray(fieldName)
-                      .addAll(createBasicArray(
-                              fieldName,
-                              fieldValueMapping.getFieldType(),
-                              calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                              fieldValueMapping.getValueLength(),
-                              fieldValueMapping.getFieldValuesList()));
-              fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
-            } else {
-              entity.putArray(fieldName).addAll(
+                          fieldName,
+                          calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                          fieldExpMappingsQueue));
+                  fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+                }else {
+                  nombreCompleto =  nombreCompleto.replace("[]." , "");
+                  entity.putArray(nombreCompleto).addAll(
                       createObjectArray(
-                              fieldName,
-                              calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                              fieldExpMappingsQueue));
-              fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+                          fieldName ,
+                          calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                          fieldExpMappingsQueue));
+                  fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+                }
+
+              }
+
+            } else {
+              //array/map simple
+
+              if(Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map-map")) {
+                nombreCompleto = nombreCompleto.replace("[:][:]" , "");
+                fieldExpMappingsQueue.poll();
+
+                entity.putPOJO(nombreCompleto , createBasicMap(fieldValueMapping.getFieldType() ,
+                                                               calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                                               fieldValueMapping.getFieldValuesList()));
+
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+
+              } else if(Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("array-map")) {
+
+                nombreCompleto = nombreCompleto.replace("[:][]" , "");
+                fieldExpMappingsQueue.poll();
+
+             /*   ObjectNode objectArray =  JsonNodeFactory.instance.objectNode();
+                objectArray.set("PEPE",new ObjectMapper().convertValue(createBasicMap(fieldValueMapping.getFieldType() ,
+                                                                                      calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                                                                      fieldValueMapping.getFieldValuesList()),JsonNode.class));*/
+
+                entity.putPOJO(nombreCompleto,createBasicArray(nombreCompleto,
+                                                               fieldValueMapping.getFieldType() ,
+                                                               calculateSize(fieldValueMapping.getFieldName() , nombreCompleto) ,
+                                                               fieldValueMapping.getValueLength() ,
+                                                               fieldValueMapping.getFieldValuesList()));
+
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+
+              } else if(Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map-array")){
+                nombreCompleto = nombreCompleto.replace("[][:]" , "");
+                fieldExpMappingsQueue.poll();
+
+                ObjectNode objectArray =  JsonNodeFactory.instance.objectNode();
+                objectArray.set("PEPE",new ObjectMapper().convertValue(createBasicMap(fieldValueMapping.getFieldType() ,
+                                                                                      calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                                                                      fieldValueMapping.getFieldValuesList()),JsonNode.class));
+
+              entity.putArray(nombreCompleto).add(objectArray);
+
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+              } else if(nombreCompleto.contains("[:]")){
+                nombreCompleto =  nombreCompleto.replace("[:]" , "");
+                fieldExpMappingsQueue.poll();
+                entity.putPOJO(nombreCompleto , createBasicMap(fieldValueMapping.getFieldType() ,
+                                                                 calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                                                 fieldValueMapping.getFieldValuesList()));
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+              } else {
+                fieldExpMappingsQueue.poll();
+                nombreCompleto =  nombreCompleto.replace("[]" , "");
+                entity.putArray(nombreCompleto).addAll(createBasicArray(nombreCompleto,
+                                                  fieldValueMapping.getFieldType() ,
+                                                  calculateSize(fieldValueMapping.getFieldName() , nombreCompleto) ,
+                                                  fieldValueMapping.getValueLength() ,
+                                                  fieldValueMapping.getFieldValuesList()));
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+              }
             }
+
+             /* if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
+                String fieldCleanUpPath = cleanUpPath(fieldValueMapping , "").replace("[:]" , "");
+                fieldExpMappingsQueue.poll();
+                entity.putPOJO(fieldCleanUpPath , createBasicMap(fieldValueMapping.getFieldType() ,
+                                                                 calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                                                 fieldValueMapping.getFieldValuesList()));
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+              } else if (fieldValueMapping.getName().contains("[:].")) {
+
+              } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
+                fieldExpMappingsQueue.poll();
+                entity.putPOJO(fieldName , createObjectMapArray(fieldValueMapping.getFieldType() ,
+                                                                calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                                                fieldValueMapping.getValueLength() ,
+                                                                fieldValueMapping.getFieldValuesList()));
+              } else if (cleanUpPath(fieldValueMapping , "").contains("][]")) {
+                entity.putArray(fieldName).addAll(
+                    createObjectMap(
+                        fieldName ,
+                        calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                        fieldExpMappingsQueue));
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+              } else if (isBasicArray(fieldValueMapping.getFieldType())) {
+                fieldExpMappingsQueue.poll();
+                entity
+                    .putArray(fieldName)
+                    .addAll(createBasicArray(
+                        fieldName ,
+                        fieldValueMapping.getFieldType() ,
+                        calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                        fieldValueMapping.getValueLength() ,
+                        fieldValueMapping.getFieldValuesList()));
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+              } else {
+                entity.putArray(fieldName).addAll(
+                    createObjectArray(
+                        fieldName ,
+                        calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                        fieldExpMappingsQueue));
+                fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+              }
+            */
           } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
             entity.set(fieldName, createObject(fieldName, fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
@@ -184,7 +293,60 @@ public class JsonSchemaProcessor {
         }
       } else {
         if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
-          if (fieldValueMapping.getFieldType().endsWith("map")) {
+
+
+          String nombreCompleto = cleanFieldName.matches("[\\w\\d]*[\\[\\:*\\]]*\\[\\:*\\]\\.[\\w\\d]*.*") ?
+              cleanFieldName.substring(0,cleanFieldName.indexOf(".") + 1) : cleanFieldName;
+
+
+          //comprobamso si es array/map y objeto, sellamara en todos lo0s casos a createObject
+            if (nombreCompleto.contains("].")) {
+              if(nombreCompleto.contains("][")){
+                //map-map, array-array y combinaciones (4) con objetos
+                System.out.println("HAY MAPA/ARRAY CON OBJETO");
+              } else {
+                //simple map o array con objeto
+                if(nombreCompleto.contains("[:]")){
+                  nombreCompleto.replace("[:]." , "");
+                  subEntity.putPOJO(nombreCompleto,
+                      createObjectMap(
+                          fieldName,
+                          calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                          fieldExpMappingsQueue));
+
+                }else {
+                  subEntity.putArray(fieldName).addAll(
+                      createObjectArray(
+                          fieldName ,
+                          calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                          fieldExpMappingsQueue));
+
+                }
+
+              }
+
+            } else {
+              if(nombreCompleto.contains("[:]")){
+                nombreCompleto.replace("[:]" , "");
+                fieldExpMappingsQueue.poll();
+                subEntity.putPOJO(nombreCompleto , createBasicMap(fieldValueMapping.getFieldType() ,
+                                                                 calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
+                                                                 fieldValueMapping.getFieldValuesList()));
+
+              } else {
+                fieldExpMappingsQueue.poll();
+                nombreCompleto = nombreCompleto.replace("[]" , "");
+                subEntity.putArray(nombreCompleto).addAll(createBasicArray(nombreCompleto,
+                                                                   fieldValueMapping.getFieldType() ,
+                                                                   calculateSize(fieldValueMapping.getFieldName() , nombreCompleto) ,
+                                                                   fieldValueMapping.getValueLength() ,
+                                                                   fieldValueMapping.getFieldValuesList()));
+
+              }
+            }
+
+
+         /* if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map")) {
             fieldExpMappingsQueue.poll();
             String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
             subEntity.putPOJO(fieldNameSubEntity, createBasicMap(fieldValueMapping.getFieldType(),
@@ -205,10 +367,11 @@ public class JsonSchemaProcessor {
                             fieldExpMappingsQueue));
           } else if (isBasicArray(fieldValueMapping.getFieldType())) {
             fieldExpMappingsQueue.poll();
+            String fieldNameSubEntity = getCleanMethodNameMap(fieldValueMapping, fieldName);
             subEntity
-                    .putArray(fieldName)
+                    .putArray(fieldNameSubEntity)
                     .addAll(createBasicArray(
-                            fieldName,
+                        fieldNameSubEntity,
                             fieldValueMapping.getFieldType(),
                             calculateSize(fieldValueMapping.getFieldName(), fieldName),
                             fieldValueMapping.getValueLength(),
@@ -220,7 +383,7 @@ public class JsonSchemaProcessor {
                             fieldNameSubEntity,
                             calculateSize(fieldValueMapping.getFieldName(), fieldName),
                             fieldExpMappingsQueue));
-          }
+          }*/
         } else if (cleanFieldName.contains(".")) {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
           subEntity.set(fieldNameSubEntity, createObject(fieldNameSubEntity, fieldExpMappingsQueue));
@@ -239,16 +402,32 @@ public class JsonSchemaProcessor {
     return subEntity;
   }
 
-  private ArrayNode createObjectMap(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-   ArrayNode objectArray = JsonNodeFactory.instance.arrayNode();
+  private ObjectNode createObjectMap(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+
+    ObjectNode objectArray =  JsonNodeFactory.instance.objectNode();
 
     for(int i=0; i<calculateSize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.add(JsonNodeFactory.instance.objectNode().set(String.valueOf(i), createObject(fieldName, temporalQueue)));
+      objectArray.set(String.valueOf(i), createObject(fieldName, temporalQueue));
     }
-    objectArray.add(JsonNodeFactory.instance.objectNode().set(String.valueOf(calculateSize), createObject(fieldName, fieldExpMappingsQueue)));
+    objectArray.set(String.valueOf(calculateSize), createObject(fieldName, fieldExpMappingsQueue));
     return objectArray;
   }
+
+  private ObjectNode createObjectMapMap(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+
+    ObjectNode objectArray =  JsonNodeFactory.instance.objectNode();
+
+    for(int i=0; i<calculateSize-1; i++) {
+      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
+      objectArray.set(String.valueOf(i), createObjectMap(fieldName,calculateSize, temporalQueue));
+    }
+    objectArray.set(String.valueOf(calculateSize), createObjectMap(fieldName,calculateSize, fieldExpMappingsQueue));
+    return objectArray;
+  }
+
+
+
 
   private ArrayNode createBasicArray(String fieldName, String fieldType, Integer calculateSize, Integer valueSize, List<String> fieldValuesList) {
     return mapper.convertValue(
@@ -306,7 +485,7 @@ public class JsonSchemaProcessor {
       startPosition = fieldValueMapping.getFieldName().indexOf(fieldName) + fieldName.length() + 1;
     }
     cleanPath = fieldValueMapping.getFieldName().substring(startPosition);
-    if (cleanPath.matches("^(\\d*]).*$")) {
+    if (cleanPath.matches("^(\\d*:*]).*$")) {
       cleanPath = cleanPath.substring(cleanPath.indexOf(".") + 1);
     }
     return cleanPath;
@@ -325,4 +504,6 @@ public class JsonSchemaProcessor {
         pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[[0-9]*]", "");
   }
+
+
 }

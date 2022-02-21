@@ -29,6 +29,7 @@ public class RandomArray {
 
         switch (fieldType) {
             case ValidTypeConstants.INT_ARRAY:
+            case ValidTypeConstants.NUMBER_ARRAY:
                 value = generate(ValidTypeConstants.INT, arraySize, valueLength, fieldValueList, constrains);
                 break;
             case ValidTypeConstants.LONG_ARRAY:
