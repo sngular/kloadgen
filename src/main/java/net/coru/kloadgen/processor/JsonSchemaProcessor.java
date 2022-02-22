@@ -196,9 +196,9 @@ public class JsonSchemaProcessor {
 
     for(int i=0; i<calculateSize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.set(String.valueOf(i), createObjectMap(fieldName,calculateSize, temporalQueue));
+      objectArray.set(statelessGeneratorTool.generateRandomString(i), createObjectMap(fieldName,calculateSize, temporalQueue));
     }
-    objectArray.set(String.valueOf(calculateSize), createObjectMap(fieldName,calculateSize, fieldExpMappingsQueue));
+    objectArray.set(statelessGeneratorTool.generateRandomString(calculateSize), createObjectMap(fieldName,calculateSize, fieldExpMappingsQueue));
     return objectArray;
   }
 
@@ -231,9 +231,9 @@ public class JsonSchemaProcessor {
 
     for(int i=0; i<calculateSize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.putArray(String.valueOf(i)).addAll(createObjectArray(fieldName,2,temporalQueue));
+      objectArray.putArray(statelessGeneratorTool.generateRandomString(i)).addAll(createObjectArray(fieldName,2,temporalQueue));
     }
-    objectArray.putArray("sdasdqwewq").addAll(createObjectArray(fieldName,2,fieldExpMappingsQueue));
+    objectArray.putArray(statelessGeneratorTool.generateRandomString(calculateSize)).addAll(createObjectArray(fieldName,2,fieldExpMappingsQueue));
     return objectArray;
   }
   private ObjectNode createObjectArrayMap(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {

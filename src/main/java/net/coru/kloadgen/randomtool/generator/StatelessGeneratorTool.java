@@ -14,6 +14,8 @@ import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
+
 
 public class StatelessGeneratorTool {
 
@@ -24,6 +26,11 @@ public class StatelessGeneratorTool {
   private final RandomArray randomArray = new RandomArray();
 
   private final RandomObject randomObject = new RandomObject();
+
+  public String generateRandomString(Integer valueLength){
+    return  (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength,Collections.emptyList(), Collections.emptyMap());
+  }
+
 
   public Object generateObject(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
