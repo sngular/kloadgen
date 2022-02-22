@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import lombok.SneakyThrows;
@@ -203,20 +202,26 @@ public class JsonSchemaProcessor {
     return objectArray;
   }
 
-  private ObjectNode createObjectArrayArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
+  private ArrayNode createObjectArrayArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
       throws KLoadGenException {
-    ObjectNode subentity = JsonNodeFactory.instance.objectNode();
+    //ObjectNode subentity = JsonNodeFactory.instance.objectNode();
     List<ObjectNode> objectArray = new ArrayList<>(arraySize);
+    ArrayNode subentity = new ArrayNode(JsonNodeFactory.instance);
+    ArrayNode subentity2 = JsonNodeFactory.instance.arrayNode();
+
 
     for(int i=0; i<arraySize -1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
       objectArray.addAll(createObjectArray(fieldName,2,temporalQueue)); //aqui meter calculateSize
-      subentity.putArray(String.valueOf(i)).addAll(objectArray);
+      subentity.addAll(objectArray);
+      subentity2.add(subentity);
       objectArray.removeAll(objectArray);
+      subentity.removeAll();
     }
     objectArray.addAll(createObjectArray(fieldName,2,fieldExpMappingsQueue));
-    subentity.putArray("sadsdaQWEE").addAll(objectArray);
-    return subentity;
+    subentity.addAll(objectArray);
+    subentity2.add(subentity);
+    return subentity2;
   }
 
   private ObjectNode createObjectMapArray(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
@@ -251,6 +256,7 @@ public class JsonSchemaProcessor {
                                              valueSize,
                                              fieldValuesList), ArrayNode.class);
   }
+
 
   private boolean isBasicArray(String fieldType) {
     return fieldType.contains("-");
@@ -327,7 +333,7 @@ public class JsonSchemaProcessor {
                                                                                      fieldExpMappingsQueue));
       }else if(completeFieldName.contains("[][].")){
         completeFieldName =  completeFieldName.replace("[][]." , "");
-        entity.putArray(completeFieldName).add(createObjectArrayArray(fieldName,
+        entity.putArray(completeFieldName).addAll(createObjectArrayArray(fieldName,
                                                                       calculateSize(fieldValueMapping.getFieldName() , fieldName),
                                                                       fieldExpMappingsQueue));
       }else if(completeFieldName.contains("[:][].")){
@@ -369,10 +375,6 @@ public class JsonSchemaProcessor {
                 objectArray.set("PEPE",new ObjectMapper().convertValue(createBasicMap(fieldValueMapping.getFieldType() ,
                                                                                       calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
                                                                                       fieldValueMapping.getFieldValuesList()),JsonNode.class));*/
-
-      entity.putPOJO(completeFieldName,createBasicArray(completeFieldName,fieldValueMapping.getFieldType(),
-                                                        calculateSize(fieldValueMapping.getFieldName() , completeFieldName),
-                                                        fieldValueMapping.getValueLength(),fieldValueMapping.getFieldValuesList()));
 
     } else if(Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("map-array")){
       completeFieldName = completeFieldName.replace("[][:]" , "");
