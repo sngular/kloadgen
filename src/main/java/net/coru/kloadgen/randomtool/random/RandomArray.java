@@ -61,8 +61,25 @@ public class RandomArray {
         if (fieldType.endsWith("-array-array")) {
             value = generateArrayOfArray(fieldType.replace("-array-array", "-array"), valueLength, fieldValueList, arraySize, arraySize,
                     constrains);
+        } else if (fieldType.endsWith("map")){
+            value = generateRandomArrayMap(fieldType.replace("-map", ""), valueLength, fieldValueList, arraySize, arraySize,
+                                         constrains);
         }
         return value;
+    }
+
+    private Object generateRandomArrayMap(String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
+        Integer innerArraySize, Map<ConstraintTypeEnum, String> constrains) {
+        int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
+        Map<String, Object> map = new java.util.HashMap<>(arraySize);
+
+        for (int i = 0; i < size; i++) {
+            map.put(
+                (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), constrains),
+                generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains)
+            );
+       }
+        return map;
     }
 
     private Object generateArrayOfArray(String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize, Integer innerArraySize, Map<ConstraintTypeEnum, String> constrains) {
