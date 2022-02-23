@@ -77,8 +77,11 @@ public class JsonSchemaProcessor {
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
         } else {
+
+
           if (cleanUpPath(fieldValueMapping, "").contains("[")) {
             String completeFieldName = getNameObjectCollection(fieldValueMapping.getFieldName());
+
             if (completeFieldName.contains("].")) {
               operationsObjectCollections(completeFieldName,entity,fieldValueMapping,fieldName,fieldExpMappingsQueue);
             } else {
@@ -86,9 +89,11 @@ public class JsonSchemaProcessor {
             }
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
+
             entity.set(fieldName, createObject(fieldName, fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
           } else {
+
             entity.putPOJO(Objects.requireNonNull(fieldValueMapping).getFieldName(),
                            mapper.convertValue(
                                statelessGeneratorTool.generateObject(fieldName,
@@ -148,22 +153,25 @@ public class JsonSchemaProcessor {
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
         } else{
-          //fieldExpMappingsQueue.remove();
           fieldValueMapping = nextField;
         }
       } else {
+
         if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
 
           String completeFieldName = getNameObjectCollection(cleanFieldName);
+
           if (completeFieldName.contains("].")) {
             operationsObjectCollections(completeFieldName,subEntity,fieldValueMapping,fieldName,fieldExpMappingsQueue);
           } else {
             operationsCollections(completeFieldName,subEntity,fieldValueMapping,fieldName,fieldExpMappingsQueue);
           }
+
         } else if (cleanFieldName.contains(".")) {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
           subEntity.set(fieldNameSubEntity, createObject(fieldNameSubEntity, fieldExpMappingsQueue));
         } else {
+
           fieldExpMappingsQueue.poll();
           subEntity.putPOJO(cleanFieldName,
                             mapper.convertValue(
@@ -184,9 +192,9 @@ public class JsonSchemaProcessor {
 
     for(int i=0; i<calculateSize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.set(String.valueOf(i), createObject(fieldName, temporalQueue));
+      objectArray.set(statelessGeneratorTool.generateRandomString(i), createObject(fieldName, temporalQueue));
     }
-    objectArray.set(String.valueOf(calculateSize), createObject(fieldName, fieldExpMappingsQueue));
+    objectArray.set(statelessGeneratorTool.generateRandomString(calculateSize), createObject(fieldName, fieldExpMappingsQueue));
     return objectArray;
   }
 
@@ -225,10 +233,7 @@ public class JsonSchemaProcessor {
   }
 
   private ObjectNode createObjectMapArray(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-
     ObjectNode objectArray =  JsonNodeFactory.instance.objectNode();
-
-
     for(int i=0; i<calculateSize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
       objectArray.putArray(statelessGeneratorTool.generateRandomString(i)).addAll(createObjectArray(fieldName,2,temporalQueue));
@@ -236,33 +241,30 @@ public class JsonSchemaProcessor {
     objectArray.putArray(statelessGeneratorTool.generateRandomString(calculateSize)).addAll(createObjectArray(fieldName,2,fieldExpMappingsQueue));
     return objectArray;
   }
-  private ObjectNode createObjectArrayMap(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private ArrayNode createObjectArrayMap(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
 
-    ObjectNode objectArray =  JsonNodeFactory.instance.objectNode();
+    ObjectNode objectMap = JsonNodeFactory.instance.objectNode();
+    ArrayNode array = JsonNodeFactory.instance.arrayNode(calculateSize);
 
     for(int i=0; i<calculateSize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.putPOJO(String.valueOf(i),createObjectMap(fieldName,2,temporalQueue));
+      objectMap.setAll(createObjectMap(fieldName,2,temporalQueue));
+      array.add(objectMap);
+      objectMap = JsonNodeFactory.instance.objectNode();
     }
-    objectArray.putPOJO("RANDOM_MAP_KEY",createObjectMap(fieldName,2,fieldExpMappingsQueue));
-    return objectArray;
+
+    objectMap.setAll(createObjectMap(fieldName,2,fieldExpMappingsQueue));
+    array.add(objectMap);
+    return array;
   }
 
   private ArrayNode createBasicArray(String fieldName, String fieldType, Integer calculateSize, Integer valueSize, List<String> fieldValuesList) {
     return mapper.convertValue(
-        statelessGeneratorTool.generateArray(fieldName,
-                                             fieldType,
-                                             calculateSize,
-                                             valueSize,
-                                             fieldValuesList), ArrayNode.class);
+        statelessGeneratorTool.generateArray(fieldName,fieldType,calculateSize,valueSize,fieldValuesList), ArrayNode.class);
   }
 
   private Object createBasicArrayMap(String fieldName, String fieldType, Integer calculateSize, Integer valueSize, List<String> fieldValuesList) {
     return statelessGeneratorTool.generateArray(fieldName,fieldType, calculateSize,valueSize,fieldValuesList);
-  }
-
-  private boolean isBasicArray(String fieldType) {
-    return fieldType.contains("-");
   }
 
   private List<ObjectNode> createObjectArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
@@ -284,12 +286,6 @@ public class JsonSchemaProcessor {
   private ArrayNode createBasicMapArray(String fieldType, Integer arraySize, List<String> fieldExpMappings)
       throws KLoadGenException {
     return mapper.convertValue(statelessGeneratorTool.generateMap(fieldType, arraySize, fieldExpMappings, arraySize), ArrayNode.class);
-  }
-
-
-  private Object createObjectMapArray(String fieldType, Integer arraySize, Integer mapSize, List<String> fieldExpMappings)
-      throws KLoadGenException {
-    return statelessGeneratorTool.generateMap(fieldType, mapSize, fieldExpMappings, arraySize);
   }
 
   private Integer calculateSize(String fieldName, String methodName) {
@@ -314,6 +310,7 @@ public class JsonSchemaProcessor {
       startPosition = fieldValueMapping.getFieldName().indexOf(fieldName) + fieldName.length() + 1;
     }
     cleanPath = fieldValueMapping.getFieldName().substring(startPosition);
+
     if (cleanPath.matches("^(\\d*:*]).*$")) {
       cleanPath = cleanPath.substring(cleanPath.indexOf(".") + 1);
     }
@@ -352,9 +349,7 @@ public class JsonSchemaProcessor {
                                                               fieldExpMappingsQueue));
       }else{
         completeFieldName =  completeFieldName.replace("[][:]." , "");
-        entity.putArray(completeFieldName).add(createObjectArrayMap(completeFieldName,
-                                                                    calculateSize(fieldValueMapping.getFieldName(), completeFieldName),
-                                                                    fieldExpMappingsQueue));
+        entity.set(completeFieldName,createObjectArrayMap(completeFieldName,calculateSize(fieldValueMapping.getFieldName(), completeFieldName),fieldExpMappingsQueue));
       }
     } else {
       if(completeFieldName.contains("[:]")){
