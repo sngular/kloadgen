@@ -76,10 +76,14 @@ public class JsonSchemaProcessor {
           elapsedProperties++;
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
+          fieldExpMappingsQueueCopy.poll();
         } else {
 
 
-          if (cleanUpPath(fieldValueMapping, "").contains("[")) {
+          String fieldNameProcessed = getFirstPartOfFieldValueMappingName(fieldValueMapping);
+
+
+          if (fieldNameProcessed.contains("[")) {
             String completeFieldName = getNameObjectCollection(fieldValueMapping.getFieldName());
 
             if (completeFieldName.contains("].")) {
@@ -88,10 +92,12 @@ public class JsonSchemaProcessor {
               operationsCollections(completeFieldName,entity,fieldValueMapping,fieldName,fieldExpMappingsQueue);
             }
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            fieldExpMappingsQueueCopy.poll();
           } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
 
             entity.set(fieldName, createObject(fieldName, fieldExpMappingsQueue));
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+            fieldExpMappingsQueueCopy.poll();
           } else {
 
             entity.putPOJO(Objects.requireNonNull(fieldValueMapping).getFieldName(),
@@ -102,6 +108,7 @@ public class JsonSchemaProcessor {
                                                                      fieldValueMapping.getFieldValuesList()), JsonNode.class));
             fieldExpMappingsQueue.remove();
             fieldValueMapping = fieldExpMappingsQueue.peek();
+            fieldExpMappingsQueueCopy.poll();
           }
         }
       }
@@ -143,10 +150,27 @@ public class JsonSchemaProcessor {
         fieldExpMappingsQueue.remove();
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
-        if (!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
+        if((nextField == null
+            &&
+            actualField.getParentRequired()
+            &&
+            (generatedProperties == elapsedProperties && generatedProperties>0)
+        )){
+          fieldValueMapping = actualField;
+          fieldValueMapping.setRequired(true);
+          List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+          temporalFieldValueList.remove("null");
+          fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+        }
+        else if(nextField == null && !actualField.getParentRequired()){
+          fieldValueMapping = nextField;
+        }
+
+        else if ((!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
             && actualField.getParentRequired()
             && fieldExpMappingsQueue.peek() != null
-            && (generatedProperties == elapsedProperties && generatedProperties>0)){
+            && (generatedProperties == elapsedProperties && generatedProperties>0))
+        ){
           fieldValueMapping = actualField;
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
@@ -162,7 +186,8 @@ public class JsonSchemaProcessor {
           String completeFieldName = getNameObjectCollection(cleanFieldName);
 
           if (completeFieldName.contains("].")) {
-            operationsObjectCollections(completeFieldName,subEntity,fieldValueMapping,fieldName,fieldExpMappingsQueue);
+            String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
+            operationsObjectCollections(completeFieldName,subEntity,fieldValueMapping,fieldNameSubEntity,fieldExpMappingsQueue);
           } else {
             operationsCollections(completeFieldName,subEntity,fieldValueMapping,fieldName,fieldExpMappingsQueue);
           }
@@ -395,5 +420,13 @@ public class JsonSchemaProcessor {
     }
   }
 
+
+  public String getFirstPartOfFieldValueMappingName(FieldValueMapping fieldValueMapping){
+    if(fieldValueMapping.getFieldName().contains(".")){
+      return fieldValueMapping.getFieldName().substring(0,fieldValueMapping.getFieldName().indexOf("."));
+    }else{
+      return fieldValueMapping.getFieldName();
+    }
+  }
 
 }

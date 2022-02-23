@@ -25,7 +25,12 @@ public class RandomArray {
 
     public Object generateArray(String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
                                 Map<ConstraintTypeEnum, String> constrains) {
+
         Object value;
+
+        if(checkIfNullFieldValueList(fieldValueList)){
+            return new ArrayList<>();
+        }
 
         switch (fieldType) {
             case ValidTypeConstants.INT_ARRAY:
@@ -102,5 +107,10 @@ public class RandomArray {
         }
 
         return array;
+    }
+
+    public boolean checkIfNullFieldValueList(List<String> fieldValueList){
+        return (fieldValueList!=null && fieldValueList.size() == 1 && fieldValueList.contains("null")) ? true :
+            ((fieldValueList==null) ? true:false);
     }
 }
