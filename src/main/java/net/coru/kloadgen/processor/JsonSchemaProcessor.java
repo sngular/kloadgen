@@ -147,18 +147,23 @@ public class JsonSchemaProcessor {
     if (null == subEntity) {
       throw new KLoadGenException("Something Odd just happened");
     }
+    ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>();
+    ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopyCopy = new ArrayDeque<>();
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
 
     int generatedProperties = 0;
     int elapsedProperties = 0;
 
-    while(!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) {
+    while((!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) || !fieldExpMappingsQueueCopyCopy.isEmpty()) {
+      fieldExpMappingsQueueCopyCopy.poll();
+      fieldExpMappingsQueueCopy.poll();
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       generatedProperties++;
       if (checkIfObjectOptional(fieldValueMapping, cleanFieldName)){
         elapsedProperties++;
 
         FieldValueMapping actualField = fieldExpMappingsQueue.peek();
+        fieldExpMappingsQueueCopy =  new ArrayDeque<>(fieldExpMappingsQueue);
         fieldExpMappingsQueue.remove();
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
@@ -173,6 +178,8 @@ public class JsonSchemaProcessor {
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+          //REVISAR MUY FUERTE
+          fieldExpMappingsQueueCopyCopy =  new ArrayDeque<>(fieldExpMappingsQueueCopy);
         }
         else if((nextField == null && (!actualField.getParentRequired() && !actualField.getRequired() ))){
           fieldValueMapping = nextField;
