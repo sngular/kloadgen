@@ -6,6 +6,7 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,18 +52,32 @@ public class StatelessGeneratorTool {
   }
 
   public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
+    if(checkIfNullFieldValueList(fieldValuesList) && fieldType.endsWith("-array")){
+      return new ArrayList<>();
+    }else if(checkIfNullFieldValueList(fieldValuesList)){
+      return new HashMap<>();
+    }
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
   public Object generateArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
 
+    if(checkIfNullFieldValueList(fieldValuesList)){
+      return new ArrayList<>();
+    }
+
+    List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     Object value = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     if ("seq".equals(fieldType)) {
       value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
     }
 
     return value;
+  }
+
+  public boolean checkIfNullFieldValueList(List<String> fieldValueList){
+    return (fieldValueList!=null && fieldValueList.size() == 1 && fieldValueList.contains("null")) ? true :
+        ((fieldValueList==null) ? true:false);
   }
 }

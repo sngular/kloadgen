@@ -56,12 +56,18 @@ public class JsonSchemaProcessor {
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
-          fieldExpMappingsQueueCopy.poll();
+         // fieldExpMappingsQueueCopy.poll();
 
-        } else {
+        } else if((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
+        && (generatedProperties == elapsedProperties && generatedProperties == 0) && fieldValueMapping.getParentRequired()
+        && (fieldValueMapping.getFieldType().contains("-array-map") || fieldValueMapping.getFieldType().contains("-map-array")
+            || fieldValueMapping.getFieldType().contains("-array-array")   || fieldValueMapping.getFieldType().contains("-map-map"))){
+          fieldValueMapping.setRequired(true);
+        }
+        else {
           generatedProperties = 0;
           elapsedProperties = 0;
-          fieldExpMappingsQueueCopy.poll();
+         // fieldExpMappingsQueueCopy.poll();
         }
         generatedProperties++;
 

@@ -33,9 +33,7 @@ public class RandomMap {
                               Map<ConstraintTypeEnum, String> constrains) {
         Object value;
 
-        if(checkIfNullFieldValueList(fieldValueList)){
-            return new ArrayList<>();
-        }
+
 
         switch (fieldType) {
             case ValidTypeConstants.INT_MAP:
@@ -81,6 +79,7 @@ public class RandomMap {
                               Map<ConstraintTypeEnum, String> constrains) {
         Object value;
 
+
         switch (fieldType) {
             case ValidTypeConstants.INT_MAP:
                 value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, valueLength, constrains);
@@ -123,6 +122,8 @@ public class RandomMap {
 
     private Object generateRandomMapArray(String type, Integer mapSize, List<String> fieldValueList, Integer valueLength, Integer arraySize,
                                           Map<ConstraintTypeEnum, String> constrains) {
+
+
         List<Map<String, Object>> generatedMapArray = new ArrayList<>(arraySize);
         int tempValueLength = valueLength;
         if (valueLength == 0){
@@ -190,6 +191,9 @@ public class RandomMap {
     }
 
     private Map<String, Object> generateMapOfMap(String type, Integer mapSize, Integer innerMapSize, List<String> fieldValueList, int valueLength, Map<ConstraintTypeEnum, String> constrains) {
+
+
+
         int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1, 5);
         Map<String, Object> map = new HashMap<>(size);
 
@@ -202,8 +206,5 @@ public class RandomMap {
         return map;
     }
 
-    public boolean checkIfNullFieldValueList(List<String> fieldValueList){
-        return (fieldValueList!=null && fieldValueList.size() == 1 && fieldValueList.contains("null")) ? true :
-            ((fieldValueList==null) ? true:false);
-    }
+
 }
