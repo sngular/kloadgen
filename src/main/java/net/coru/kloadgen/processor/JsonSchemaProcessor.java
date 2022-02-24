@@ -123,7 +123,13 @@ public class JsonSchemaProcessor {
   }
 
   private boolean checkIfObjectOptional(FieldValueMapping field, String fieldName){
+
+    if(fieldName!= null && !field.getParentRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("["))){
+      return true;
+    }
+
     if (fieldName != null){
+
       return !field.getRequired() && field.getFieldValuesList().contains("null")
              && (!fieldName.contains(".") ||
                  (fieldName.contains(".") && fieldName.contains("[")) ||
@@ -168,10 +174,11 @@ public class JsonSchemaProcessor {
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
         }
-        else if(nextField == null && !actualField.getParentRequired()){
+        else if((nextField == null && (!actualField.getParentRequired() && !actualField.getRequired() ))){
+          fieldValueMapping = nextField;
+        }else if(nextField == null && !actualField.getRequired()){
           fieldValueMapping = nextField;
         }
-
         else if ((!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
             && actualField.getParentRequired()
             && fieldExpMappingsQueue.peek() != null
