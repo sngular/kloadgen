@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import lombok.SneakyThrows;
@@ -21,6 +22,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import scala.annotation.meta.field;
 
 public class JsonSchemaProcessor {
 
@@ -81,8 +83,18 @@ public class JsonSchemaProcessor {
                 cleanUpPath(fieldValueMapping, "").contains("["))){
 
           elapsedProperties++;
+          fieldExpMappingsQueueCopy = fieldExpMappingsQueue.clone(); //OJO
           fieldExpMappingsQueue.remove();
+          FieldValueMapping fieldValueMappingCopy = fieldValueMapping;
           fieldValueMapping = fieldExpMappingsQueue.peek();
+          if( fieldExpMappingsQueue.isEmpty() && elapsedProperties == generatedProperties && fieldValueMappingCopy.getParentRequired()){
+            fieldValueMappingCopy.setRequired(true);
+            List<String> temporalFieldValueList = fieldValueMappingCopy.getFieldValuesList();
+            temporalFieldValueList.remove("null");
+            fieldValueMappingCopy.setFieldValuesList(temporalFieldValueList.toString());
+            fieldExpMappingsQueue = fieldExpMappingsQueueCopy.clone();
+            fieldValueMapping = fieldValueMappingCopy;
+          }
           fieldExpMappingsQueueCopy.poll();
         } else {
 
@@ -102,7 +114,12 @@ public class JsonSchemaProcessor {
             fieldExpMappingsQueueCopy.poll();
           } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
 
-            entity.set(fieldName, createObject(fieldName, fieldExpMappingsQueue));
+            ObjectNode createdObject = createObject(fieldName, fieldExpMappingsQueue);
+            if(!createdObject.isEmpty()){
+              entity.set(fieldName, createdObject);
+            }
+
+
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
             fieldExpMappingsQueueCopy.poll();
           } else {
@@ -120,9 +137,12 @@ public class JsonSchemaProcessor {
         }
       }
     }
-    if(entity.isEmpty() && initialFieldValueMapping!=null){
-      entity.set(getCleanMethodName(initialFieldValueMapping, ""),JsonNodeFactory.instance.objectNode());
-    }
+    /*if(entity.isEmpty() && initialFieldValueMapping!=null){
+      entity.set(getCleanMethodName(initialFieldValueMapping, ""),null);
+    }*/
+
+
+
     return entity;
   }
 
@@ -218,7 +238,11 @@ public class JsonSchemaProcessor {
 
         } else if (cleanFieldName.contains(".")) {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
-          subEntity.set(fieldNameSubEntity, createObject(fieldNameSubEntity, fieldExpMappingsQueue));
+          ObjectNode createdObject = createObject(fieldNameSubEntity, fieldExpMappingsQueue);
+          if(!createdObject.isEmpty()){
+            subEntity.set(fieldNameSubEntity, createdObject);
+          }
+
         } else {
 
           fieldExpMappingsQueue.poll();
@@ -232,6 +256,12 @@ public class JsonSchemaProcessor {
         fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       }
     }
+
+
+    if(subEntity == null || subEntity.get(0) == null || subEntity.get(0).isEmpty()){
+      System.out.println(subEntity);
+    }
+
     return subEntity;
   }
 
