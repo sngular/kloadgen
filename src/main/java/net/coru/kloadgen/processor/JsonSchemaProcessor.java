@@ -38,12 +38,13 @@ public class JsonSchemaProcessor {
   @SneakyThrows
   public ObjectNode next() {
     ObjectNode entity = JsonNodeFactory.instance.objectNode();
+    FieldValueMapping initialFieldValueMapping = null;
     if (!fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExprMappings);
       fieldExpMappingsQueueCopy.poll();
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-
+      initialFieldValueMapping = fieldValueMapping;
       int generatedProperties = 0;
       int elapsedProperties = 0;
 
@@ -118,6 +119,9 @@ public class JsonSchemaProcessor {
           }
         }
       }
+    }
+    if(entity.isEmpty() && initialFieldValueMapping!=null){
+      entity.set(getCleanMethodName(initialFieldValueMapping, ""),JsonNodeFactory.instance.objectNode());
     }
     return entity;
   }
