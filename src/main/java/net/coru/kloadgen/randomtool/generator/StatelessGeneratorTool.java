@@ -53,7 +53,7 @@ public class StatelessGeneratorTool {
 
   public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
 
-    if(checkIfNullFieldValueList(fieldValuesList) && fieldType.endsWith("-array")){
+    if(checkIfNullFieldValueList(fieldValuesList) && (fieldType.endsWith("-array") || fieldType.endsWith("-map"))){
       return fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();
     }
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
