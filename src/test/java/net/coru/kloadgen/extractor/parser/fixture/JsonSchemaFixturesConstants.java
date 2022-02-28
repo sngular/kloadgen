@@ -66,6 +66,7 @@ public class JsonSchemaFixturesConstants {
                              .property(StringField.builder().name("veggieName").build())
                              .property(BooleanField.builder().name("veggieLike").build())
                              .isFieldRequired(false)
+                             .required(asList("veggieName", "veggieLike"))
                              .build())
                       .isFieldRequired(true)
                       .build())
@@ -75,6 +76,7 @@ public class JsonSchemaFixturesConstants {
                     .property(StringField.builder().name("veggieName").build())
                     .property(BooleanField.builder().name("veggieLike").build())
                     .isFieldRequired(false)
+                    .required(asList("veggieName", "veggieLike"))
                     .build())
                 .build();
 
@@ -275,6 +277,8 @@ public class JsonSchemaFixturesConstants {
                      .property(IntegerField.builder().name("value").build())
                      .property(StringField.builder().name("currency").regex("^(.*)$").build())
                      .property(IntegerField.builder().name("exponent").build())
+                     .required(asList("value", "currency", "exponent"))
+                     .isFieldRequired(true)
                      .build())
                  .property(ObjectField
                      .builder()
@@ -282,6 +286,7 @@ public class JsonSchemaFixturesConstants {
                      .property(IntegerField.builder().name("value").build())
                      .property(StringField.builder().name("currency").regex("^(.*)$").build())
                      .property(IntegerField.builder().name("exponent").build())
+                     .required(asList("value", "currency", "exponent"))
                      .build())
                  .property(NumberField.builder().name("taxesPercentage").maximum(0).minimum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
                  .property(StringField.builder().name("initialMinimumDate").regex("^(.*)$").build())
@@ -292,6 +297,7 @@ public class JsonSchemaFixturesConstants {
                      .property(IntegerField.builder().name("value").build())
                      .property(StringField.builder().name("currency").regex("^(.*)$").build())
                      .property(IntegerField.builder().name("exponent").build())
+                     .required(asList("value", "currency", "exponent"))
                      .build())
                  .property(ObjectField
                      .builder()
@@ -332,6 +338,7 @@ public class JsonSchemaFixturesConstants {
                       .property(IntegerField.builder().name("value").build())
                       .property(StringField.builder().name("currency").regex("^(.*)$").build())
                       .property(IntegerField.builder().name("exponent").build())
+                      .required(asList("value", "currency","exponent"))
                       .build(),
                   ObjectField
                       .builder()
