@@ -5,16 +5,6 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "arrayOfMapsOfStrings": {
-    "type": "array",
-    "items": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      },
-      "minItems": 0
-    }
-  },
     "arrayOfMapsOfObjects": {
       "type": "array",
       "items": {
@@ -29,7 +19,7 @@
               "type": "integer"
             }
           },
-          "required": ["numberObject"]
+          "required": []
         }
       },
       "minItems": 1
@@ -44,57 +34,11 @@
         "minItems": 1
       }
     },
-    "arrayOfArraysOfObjects": {
-      "type": "array",
-      "items": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name2Object": {
-              "type": "string"
-            },
-            "number2Object": {
-              "type": "integer"
-            }
-          },
-          "required": ["name2ArraysObject"]
-        }
-      },
-      "minItems": 1
-    },
     "mapOfArraysOfStrings": {
       "type": "object",
       "additionalProperties": {
         "type": "array",
         "items": {
-          "type": "string"
-        }
-      }
-    },
-    "mapOfArraysOfObjects": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name3Object": {
-              "type": "string"
-            },
-            "number3Object": {
-              "type": "integer"
-            }
-          },
-          "required": ["name3Object"]
-        }
-      }
-    },
-    "mapOfMapsOfStrings": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": {
           "type": "string"
         }
       }
@@ -116,61 +60,32 @@
         }
       }
     },
-    "mapOfMapsOfObjectsOfArrayOfArrayOfStrings": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": {
-          "type": "object",
-          "properties": {
-            "stringControlObject": {
-              "type": "string"
-            },
-            "arrayOfArraysOfStrings": {
-              "type": "array",
-              "items": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "required": ["stringControlObject"]
-        }
-      }
-    },
     "mapOfObjectsOfCollections": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "stringControlObject": {
-            "type": "string"
-          },
-          "arrayOfArraysOfStrings": {
-            "type": "array",
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "minItems": 1
-          },
-          "arrayOfMapsOfStrings": {
+          "arrayOfMapsOfObject": {
             "type": "array",
             "items": {
               "type": "object",
               "additionalProperties": {
-                "type": "string"
+                "type": "object",
+                "properties": {
+                  "stringControl": {
+                    "type": "string"
+                  },
+                  "numberControl": {
+                    "type": "integer"
+                  }
+                }
               }
             }
           }
         },
-        "required": ["stringControlObject","arrayOfMapsOfStrings"]
+        "required": []
       }
     }
   },
-  "required": ["arrayOfMapsOfStrings"]
+  "required": []
 }

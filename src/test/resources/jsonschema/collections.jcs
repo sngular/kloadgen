@@ -5,15 +5,12 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "controlString": {
-      "type": "string"
-    },
-    "arrayOfStrings": {
-      "type": "array",
-      "items": {
+
+    "mapOfStrings": {
+      "type": "object",
+      "additionalProperties": {
         "type": "string"
-      },
-      "minItems": 1
+      }
     },
     "arrayOfObjectsOfBasicTypes": {
       "type": "array",
@@ -27,89 +24,26 @@
             "type": "integer"
           }
         },
-        "required": ["numberOfObject"]
-      }
-    },
-    "mapOfStrings": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
+        "required": []
       },
-      "minProperties": 1
+      "minItems": 1
     },
-    "mapOfObjectsOfBasicTypes": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "properties": {
-          "arrayOfInternalObject": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": ["arrayOfInternalObject"]
-      }
-    },
-    "objectOfArraysOfBasicTypes":{
+    "objectOfCollectionsOfBasicTypes":{
       "type": "object",
       "properties": {
-        "stringControl": {"type": "string"},
-        "arrayOfStrings": {"type": "array", "items": {"type": "string"}},
-        "arrayOfIntegers": {"type": "array", "items": {"type": "integer"}}
+        "arrayOfStrings": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "mapOfIntegers": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "stringControl": {"type": "string"}
       },
-      "required": ["stringControl"]
+      "required": []
     },
-    "objectOfArraysOfObject":{
+    "objectOfCollectionsOfObject":{
       "type": "object",
       "properties": {
         "stringControl": {"type": "string"},
         "arrayOfObjectsPerson": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "namePerson": {"type": "string"},
-              "phonePerson": {"type": "integer"}
-            }
-          }
-        },
-        "arrayOfObjectsDog": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "nameDog": {"type": "string"},
-              "vetData": {
-                "type": "object",
-                "properties": {
-                  "dogId": {"type": "integer"},
-                  "breedName": {"type": "string"}
-                }
-              }
-            }
-          }
-        }
-      },
-      "required": ["stringControl", "arrayOfObjectsPerson"]
-    },
-    "objectOfMapsOfBasicTypes":{
-      "type": "object",
-      "properties": {
-        "stringControl": {"type": "string"},
-        "mapOfStrings": {"type": "object", "additionalProperties": {"type": "string"}},
-        "mapOfIntegers": {"type": "object", "additionalProperties": {"type": "integer"}}
-      },
-      "required": ["stringControl","mapOfStrings"]
-    },
-    "objectOfMapsOfObject":{
-      "type": "object",
-      "properties": {
-        "stringControl": {"type": "string"},
-        "mapOfObjectsPerson": {
-          "type": "object",
-          "additionalProperties": {
             "type": "object",
             "properties": {
               "namePerson": {"type": "string"},
@@ -134,18 +68,12 @@
           }
         }
       },
-      "required": ["stringControl","mapOfObjectsPerson"]
+      "required": []
     }
   },
   "required": [
-    "controlString",
-    "arrayOfStrings",
-    "mapOfStrings",
-    "mapOfObjectsOfBasicTypes",
-    "objectOfArraysOfBasicTypes",
-    "objectOfArraysOfObject",
-    "objectOfMapsOfBasicTypes",
-    "objectOfMapsOfObject"
+    "objectOfCollectionsOfBasicTypes",
+    "objectOfCollectionsOfObject"
   ]
 
 }

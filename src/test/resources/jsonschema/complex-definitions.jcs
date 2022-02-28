@@ -5,6 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+
     "objectOfDefinitions":{
       "type": "object",
       "properties": {
@@ -32,50 +33,10 @@
       "additionalProperties": {
         "$ref": "#/definitions/mapOfObjectsDef"
       }
-    },
-    "mapOfObjectsOfCollectionsDef": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/definitions/objectOfCollectionsDef"
-      }
-    },
-    "arrayOfObjectsOfCollectionsDef": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/objectOfCollectionsDef"
-      },
-      "minItems": 1
     }
+
   },
   "definitions": {
-    "objectOfCollectionsDef": {
-      "type": "object",
-      "properties": {
-        "stringControlObject": {
-          "type": "string"
-        },
-        "arrayOfArraysOfStrings": {
-          "type": "array",
-          "items": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "minItems": 2
-        },
-        "arrayOfMapsOfStrings": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "required": ["stringControlObject","arrayOfMapsOfStrings"]
-    },
     "mapOfObjectsDef": {
       "type": "object",
       "additionalProperties": {
