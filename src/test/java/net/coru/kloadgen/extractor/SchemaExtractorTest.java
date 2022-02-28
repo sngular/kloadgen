@@ -228,11 +228,11 @@ class SchemaExtractorTest {
                     new FieldValueMapping("geopoliticalSubdivisions.level2.code", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
                       put(MINIMUM_VALUE, "2");
                       put(MAXIMUM_VALUE, "3");
-                    }}, false, false),
+                    }}, false, true),
                     new FieldValueMapping("geopoliticalSubdivisions.level2.freeForm", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
                       put(MINIMUM_VALUE, "1");
                       put(MAXIMUM_VALUE, "256");
-                    }}, false,false)
+                    }}, false,true)
             );
   }
 
@@ -260,7 +260,7 @@ class SchemaExtractorTest {
     File testFile = fileHelper.getFile("/jsonschema/test-map.jcs");
 
     List<FieldValueMapping> fieldValueMappingList =
-            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+        schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
 
     assertThat(fieldValueMappingList).contains(
             new FieldValueMapping("firstName","string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
@@ -272,8 +272,8 @@ class SchemaExtractorTest {
               put(MAXIMUM_VALUE, "0");
             }},true, false),
             new FieldValueMapping("age","number", 0,"",true, false),
-            new FieldValueMapping("testMap.itemType[]","number-map", 0,"", false, true),
-            new FieldValueMapping("testMap.itemTipo[]","string-map", 0,"", false, true)
+            new FieldValueMapping("testMap.itemType[:]","number-map", 0,"", true, true),
+            new FieldValueMapping("testMap.itemTipo[:]","string-map", 0,"", true, true)
 
     );
   }
