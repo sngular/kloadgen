@@ -120,19 +120,19 @@ public class JsonSchemaFixturesConstants {
                     })
                     .build(),
             FieldValueMapping.builder()
-                    .fieldName("testMap.itemType[]")
+                    .fieldName("testMap.itemType[:]")
                     .fieldType("number-map")
                     .valueLength(0)
                     .fieldValueList("null")
-                    .required(false)
+                    .required(true)
                     .isParentRequired(true)
                     .build(),
             FieldValueMapping.builder()
-                    .fieldName("testMap.itemTipo[]")
+                    .fieldName("testMap.itemTipo[:]")
                     .fieldType("string-map")
                     .valueLength(0)
                     .fieldValueList("null")
-                    .required(false)
+                    .required(true)
                     .isParentRequired(true)
                     .build()
     ));
@@ -290,6 +290,7 @@ public class JsonSchemaFixturesConstants {
                             .fieldType("string")
                             .valueLength(0)
                             .required(false)
+                            .isParentRequired(true)
                             .fieldValueList("null")
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "2");
@@ -301,6 +302,7 @@ public class JsonSchemaFixturesConstants {
                             .fieldType("string")
                             .valueLength(0)
                             .required(false)
+                            .isParentRequired(true)
                             .fieldValueList("null")
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "0");
@@ -600,6 +602,6 @@ public class JsonSchemaFixturesConstants {
                             .build()
             ));
 
-    public static final String COMPLEX_SCHEMA_EXPECTED = "{\"_id\":\"1\",\"userId\":2.0,\"storeId\":3.0,\"snapshotId\":\"snap\",\"addressId\":\"address\",\"addressLine\":\"addressLine\",\"alias\":\"alias\",\"contactInformation\":{\"email\":\"email\",\"firstName\":\"firstname\"},\"countryCode\":\"co\",\"location\":{},\"geopoliticalSubdivisions\":{\"level1\":{\"freeForm\":\"freeForm\"},\"level2\":{},\"level3\":{},\"level4\":{}},\"_metadata\":{\"createdBy\":\"createdBy\",\"lastUpdatedBy\":\"lastUpdated\",\"projectVersion\":\"projectVersion\",\"projectName\":\"projectName\",\"schema\":\"schema\"},\"_entity\":\"AddressSnapshot\",\"_class\":\"AddressSnapshot\"}";
+    public static final String COMPLEX_SCHEMA_EXPECTED = "{\"_id\":\"1\",\"userId\":2.0,\"storeId\":3.0,\"snapshotId\":\"snap\",\"addressId\":\"address\",\"addressLine\":\"addressLine\",\"alias\":\"alias\",\"contactInformation\":{\"email\":\"email\",\"firstName\":\"firstname\"},\"countryCode\":\"co\",\"geopoliticalSubdivisions\":{\"level1\":{\"freeForm\":\"freeForm\"}},\"_metadata\":{\"createdBy\":\"createdBy\",\"lastUpdatedBy\":\"lastUpdated\",\"projectVersion\":\"projectVersion\",\"projectName\":\"projectName\",\"schema\":\"schema\"},\"_entity\":\"AddressSnapshot\",\"_class\":\"AddressSnapshot\"}";
 
 }

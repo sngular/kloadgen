@@ -52,13 +52,13 @@ public class JsonSchemaProcessorTest {
     }
 
     @Test
-    void testNullOnOptionalMapWithChildren(){
+    void testNullOnMapWithChildren(){
         JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
         jsonSchemaProcessor.processSchema(SIMPLE_SCHEMA_MAP);
         ObjectNode message = jsonSchemaProcessor.next();
 
         assertThat(message.toString()).contains("lastName\":\"García")
-                .contains("itemTipo\":{").doesNotContain("itemType\":{");
+                .contains("itemTipo\":{").contains("itemType\":{");
 
     }
 }
