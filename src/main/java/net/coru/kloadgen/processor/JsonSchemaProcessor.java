@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import lombok.SneakyThrows;
@@ -22,7 +21,6 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import scala.annotation.meta.field;
 
 public class JsonSchemaProcessor {
 
@@ -54,7 +52,7 @@ public class JsonSchemaProcessor {
         String fieldName = getCleanMethodName(fieldValueMapping, "");
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
-            && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()){
+            && (generatedProperties == elapsedProperties && generatedProperties > 0) && Objects.requireNonNull(fieldValueMapping).getParentRequired()){
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
@@ -62,31 +60,25 @@ public class JsonSchemaProcessor {
          // fieldExpMappingsQueueCopy.poll();
 
         } else if((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
-        && (generatedProperties == elapsedProperties && generatedProperties == 0) && fieldValueMapping.getParentRequired()
-        && (fieldValueMapping.getFieldType().contains("-array-map") || fieldValueMapping.getFieldType().contains("-map-array")
-            || fieldValueMapping.getFieldType().contains("-array-array")   || fieldValueMapping.getFieldType().contains("-map-map"))){
+                  && (generatedProperties == elapsedProperties && generatedProperties == 0) && Objects.requireNonNull(fieldValueMapping).getParentRequired()
+                  && checkIfNestedCollection(Objects.requireNonNull(fieldValueMapping).getFieldType())){
           fieldValueMapping.setRequired(true);
         }
         else {
           generatedProperties = 0;
           elapsedProperties = 0;
-         // fieldExpMappingsQueueCopy.poll();
+
         }
         generatedProperties++;
 
-        //Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName);
-
-        if (!fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")
-            && (!cleanUpPath(fieldValueMapping, "").contains(".") ||
-                (cleanUpPath(fieldValueMapping, "").contains(".") &&
-                 cleanUpPath(fieldValueMapping, "").contains("[") ) ||
-                cleanUpPath(fieldValueMapping, "").contains("["))){
+        if (checkIfObjectNullNotRequired(Objects.requireNonNull(fieldValueMapping), cleanUpPath(fieldValueMapping, ""))){
 
           elapsedProperties++;
           fieldExpMappingsQueueCopy = fieldExpMappingsQueue.clone(); //OJO
           fieldExpMappingsQueue.remove();
           FieldValueMapping fieldValueMappingCopy = fieldValueMapping;
           fieldValueMapping = fieldExpMappingsQueue.peek();
+
           if( fieldExpMappingsQueue.isEmpty() && elapsedProperties == generatedProperties && fieldValueMappingCopy.getParentRequired()){
             fieldValueMappingCopy.setRequired(true);
             List<String> temporalFieldValueList = fieldValueMappingCopy.getFieldValuesList();
@@ -95,12 +87,12 @@ public class JsonSchemaProcessor {
             fieldExpMappingsQueue = fieldExpMappingsQueueCopy.clone();
             fieldValueMapping = fieldValueMappingCopy;
           }
+
           fieldExpMappingsQueueCopy.poll();
+
         } else {
 
-
           String fieldNameProcessed = getFirstPartOfFieldValueMappingName(fieldValueMapping);
-
 
           if (fieldNameProcessed.contains("[")) {
             String completeFieldName = getNameObjectCollection(fieldValueMapping.getFieldName());
@@ -119,7 +111,6 @@ public class JsonSchemaProcessor {
               entity.set(fieldName, createdObject);
             }
 
-
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
             fieldExpMappingsQueueCopy.poll();
           } else {
@@ -137,33 +128,9 @@ public class JsonSchemaProcessor {
         }
       }
     }
-    /*if(entity.isEmpty() && initialFieldValueMapping!=null){
-      entity.set(getCleanMethodName(initialFieldValueMapping, ""),null);
-    }*/
-
-
-
     return entity;
   }
 
-  private boolean checkIfObjectOptional(FieldValueMapping field, String fieldName){
-
-    if(fieldName!= null && !field.getParentRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("["))){
-      return true;
-    }
-
-    if (fieldName != null){
-
-      return !field.getRequired() && field.getFieldValuesList().contains("null")
-             && (!fieldName.contains(".") ||
-                 (fieldName.contains(".") && fieldName.contains("[")) ||
-                 fieldName.contains("["));
-    }
-    return !field.getRequired() && field.getFieldValuesList().contains("null")
-           && (!cleanUpPath(field, "").contains(".") ||
-               (cleanUpPath(field, "").contains(".") && cleanUpPath(field, "").contains("[")) ||
-               cleanUpPath(field, "").contains("["));
-  }
 
   private ObjectNode createObject(final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
       throws KLoadGenException {
@@ -178,48 +145,48 @@ public class JsonSchemaProcessor {
     int generatedProperties = 0;
     int elapsedProperties = 0;
 
-    while((!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)) || !fieldExpMappingsQueueCopyCopy.isEmpty()) {
+    while((!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName))
+          || !fieldExpMappingsQueueCopyCopy.isEmpty()) {
+
       fieldExpMappingsQueueCopyCopy.poll();
       fieldExpMappingsQueueCopy.poll();
       String cleanFieldName = cleanUpPath(fieldValueMapping, fieldName);
       generatedProperties++;
-      if (checkIfObjectOptional(fieldValueMapping, cleanFieldName)){
-        elapsedProperties++;
 
+      if (checkIfObjectOptional(fieldValueMapping, cleanFieldName)){
+
+        elapsedProperties++;
         FieldValueMapping actualField = fieldExpMappingsQueue.peek();
         fieldExpMappingsQueueCopy =  new ArrayDeque<>(fieldExpMappingsQueue);
         fieldExpMappingsQueue.remove();
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
-        if((nextField == null
-            &&
-            actualField.getParentRequired()
-            &&
-            (generatedProperties == elapsedProperties && generatedProperties>0)
-        )){
+        if((nextField == null && Objects.requireNonNull(actualField).getParentRequired()
+            && (generatedProperties == elapsedProperties && generatedProperties>0))){
+
           fieldValueMapping = actualField;
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
-          //REVISAR MUY FUERTE
           fieldExpMappingsQueueCopyCopy =  new ArrayDeque<>(fieldExpMappingsQueueCopy);
-        }
-        else if((nextField == null && (!actualField.getParentRequired() && !actualField.getRequired() ))){
-          fieldValueMapping = nextField;
-        }else if(nextField == null && !actualField.getRequired()){
-          fieldValueMapping = nextField;
-        }
-        else if ((!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
-            && actualField.getParentRequired()
+
+        } else if(nextField == null
+                  && (!actualField.getRequired()
+                      || (!actualField.getRequired() && !actualField.getParentRequired()))){
+          fieldValueMapping = null;
+
+        } else if ((!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
+            && Objects.requireNonNull(actualField).getParentRequired()
             && fieldExpMappingsQueue.peek() != null
-            && (generatedProperties == elapsedProperties && generatedProperties>0))
-        ){
+            && (generatedProperties == elapsedProperties && generatedProperties>0))){
+
           fieldValueMapping = actualField;
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+
         } else{
           fieldValueMapping = nextField;
         }
@@ -228,7 +195,6 @@ public class JsonSchemaProcessor {
         if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
 
           String completeFieldName = getNameObjectCollection(cleanFieldName);
-
           if (completeFieldName.contains("].")) {
             String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
             operationsObjectCollections(completeFieldName,subEntity,fieldValueMapping,fieldNameSubEntity,fieldExpMappingsQueue);
@@ -249,17 +215,12 @@ public class JsonSchemaProcessor {
           subEntity.putPOJO(cleanFieldName,
                             mapper.convertValue(
                                 statelessGeneratorTool.generateObject(cleanFieldName,
-                                                                      fieldValueMapping.getFieldType(),
+                                                                      Objects.requireNonNull(fieldValueMapping).getFieldType(),
                                                                       fieldValueMapping.getValueLength(),
                                                                       fieldValueMapping.getFieldValuesList()), JsonNode.class));
         }
         fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       }
-    }
-
-
-    if(subEntity == null || subEntity.get(0) == null || subEntity.get(0).isEmpty()){
-      System.out.println(subEntity);
     }
 
     return subEntity;
@@ -291,7 +252,7 @@ public class JsonSchemaProcessor {
 
   private ArrayNode createObjectArrayArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
       throws KLoadGenException {
-    //ObjectNode subentity = JsonNodeFactory.instance.objectNode();
+
     List<ObjectNode> objectArray = new ArrayList<>(arraySize);
     ArrayNode subentity = new ArrayNode(JsonNodeFactory.instance);
     ArrayNode subentity2 = JsonNodeFactory.instance.arrayNode();
@@ -299,13 +260,13 @@ public class JsonSchemaProcessor {
 
     for(int i=0; i<arraySize -1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.addAll(createObjectArray(fieldName,2,temporalQueue)); //aqui meter calculateSize
+      objectArray.addAll(createObjectArray(fieldName,arraySize,temporalQueue));
       subentity.addAll(objectArray);
       subentity2.add(subentity);
       objectArray.removeAll(objectArray);
       subentity.removeAll();
     }
-    objectArray.addAll(createObjectArray(fieldName,2,fieldExpMappingsQueue));
+    objectArray.addAll(createObjectArray(fieldName,arraySize,fieldExpMappingsQueue));
     subentity.addAll(objectArray);
     subentity2.add(subentity);
     return subentity2;
@@ -327,12 +288,12 @@ public class JsonSchemaProcessor {
 
     for(int i=0; i<calculateSize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectMap.setAll(createObjectMap(fieldName,2,temporalQueue));
+      objectMap.setAll(createObjectMap(fieldName,calculateSize,temporalQueue));
       array.add(objectMap);
       objectMap = JsonNodeFactory.instance.objectNode();
     }
 
-    objectMap.setAll(createObjectMap(fieldName,2,fieldExpMappingsQueue));
+    objectMap.setAll(createObjectMap(fieldName,calculateSize,fieldExpMappingsQueue));
     array.add(objectMap);
     return array;
   }
@@ -413,7 +374,7 @@ public class JsonSchemaProcessor {
     if(completeFieldName.contains("][")){
       if(completeFieldName.contains("[:][:].")){
         completeFieldName =  completeFieldName.replace("[:][:]." , "");
-        entity.putPOJO(completeFieldName.replace("[:][:]." , ""), createObjectMapMap(fieldName,
+        entity.putPOJO(completeFieldName, createObjectMapMap(fieldName,
                                                                                      calculateSize(fieldValueMapping.getFieldName(), fieldName),
                                                                                      fieldExpMappingsQueue));
       }else if(completeFieldName.contains("[][].")){
@@ -474,13 +435,30 @@ public class JsonSchemaProcessor {
     }
   }
 
-
   public String getFirstPartOfFieldValueMappingName(FieldValueMapping fieldValueMapping){
     if(fieldValueMapping.getFieldName().contains(".")){
       return fieldValueMapping.getFieldName().substring(0,fieldValueMapping.getFieldName().indexOf("."));
     }else{
       return fieldValueMapping.getFieldName();
     }
+  }
+
+
+  public boolean checkIfNestedCollection(String fieldType){
+    return fieldType.contains("-array-map") || fieldType.contains("-map-array") || fieldType.contains("-array-array")   || fieldType.contains("-map-map");
+  }
+
+  private boolean checkIfObjectOptional(FieldValueMapping field, String fieldName){
+    if(fieldName!= null && !field.getParentRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("["))){
+      return true;
+    }
+    return fieldName != null ? checkIfObjectNullNotRequired(field, fieldName) : checkIfObjectNullNotRequired(field, cleanUpPath(field, ""));
+
+  }
+
+  private boolean checkIfObjectNullNotRequired(FieldValueMapping field, String nameOfField){
+    return !field.getRequired() && field.getFieldValuesList().contains("null")
+           && (!nameOfField.contains(".") || (nameOfField.contains(".") && nameOfField.contains("[")) || nameOfField.contains("["));
   }
 
 }

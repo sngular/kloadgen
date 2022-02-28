@@ -52,10 +52,9 @@ public class StatelessGeneratorTool {
   }
 
   public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
+
     if(checkIfNullFieldValueList(fieldValuesList) && fieldType.endsWith("-array")){
-      return new ArrayList<>();
-    }else if(checkIfNullFieldValueList(fieldValuesList)){
-      return new HashMap<>();
+      return fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();
     }
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
@@ -77,7 +76,6 @@ public class StatelessGeneratorTool {
   }
 
   public boolean checkIfNullFieldValueList(List<String> fieldValueList){
-    return (fieldValueList!=null && fieldValueList.size() == 1 && fieldValueList.contains("null")) ? true :
-        ((fieldValueList==null) ? true:false);
+    return fieldValueList == null || (fieldValueList.size() == 1 && fieldValueList.contains("null"));
   }
 }
