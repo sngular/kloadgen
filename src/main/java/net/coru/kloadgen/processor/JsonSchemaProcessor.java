@@ -171,6 +171,7 @@ public class JsonSchemaProcessor {
         elapsedProperties++;
         FieldValueMapping actualField = fieldExpMappingsQueue.peek();
         fieldExpMappingsQueueCopy =  new ArrayDeque<>(fieldExpMappingsQueue);
+
         fieldExpMappingsQueue.remove();
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
@@ -194,19 +195,31 @@ public class JsonSchemaProcessor {
           fieldValueMapping = actualField;
           fieldValueMapping.setRequired(true);
         }
+
         else if ((!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
             && Objects.requireNonNull(actualField).getParentRequired()
             && fieldExpMappingsQueue.peek() != null
             && (generatedProperties == elapsedProperties && generatedProperties>0))){
 
-          fieldValueMapping = actualField;
-          fieldValueMapping.setRequired(true);
-          List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
-          temporalFieldValueList.remove("null");
-          fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
-
+          if(fieldValueMapping.getFieldName().contains(".")){
+            String ancestorName = fieldValueMapping.getFieldName().substring(0,fieldValueMapping.getFieldName().indexOf("."));
+            if(Objects.requireNonNull(nextField).getFieldName().contains(ancestorName)){
+              fieldValueMapping = nextField;
+            }else{
+              fieldValueMapping = actualField;
+              fieldValueMapping.setRequired(true);
+              List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+              temporalFieldValueList.remove("null");
+              fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+            }
+          }else{
+            fieldValueMapping = actualField;
+            fieldValueMapping.setRequired(true);
+            List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+            temporalFieldValueList.remove("null");
+            fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+          }
         }
-
         else{
           fieldValueMapping = nextField;
         }
@@ -333,9 +346,15 @@ public class JsonSchemaProcessor {
     List<ObjectNode> objectArray = new ArrayList<>(arraySize);
     for(int i=0; i<arraySize-1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.add(createObject(fieldName, temporalQueue));
+      ObjectNode objectNode = createObject(fieldName, temporalQueue);
+      if(objectNode != null && !objectNode.isEmpty()){
+        objectArray.add(objectNode);
+      }
     }
-    objectArray.add(createObject(fieldName, fieldExpMappingsQueue));
+    ObjectNode objectNode = createObject(fieldName, fieldExpMappingsQueue);
+    if(objectNode != null && !objectNode.isEmpty()){
+      objectArray.add(objectNode);
+    }
     return objectArray;
   }
 
