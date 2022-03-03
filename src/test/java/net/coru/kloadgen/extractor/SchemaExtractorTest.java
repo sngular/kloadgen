@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static net.coru.kloadgen.model.ConstraintTypeEnum.*;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.*;
@@ -276,6 +277,92 @@ class SchemaExtractorTest {
             new FieldValueMapping("testMap.itemTipo[:]","string-map", 0,"", true, true)
 
     );
+  }
+
+  @Test
+  @DisplayName("Should extract optional collections and optional collections inside objects")
+  void testFlatPropertiesOptionalCollections() throws IOException {
+
+    File testFile = fileHelper.getFile("/jsonschema/collections.jcs");
+
+    Map<ConstraintTypeEnum,String> constraints = new HashMap<>();
+
+    constraints.put(MINIMUM_VALUE,"0");
+    constraints.put(MAXIMUM_VALUE,"0");
+
+    FieldValueMapping second = new FieldValueMapping("arrayOfObjectsOfBasicTypes[].stringOfObject", "string", 0, "", false, true);
+    second.setConstrains(constraints);
+
+    FieldValueMapping objectCollectionsBasicTypesStringControl=  new FieldValueMapping("objectOfCollectionsOfBasicTypes.stringControl", "string", 0, "", false, true);
+    objectCollectionsBasicTypesStringControl.setConstrains(constraints);
+
+    FieldValueMapping objectCollectionsObjectStringControl = new FieldValueMapping("objectOfCollectionsOfObject.stringControl", "string", 0, "", false, true);
+    objectCollectionsObjectStringControl.setConstrains(constraints);
+
+    FieldValueMapping objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson = new FieldValueMapping("objectOfCollectionsOfObject.arrayOfObjectsPerson[].namePerson", "string"
+        , 0, "", false, true);
+    objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson.setConstrains(constraints);
+
+    FieldValueMapping  objectOfCollectionsOfObjectMapOfObjectsDogNameDog =  new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].nameDog", "string", 0, "",
+                                                                                                  false, true);
+    objectOfCollectionsOfObjectMapOfObjectsDogNameDog.setConstrains(constraints);
+
+    FieldValueMapping objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName = new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.breedName",
+                                                                                                         "string", 0, "", false, true);
+    objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName.setConstrains(constraints);
+
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+    assertThat(fieldValueMappingList)
+        .hasSize(12)
+        .containsExactlyInAnyOrder(
+            new FieldValueMapping("mapOfStrings[:]", "string-map", 0, "", true, false),
+            second,
+            new FieldValueMapping("arrayOfObjectsOfBasicTypes[].numberOfObject", "number", 0, "", false, true),
+            new FieldValueMapping("objectOfCollectionsOfBasicTypes.arrayOfStrings[]", "string-array", 0, "", true, true),
+            new FieldValueMapping("objectOfCollectionsOfBasicTypes.mapOfIntegers[:]", "number-map", 0, "", true, true),
+            objectCollectionsBasicTypesStringControl,
+            objectCollectionsObjectStringControl,
+            objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson,
+            new FieldValueMapping("objectOfCollectionsOfObject.arrayOfObjectsPerson[].phonePerson", "number", 0, "", false, true),
+            objectOfCollectionsOfObjectMapOfObjectsDogNameDog,
+            new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.dogId", "number", 0, "", false, true),
+            objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName
+        );
+  }
+
+  @Test
+  @DisplayName("Should extract optional nested-collections and optional nested-collections inside objects")
+  void testFlatPropertiesOptionalNestedCollections() throws IOException{
+    File testFile = fileHelper.getFile("/jsonschema/nested-collections.jcs");
+
+    Map<ConstraintTypeEnum,String> constraints = new HashMap<>();
+
+    constraints.put(MINIMUM_VALUE,"0");
+    constraints.put(MAXIMUM_VALUE,"0");
+
+    FieldValueMapping arrayOfMapsOfObjectsStringObject = new FieldValueMapping("arrayOfMapsOfObjects[][:].stringObject", "string", 0, "", false, true);
+    arrayOfMapsOfObjectsStringObject.setConstrains(constraints);
+
+    FieldValueMapping mapOfMapsOfObjectsName4Object = new FieldValueMapping("mapOfMapsOfObjects[:][:].name4Object", "string", 0, "", false, true);
+    mapOfMapsOfObjectsName4Object.setConstrains(constraints);
+
+    FieldValueMapping mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl = new FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].stringControl", "string", 0, "", false, true);
+    mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl.setConstrains(constraints);
+
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+    assertThat(fieldValueMappingList)
+        .hasSize(8)
+        .containsExactlyInAnyOrder(
+            arrayOfMapsOfObjectsStringObject,
+            new FieldValueMapping("arrayOfMapsOfObjects[][:].numberObject", "number", 0, "", false, true),
+            new FieldValueMapping("arrayOfArraysOfStrings[][]", "string-array-array", 0, "", false, true),
+            new FieldValueMapping("mapOfArraysOfStrings[:][]", "string-array-map", 0, "", false, true),
+            mapOfMapsOfObjectsName4Object,
+            new FieldValueMapping("mapOfMapsOfObjects[:][:].number4Object", "number", 0, "", false, true),
+            mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl,
+            new FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl", "number", 0, "", false, true)
+        );
+
   }
 
 }
