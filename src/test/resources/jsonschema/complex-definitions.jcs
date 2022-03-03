@@ -1,7 +1,5 @@
 {
-  "$id": "https://example.com/complex-definitions.schema.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "basic collections",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -15,20 +13,20 @@
       },
       "required": ["stringControl","arrayOfStrings"]
     },
-    "arrayOfObjectsDef": {
+    "arrayOfObjects": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/arrayDef"
+        "$ref": "#/definitions/objectDef"
       },
       "minItems": 0
     },
-    "mapOfObjectsDef": {
+    "mapOfObjects": {
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/objectOfArraysDef"
       }
     },
-    "mapOfMapsDef": {
+    "mapOfMaps": {
       "type": "object",
       "additionalProperties": {
         "$ref": "#/definitions/mapOfObjectsDef"
@@ -36,7 +34,28 @@
     }
 
   },
+  "required": [
+    "objectOfDefinitions"
+  ],
   "definitions": {
+    "objectDef": {
+      "type": "object",
+      "properties": {
+        "stringOfObject": {
+          "type": "string"
+        },
+        "numberOfObject": {
+          "type": "integer"
+        }
+      },
+      "required": ["numberOfObject"]
+    },
+    "mapOfStringsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "mapOfObjectsDef": {
       "type": "object",
       "additionalProperties": {
@@ -59,18 +78,6 @@
         "required": ["stringControlObject"]
       }
     },
-    "arrayDef": {
-      "type": "object",
-      "properties": {
-        "stringOfObject": {
-          "type": "string"
-        },
-        "numberOfObject": {
-          "type": "integer"
-        }
-      },
-      "required": ["numberOfObject"]
-    },
     "objectOfArraysDef": {
       "type": "object",
       "properties": {
@@ -89,16 +96,6 @@
         "type": "string"
       },
       "minItems": 1
-    },
-    "mapOfStringsDef": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      }
     }
-  },
-  "required": [
-    "objectOfDefinitions"
-  ]
-
+  }
 }

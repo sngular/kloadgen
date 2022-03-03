@@ -12,6 +12,7 @@ import net.coru.kloadgen.model.json.NumberField;
 import net.coru.kloadgen.model.json.ObjectField;
 import net.coru.kloadgen.model.json.Schema;
 import net.coru.kloadgen.model.json.StringField;
+import net.coru.kloadgen.model.json.MapField;
 
 public class JsonSchemaFixturesConstants {
 
@@ -350,4 +351,175 @@ public class JsonSchemaFixturesConstants {
                 )
               )
           .build();
+
+
+  public static final Schema COLLECTIONS_SCHEMA =
+      Schema.builder()
+            .id("https://example.com/collections.schema.json")
+            .name("http://json-schema.org/draft-04/schema#")
+            .type("object")
+            .property(MapField.builder().name("mapOfStrings").mapType(
+                StringField.builder().name("internalMapField").build()).isFieldRequired(true).build())
+            .property(ArrayField.builder().name("arrayOfObjectsOfBasicTypes").value(
+                ObjectField.builder()
+                           .property(StringField.builder().name("stringOfObject").build())
+                           .property(IntegerField.builder().name("numberOfObject").maximum(0).minimum(0).build())
+                           .isFieldRequired(true)
+                           .build()
+            ).minItems(1).uniqueItems(false).isFieldRequired(true).build())
+            .property(ObjectField.builder()
+                          .name("objectOfCollectionsOfBasicTypes")
+                          .property(ArrayField.builder().name("arrayOfStrings")
+                                              .value(StringField.builder().build())
+                                              .minItems(1)
+                                              .isFieldRequired(true)
+                                              .build())
+                          .property(MapField.builder()
+                                            .name("mapOfIntegers")
+                                            .mapType(IntegerField.builder().name("internalMapField").maximum(0).minimum(0).build())
+                                            .isFieldRequired(true)
+                                            .build())
+                          .property(StringField.builder().name("stringControl").build())
+                          .isFieldRequired(true)
+                          .build())
+            .property(ObjectField.builder()
+                                 .name("objectOfCollectionsOfObject")
+                                 .property(StringField.builder().name("stringControl").build())
+                                 .property(ArrayField.builder()
+                                                     .name("arrayOfObjectsPerson")
+                                                     .value(ObjectField.builder()
+                                                             .property(StringField.builder().name("namePerson").build())
+                                                             .property(IntegerField.builder().name("phonePerson").maximum(0).minimum(0).build())
+                                                             .build()
+                                                     )
+                                                     .isFieldRequired(true).build())
+                                 .property(MapField.builder()
+                                                   .name("mapOfObjectsDog")
+                                                   .mapType(ObjectField.builder()
+                                                                .name("internalMapField")
+                                                                .property(StringField.builder().name("nameDog").build())
+                                                                .property(ObjectField.builder()
+                                                                             .name("vetData")
+                                                                             .property(IntegerField.builder().name("dogId").maximum(0).minimum(0).build())
+                                                                             .property(StringField.builder().name("breedName").build())
+                                                                             .build()
+                                                                    ).build())
+                                                   .isFieldRequired(true)
+                                                   .build())
+                                 .isFieldRequired(true)
+                                 .build())
+            .requiredFields(asList("objectOfCollectionsOfBasicTypes","objectOfCollectionsOfObject"))
+            .build();
+
+
+  public static final Schema NESTED_COLLECTIONS_SCHEMA =
+      Schema.builder()
+            .id("https://example.com/nested-collections.schema.json")
+            .name("http://json-schema.org/draft-04/schema#")
+            .type("object")
+            .property(ArrayField.builder().name("arrayOfMapsOfObjects").value(
+               MapField.builder()
+                       .mapType(ObjectField.builder().name("internalMapField")
+                                           .property(StringField.builder().name("stringObject").build())
+                                           .property(IntegerField.builder().name("numberObject").maximum(0).minimum(0).build()
+                                           ).build())
+                       .isFieldRequired(true).build()).minItems(1).uniqueItems(false).isFieldRequired(true).build())
+            .property(ArrayField.builder().name("arrayOfArraysOfStrings").value(
+                ArrayField.builder()
+                          .value(StringField.builder().build())
+                          .minItems(1)
+                          .build()).isFieldRequired(true).build())
+            .property(MapField.builder().name("mapOfArraysOfStrings").mapType(
+                ArrayField.builder().name("internalMapField")
+                          .value(StringField.builder().build())
+                          .build()).isFieldRequired(true).build())
+            .property(MapField.builder().name("mapOfMapsOfObjects").mapType(
+                MapField.builder().name("internalMapField").mapType(
+                    ObjectField.builder().name("internalMapField")
+                               .property(StringField.builder().name("name4Object").build())
+                               .property(IntegerField.builder().name("number4Object").maximum(0).minimum(0).build())
+                               .build()
+                           ).build()).isFieldRequired(true).build())
+            .property(MapField.builder().name("mapOfObjectsOfCollections").mapType(
+                    ObjectField.builder().name("internalMapField")
+                               .property(ArrayField.builder().name("arrayOfMapsOfObject").value(
+                                                        MapField.builder().mapType(
+                                                            ObjectField.builder().name("internalMapField")
+                                                                       .property(StringField.builder().name("stringControl").build())
+                                                                       .property(IntegerField.builder().name("numberControl").maximum(0).minimum(0).build())
+                                                                       .build()
+                                                        ).build())
+                                                   .isFieldRequired(true)
+                                                   .build()).build())
+                              .isFieldRequired(true).build())
+            .build();
+
+
+  public static final Schema DEFINITIONS_COMPLEX_SCHEMA =
+      Schema.builder()
+            .id("")
+            .name("http://json-schema.org/draft-04/schema#")
+            .type("object")
+            .property(ObjectField.builder().name("objectOfDefinitions")
+                                 .property(StringField.builder().name("stringControl").build() )
+                                 .property(ArrayField.builder().name("arrayOfStrings").value(StringField.builder().build())
+                                                     .minItems(1).isFieldRequired(true).build())
+                                 .property(MapField.builder().name("mapOfStrings").mapType(
+                                     StringField.builder().name("internalMapField").build())
+                                                   .isFieldRequired(true).build())
+                                 .required(asList("stringControl","arrayOfStrings")).isFieldRequired(true).build())
+            .property(ArrayField.builder().name("arrayOfObjects").value(
+                    ObjectField.builder()
+                               .property(StringField.builder().name("stringOfObject").build())
+                               .property(IntegerField.builder().name("numberOfObject").maximum(0).minimum(0).build())
+                               .required(asList("numberOfObject"))
+                               .build())
+            .isFieldRequired(true).build())
+            .property(MapField.builder().name("mapOfObjects").mapType(
+                ObjectField.builder().name("internalMapField")
+                           .property(ArrayField.builder().name("arrayOfInternalObject").value(StringField.builder().build())
+                                               .isFieldRequired(true).build())
+                           .required(asList("arrayOfInternalObject")).build()
+            ).isFieldRequired(true).build())
+            .property(MapField.builder().name("mapOfMaps").mapType(
+                MapField.builder().name("internalMapField").mapType(
+                    ObjectField.builder().name("internalMapField")
+                               .property(StringField.builder().name("stringControlObject").build())
+                               .property(ArrayField.builder().name("arrayOfArraysOfStrings").value(
+                                   ArrayField.builder().value(
+                                       StringField.builder().build()
+                                   ).minItems(1).build()
+                               ).isFieldRequired(true).build())
+                               .required(asList("stringControlObject")).build()
+                ).build()
+                ).isFieldRequired(true).build())
+            .requiredFields(asList("objectOfDefinitions", "objectOfDefinitions.stringControl", "objectOfDefinitions.arrayOfStrings"))
+            .definitions(asList(
+                ObjectField.builder().name("objectDef")
+                           .property(StringField.builder().name("stringOfObject").build())
+                           .property(IntegerField.builder().name("numberOfObject").maximum(0).minimum(0).build())
+                           .required(asList("numberOfObject"))
+                           .build(),
+                MapField.builder().name("mapOfStringsDef").mapType(StringField.builder().name("internalMapField").build())
+                        .build(),
+                MapField.builder().name("mapOfObjectsDef").mapType(
+                    ObjectField.builder().name("internalMapField")
+                               .property(StringField.builder().name("stringControlObject").build())
+                               .property(ArrayField.builder().name("arrayOfArraysOfStrings").value(
+                                   ArrayField.builder().value(
+                                       StringField.builder().build()
+                                   ).minItems(1).build()
+                                         ).isFieldRequired(true).build())
+                        .required(asList("stringControlObject")).build()
+                ).build(),
+                ObjectField.builder().name("objectOfArraysDef")
+                           .property(ArrayField.builder().name("arrayOfInternalObject").value(StringField.builder().build())
+                                               .isFieldRequired(true).build())
+                           .required(asList("arrayOfInternalObject"))
+                           .build(),
+                ArrayField.builder().name("arrayOfStringsDef").value(StringField.builder().build())
+                    .minItems(1).build()
+
+            ))
+            .build();
 }
