@@ -8,6 +8,7 @@ package net.coru.kloadgen.extractor;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -35,6 +36,7 @@ import java.util.Map;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.*;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith({
     WiremockResolver.class,
@@ -363,6 +365,17 @@ class SchemaExtractorTest {
             new FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl", "number", 0, "", false, true)
         );
 
+  }
+
+  @Test
+  @DisplayName("Should capture 3+ level exception in collections. Three levels of nested collections are not allowed")
+  void testFlatPropertiesCaptureThreeLevelException() throws IOException{
+    File testFile = fileHelper.getFile("/jsonschema/test-level-nested-exception.jcs");
+    assertThatExceptionOfType(KLoadGenException.class)
+        .isThrownBy(() -> {
+          List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+        })
+        .withMessage("Wrong Json Schema, 3+ consecutive nested collections are not allowed");
   }
 
 }
