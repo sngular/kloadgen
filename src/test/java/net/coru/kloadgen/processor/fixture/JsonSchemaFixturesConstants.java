@@ -49,42 +49,30 @@ public class JsonSchemaFixturesConstants {
 
     public static final String SIMPLE_SCHEMA_EXPECTED = "{\"lastName\":\"García\"}";
 
-    public static final List<FieldValueMapping> SIMPLE_SCHEMA_ARRAY = new ArrayList<FieldValueMapping>(Arrays.asList(
+    public static final List<FieldValueMapping> SIMPLE_SCHEMA_COLLECTIONS = new ArrayList<FieldValueMapping>(Arrays.asList(
             FieldValueMapping.builder()
                     .fieldName("fruits[]")
                     .fieldType("string-array")
                     .valueLength(0)
                     .fieldValueList("null")
-                    .required(false)
+                    .required(true)
                     .isParentRequired(false)
                     .constrains(new HashMap<ConstraintTypeEnum, String>() {
                     })
                     .build(),
             FieldValueMapping.builder()
-                    .fieldName("vegetables[].veggieName")
-                    .fieldType("string")
+                    .fieldName("vegetables[:]")
+                    .fieldType("string-map")
                     .valueLength(0)
                     .fieldValueList("null")
-                    .required(false)
-                    .isParentRequired(false)
-                    .constrains(new HashMap<ConstraintTypeEnum, String>() {{
-                        put(MINIMUM_VALUE, "0");
-                        put(MAXIMUM_VALUE, "0");
-                    }})
-                    .build(),
-            FieldValueMapping.builder()
-                    .fieldName("vegetables[].veggieLike")
-                    .fieldType("boolean")
-                    .valueLength(0)
-                    .fieldValueList("null")
-                    .required(false)
+                    .required(true)
                     .isParentRequired(false)
                     .constrains(new HashMap<ConstraintTypeEnum, String>() {
                     })
                     .build()
     ));
 
-    public static final String SIMPLE_SCHEMA_ARRAY_EXPECTED = "{}";
+    public static final String SIMPLE_SCHEMA_COLLECTIONS_EXPECTED = "{\"fruits\":[],\"vegetables\":{}}";
 
     public static final List<FieldValueMapping> SIMPLE_SCHEMA_MAP = new ArrayList<FieldValueMapping>(Arrays.asList(
             FieldValueMapping.builder()
@@ -230,7 +218,7 @@ public class JsonSchemaFixturesConstants {
                             .valueLength(0)
                             .fieldValueList("email")
                             .required(true)
-                            .isParentRequired(true)
+                            .isParentRequired(false)
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "0");
                                 put(MAXIMUM_VALUE, "0");
@@ -242,7 +230,7 @@ public class JsonSchemaFixturesConstants {
                             .valueLength(0)
                             .fieldValueList("firstname")
                             .required(true)
-                            .isParentRequired(true)
+                            .isParentRequired(false)
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "0");
                                 put(MAXIMUM_VALUE, "0");
@@ -254,7 +242,7 @@ public class JsonSchemaFixturesConstants {
                             .valueLength(0)
                             .fieldValueList("null")
                             .required(false)
-                            .isParentRequired(true)
+                            .isParentRequired(false)
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "0");
                                 put(MAXIMUM_VALUE, "0");
@@ -266,7 +254,7 @@ public class JsonSchemaFixturesConstants {
                             .valueLength(0)
                             .fieldValueList("null")
                             .required(false)
-                            .isParentRequired(true)
+                            .isParentRequired(false)
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "0");
                                 put(MAXIMUM_VALUE, "0");
@@ -278,7 +266,7 @@ public class JsonSchemaFixturesConstants {
                             .valueLength(0)
                             .fieldValueList("null")
                             .required(false)
-                            .isParentRequired(true)
+                            .isParentRequired(false)
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "0");
                                 put(MAXIMUM_VALUE, "0");
@@ -290,11 +278,11 @@ public class JsonSchemaFixturesConstants {
                             .fieldType("string")
                             .valueLength(0)
                             .required(false)
-                            .isParentRequired(true)
+                            .isParentRequired(false)
                             .fieldValueList("null")
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
-                                put(MINIMUM_VALUE, "2");
-                                put(MAXIMUM_VALUE, "3");
+                                put(MINIMUM_VALUE, "0");
+                                put(MAXIMUM_VALUE, "0");
                             }})
                             .build(),
                     FieldValueMapping.builder()
@@ -302,7 +290,7 @@ public class JsonSchemaFixturesConstants {
                             .fieldType("string")
                             .valueLength(0)
                             .required(false)
-                            .isParentRequired(true)
+                            .isParentRequired(false)
                             .fieldValueList("null")
                             .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                                 put(MINIMUM_VALUE, "0");
@@ -602,6 +590,100 @@ public class JsonSchemaFixturesConstants {
                             .build()
             ));
 
-    public static final String COMPLEX_SCHEMA_EXPECTED = "{\"_id\":\"1\",\"userId\":2.0,\"storeId\":3.0,\"snapshotId\":\"snap\",\"addressId\":\"address\",\"addressLine\":\"addressLine\",\"alias\":\"alias\",\"contactInformation\":{\"email\":\"email\",\"firstName\":\"firstname\"},\"countryCode\":\"co\",\"geopoliticalSubdivisions\":{\"level1\":{\"freeForm\":\"freeForm\"}},\"_metadata\":{\"createdBy\":\"createdBy\",\"lastUpdatedBy\":\"lastUpdated\",\"projectVersion\":\"projectVersion\",\"projectName\":\"projectName\",\"schema\":\"schema\"},\"_entity\":\"AddressSnapshot\",\"_class\":\"AddressSnapshot\"}";
+    public static final String COMPLEX_SCHEMA_EXPECTED = "{\"_id\":\"1\",\"userId\":2.0,\"storeId\":3.0,\"snapshotId\":\"snap\",\"addressId\":\"address\"," +
+                                                         "\"addressLine\":\"addressLine\",\"alias\":\"alias\",\"contactInformation\":{\"email\":\"email\",\"firstName\":\"firstname\"},\"countryCode\":\"co\"," +
+                                         "\"_metadata\":{\"createdBy\":\"createdBy\",\"lastUpdatedBy\":\"lastUpdated\",\"projectVersion\":\"projectVersion\"," +
+                                         "\"projectName\":\"projectName\",\"schema\":\"schema\"},\"_entity\":\"AddressSnapshot\",\"_class\":\"AddressSnapshot\"}";
+
+
+
+  public static final List<FieldValueMapping> SCHEMA_NESTED_COLLECTIONS = new ArrayList<FieldValueMapping>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("fruits[][:]")
+                       .fieldType("string-map-array")
+                       .valueLength(0)
+                       .required(false)
+                       .isParentRequired(true)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("vegetables[:][]")
+                       .fieldType("string-array-map")
+                       .valueLength(0)
+                       .required(false)
+                       .isParentRequired(true)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("birds[][]")
+                       .fieldType("string-array-array")
+                       .valueLength(0)
+                       .required(true)
+                       .isParentRequired(false)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("animals[:][:]")
+                       .fieldType("string-map-map")
+                       .valueLength(0)
+                       .required(true)
+                       .isParentRequired(false)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build()
+  ));
+
+
+  public static final List<FieldValueMapping> SCHEMA_COMPLEX_COLLECTIONS = new ArrayList<FieldValueMapping>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("fruits.tropical[]")
+                       .fieldType("string-array")
+                       .valueLength(0)
+                       .required(true)
+                       .isParentRequired(true)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("vegetables.trees[:]")
+                       .fieldType("string-map")
+                       .valueLength(0)
+                       .required(true)
+                       .isParentRequired(true)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("birds[][].nameBird")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .required(false)
+                       .isParentRequired(true)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("animals[:][:].nameAnimal")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .required(false)
+                       .isParentRequired(true)
+                       .fieldValueList("null")
+                       .constrains(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build()
+  ));
+
+
 
 }

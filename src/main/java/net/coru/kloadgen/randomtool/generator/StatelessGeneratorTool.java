@@ -63,7 +63,7 @@ public class StatelessGeneratorTool {
   public Object generateArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
 
     if(checkIfNullFieldValueList(fieldValuesList)){
-      return new ArrayList<>();
+      return fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();
     }
 
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);

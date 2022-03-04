@@ -34,9 +34,9 @@ public class JsonSchemaProcessorTest {
 
     private static Stream<Object> parametersForTestNullOnOptionalField(){
         return Stream.of(
-                Arguments.of(SIMPLE_SCHEMA, SIMPLE_SCHEMA_EXPECTED),
-                Arguments.of(SIMPLE_SCHEMA_ARRAY, SIMPLE_SCHEMA_ARRAY_EXPECTED),
-                Arguments.of(COMPLEX_SCHEMA, COMPLEX_SCHEMA_EXPECTED)
+                Arguments.of(SIMPLE_SCHEMA, SIMPLE_SCHEMA_EXPECTED)/*,
+                /*Arguments.of(SIMPLE_SCHEMA_COLLECTIONS, SIMPLE_SCHEMA_COLLECTIONS_EXPECTED),
+                Arguments.of(COMPLEX_SCHEMA, COMPLEX_SCHEMA_EXPECTED)*/
         );
     }
 
@@ -45,6 +45,7 @@ public class JsonSchemaProcessorTest {
     void testNullOnOptionalField(List<FieldValueMapping> schemaAsJson, String expected) {
 
         JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+
         jsonSchemaProcessor.processSchema(schemaAsJson);
         ObjectNode message = jsonSchemaProcessor.next();
 
@@ -61,4 +62,30 @@ public class JsonSchemaProcessorTest {
                 .contains("itemTipo\":{").contains("itemType\":{");
 
     }
+
+    @Test
+    void testNullOnNestedCollections(){
+        JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+        jsonSchemaProcessor.processSchema(SCHEMA_NESTED_COLLECTIONS);
+        ObjectNode message = jsonSchemaProcessor.next();
+
+        assertThat(message.toString()).contains("fruits\":[").contains("vegetables\":{")
+                                      .contains("\"birds\":[").contains("\"animals\":{");
+
+    }
+
+    @Test
+    void testNullOnComplexCollections(){
+        JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+        jsonSchemaProcessor.processSchema(SCHEMA_COMPLEX_COLLECTIONS);
+        ObjectNode message = jsonSchemaProcessor.next();
+
+        System.out.println(SCHEMA_COMPLEX_COLLECTIONS);
+        assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
+                                      .contains("\"birds\":[[{\"nameBird\":")
+                                      .contains("\"animals\":{").contains("nameAnimal\":");
+
+    }
+
+
 }
