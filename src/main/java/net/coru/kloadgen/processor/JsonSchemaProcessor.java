@@ -175,15 +175,24 @@ public class JsonSchemaProcessor {
         fieldExpMappingsQueue.remove();
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
+
+
+
         if((nextField == null && Objects.requireNonNull(actualField).getParentRequired()
             && (generatedProperties == elapsedProperties && generatedProperties>0))){
 
-          fieldValueMapping = actualField;
-          fieldValueMapping.setRequired(true);
-          List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
-          temporalFieldValueList.remove("null");
-          fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
-          fieldExpMappingsQueueCopyCopy =  new ArrayDeque<>(fieldExpMappingsQueueCopy);
+          if(fieldValueMapping.getFieldName().split(cleanFieldName)[0].endsWith("[].") || fieldValueMapping.getFieldName().split(cleanFieldName)[0].endsWith("[:].")){
+            fieldValueMapping = null;
+          }else{
+            fieldValueMapping = actualField;
+            fieldValueMapping.setRequired(true);
+            List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+            temporalFieldValueList.remove("null");
+            fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+            fieldExpMappingsQueueCopyCopy =  new ArrayDeque<>(fieldExpMappingsQueueCopy);
+          }
+
+
 
         } else if(nextField == null
                   && (!actualField.getRequired()
