@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
@@ -113,7 +114,8 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Random Value for Field")
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expected);
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest
@@ -122,7 +124,8 @@ class AvroGeneratorToolTest {
   void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
                                                    Field field, Object expected,
                                                    Map<ConstraintTypeEnum, String> constrains) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, constrains)).isEqualTo(expected);
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constrains)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
@@ -137,7 +140,8 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Generate a Random Value")
   @MethodSource("parametersForGenerateRandomValue")
   void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
-    Object number = new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap());
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    Object number = new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap());
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
     assertThat(String.valueOf(number)).hasSize(valueLength);
   }
@@ -175,7 +179,8 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Generate a Random Value for Enums")
   @MethodSource("parametersForGenerateRandomValueForEnums")
   void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap()))
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap()))
         .hasFieldOrPropertyWithValue("symbol", expected);
   }
 
@@ -191,7 +196,8 @@ class AvroGeneratorToolTest {
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
       Object expectedTyped) {
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, fieldValuesList, Collections.emptyMap())).isEqualTo(expectedTyped);
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
@@ -255,8 +261,8 @@ class AvroGeneratorToolTest {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, Collections.singletonList("$" +
-            "{VARIABLE}"),Collections.emptyMap()))
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,Collections.emptyMap()))
         .isEqualTo(expected);
   }
 
@@ -268,8 +274,8 @@ class AvroGeneratorToolTest {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldType, valueLength, Collections.singletonList("$" +
-            "{VARIABLE}"),constrains))
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constrains))
             .isEqualTo(expected);
   }
 }

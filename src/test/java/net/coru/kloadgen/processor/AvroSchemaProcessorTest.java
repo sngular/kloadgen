@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Streams;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -42,6 +43,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
 import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL;
 import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL_FIELDS;
@@ -370,7 +372,6 @@ class AvroSchemaProcessorTest {
 
         assertThat(message)
             .isNotNull()
-            .isInstanceOf(EnrichedRecord.class)
             .extracting(EnrichedRecord::getGenericRecord)
             .isNotNull();
 
@@ -378,5 +379,123 @@ class AvroSchemaProcessorTest {
         assertThat(record.get(0)).isNotNull();
         assertThat(record.get(1)).isNull();
 
+    }
+
+    private GenericRecord entityForCustomSequenceOfValuesWithSameStartingStartingValue(Schema schema, List<String> idValues, List<String> otherIdValues) {
+        GenericRecord entity = new GenericData.Record(schema);
+        Schema valuesSchema = entity.getSchema().getField("values").schema();
+        Schema valuesDataSchema = valuesSchema.getElementType();
+        List<GenericRecord> valuesData = Streams.zip(idValues.stream(), otherIdValues.stream(), (id, otherId) -> {
+            GenericRecord valuesDataRecord = new GenericData.Record(valuesDataSchema);
+            valuesDataRecord.put("id", id);
+            valuesDataRecord.put("otherId", otherId);
+            return valuesDataRecord;
+        }).collect(toList());
+
+        entity.put("values", valuesData);
+        return entity;
+    }
+
+    @Test
+    void testCustomSequenceOfValuesWithSameStartingStartingValue() {
+        List<FieldValueMapping> fieldValueMappingList = asList(
+                new FieldValueMapping("values[3].id", "seq", 0, "[{1,2]"),
+                new FieldValueMapping("values[3].otherId", "seq", 0, "[{1,3]"));
+
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
+                .builder()
+                .record("Root")
+                .fields()
+                .name("values")
+                .type()
+                .array()
+                .items()
+                .type(SchemaBuilder.builder()
+                        .record("valuesData")
+                        .fields()
+                        .name("id")
+                        .type(Schema.Type.STRING.getName())
+                        .noDefault()
+                        .name("otherId")
+                        .type(Schema.Type.STRING.getName())
+                        .noDefault()
+                        .endRecord())
+                .noDefault()
+                .endRecord();
+        GenericRecord entity = entityForCustomSequenceOfValuesWithSameStartingStartingValue(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2", "1"), asList("1", "3", "1"));
+        avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
+                new SchemaMetadata(1, 1, ""),
+                fieldValueMappingList);
+
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message.getGenericRecord()).isEqualTo(entity);
+    }
+
+    private GenericRecord entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(Schema schema, List<String> idValues, List<String> idOtherValues) {
+        GenericRecord entity = new GenericData.Record(schema);
+        List<GenericRecord> valuesData = getIdRecordsList(entity, "values", idValues);
+        List<GenericRecord> otherValuesData = getIdRecordsList(entity, "otherValues", idOtherValues);
+
+        entity.put("values", valuesData);
+        entity.put("otherValues", otherValuesData);
+        return entity;
+    }
+
+    private List<GenericRecord> getIdRecordsList(GenericRecord entity, String fieldNameContainingId, List<String> idValues) {
+        Schema schemaArrayContainingId = entity.getSchema().getField(fieldNameContainingId).schema();
+        Schema schemaContainingId = schemaArrayContainingId.getElementType();
+        return idValues.stream().map(id -> {
+            GenericRecord recordContainingId = new GenericData.Record(schemaContainingId);
+            recordContainingId.put("id", id);
+            return recordContainingId;
+        }).collect(toList());
+    }
+
+    @Test
+    void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
+        List<FieldValueMapping> fieldValueMappingList = asList(
+                new FieldValueMapping("values[4].id", "seq", 0, "[{1,2,3]"),
+                new FieldValueMapping("otherValues[4].id", "seq", 0, "[{1,3,4]"));
+
+        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+        Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
+                .builder()
+                .record("Root")
+                .fields()
+                .name("values")
+                .type()
+                .array()
+                .items()
+                .type(SchemaBuilder.builder()
+                        .record("valuesData")
+                        .fields()
+                        .name("id")
+                        .type(Schema.Type.STRING.getName())
+                        .noDefault()
+                        .endRecord())
+                .noDefault()
+                .name("otherValues")
+                .type()
+                .array()
+                .items()
+                .type(SchemaBuilder.builder()
+                        .record("otherValuesData")
+                        .fields()
+                        .name("id")
+                        .type(Schema.Type.STRING.getName())
+                        .noDefault()
+                        .endRecord())
+                .noDefault()
+                .endRecord();
+        GenericRecord entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2", "3", "1"), asList("1", "3", "4", "1"));
+        avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
+                new SchemaMetadata(1, 1, ""),
+                fieldValueMappingList);
+
+        EnrichedRecord message = avroSchemaProcessor.next();
+
+        assertThat(message.getGenericRecord()).isEqualTo(entity);
     }
 }
