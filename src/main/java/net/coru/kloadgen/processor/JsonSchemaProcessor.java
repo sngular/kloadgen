@@ -65,18 +65,15 @@ public class JsonSchemaProcessor {
         else {
           generatedProperties = 0;
           elapsedProperties = 0;
-
         }
         generatedProperties++;
 
         if (checkIfObjectNullNotRequired(Objects.requireNonNull(fieldValueMapping), cleanUpPath(fieldValueMapping, ""))){
-
           elapsedProperties++;
           fieldExpMappingsQueueCopy = fieldExpMappingsQueue.clone();
           fieldExpMappingsQueue.remove();
           FieldValueMapping fieldValueMappingCopy = fieldValueMapping;
           fieldValueMapping = fieldExpMappingsQueue.peek();
-
 
           if(fieldExpMappingsQueue.isEmpty() && elapsedProperties == generatedProperties && fieldValueMappingCopy.getParentRequired()){
             fieldValueMappingCopy.setRequired(true);
@@ -95,7 +92,6 @@ public class JsonSchemaProcessor {
           } else {
             fieldExpMappingsQueueCopy = fieldExpMappingsQueue.clone();
           }
-
           fieldExpMappingsQueueCopy.poll();
 
         } else {
@@ -104,7 +100,6 @@ public class JsonSchemaProcessor {
 
           if (fieldNameProcessed.contains("[")) {
             String completeFieldName = getNameObjectCollection(fieldValueMapping.getFieldName());
-
             if (completeFieldName.contains("].")) {
               if(fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName)){
                 generatedProperties = 0;
@@ -126,7 +121,6 @@ public class JsonSchemaProcessor {
             if(!createdObject.isEmpty()){
               entity.set(fieldName, createdObject);
             }
-
             fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
             fieldExpMappingsQueueCopy.poll();
           } else {
@@ -141,7 +135,6 @@ public class JsonSchemaProcessor {
             fieldValueMapping = fieldExpMappingsQueue.peek();
             fieldExpMappingsQueueCopy.poll();
           }
-
         }
       }
     }
@@ -175,12 +168,8 @@ public class JsonSchemaProcessor {
         elapsedProperties++;
         FieldValueMapping actualField = fieldExpMappingsQueue.peek();
         fieldExpMappingsQueueCopy =  new ArrayDeque<>(fieldExpMappingsQueue);
-
         fieldExpMappingsQueue.remove();
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
-
-
-
 
         if((nextField == null && Objects.requireNonNull(actualField).getParentRequired()
             && (generatedProperties == elapsedProperties && generatedProperties>0))){
@@ -195,8 +184,6 @@ public class JsonSchemaProcessor {
             fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
             fieldExpMappingsQueueCopyCopy =  new ArrayDeque<>(fieldExpMappingsQueueCopy);
           }
-
-
 
         } else if(nextField == null
                   && (!actualField.getRequired()
@@ -241,13 +228,11 @@ public class JsonSchemaProcessor {
       } else {
 
         if (cleanFieldName.matches("[\\w\\d]+\\[.*")) {
-
           String completeFieldName = getNameObjectCollection(cleanFieldName);
           if (completeFieldName.contains("].")) {
             String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, fieldName);
             operationsObjectCollections(completeFieldName,subEntity,fieldValueMapping,fieldNameSubEntity,fieldExpMappingsQueue);
           } else {
-
             operationsCollections(completeFieldName,subEntity,fieldValueMapping,fieldName,fieldExpMappingsQueue);
           }
 
@@ -257,7 +242,6 @@ public class JsonSchemaProcessor {
           if(!createdObject.isEmpty()){
             subEntity.set(fieldNameSubEntity, createdObject);
           }
-
         } else {
 
           fieldExpMappingsQueue.poll();
@@ -476,32 +460,32 @@ public class JsonSchemaProcessor {
 
   private void operationsCollections(String completeFieldName, ObjectNode entity,FieldValueMapping fieldValueMapping,
       String fieldName,ArrayDeque<FieldValueMapping> fieldExpMappingsQueue){
-
+     var finalFieldName = "";
      if(Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("array-map")) {
-      completeFieldName = completeFieldName.replace("[:][]" , "");
+       finalFieldName = completeFieldName.replace("[:][]" , "");
       fieldExpMappingsQueue.poll();
-      entity.putPOJO(completeFieldName,createBasicArrayMap(completeFieldName,fieldValueMapping.getFieldType(),
-                                                        calculateSize(fieldValueMapping.getFieldName() , completeFieldName),
+      entity.putPOJO(finalFieldName,createBasicArrayMap(finalFieldName,fieldValueMapping.getFieldType(),
+                                                        calculateSize(fieldValueMapping.getFieldName() , finalFieldName),
                                                         fieldValueMapping.getValueLength(),fieldValueMapping.getFieldValuesList()));
 
     } else if(fieldValueMapping.getFieldType().endsWith("map-array")){
-      completeFieldName = completeFieldName.replace("[][:]" , "");
+       finalFieldName = completeFieldName.replace("[][:]" , "");
       fieldExpMappingsQueue.poll();
-      entity.putArray(completeFieldName).addAll(createBasicMapArray(fieldValueMapping.getFieldType() ,
+      entity.putArray(finalFieldName).addAll(createBasicMapArray(fieldValueMapping.getFieldType() ,
                                                             calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
                                                             fieldValueMapping.getFieldValuesList()));
     } else if(completeFieldName.contains("[:]")){
-      completeFieldName =  completeFieldName.replace(fieldValueMapping.getFieldType().endsWith("map-map") ? "[:][:]" : "[:]", "");
+       finalFieldName =  completeFieldName.replace(fieldValueMapping.getFieldType().endsWith("map-map") ? "[:][:]" : "[:]", "");
       fieldExpMappingsQueue.poll();
-      entity.putPOJO(completeFieldName, createBasicMap(fieldValueMapping.getFieldType() ,
+      entity.putPOJO(finalFieldName, createBasicMap(fieldValueMapping.getFieldType() ,
                                                        calculateSize(fieldValueMapping.getFieldName() , fieldName) ,
                                                        fieldValueMapping.getFieldValuesList()));
     } else {
       fieldExpMappingsQueue.poll();
-      completeFieldName =  completeFieldName.replace(fieldValueMapping.getFieldType().endsWith("array-array") ? "[][]": "[]" , "");
-      entity.putArray(completeFieldName).addAll(createBasicArray(completeFieldName,
+       finalFieldName =  completeFieldName.replace(fieldValueMapping.getFieldType().endsWith("array-array") ? "[][]": "[]" , "");
+      entity.putArray(finalFieldName).addAll(createBasicArray(finalFieldName,
                                                                  fieldValueMapping.getFieldType() ,
-                                                                 calculateSize(fieldValueMapping.getFieldName() , completeFieldName) ,
+                                                                 calculateSize(fieldValueMapping.getFieldName() , finalFieldName) ,
                                                                  fieldValueMapping.getValueLength() ,
                                                                  fieldValueMapping.getFieldValuesList()));
     }

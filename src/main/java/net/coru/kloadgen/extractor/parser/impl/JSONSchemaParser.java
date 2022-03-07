@@ -357,10 +357,6 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildField(String fieldName, JsonNode jsonNode) {
-    return buildField(fieldName, jsonNode, null);
-  }
-
-  private Field buildField(String fieldName, JsonNode jsonNode, Boolean required) {
     return buildField(fieldName, jsonNode, null, null);
   }
 
