@@ -18,7 +18,6 @@ import java.util.Objects;
 import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.model.json.Field;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,13 +38,11 @@ public class JsonSchemaProcessor {
   @SneakyThrows
   public ObjectNode next() {
     ObjectNode entity = JsonNodeFactory.instance.objectNode();
-    FieldValueMapping initialFieldValueMapping = null;
     if (!fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExprMappings);
       fieldExpMappingsQueueCopy.poll();
       FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-      initialFieldValueMapping = fieldValueMapping;
       int generatedProperties = 0;
       int elapsedProperties = 0;
 
@@ -58,7 +55,6 @@ public class JsonSchemaProcessor {
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
-         // fieldExpMappingsQueueCopy.poll();
 
         } else if((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
                   && (generatedProperties == elapsedProperties && generatedProperties == 0)
@@ -440,33 +436,40 @@ public class JsonSchemaProcessor {
 
   private void operationsObjectCollections(String completeFieldName, ObjectNode entity,FieldValueMapping fieldValueMapping,
       String fieldName,ArrayDeque<FieldValueMapping> fieldExpMappingsQueue){
+    var finalFieldName = "";
     if(completeFieldName.contains("][")){
       if(completeFieldName.contains("[:][:].")){
-        completeFieldName =  completeFieldName.replace("[:][:]." , "");
-        entity.putPOJO(completeFieldName, createObjectMapMap(fieldName,
-                                                                                     calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                                                                                     fieldExpMappingsQueue));
+        finalFieldName =  completeFieldName.replace("[:][:]." , "");
+        entity.putPOJO(finalFieldName, createObjectMapMap(fieldName,
+                                                          calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                                          fieldExpMappingsQueue));
       }else if(completeFieldName.contains("[][].")){
-        completeFieldName =  completeFieldName.replace("[][]." , "");
-        entity.putArray(completeFieldName).addAll(createObjectArrayArray(fieldName,
+        finalFieldName =  completeFieldName.replace("[][]." , "");
+        entity.putArray(finalFieldName).addAll(createObjectArrayArray(fieldName,
                                                                       calculateSize(fieldValueMapping.getFieldName() , fieldName),
                                                                       fieldExpMappingsQueue));
       }else if(completeFieldName.contains("[:][].")){
-        completeFieldName =  completeFieldName.replace("[:][]." , "");
-        entity.putPOJO(completeFieldName,createObjectMapArray(fieldName,
+        finalFieldName =  completeFieldName.replace("[:][]." , "");
+        entity.putPOJO(finalFieldName,createObjectMapArray(fieldName,
                                                               calculateSize(fieldValueMapping.getFieldName(), fieldName),
                                                               fieldExpMappingsQueue));
       }else{
-        completeFieldName =  completeFieldName.replace("[][:]." , "");
-        entity.set(completeFieldName,createObjectArrayMap(completeFieldName,calculateSize(fieldValueMapping.getFieldName(), completeFieldName),fieldExpMappingsQueue));
+        finalFieldName =  completeFieldName.replace("[][:]." , "");
+        entity.set(finalFieldName,createObjectArrayMap(completeFieldName,
+                                                       calculateSize(fieldValueMapping.getFieldName(), finalFieldName),
+                                                       fieldExpMappingsQueue));
       }
     } else {
       if(completeFieldName.contains("[:]")){
-        completeFieldName =  completeFieldName.replace("[:]." , "");
-        entity.putPOJO(completeFieldName, createObjectMap(fieldName,calculateSize(fieldValueMapping.getFieldName() , fieldName), fieldExpMappingsQueue));
+        finalFieldName =  completeFieldName.replace("[:]." , "");
+        entity.putPOJO(finalFieldName, createObjectMap(fieldName,
+                                                       calculateSize(fieldValueMapping.getFieldName() , fieldName),
+                                                       fieldExpMappingsQueue));
       }else {
-        completeFieldName =  completeFieldName.replace("[]." , "");
-        entity.putArray(completeFieldName).addAll(createObjectArray(fieldName,calculateSize(fieldValueMapping.getFieldName() , fieldName),fieldExpMappingsQueue));
+        finalFieldName =  completeFieldName.replace("[]." , "");
+        entity.putArray(finalFieldName).addAll(createObjectArray(fieldName,
+                                                                 calculateSize(fieldValueMapping.getFieldName() , fieldName),
+                                                                 fieldExpMappingsQueue));
       }
     }
   }
@@ -531,12 +534,7 @@ public class JsonSchemaProcessor {
   }
 
   private boolean checkIfOptionalCollection(FieldValueMapping field, String nameOfField){
-
-    if(!field.getRequired() && field.getFieldValuesList().contains("null") && (nameOfField.contains("[]") || nameOfField.contains("[:]") )){
-      return true;
-    }else{
-      return false;
-    }
+    return !field.getRequired() && field.getFieldValuesList().contains("null") && (nameOfField.contains("[]") || nameOfField.contains("[:]"));
   }
 
 

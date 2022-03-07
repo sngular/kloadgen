@@ -369,11 +369,12 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Should capture 3+ level exception in collections. Three levels of nested collections are not allowed")
-  void testFlatPropertiesCaptureThreeLevelException() throws IOException{
+  void testFlatPropertiesCaptureThreeLevelException() {
     File testFile = fileHelper.getFile("/jsonschema/test-level-nested-exception.jcs");
     assertThatExceptionOfType(KLoadGenException.class)
         .isThrownBy(() -> {
           List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+          assertThat(fieldValueMappingList).isNull();
         })
         .withMessage("Wrong Json Schema, 3+ consecutive nested collections are not allowed");
   }
