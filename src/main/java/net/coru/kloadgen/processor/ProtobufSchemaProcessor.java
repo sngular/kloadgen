@@ -434,8 +434,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     String fieldValueMappingCleanType = fieldValueMapping.getFieldType().substring(0, fieldValueMapping.getFieldType().indexOf("-map"));
     DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor.getMessageType());
     Descriptors.FieldDescriptor keyFieldDescriptor = descriptor.getMessageType().findFieldByName("key");
-    builder.setField(keyFieldDescriptor,
-                     randomObject.generateRandom(STRING_TYPE, 10, Collections.emptyList(), Collections.emptyMap()));
+    builder.setField(keyFieldDescriptor, randomObject.generateRandom(STRING_TYPE, 10, Collections.emptyList(), Collections.emptyMap()));
     Descriptors.FieldDescriptor valueFieldDescriptor = descriptor.getMessageType().findFieldByName("value");
     if (valueFieldDescriptor.getType().equals(ENUM)) {
       List<String> fieldValueMappings = new ArrayList<>();

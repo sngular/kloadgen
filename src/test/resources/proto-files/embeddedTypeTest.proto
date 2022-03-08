@@ -7,16 +7,22 @@ option java_package = "com.example.tutorial.protos";
 option java_outer_classname = "AddressBookProtos";
 
 message Person {
-  map<string, PhoneNumber> phones = 1;
+  PhoneNumber phones = 1;
 
   message PhoneNumber {
 
     map<string, Address> addressesPhone = 1;
+    optional PhoneTypes phoneType = 2;
 
     message Address{
       repeated string id = 1;
     }
 
+    enum PhoneTypes{
+      MOBILE = 0;
+      HOME = 1;
+      WORK = 2;
+    }
   }
 }
 

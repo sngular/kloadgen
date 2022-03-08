@@ -183,7 +183,7 @@ public class ProtoBufExtractor {
                                                        0, getValueList(fieldValueMapping), isRequired, isParentRequired));
         } else {
           completeFieldList.add(
-              new FieldValueMapping(subfield.getName(), fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping), isRequired, isParentRequired));
+              new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."), fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping), isRequired, isParentRequired));
         }
       } else {
         if (isArray) {

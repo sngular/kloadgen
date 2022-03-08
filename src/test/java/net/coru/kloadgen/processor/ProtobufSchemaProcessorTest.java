@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,7 +51,8 @@ class ProtobufSchemaProcessorTest {
   void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
     List<FieldValueMapping> fieldValueMappingList = List.of(
-        new FieldValueMapping("phones[1:].addressesPhone[1:].id[1]", "string-array", 0, "Pablo"));
+        new FieldValueMapping("phones.addressesPhone[1:].id[1]", "string-array", 0, "Pablo"),
+        new FieldValueMapping("phones.phoneType", "enum", 0, "[MOBILE, HOME, WORK]"));
     ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
     protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
     EnrichedRecord message = protobufSchemaProcessor.next();
@@ -72,13 +74,10 @@ class ProtobufSchemaProcessorTest {
   }
 
   private String getIdFieldForEmbeddedTypeTest(List<Object> assertValues) {
-    List<Object> objectList = (List<Object>) assertValues.get(0);
-    DynamicMessage dynamicMessage = (DynamicMessage) objectList.get(0);
-    DynamicMessage firstMap = (DynamicMessage) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
-    List<Object> secondMap = (List<Object>) firstMap.getField(firstMap.getDescriptorForType().findFieldByName("addressesPhone"));
-    DynamicMessage secondMapAsDynamicField = (DynamicMessage) secondMap.get(0);
-    Object thirdArray = secondMapAsDynamicField.getField(secondMapAsDynamicField.getDescriptorForType().findFieldByName("value"));
-    return ((DynamicMessage) thirdArray).getField(((DynamicMessage) thirdArray).getDescriptorForType().findFieldByName("id")).toString();
+    DynamicMessage dynamicMessage = (DynamicMessage) assertValues.get(0);
+    DynamicMessage firstMap = (DynamicMessage) ((List) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("addressesPhone"))).get(0);
+    DynamicMessage secondMapAsDynamicField = (DynamicMessage) firstMap.getField(firstMap.getDescriptorForType().findFieldByName("value"));
+    return secondMapAsDynamicField.getField(secondMapAsDynamicField.getDescriptorForType().findFieldByName("id")).toString();
   }
 
   @Test

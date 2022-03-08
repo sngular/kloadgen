@@ -54,9 +54,10 @@ class ProtobufExtractorTest {
     File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     assertThat(fieldValueMappingList)
-        .hasSize(1)
+        .hasSize(2)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("phones[:].addressesPhone[:].id[]", "string-array", 0, "")
+            new FieldValueMapping("phones.addressesPhone[:].id[]", "string-array", 0, ""),
+            new FieldValueMapping("phones.phoneType", "enum", 0, "[MOBILE, HOME, WORK]")
         );
   }
 
