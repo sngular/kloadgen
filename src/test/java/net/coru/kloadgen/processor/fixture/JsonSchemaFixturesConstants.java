@@ -1,14 +1,19 @@
 package net.coru.kloadgen.processor.fixture;
 
-import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.model.FieldValueMapping;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.MAXIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.MULTIPLE_OF;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static net.coru.kloadgen.model.ConstraintTypeEnum.*;
+import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.model.FieldValueMapping;
 
 public class JsonSchemaFixturesConstants {
 
