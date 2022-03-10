@@ -6,14 +6,17 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 
 public class StatelessGeneratorTool {
 
@@ -24,6 +27,10 @@ public class StatelessGeneratorTool {
   private final RandomArray randomArray = new RandomArray();
 
   private final RandomObject randomObject = new RandomObject();
+
+  public String generateRandomString(Integer valueLength) {
+    return (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), Collections.emptyMap());
+  }
 
   public Object generateObject(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
@@ -44,18 +51,30 @@ public class StatelessGeneratorTool {
   }
 
   public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
+
+    if (checkIfNullFieldValueList(fieldValuesList) && (fieldType.endsWith("-array") || fieldType.endsWith("-map"))) {
+      return fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();
+    }
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
   public Object generateArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
-    List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
 
+    if (checkIfNullFieldValueList(fieldValuesList)) {
+      return fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();
+    }
+
+    List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     Object value = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     if ("seq".equals(fieldType)) {
       value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
     }
 
     return value;
+  }
+
+  public boolean checkIfNullFieldValueList(List<String> fieldValueList) {
+    return fieldValueList == null || (fieldValueList.size() == 1 && fieldValueList.contains("null"));
   }
 }
