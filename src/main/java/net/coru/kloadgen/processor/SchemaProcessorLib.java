@@ -150,8 +150,7 @@ public abstract class SchemaProcessorLib {
 
         var value = new HashMap<>(mapSize);
         if ("seq".equals(fieldType)) {
-            if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
-                parameterList.set(0, parameterList.get(0).substring(1));
+            if (!fieldValuesList.isEmpty() && fieldValuesList.size()> 1) {
                 value.put(generateMapKey(), randomObject.generateSequenceForFieldValueList(parameterList.get(0), fieldType, parameterList, context));
             }
             for (int i = mapSize; i > 0; i--) {
@@ -175,8 +174,7 @@ public abstract class SchemaProcessorLib {
         );
         List value = new ArrayList<>(arraySize);
         if ("seq".equals(fieldType)) {
-            if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
-                parameterList.set(0, parameterList.get(0).substring(1));
+            if (!fieldValuesList.isEmpty() && fieldValuesList.size()> 1) {
                 value.add(randomObject.generateSequenceForFieldValueList(parameterList.get(0), fieldType, parameterList, context));
             } else {
                 for (int i = arraySize; i > 0; i--) {

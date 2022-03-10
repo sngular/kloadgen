@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
@@ -49,24 +50,21 @@ public class AvroGeneratorTool {
     return randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
   }
 
-
-
-
   public Object generateObject(Field field, String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constrains) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     boolean logicalType = Objects.nonNull(field.schema().getLogicalType());
 
     Object value;
     if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(fieldType, field.schema(), parameterList);
-    }else if (UNION == field.schema().getType()) {
+      value = getEnumOrGenerate(fieldType, field.schema(), parameterList, fieldType);
+    } else if (UNION == field.schema().getType()) {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
 
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
         value = ValueUtils.castValue(value, field.schema().getType().getName());
       } else if (ENUM == safeSchema.getType()) {
-        value = getEnumOrGenerate(fieldType, safeSchema, parameterList);
+        value = getEnumOrGenerate(fieldType, safeSchema, parameterList, fieldType);
       } else {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
         if ("null".equalsIgnoreCase(value.toString())) {
@@ -74,10 +72,9 @@ public class AvroGeneratorTool {
         }
       }
     } else if ("seq".equalsIgnoreCase(fieldType)) {
-      if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
-        fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
-        return randomObject.generateSequenceForFieldValueList(fieldValuesList.get(0), fieldType, fieldValuesList, context);
-      }else {
+      if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
+        return randomObject.generateSequenceForFieldValueList(fieldValuesList.get(0), field.schema().getType().getName(), fieldValuesList, context);
+      } else {
         value = randomObject.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
@@ -143,22 +140,22 @@ public class AvroGeneratorTool {
     }
   }
 
-  private Object getEnumOrGenerate(String fieldType, Schema schema, List<String> parameterList) {
+  private Object getEnumOrGenerate(String fieldType, Schema schema, List<String> parameterList, String fieldValueMappingType) {
     Object value;
     if ("ENUM".equalsIgnoreCase(fieldType)) {
       if (parameterList.isEmpty()) {
         List<String> enumValueList = schema.getEnumSymbols();
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
       } else {
-        if ('{'== parameterList.get(0).charAt(0)) {
-          parameterList.set(0, parameterList.get(0).substring(1));
-          value = new GenericData.EnumSymbol(schema, randomObject.generateSequenceForFieldValueList(parameterList.get(0),fieldType,parameterList,context));
-        } else {
-          value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
-        }
+        value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
       }
     } else {
-      value = new GenericData.EnumSymbol(schema, fieldType);
+      if ("Seq".equalsIgnoreCase(fieldValueMappingType)) {
+        value = new GenericData.EnumSymbol(schema, randomObject.generateSequenceForFieldValueList(parameterList.get(0), fieldType, parameterList, context));
+      } else {
+        value = new GenericData.EnumSymbol(schema, fieldType);
+      }
+
     }
     return value;
   }
