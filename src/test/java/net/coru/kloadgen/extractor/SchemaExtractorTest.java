@@ -8,6 +8,7 @@ package net.coru.kloadgen.extractor;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -30,10 +31,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static net.coru.kloadgen.model.ConstraintTypeEnum.*;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith({
     WiremockResolver.class,
@@ -42,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SchemaExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
+
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
   @BeforeEach
@@ -103,7 +107,7 @@ class SchemaExtractorTest {
         .hasSize(2)
         .containsExactlyInAnyOrder(
             new FieldValueMapping("name", "string", 0, null, true, true),
-            new FieldValueMapping("values[][:]", "string-map-array", 0 ,"", true, true)
+            new FieldValueMapping("values[][:]", "string-map-array", 0, "", true, true)
         );
   }
 
@@ -115,10 +119,10 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(4)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("fieldMySchema.testInt_id", "int",0,""),
-            new FieldValueMapping("fieldMySchema.testLong", "long",0,""),
-            new FieldValueMapping("fieldMySchema.fieldString", "string",0,""),
-            new FieldValueMapping("timestamp", "long",0,null, true, true)
+            new FieldValueMapping("fieldMySchema.testInt_id", "int", 0, ""),
+            new FieldValueMapping("fieldMySchema.testLong", "long", 0, ""),
+            new FieldValueMapping("fieldMySchema.fieldString", "string", 0, ""),
+            new FieldValueMapping("timestamp", "long", 0, null, true, true)
         );
   }
 
@@ -166,32 +170,32 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Should extract Logical times")
-  void testFlatPropertiesLogicalTypes () throws IOException {
+  void testFlatPropertiesLogicalTypes() throws IOException {
 
     File testFile = fileHelper.getFile("/avro-files/testLogicalTypes.avsc");
 
     List<FieldValueMapping> fieldValueMappingList =
-      schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
+        schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "AVRO"));
 
     assertThat(fieldValueMappingList)
-      .hasSize(10)
-      .containsExactlyInAnyOrder(
-          new FieldValueMapping("Date", "int_date"),
-          new FieldValueMapping("TimeMillis", "int_time-millis"),
-          new FieldValueMapping("TimeMicros", "long_time-micros"),
-          new FieldValueMapping("TimestampMillis", "long_timestamp-millis"),
-          new FieldValueMapping("TimestampMicros", "long_timestamp-micros"),
-          new FieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
-          new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
-          new FieldValueMapping("UUID","string_uuid"),
-          new FieldValueMapping("Decimal","bytes_decimal"),
-          new FieldValueMapping("DecimalFixed","fixed_decimal")
-      );
+        .hasSize(10)
+        .containsExactlyInAnyOrder(
+            new FieldValueMapping("Date", "int_date"),
+            new FieldValueMapping("TimeMillis", "int_time-millis"),
+            new FieldValueMapping("TimeMicros", "long_time-micros"),
+            new FieldValueMapping("TimestampMillis", "long_timestamp-millis"),
+            new FieldValueMapping("TimestampMicros", "long_timestamp-micros"),
+            new FieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
+            new FieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
+            new FieldValueMapping("UUID", "string_uuid"),
+            new FieldValueMapping("Decimal", "bytes_decimal"),
+            new FieldValueMapping("DecimalFixed", "fixed_decimal")
+        );
   }
 
   @Test
   @DisplayName("Should extract Optional Array")
-  void testFlatPropertiesOptionalArray () throws IOException {
+  void testFlatPropertiesOptionalArray() throws IOException {
 
     File testFile = fileHelper.getFile("/avro-files/issue.avsc");
 
@@ -213,27 +217,27 @@ class SchemaExtractorTest {
     File testFile = fileHelper.getFile("/jsonschema/complex-document.jcs");
 
     List<FieldValueMapping> fieldValueMappingList =
-            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+        schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
 
     assertThat(fieldValueMappingList)
-            .contains(
-                    new FieldValueMapping("geopoliticalSubdivisions.level1.code", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
-                      put(MINIMUM_VALUE, "2");
-                      put(MAXIMUM_VALUE, "3");
-                    }}, false,true),
-                    new FieldValueMapping("geopoliticalSubdivisions.level1.freeForm", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
-                      put(MINIMUM_VALUE, "1");
-                      put(MAXIMUM_VALUE, "256");
-                    }}, false,true),
-                    new FieldValueMapping("geopoliticalSubdivisions.level2.code", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
-                      put(MINIMUM_VALUE, "2");
-                      put(MAXIMUM_VALUE, "3");
-                    }}, false, false),
-                    new FieldValueMapping("geopoliticalSubdivisions.level2.freeForm", "string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
-                      put(MINIMUM_VALUE, "1");
-                      put(MAXIMUM_VALUE, "256");
-                    }}, false,false)
-            );
+        .contains(
+            new FieldValueMapping("geopoliticalSubdivisions.level1.code", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
+              put(MINIMUM_VALUE, "2");
+              put(MAXIMUM_VALUE, "3");
+            }}, false, true),
+            new FieldValueMapping("geopoliticalSubdivisions.level1.freeForm", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
+              put(MINIMUM_VALUE, "1");
+              put(MAXIMUM_VALUE, "256");
+            }}, false, true),
+            new FieldValueMapping("geopoliticalSubdivisions.level2.code", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
+              put(MINIMUM_VALUE, "2");
+              put(MAXIMUM_VALUE, "3");
+            }}, false, true),
+            new FieldValueMapping("geopoliticalSubdivisions.level2.freeForm", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
+              put(MINIMUM_VALUE, "1");
+              put(MAXIMUM_VALUE, "256");
+            }}, false, true)
+        );
   }
 
   @Test
@@ -242,16 +246,16 @@ class SchemaExtractorTest {
     File testFile = fileHelper.getFile("/jsonschema/medium-document.jcs");
 
     List<FieldValueMapping> fieldValueMappingList =
-            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+        schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
 
     assertThat(fieldValueMappingList).contains(
-            new FieldValueMapping("duty.amount.value","number", 0, "", false, false),
-            new FieldValueMapping("duty.amount.currency","string", 0, "",new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "0");
-              put(MAXIMUM_VALUE, "0");
-              put(REGEX, "^(.*)$");
-            }}, false, false),
-            new FieldValueMapping("duty.amount.exponent","number", 0, "", false, false));
+        new FieldValueMapping("duty.amount.value", "number", 0, "", false, false),
+        new FieldValueMapping("duty.amount.currency", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
+          put(MINIMUM_VALUE, "0");
+          put(MAXIMUM_VALUE, "0");
+          put(REGEX, "^(.*)$");
+        }}, false, false),
+        new FieldValueMapping("duty.amount.exponent", "number", 0, "", false, false));
   }
 
   @Test
@@ -260,22 +264,121 @@ class SchemaExtractorTest {
     File testFile = fileHelper.getFile("/jsonschema/test-map.jcs");
 
     List<FieldValueMapping> fieldValueMappingList =
-            schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+        schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
 
     assertThat(fieldValueMappingList).contains(
-            new FieldValueMapping("firstName","string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "0");
-              put(MAXIMUM_VALUE, "0");
-            }},false, false),
-            new FieldValueMapping("lastName","string", 0,"", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "0");
-              put(MAXIMUM_VALUE, "0");
-            }},true, false),
-            new FieldValueMapping("age","number", 0,"",true, false),
-            new FieldValueMapping("testMap.itemType[]","number-map", 0,"", false, true),
-            new FieldValueMapping("testMap.itemTipo[]","string-map", 0,"", false, true)
+        new FieldValueMapping("firstName", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
+          put(MINIMUM_VALUE, "0");
+          put(MAXIMUM_VALUE, "0");
+        }}, false, false),
+        new FieldValueMapping("lastName", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
+          put(MINIMUM_VALUE, "0");
+          put(MAXIMUM_VALUE, "0");
+        }}, true, false),
+        new FieldValueMapping("age", "number", 0, "", true, false),
+        new FieldValueMapping("testMap.itemType[:]", "number-map", 0, "", true, true),
+        new FieldValueMapping("testMap.itemTipo[:]", "string-map", 0, "", true, true)
 
     );
+  }
+
+  @Test
+  @DisplayName("Should extract optional collections and optional collections inside objects")
+  void testFlatPropertiesOptionalCollections() throws IOException {
+
+    File testFile = fileHelper.getFile("/jsonschema/collections.jcs");
+
+    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
+
+    constraints.put(MINIMUM_VALUE, "0");
+    constraints.put(MAXIMUM_VALUE, "0");
+
+    FieldValueMapping second = new FieldValueMapping("arrayOfObjectsOfBasicTypes[].stringOfObject", "string", 0, "", false, true);
+    second.setConstrains(constraints);
+
+    FieldValueMapping objectCollectionsBasicTypesStringControl = new FieldValueMapping("objectOfCollectionsOfBasicTypes.stringControl", "string", 0, "", false, true);
+    objectCollectionsBasicTypesStringControl.setConstrains(constraints);
+
+    FieldValueMapping objectCollectionsObjectStringControl = new FieldValueMapping("objectOfCollectionsOfObject.stringControl", "string", 0, "", false, true);
+    objectCollectionsObjectStringControl.setConstrains(constraints);
+
+    FieldValueMapping objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson = new FieldValueMapping("objectOfCollectionsOfObject.arrayOfObjectsPerson[].namePerson", "string"
+        , 0, "", false, true);
+    objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson.setConstrains(constraints);
+
+    FieldValueMapping objectOfCollectionsOfObjectMapOfObjectsDogNameDog = new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].nameDog", "string", 0, "",
+                                                                                                false, true);
+    objectOfCollectionsOfObjectMapOfObjectsDogNameDog.setConstrains(constraints);
+
+    FieldValueMapping objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName = new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.breedName",
+                                                                                                         "string", 0, "", false, true);
+    objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName.setConstrains(constraints);
+
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+    assertThat(fieldValueMappingList)
+        .hasSize(12)
+        .containsExactlyInAnyOrder(
+            new FieldValueMapping("mapOfStrings[:]", "string-map", 0, "", true, false),
+            second,
+            new FieldValueMapping("arrayOfObjectsOfBasicTypes[].numberOfObject", "number", 0, "", false, true),
+            new FieldValueMapping("objectOfCollectionsOfBasicTypes.arrayOfStrings[]", "string-array", 0, "", true, true),
+            new FieldValueMapping("objectOfCollectionsOfBasicTypes.mapOfIntegers[:]", "number-map", 0, "", true, true),
+            objectCollectionsBasicTypesStringControl,
+            objectCollectionsObjectStringControl,
+            objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson,
+            new FieldValueMapping("objectOfCollectionsOfObject.arrayOfObjectsPerson[].phonePerson", "number", 0, "", false, true),
+            objectOfCollectionsOfObjectMapOfObjectsDogNameDog,
+            new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.dogId", "number", 0, "", false, true),
+            objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName
+        );
+  }
+
+  @Test
+  @DisplayName("Should extract optional nested-collections and optional nested-collections inside objects")
+  void testFlatPropertiesOptionalNestedCollections() throws IOException {
+    File testFile = fileHelper.getFile("/jsonschema/nested-collections.jcs");
+
+    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
+
+    constraints.put(MINIMUM_VALUE, "0");
+    constraints.put(MAXIMUM_VALUE, "0");
+
+    FieldValueMapping arrayOfMapsOfObjectsStringObject = new FieldValueMapping("arrayOfMapsOfObjects[][:].stringObject", "string", 0, "", false, true);
+    arrayOfMapsOfObjectsStringObject.setConstrains(constraints);
+
+    FieldValueMapping mapOfMapsOfObjectsName4Object = new FieldValueMapping("mapOfMapsOfObjects[:][:].name4Object", "string", 0, "", false, true);
+    mapOfMapsOfObjectsName4Object.setConstrains(constraints);
+
+    FieldValueMapping mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl = new FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].stringControl",
+                                                                                                        "string", 0, "", false, true);
+    mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl.setConstrains(constraints);
+
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+    assertThat(fieldValueMappingList)
+        .hasSize(8)
+        .containsExactlyInAnyOrder(
+            arrayOfMapsOfObjectsStringObject,
+            new FieldValueMapping("arrayOfMapsOfObjects[][:].numberObject", "number", 0, "", false, true),
+            new FieldValueMapping("arrayOfArraysOfStrings[][]", "string-array-array", 0, "", false, true),
+            new FieldValueMapping("mapOfArraysOfStrings[:][]", "string-array-map", 0, "", false, true),
+            mapOfMapsOfObjectsName4Object,
+            new FieldValueMapping("mapOfMapsOfObjects[:][:].number4Object", "number", 0, "", false, true),
+            mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl,
+            new FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl", "number", 0, "", false, true)
+        );
+
+  }
+
+  @Test
+  @DisplayName("Should capture 3+ level exception in collections. Three levels of nested collections are not allowed")
+  void testFlatPropertiesCaptureThreeLevelException() {
+    File testFile = fileHelper.getFile("/jsonschema/test-level-nested-exception.jcs");
+    assertThatExceptionOfType(KLoadGenException.class)
+        .isThrownBy(() -> {
+          List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
+          assertThat(fieldValueMappingList).isNull();
+        })
+        .withMessage("Wrong Json Schema, 3+ consecutive nested collections are not allowed");
   }
 
 }

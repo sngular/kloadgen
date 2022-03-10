@@ -1,0 +1,40 @@
+{
+  "$id": "https://example.com/collections.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "basic collections",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "objectOfCollectionsOfBasicTypes": {
+      "type": "object",
+      "properties": {
+        "arrayOfArrayOfArray": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "minItems": 1
+          },
+          "minItems": 1
+        },
+        "mapOfIntegers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "stringControl": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "objectOfCollectionsOfBasicTypes"
+      ]
+    }
+  }
+}

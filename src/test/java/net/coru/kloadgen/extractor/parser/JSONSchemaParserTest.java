@@ -1,7 +1,10 @@
 package net.coru.kloadgen.extractor.parser;
 
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.COLLECTIONS_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.COMPLEX_SCHEMA;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.DEFINITIONS_COMPLEX_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.MEDIUM_COMPLEX_SCHEMA;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.NESTED_COLLECTIONS_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_ARRAY;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NUMBER;
@@ -9,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 import java.util.stream.Stream;
+
 import net.coru.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import net.coru.kloadgen.model.json.Field;
 import net.coru.kloadgen.model.json.NumberField;
@@ -33,7 +37,10 @@ class JSONSchemaParserTest {
         Arguments.of(resourceAsFile.getContent("/jsonschema/basic-number.jcs"), SIMPLE_SCHEMA_NUMBER),
         Arguments.of(resourceAsFile.getContent("/jsonschema/basic-array.jcs"), SIMPLE_SCHEMA_ARRAY),
         Arguments.of(resourceAsFile.getContent("/jsonschema/complex-document.jcs"), COMPLEX_SCHEMA),
-        Arguments.of(resourceAsFile.getContent("/jsonschema/medium-document.jcs"), MEDIUM_COMPLEX_SCHEMA)
+        Arguments.of(resourceAsFile.getContent("/jsonschema/medium-document.jcs"), MEDIUM_COMPLEX_SCHEMA),
+        Arguments.of(resourceAsFile.getContent("/jsonschema/collections.jcs"), COLLECTIONS_SCHEMA),
+        Arguments.of(resourceAsFile.getContent("/jsonschema/nested-collections.jcs"), NESTED_COLLECTIONS_SCHEMA),
+        Arguments.of(resourceAsFile.getContent("/jsonschema/complex-definitions.jcs"), DEFINITIONS_COMPLEX_SCHEMA)
     );
   }
 
@@ -52,14 +59,14 @@ class JSONSchemaParserTest {
     Schema result = jsonSchemaParser.parse(resourceAsFile.getContent("/jsonschema/multiple-type.jcs"));
 
     assertThat(result)
-            .extracting(Schema::getProperties)
-            .satisfies(this::multiTypeTestStringOrNumber);
+        .extracting(Schema::getProperties)
+        .satisfies(this::multiTypeTestStringOrNumber);
   }
 
   private boolean multiTypeTestStringOrNumber(Object field) {
     Set<String> propertyNames = Set.of("id", "version", "dtype", "timestamp", "event_type");
     return (field instanceof StringField || field instanceof NumberField || field instanceof UUIDField) &&
-        propertyNames.contains(((Field)field).getName());
+           propertyNames.contains(((Field) field).getName());
   }
 
 }
