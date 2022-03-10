@@ -5,7 +5,6 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-
     "mapOfStrings": {
       "type": "object",
       "additionalProperties": {
@@ -28,26 +27,45 @@
       },
       "minItems": 1
     },
-    "objectOfCollectionsOfBasicTypes":{
+    "objectOfCollectionsOfBasicTypes": {
       "type": "object",
       "properties": {
-        "arrayOfStrings": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-        "mapOfIntegers": {"type": "object", "additionalProperties": {"type": "integer"}},
-        "stringControl": {"type": "string"}
+        "arrayOfStrings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "mapOfIntegers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "stringControl": {
+          "type": "string"
+        }
       },
       "required": []
     },
-    "objectOfCollectionsOfObject":{
+    "objectOfCollectionsOfObject": {
       "type": "object",
       "properties": {
-        "stringControl": {"type": "string"},
+        "stringControl": {
+          "type": "string"
+        },
         "arrayOfObjectsPerson": {
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
-              "namePerson": {"type": "string"},
-              "phonePerson": {"type": "integer"}
+              "namePerson": {
+                "type": "string"
+              },
+              "phonePerson": {
+                "type": "integer"
+              }
             }
           }
         },
@@ -56,12 +74,18 @@
           "additionalProperties": {
             "type": "object",
             "properties": {
-              "nameDog": {"type": "string"},
+              "nameDog": {
+                "type": "string"
+              },
               "vetData": {
                 "type": "object",
                 "properties": {
-                  "dogId": {"type": "integer"},
-                  "breedName": {"type": "string"}
+                  "dogId": {
+                    "type": "integer"
+                  },
+                  "breedName": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -75,5 +99,4 @@
     "objectOfCollectionsOfBasicTypes",
     "objectOfCollectionsOfObject"
   ]
-
 }

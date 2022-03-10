@@ -3,15 +3,23 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-
-    "objectOfDefinitions":{
+    "objectOfDefinitions": {
       "type": "object",
       "properties": {
-        "stringControl": {"type": "string"},
-        "arrayOfStrings": {"$ref": "#/definitions/arrayOfStringsDef"},
-        "mapOfStrings" :{"$ref": "#/definitions/mapOfStringsDef"}
+        "stringControl": {
+          "type": "string"
+        },
+        "arrayOfStrings": {
+          "$ref": "#/definitions/arrayOfStringsDef"
+        },
+        "mapOfStrings": {
+          "$ref": "#/definitions/mapOfStringsDef"
+        }
       },
-      "required": ["stringControl","arrayOfStrings"]
+      "required": [
+        "stringControl",
+        "arrayOfStrings"
+      ]
     },
     "arrayOfObjects": {
       "type": "array",
@@ -32,7 +40,6 @@
         "$ref": "#/definitions/mapOfObjectsDef"
       }
     }
-
   },
   "required": [
     "objectOfDefinitions"
@@ -48,7 +55,9 @@
           "type": "integer"
         }
       },
-      "required": ["numberOfObject"]
+      "required": [
+        "numberOfObject"
+      ]
     },
     "mapOfStringsDef": {
       "type": "object",
@@ -75,7 +84,9 @@
             }
           }
         },
-        "required": ["stringControlObject"]
+        "required": [
+          "stringControlObject"
+        ]
       }
     },
     "objectOfArraysDef": {
@@ -88,7 +99,9 @@
           }
         }
       },
-      "required": ["arrayOfInternalObject"]
+      "required": [
+        "arrayOfInternalObject"
+      ]
     },
     "arrayOfStringsDef": {
       "type": "array",

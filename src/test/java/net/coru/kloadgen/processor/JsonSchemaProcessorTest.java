@@ -22,70 +22,70 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JsonSchemaProcessorTest {
 
-    @BeforeEach
-    public void setUp() {
-        File file = new File("src/test/resources");
-        String absolutePath = file.getAbsolutePath();
-        JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
-        JMeterContext jmcx = JMeterContextService.getContext();
-        jmcx.setVariables(new JMeterVariables());
-        JMeterUtils.setLocale(Locale.ENGLISH);
-    }
+  @BeforeEach
+  public void setUp() {
+    File file = new File("src/test/resources");
+    String absolutePath = file.getAbsolutePath();
+    JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
+    JMeterContext jmcx = JMeterContextService.getContext();
+    jmcx.setVariables(new JMeterVariables());
+    JMeterUtils.setLocale(Locale.ENGLISH);
+  }
 
-    private static Stream<Object> parametersForTestNullOnOptionalField(){
-        return Stream.of(
-                Arguments.of(SIMPLE_SCHEMA, SIMPLE_SCHEMA_EXPECTED)/*,
+  private static Stream<Object> parametersForTestNullOnOptionalField() {
+    return Stream.of(
+        Arguments.of(SIMPLE_SCHEMA, SIMPLE_SCHEMA_EXPECTED)/*,
                 /*Arguments.of(SIMPLE_SCHEMA_COLLECTIONS, SIMPLE_SCHEMA_COLLECTIONS_EXPECTED),
                 Arguments.of(COMPLEX_SCHEMA, COMPLEX_SCHEMA_EXPECTED)*/
-        );
-    }
+    );
+  }
 
-    @ParameterizedTest
-    @MethodSource("parametersForTestNullOnOptionalField")
-    void testNullOnOptionalField(List<FieldValueMapping> schemaAsJson, String expected) {
+  @ParameterizedTest
+  @MethodSource("parametersForTestNullOnOptionalField")
+  void testNullOnOptionalField(List<FieldValueMapping> schemaAsJson, String expected) {
 
-        JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
 
-        jsonSchemaProcessor.processSchema(schemaAsJson);
-        ObjectNode message = jsonSchemaProcessor.next();
+    jsonSchemaProcessor.processSchema(schemaAsJson);
+    ObjectNode message = jsonSchemaProcessor.next();
 
-        assertThat(message.toString()).isEqualTo(expected);
-    }
+    assertThat(message.toString()).isEqualTo(expected);
+  }
 
-    @Test
-    void testNullOnMapWithChildren(){
-        JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
-        jsonSchemaProcessor.processSchema(SIMPLE_SCHEMA_MAP);
-        ObjectNode message = jsonSchemaProcessor.next();
+  @Test
+  void testNullOnMapWithChildren() {
+    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+    jsonSchemaProcessor.processSchema(SIMPLE_SCHEMA_MAP);
+    ObjectNode message = jsonSchemaProcessor.next();
 
-        assertThat(message.toString()).contains("lastName\":\"García")
-                .contains("itemTipo\":{").contains("itemType\":{");
+    assertThat(message.toString()).contains("lastName\":\"García")
+                                  .contains("itemTipo\":{").contains("itemType\":{");
 
-    }
+  }
 
-    @Test
-    void testNullOnNestedCollections(){
-        JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
-        jsonSchemaProcessor.processSchema(SCHEMA_NESTED_COLLECTIONS);
-        ObjectNode message = jsonSchemaProcessor.next();
+  @Test
+  void testNullOnNestedCollections() {
+    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+    jsonSchemaProcessor.processSchema(SCHEMA_NESTED_COLLECTIONS);
+    ObjectNode message = jsonSchemaProcessor.next();
 
-        assertThat(message.toString()).contains("fruits\":[").contains("vegetables\":{")
-                                      .contains("\"birds\":[").contains("\"animals\":{");
+    assertThat(message.toString()).contains("fruits\":[").contains("vegetables\":{")
+                                  .contains("\"birds\":[").contains("\"animals\":{");
 
-    }
+  }
 
-    @Test
-    void testNullOnComplexCollections(){
-        JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
-        jsonSchemaProcessor.processSchema(SCHEMA_COMPLEX_COLLECTIONS);
-        ObjectNode message = jsonSchemaProcessor.next();
+  @Test
+  void testNullOnComplexCollections() {
+    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+    jsonSchemaProcessor.processSchema(SCHEMA_COMPLEX_COLLECTIONS);
+    ObjectNode message = jsonSchemaProcessor.next();
 
-        System.out.println(SCHEMA_COMPLEX_COLLECTIONS);
-        assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
-                                      .contains("\"birds\":[[{\"nameBird\":")
-                                      .contains("\"animals\":{").contains("nameAnimal\":");
+    System.out.println(SCHEMA_COMPLEX_COLLECTIONS);
+    assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
+                                  .contains("\"birds\":[[{\"nameBird\":")
+                                  .contains("\"animals\":{").contains("nameAnimal\":");
 
-    }
+  }
 
 
 }

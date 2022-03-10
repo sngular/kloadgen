@@ -8,7 +8,6 @@
   <artifactId>kloadgen</artifactId>
   <version>3.9.2</version>
 
-
   <properties>
     <assertj-core.version>3.18.1</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>

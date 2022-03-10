@@ -5,7 +5,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "objectOfCollectionsOfBasicTypes":{
+    "objectOfCollectionsOfBasicTypes": {
       "type": "object",
       "properties": {
         "arrayOfArrayOfArray": {
@@ -14,18 +14,27 @@
             "type": "array",
             "items": {
               "type": "array",
-              "items": {"type": "string"}
+              "items": {
+                "type": "string"
+              }
             },
             "minItems": 1
           },
           "minItems": 1
         },
-        "mapOfIntegers": {"type": "object", "additionalProperties": {"type": "integer"}},
-        "stringControl": {"type": "string"}
+        "mapOfIntegers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "stringControl": {
+          "type": "string"
+        }
       },
       "required": [
-        "objectOfCollectionsOfBasicTypes"]
-
+        "objectOfCollectionsOfBasicTypes"
+      ]
     }
   }
 }
