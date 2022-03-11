@@ -11,6 +11,8 @@ import java.util.Set;
 public class ValidTypeConstants {
 
   // Map type values
+  public static final String NUMBER_ARRAY = "number-array";
+
   public static final String INT_ARRAY = "int-array";
 
   public static final String LONG_ARRAY = "long-array";
@@ -101,8 +103,8 @@ public class ValidTypeConstants {
 
   public static final Set<String> VALID_OBJECT_TYPES = Set.of(
       ARRAY, MAP, ENUM, STRING, INT, LONG, TIMESTAMP, STRING_TIMESTAMP, SHORT, DOUBLE, LONG_TIMESTAMP, UUID, BOOLEAN,
-          BYTES, INT_DATE, INT_TIME_MILLIS, LONG_TIME_MICROS, LONG_TIMESTAMP_MILLIS, LONG_TIMESTAMP_MICROS,
-          LONG_LOCAL_TIMESTAMP_MILLIS, LONG_LOCAL_TIMESTAMP_MICROS, STRING_UUID, BYTES_DECIMAL, FIXED_DECIMAL
+      BYTES, INT_DATE, INT_TIME_MILLIS, LONG_TIME_MICROS, LONG_TIMESTAMP_MILLIS, LONG_TIMESTAMP_MICROS,
+      LONG_LOCAL_TIMESTAMP_MILLIS, LONG_LOCAL_TIMESTAMP_MICROS, STRING_UUID, BYTES_DECIMAL, FIXED_DECIMAL
   );
 
   private ValidTypeConstants() {

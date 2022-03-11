@@ -1,0 +1,102 @@
+{
+  "$id": "https://example.com/collections.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "basic collections",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mapOfStrings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "arrayOfObjectsOfBasicTypes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stringOfObject": {
+            "type": "string"
+          },
+          "numberOfObject": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      },
+      "minItems": 1
+    },
+    "objectOfCollectionsOfBasicTypes": {
+      "type": "object",
+      "properties": {
+        "arrayOfStrings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "mapOfIntegers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "stringControl": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "objectOfCollectionsOfObject": {
+      "type": "object",
+      "properties": {
+        "stringControl": {
+          "type": "string"
+        },
+        "arrayOfObjectsPerson": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "namePerson": {
+                "type": "string"
+              },
+              "phonePerson": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "mapOfObjectsDog": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "nameDog": {
+                "type": "string"
+              },
+              "vetData": {
+                "type": "object",
+                "properties": {
+                  "dogId": {
+                    "type": "integer"
+                  },
+                  "breedName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": []
+    }
+  },
+  "required": [
+    "objectOfCollectionsOfBasicTypes",
+    "objectOfCollectionsOfObject"
+  ]
+}
