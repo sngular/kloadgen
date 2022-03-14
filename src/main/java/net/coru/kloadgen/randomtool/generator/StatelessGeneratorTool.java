@@ -38,8 +38,7 @@ public class StatelessGeneratorTool {
     Object value;
 
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
-        fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
+      if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
         return randomObject.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
       } else {
         value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
