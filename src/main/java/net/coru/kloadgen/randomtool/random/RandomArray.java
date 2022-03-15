@@ -26,10 +26,12 @@ public class RandomArray {
   public Object generateArray(
       String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
       Map<ConstraintTypeEnum, String> constrains) {
+
     Object value;
 
     switch (fieldType) {
       case ValidTypeConstants.INT_ARRAY:
+      case ValidTypeConstants.NUMBER_ARRAY:
         value = generate(ValidTypeConstants.INT, arraySize, valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.LONG_ARRAY:
@@ -61,20 +63,39 @@ public class RandomArray {
     if (fieldType.endsWith("-array-array")) {
       value = generateArrayOfArray(fieldType.replace("-array-array", "-array"), valueLength, fieldValueList, arraySize, arraySize,
                                    constrains);
+    } else if (fieldType.endsWith("map")) {
+      value = generateRandomArrayMap(fieldType.replace("-map", ""), valueLength, fieldValueList, arraySize, arraySize,
+                                     constrains);
     }
     return value;
   }
 
+  private Object generateRandomArrayMap(
+      String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
+      Integer innerArraySize, Map<ConstraintTypeEnum, String> constrains) {
+    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
+    Map<String, Object> map = new java.util.HashMap<>(arraySize);
+
+    for (int i = 0; i < size; i++) {
+      map.put(
+          (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), constrains),
+          generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains)
+      );
+    }
+    return map;
+  }
+
   private Object generateArrayOfArray(
       String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize, Integer innerArraySize, Map<ConstraintTypeEnum, String> constrains) {
+
     int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<Object> array = new ArrayList<>(size);
 
-    for (int i = 0; i < size; i++) {
-      array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains));
+      for (int i = 0; i < size; i++) {
+          array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains));
+      }
+      return array;
     }
-    return array;
-  }
 
   private List<Object> generate(
       String type, Integer arraySize, Integer valueLength, List<String> fieldValueList,

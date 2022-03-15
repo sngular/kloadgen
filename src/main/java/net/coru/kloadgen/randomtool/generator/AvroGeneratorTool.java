@@ -6,6 +6,7 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
+import static net.coru.kloadgen.randomtool.util.ValueUtils.getValidTypeFromSchema;
 import static org.apache.avro.Schema.Type.ENUM;
 import static org.apache.avro.Schema.Type.FIXED;
 import static org.apache.avro.Schema.Type.NULL;
@@ -44,7 +45,7 @@ public class AvroGeneratorTool {
 
     Object value;
     if (ENUM == field.schema().getType()) {
-      value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, field.schema(), parameterList);
+      value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, field.schema(), parameterList, field.schema().getType().getName());
     } else if (UNION == field.schema().getType()) {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
@@ -52,7 +53,7 @@ public class AvroGeneratorTool {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
         value = ValueUtils.castValue(value, field.schema().getType().getName());
       } else if (ENUM == safeSchema.getType()) {
-        value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, safeSchema, parameterList);
+        value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, safeSchema, parameterList, field.schema().getType().getName());
       } else {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
         if ("null".equalsIgnoreCase(value.toString())) {
@@ -60,11 +61,10 @@ public class AvroGeneratorTool {
         }
       }
     } else if ("seq".equalsIgnoreCase(fieldType)) {
-      if (!fieldValuesList.isEmpty() && '{' == fieldValuesList.get(0).charAt(0)) {
-        fieldValuesList.set(0, fieldValuesList.get(0).substring(1));
-        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), fieldType, fieldValuesList, context);
+      if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
+        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), getValidTypeFromSchema(field.schema()), fieldValuesList, context);
       } else {
-        value = randomObject.generateSeq(field.name(), field.schema().getType().getName(), parameterList, context);
+        value = randomObject.generateSeq(field.name(), getValidTypeFromSchema(field.schema()), parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
 
@@ -129,16 +129,15 @@ public class AvroGeneratorTool {
     }
   }
 
-  private Object getEnumOrGenerate(String fieldName, String fieldType, Schema schema, List<String> parameterList) {
+  private Object getEnumOrGenerate(String fieldName, String fieldType, Schema schema, List<String> parameterList, String fieldValueMappingType) {
     Object value;
-    if ("ENUM".equalsIgnoreCase(fieldType)) {
+    if ("ENUM".equalsIgnoreCase(fieldValueMappingType)) {
       if (parameterList.isEmpty()) {
         List<String> enumValueList = schema.getEnumSymbols();
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
       } else {
-        if ('{'== parameterList.get(0).charAt(0)) {
-          parameterList.set(0, parameterList.get(0).substring(1));
-          value = new GenericData.EnumSymbol(schema, randomObject.generateSequenceForFieldValueList(fieldName,fieldType,parameterList,context));
+        if ("Seq".equalsIgnoreCase(fieldType)) {
+          value = new GenericData.EnumSymbol(schema, randomObject.generateSequenceForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));
         } else {
           value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
         }

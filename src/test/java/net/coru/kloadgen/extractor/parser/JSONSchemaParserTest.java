@@ -1,7 +1,10 @@
 package net.coru.kloadgen.extractor.parser;
 
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.COLLECTIONS_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.COMPLEX_SCHEMA;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.DEFINITIONS_COMPLEX_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.MEDIUM_COMPLEX_SCHEMA;
+import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.NESTED_COLLECTIONS_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_ARRAY;
 import static net.coru.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NUMBER;
@@ -34,7 +37,10 @@ class JSONSchemaParserTest {
         Arguments.of(resourceAsFile.getContent("/jsonschema/basic-number.jcs"), SIMPLE_SCHEMA_NUMBER),
         Arguments.of(resourceAsFile.getContent("/jsonschema/basic-array.jcs"), SIMPLE_SCHEMA_ARRAY),
         Arguments.of(resourceAsFile.getContent("/jsonschema/complex-document.jcs"), COMPLEX_SCHEMA),
-        Arguments.of(resourceAsFile.getContent("/jsonschema/medium-document.jcs"), MEDIUM_COMPLEX_SCHEMA)
+        Arguments.of(resourceAsFile.getContent("/jsonschema/medium-document.jcs"), MEDIUM_COMPLEX_SCHEMA),
+        Arguments.of(resourceAsFile.getContent("/jsonschema/collections.jcs"), COLLECTIONS_SCHEMA),
+        Arguments.of(resourceAsFile.getContent("/jsonschema/nested-collections.jcs"), NESTED_COLLECTIONS_SCHEMA),
+        Arguments.of(resourceAsFile.getContent("/jsonschema/complex-definitions.jcs"), DEFINITIONS_COMPLEX_SCHEMA)
     );
   }
 

@@ -34,36 +34,36 @@ public class RandomMap {
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
 
-        switch (fieldType) {
-            case ValidTypeConstants.INT_MAP:
-                value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, mapSize, constrains);
-                break;
-            case ValidTypeConstants.LONG_MAP:
-                value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, mapSize, constrains);
-                break;
-            case ValidTypeConstants.DOUBLE_MAP:
-                value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
-                break;
-            case ValidTypeConstants.SHORT_MAP:
-                value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, mapSize, constrains);
-                break;
-            case ValidTypeConstants.NUMBER_MAP:
-            case ValidTypeConstants.FLOAT_MAP:
-                value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, mapSize, constrains);
-                break;
-            case ValidTypeConstants.STRING_MAP:
-                value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, mapSize, constrains);
-                break;
-            case ValidTypeConstants.UUID_MAP:
-                value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
-                break;
-            case ValidTypeConstants.BOOLEAN_MAP:
-                value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
-                break;
-            default:
-                value = fieldType;
-                break;
-        }
+    switch (fieldType) {
+      case ValidTypeConstants.INT_MAP:
+        value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, mapSize, constrains);
+        break;
+      case ValidTypeConstants.LONG_MAP:
+        value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, mapSize, constrains);
+        break;
+      case ValidTypeConstants.DOUBLE_MAP:
+        value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, mapSize, constrains);
+        break;
+      case ValidTypeConstants.SHORT_MAP:
+        value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, mapSize, constrains);
+        break;
+      case ValidTypeConstants.NUMBER_MAP:
+      case ValidTypeConstants.FLOAT_MAP:
+        value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, mapSize, constrains);
+        break;
+      case ValidTypeConstants.STRING_MAP:
+        value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, mapSize, constrains);
+        break;
+      case ValidTypeConstants.UUID_MAP:
+        value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+        break;
+      case ValidTypeConstants.BOOLEAN_MAP:
+        value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
+        break;
+      default:
+        value = fieldType;
+        break;
+    }
 
     if (fieldType.endsWith("array")) {
       value = generateRandomMapArray(fieldType, mapSize, fieldValueList, mapSize, arraySize, constrains);
@@ -121,6 +121,7 @@ public class RandomMap {
   private Object generateRandomMapArray(
       String type, Integer mapSize, List<String> fieldValueList, Integer valueLength, Integer arraySize,
       Map<ConstraintTypeEnum, String> constrains) {
+
     List<Map<String, Object>> generatedMapArray = new ArrayList<>(arraySize);
     int tempValueLength = valueLength;
     if (valueLength == 0) {
@@ -190,6 +191,7 @@ public class RandomMap {
 
   private Map<String, Object> generateMapOfMap(
       String type, Integer mapSize, Integer innerMapSize, List<String> fieldValueList, int valueLength, Map<ConstraintTypeEnum, String> constrains) {
+
     int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1, 5);
     Map<String, Object> map = new HashMap<>(size);
 

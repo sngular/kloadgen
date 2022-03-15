@@ -387,7 +387,7 @@ class AvroSchemaProcessorTest {
         List<GenericRecord> valuesData = Streams.zip(idValues.stream(), otherIdValues.stream(), (id, otherId) -> {
             GenericRecord valuesDataRecord = new GenericData.Record(valuesDataSchema);
             valuesDataRecord.put("id", id);
-            valuesDataRecord.put("otherId", otherId);
+            valuesDataRecord.put("otherId", Long.valueOf(otherId));
             return valuesDataRecord;
         }).collect(toList());
 
@@ -398,8 +398,8 @@ class AvroSchemaProcessorTest {
     @Test
     void testCustomSequenceOfValuesWithSameStartingStartingValue() {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[3].id", "seq", 0, "[{1,2]"),
-                new FieldValueMapping("values[3].otherId", "seq", 0, "[{1,3]"));
+                new FieldValueMapping("values[3].id", "seq", 0, "[1,2]"),
+                new FieldValueMapping("values[3].otherId", "seq", 0, "[1,3]"));
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
@@ -417,7 +417,7 @@ class AvroSchemaProcessorTest {
                         .type(Schema.Type.STRING.getName())
                         .noDefault()
                         .name("otherId")
-                        .type(Schema.Type.STRING.getName())
+                        .type(Schema.Type.LONG.getName())
                         .noDefault()
                         .endRecord())
                 .noDefault()
@@ -447,7 +447,7 @@ class AvroSchemaProcessorTest {
         Schema schemaContainingId = schemaArrayContainingId.getElementType();
         return idValues.stream().map(id -> {
             GenericRecord recordContainingId = new GenericData.Record(schemaContainingId);
-            recordContainingId.put("id", id);
+            recordContainingId.put("id", new BigDecimal(id));
             return recordContainingId;
         }).collect(toList());
     }
@@ -455,8 +455,10 @@ class AvroSchemaProcessorTest {
     @Test
     void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[4].id", "seq", 0, "[{1,2,3]"),
-                new FieldValueMapping("otherValues[4].id", "seq", 0, "[{1,3,4]"));
+                new FieldValueMapping("values[4].id", "seq", 0, "[1,2.44,3.6]"),
+                new FieldValueMapping("otherValues[4].id", "seq", 0, "[1,3.02,4.98]"));
+
+        Schema idSchema = LogicalTypes.decimal(5, 2).addToSchema(SchemaBuilder.builder().bytesBuilder().endBytes());
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
@@ -471,7 +473,7 @@ class AvroSchemaProcessorTest {
                         .record("valuesData")
                         .fields()
                         .name("id")
-                        .type(Schema.Type.STRING.getName())
+                        .type(idSchema)
                         .noDefault()
                         .endRecord())
                 .noDefault()
@@ -483,12 +485,12 @@ class AvroSchemaProcessorTest {
                         .record("otherValuesData")
                         .fields()
                         .name("id")
-                        .type(Schema.Type.STRING.getName())
+                        .type(idSchema)
                         .noDefault()
                         .endRecord())
                 .noDefault()
                 .endRecord();
-        GenericRecord entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2", "3", "1"), asList("1", "3", "4", "1"));
+        GenericRecord entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2.44", "3.6", "1"), asList("1", "3.02", "4.98", "1"));
         avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
                 new SchemaMetadata(1, 1, ""),
                 fieldValueMappingList);
@@ -497,4 +499,5 @@ class AvroSchemaProcessorTest {
 
         assertThat(message.getGenericRecord()).isEqualTo(entity);
     }
+
 }

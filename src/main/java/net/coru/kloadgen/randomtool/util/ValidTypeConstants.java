@@ -11,6 +11,8 @@ import java.util.Set;
 public class ValidTypeConstants {
 
   // Map type values
+  public static final String NUMBER_ARRAY = "number-array";
+
   public static final String INT_ARRAY = "int-array";
 
   public static final String LONG_ARRAY = "long-array";
