@@ -455,7 +455,7 @@ class AvroSchemaProcessorTest {
   @Test
   void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
     List<FieldValueMapping> fieldValueMappingList = asList(
-        new FieldValueMapping("values[4].id", "seq", 0, "[1,2,3]"),
+        new FieldValueMapping("values[4].id", "seq", 0, "[1,2,5]"),
         new FieldValueMapping("otherValues[4].id", "seq", 0, "[1,3,4]"));
 
     AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
@@ -488,7 +488,7 @@ class AvroSchemaProcessorTest {
                            .endRecord())
         .noDefault()
         .endRecord();
-    GenericRecord entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2", "3", "1"),
+    GenericRecord entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2", "5", "1"),
                                                                                                asList("1", "3", "4", "1"));
     avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
                                       new SchemaMetadata(1, 1, ""),
