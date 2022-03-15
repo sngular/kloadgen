@@ -36,7 +36,6 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -399,8 +398,8 @@ class AvroSchemaProcessorTest {
     @Test
     void testCustomSequenceOfValuesWithSameStartingStartingValue() {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[3].id", "seq", 0, "[{1,2]"),
-                new FieldValueMapping("values[3].otherId", "seq", 0, "[{1,3]"));
+                new FieldValueMapping("values[3].id", "seq", 0, "[1,2]"),
+                new FieldValueMapping("values[3].otherId", "seq", 0, "[1,3]"));
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
@@ -456,8 +455,8 @@ class AvroSchemaProcessorTest {
     @Test
     void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[4].id", "seq", 0, "[{1,2.44,3.6]"),
-                new FieldValueMapping("otherValues[4].id", "seq", 0, "[{1,3.02,4.98]"));
+                new FieldValueMapping("values[4].id", "seq", 0, "[1,2.44,3.6]"),
+                new FieldValueMapping("otherValues[4].id", "seq", 0, "[1,3.02,4.98]"));
 
         Schema idSchema = LogicalTypes.decimal(5, 2).addToSchema(SchemaBuilder.builder().bytesBuilder().endBytes());
 
@@ -500,4 +499,5 @@ class AvroSchemaProcessorTest {
 
         assertThat(message.getGenericRecord()).isEqualTo(entity);
     }
+
 }
