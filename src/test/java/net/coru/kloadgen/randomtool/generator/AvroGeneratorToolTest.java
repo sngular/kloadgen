@@ -7,6 +7,7 @@
 package net.coru.kloadgen.randomtool.generator;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -23,7 +24,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -146,25 +146,26 @@ class AvroGeneratorToolTest {
     assertThat(String.valueOf(number)).hasSize(valueLength);
   }
 
-  private static Stream<Arguments> parametersForGenerateRandomValueWithList() {
+  private static Stream<Arguments> parametersForGenerateFieldValuesListSequence() {
     return Stream.of(
             Arguments.of(18,
-                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")),
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20)),
             Arguments.of(20,
-                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                         List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20", "1", "2")));
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20, 1, 2)));
   }
 
   @ParameterizedTest
-  @DisplayName("Testing Generate a Random Value With a List of Values")
-  @MethodSource("parametersForGenerateRandomValueWithList")
-  void testGenerateRandomValueWithList(int size, List<String> values, List<String> expected) {
-
+  @DisplayName("Testing generate a sequence of a list of values")
+  @MethodSource("parametersForGenerateFieldValuesListSequence")
+  void testGenerateFieldValuesListSequence(int size, List<String> fieldValuesList, List<Integer> expected) {
     var intList = new ArrayList<>();
-    var context = new HashMap<String, Object>();
-    for (int i=0; i <= size; i++) {
-      intList.add(new RandomObject().generateSequenceForFieldValueList("ClientCode", "seq", values, context));
+    Field field = new Field("name", SchemaBuilder.builder().intType());
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList));
+    AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
+    for (int i = 0; i <= size; i++) {
+      intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
     }
     assertThat(intList).containsExactlyElementsOf(expected);
   }

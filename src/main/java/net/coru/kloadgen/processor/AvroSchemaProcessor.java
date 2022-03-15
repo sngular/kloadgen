@@ -330,6 +330,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         } else {
           fieldValueMapping = nextField;
         }
+
       } else {
 
         if (typeFilter.matches("\\[?..]\\[.*") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array") &&
@@ -401,6 +402,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
       return createRecord(schema.getElementType());
     } else {
       return null;
+
     }
   }
 
@@ -412,29 +414,6 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
       }
     }
     return isRecord;
-  }
-
-  private Object createArray(Schema subSchema, String fieldName, Integer arraySize, Integer fieldValueLength, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-    if (ARRAY.equals(subSchema.getType())) {
-      if (typesSet.contains(subSchema.getElementType().getType())) {
-        return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-      } else if (MAP.equals(subSchema.getElementType().getType())) {
-        fieldExpMappingsQueue.remove();
-        return createSimpleTypeMap(fieldName, subSchema.getElementType().getValueType().getType().getName(), arraySize, fieldValueLength, Collections.emptyList());
-      } else {
-        return createObjectArray(subSchema.getElementType(), fieldName, arraySize, fieldExpMappingsQueue);
-      }
-    } else if (MAP.equals(subSchema.getType())) {
-      if (ARRAY.equals(subSchema.getValueType().getType())) {
-        return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-      } else {
-        return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-      }
-    } else if (typesSet.contains(subSchema.getType())) {
-      return createArray(fieldName, arraySize, fieldExpMappingsQueue);
-    } else {
-      return createObjectArray(subSchema, fieldName, arraySize, fieldExpMappingsQueue);
-    }
   }
 
   private List<GenericRecord> createObjectArray(Schema subSchema, String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {

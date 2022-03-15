@@ -206,9 +206,6 @@ public abstract class SchemaProcessorLib {
     return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, 0, fieldExpMappings);
   }
 
-  static List<Map> createSimpleTypeMapArray(String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
-    return (List<Map>) generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, arraySize, fieldExpMappings);
-  }
 
   static Map<String, Object> createSimpleTypeArrayMap(
       String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {

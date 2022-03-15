@@ -6,9 +6,17 @@
 
 package net.coru.kloadgen.randomtool.util;
 
+import org.apache.avro.Schema;
+import org.apache.jmeter.threads.JMeterContextService;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.jmeter.threads.JMeterContextService;
+import java.util.UUID;
 
 public class ValueUtils {
 
@@ -25,28 +33,70 @@ public class ValueUtils {
     return parameterList;
   }
 
-  public static Object castValue(Object value, String type) {
+  public static Object castValue(Object valueObject, String type) {
     Object castValue;
+    String value = valueObject.toString();
     switch (type) {
       case ValidTypeConstants.INT:
-        castValue = Integer.valueOf(value.toString());
+        castValue = Integer.valueOf(value);
         break;
       case ValidTypeConstants.DOUBLE:
-        castValue = Double.valueOf(value.toString());
+        castValue = Double.valueOf(value);
         break;
       case ValidTypeConstants.LONG:
-        castValue = Long.valueOf(value.toString());
+        castValue = Long.valueOf(value);
         break;
       case ValidTypeConstants.FLOAT:
-        castValue = Float.valueOf(value.toString());
+        castValue = Float.valueOf(value);
+        break;
+      case ValidTypeConstants.SHORT:
+        castValue = Short.valueOf(value);
         break;
       case ValidTypeConstants.BOOLEAN:
-        castValue = Boolean.valueOf(value.toString());
+        castValue = Boolean.valueOf(value);
+        break;
+      case ValidTypeConstants.TIMESTAMP:
+        castValue = LocalDateTime.parse(value.trim());
+        break;
+      case ValidTypeConstants.LONG_TIMESTAMP:
+        castValue = LocalDateTime.parse(value.trim()).toInstant(ZoneOffset.UTC).toEpochMilli();
+        break;
+      case ValidTypeConstants.STRING_TIMESTAMP:
+        castValue = LocalDateTime.parse(value.trim()).toString();
+        break;
+      case ValidTypeConstants.INT_DATE:
+        castValue = LocalDate.parse(value.trim());
+        break;
+      case ValidTypeConstants.INT_TIME_MILLIS:
+      case ValidTypeConstants.LONG_TIME_MICROS:
+        castValue = LocalTime.parse(value.trim());
+        break;
+      case ValidTypeConstants.LONG_TIMESTAMP_MILLIS:
+      case ValidTypeConstants.LONG_TIMESTAMP_MICROS:
+        castValue = LocalDateTime.parse(value.trim()).toInstant(ZoneOffset.UTC);
+        break;
+      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
+      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
+        castValue = LocalDateTime.parse(value.trim());
+        break;
+      case ValidTypeConstants.UUID:
+      case ValidTypeConstants.STRING_UUID:
+        castValue = UUID.fromString(value);
+        break;
+      case ValidTypeConstants.BYTES_DECIMAL:
+      case ValidTypeConstants.FIXED_DECIMAL:
+        castValue = new BigDecimal(value);
         break;
       default:
-        castValue = value.toString();
+        castValue = value;
         break;
     }
     return castValue;
+  }
+
+  public static String getValidTypeFromSchema(Schema schema) {
+    return schema.getLogicalType() == null
+            ? schema.getType().getName()
+            : String.format("%s_%s", schema.getType().getName(), schema.getLogicalType().getName());
   }
 }
