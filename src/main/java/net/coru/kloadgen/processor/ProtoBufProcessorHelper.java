@@ -11,9 +11,11 @@ import java.util.Objects;
 import com.github.os72.protobuf.dynamic.DynamicSchema;
 import com.github.os72.protobuf.dynamic.EnumDefinition;
 import com.github.os72.protobuf.dynamic.MessageDefinition;
+import com.github.os72.protobuf.dynamic.MessageDefinition.Builder;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.squareup.wire.schema.internal.parser.EnumElement;
+import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
@@ -51,7 +53,15 @@ public class ProtoBufProcessorHelper {
     fillNestedTypes(messageElement, nestedTypes);
     MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     var element = (MessageElement) messageElement;
-    for (var elementField : element.getFields()) {
+    extracted(nestedTypes, msgDef, element.getFields());
+    for (var optionalField : element.getOneOfs()) {
+      extracted(nestedTypes, msgDef, optionalField.getFields());
+    }
+    return msgDef.build();
+  }
+
+  private void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList) {
+    for (var elementField : fieldElementList) {
       var elementFieldType = elementField.getType();
       var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
@@ -95,7 +105,6 @@ public class ProtoBufProcessorHelper {
                         elementField.getTag());
       }
     }
-    return msgDef.build();
   }
 
   private void addDefinition(MessageDefinition.Builder msgDef, String typeName, TypeElement typeElement, HashMap<String, TypeElement> nestedTypes) {

@@ -151,6 +151,37 @@ class ProtobufSchemaProcessorTest {
   }
 
   @Test
+  @DisplayName("Be able to process oneOf fields")
+  void testProtoBufOneOfProcessor() throws IOException, DescriptorValidationException {
+    File testFile = fileHelper.getFile("/proto-files/oneOfTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = protobufSchemaProcessor.next();
+    DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+    List<String> assertKeys = new ArrayList<>();
+    List<Object> assertValues = new ArrayList<>();
+    Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+    map.forEach((key, value) ->
+                {
+                  assertKeys.add(key.getFullName());
+                  assertValues.add(value);
+                }
+    );
+    assertThat(message).isNotNull()
+                       .isInstanceOf(EnrichedRecord.class)
+                       .extracting(EnrichedRecord::getGenericRecord)
+                       .isNotNull();
+    assertThat(assertKeys)
+        .hasSize(2)
+        .containsAnyOf("tutorial.Address.type", "tutorial.Address.optionInt", "tutorial.Address.optionLong", "tutorial.Address.optionString")
+        .element(0)
+        .isEqualTo("tutorial.Address.type");
+    assertThat(assertValues).hasSize(2);
+
+  }
+
+  @Test
   @DisplayName("Be able to process map in schema")
   void testProtoBufMapTestProcessor() throws IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
