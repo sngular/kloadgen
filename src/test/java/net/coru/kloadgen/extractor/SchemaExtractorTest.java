@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.extractor;
 
-import static java.util.Collections.emptyList;
-
 import static net.coru.kloadgen.model.ConstraintTypeEnum.MAXIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
