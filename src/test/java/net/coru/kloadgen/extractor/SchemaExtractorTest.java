@@ -6,6 +6,8 @@
 
 package net.coru.kloadgen.extractor;
 
+import static java.util.Collections.emptyList;
+
 import static net.coru.kloadgen.model.ConstraintTypeEnum.MAXIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
 import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
@@ -108,7 +110,7 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("name", "string", 0, null, true, true),
+            new FieldValueMapping("name", "string", 0, "", true, true),
             new FieldValueMapping("values[][:]", "string-map-array", 0, "", true, true)
         );
   }
@@ -124,7 +126,7 @@ class SchemaExtractorTest {
             new FieldValueMapping("fieldMySchema.testInt_id", "int", 0, ""),
             new FieldValueMapping("fieldMySchema.testLong", "long", 0, ""),
             new FieldValueMapping("fieldMySchema.fieldString", "string", 0, ""),
-            new FieldValueMapping("timestamp", "long", 0, null, true, true)
+            new FieldValueMapping("timestamp", "long", 0, "", true, true)
         );
   }
 
