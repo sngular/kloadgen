@@ -119,11 +119,11 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             if (checkIfRecordMap(typeFilter)) {
               processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldName);
             } else if (checkIfRecordArray(typeFilter)) {
-              processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldName);
-            } else if (checkIfMap(fieldType)) {
-              processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldName);
-            } else if (checkIfArray(fieldType)) {
-              processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, "", fieldName);
+              processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , messageBuilder , fieldName);
+            } else if (checkIfMap(typeFilter , fieldType)) {
+              processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , messageBuilder , fieldName);
+            } else if (checkIfArray(typeFilter , fieldType)) {
+              processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , messageBuilder , "" , fieldName);
             } else {
               throw new KLoadGenException("Wrong configuration Map - Array");
             }
@@ -221,11 +221,11 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
           if (checkIfRecordMap(methodName)) {
             processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldName);
           } else if (checkIfRecordArray(methodName)) {
-            processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldName);
-          } else if (checkIfMap(fieldType)) {
-            processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldName);
-          } else if (checkIfArray(fieldType)) {
-            processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, parentFieldName, fieldName);
+            processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , messageBuilder , fieldName);
+          } else if (checkIfMap(collectionTail, fieldType)) {
+            processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , messageBuilder , fieldName);
+          } else if (checkIfArray(collectionTail , fieldType)) {
+            processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , messageBuilder , parentFieldName , fieldName);
           }
         } else if (collectionTail.startsWith(".")) {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, parentFieldName);

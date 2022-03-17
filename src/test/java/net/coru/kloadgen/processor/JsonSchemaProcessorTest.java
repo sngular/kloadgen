@@ -1,10 +1,8 @@
 package net.coru.kloadgen.processor;
 
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.COMPLEX_SCHEMA;
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.COMPLEX_SCHEMA_EXPECTED;
+import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_COMPLEX_COLLECTIONS;
+import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_NESTED_COLLECTIONS;
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA;
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_ARRAY;
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_ARRAY_EXPECTED;
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_EXPECTED;
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_MAP;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,9 +38,7 @@ public class JsonSchemaProcessorTest {
 
   private static Stream<Object> parametersForTestNullOnOptionalField() {
     return Stream.of(
-        Arguments.of(SIMPLE_SCHEMA, SIMPLE_SCHEMA_EXPECTED)/*,
-                /*Arguments.of(SIMPLE_SCHEMA_COLLECTIONS, SIMPLE_SCHEMA_COLLECTIONS_EXPECTED),
-                Arguments.of(COMPLEX_SCHEMA, COMPLEX_SCHEMA_EXPECTED)*/
+        Arguments.of(SIMPLE_SCHEMA , SIMPLE_SCHEMA_EXPECTED)
     );
   }
 
@@ -55,7 +51,7 @@ public class JsonSchemaProcessorTest {
     jsonSchemaProcessor.processSchema(schemaAsJson);
     ObjectNode message = jsonSchemaProcessor.next();
 
-    assertThat(message.toString()).isEqualTo(expected);
+    assertThat(message.toString()).hasToString(expected);
   }
 
   @Test

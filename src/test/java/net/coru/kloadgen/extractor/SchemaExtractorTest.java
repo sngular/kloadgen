@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
