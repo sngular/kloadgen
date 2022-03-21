@@ -18,9 +18,18 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Publish to GitHub Packages
-        run: mvn --file pom-maven-central.xml --batch-mode deploy
+          server-id: ossrh
+          server-username: JIRAID
+          server-password: JIRAPASS
+          gpg-private-key: ${{ secrets.GPGKEYNAME }}
+          gpg-passphrase: GPG_SIGNING_KEY
+
+      - name: Build with Maven
+        run: mvn -B compile --file pom-maven-central.xml
+
+      - name: Publish to Maven Central Packages
+        run: mvn -DskipTests --file pom-maven-central.xml deploy -Dgpg.passphrase=${{ secrets.GPG_SIGNING_KEY }}
         env:
-          jiraid: ${{ secrets.JIRAID }}
-          jirapass: ${{ secrets.JIRAPASS }}
-          gpg_keyname: ${{ secrets.GPGKEYNAME }}
+          OSSRH_USERNAME: ${{ secrets.JIRAID }}
+          OSSRH_PASSWORD: ${{ secrets.JIRAPASS }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_SIGNING_KEY }}
