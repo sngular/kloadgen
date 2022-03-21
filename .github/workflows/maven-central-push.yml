@@ -19,6 +19,8 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Publish to GitHub Packages
-        run: mvn --file pom-github.xml --batch-mode deploy
+        run: mvn --file pom-maven-central.xml --batch-mode deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          jiraid: ${{ secrets.JIRAID }}
+          jirapass: ${{ secrets.JIRAPASS }}
+          gpg_keyname: ${{ secrets.GPGKEYNAME }}
