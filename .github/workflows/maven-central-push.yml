@@ -35,7 +35,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Publish to Maven Central Packages
-        run: mvn deploy
+        run: mvn deploy --file pom-maven-central.xml
         env:
           MAVEN_USERNAME: ${{ secrets.JIRAID }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.JIRAPASS }}
