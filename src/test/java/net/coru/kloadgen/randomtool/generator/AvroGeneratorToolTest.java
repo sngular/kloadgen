@@ -8,6 +8,7 @@ package net.coru.kloadgen.randomtool.generator;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
 import org.apache.avro.LogicalTypes;
@@ -30,6 +32,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -136,6 +139,7 @@ class AvroGeneratorToolTest {
         Arguments.of("double", 6, emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
   }
 
+  @Disabled
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value")
   @MethodSource("parametersForGenerateRandomValue")

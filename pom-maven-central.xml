@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
+  <name>KLoadGen</name>
+  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on Data specification</description>
+  <url>https://corunet.github.io/kloadgen/</url>
 
   <groupId>net.coru</groupId>
 
@@ -19,15 +20,40 @@
       <comments></comments>
     </license>
   </licenses>
+
+  <developers>
+    <developer>
+      <id>jegarcia</id>
+      <name>Jose Enrique Garcia Maciñeiras</name>
+      <email>jegarcia@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>principal engineer</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>OSS Corunet</name>
+      <subscribe>oss@corunet.com</subscribe>
+      <unsubscribe>oss@corunet.com</unsubscribe>
+      <post>oss@corunet.com</post>
+    </mailingList>
+  </mailingLists>
+
   <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
     <repository>
       <id>ossrh</id>
       <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
   </distributionManagement>
 
   <properties>
@@ -318,6 +344,30 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
         <version>4.3.0</version>
@@ -352,7 +402,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.7</version>
+        <version>1.6.8</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -363,17 +413,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
-            <phase>verify</phase>
             <goals>
               <goal>sign</goal>
             </goals>
+            <phase>verify</phase>
             <configuration>
-              <keyname>${gpg_keyname}</keyname>
-              <passphraseServerId>${gpg_keyname}</passphraseServerId>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
             </configuration>
           </execution>
         </executions>
@@ -425,7 +477,7 @@
           <scope>provided</scope>
         </dependency>
       </dependencies>
-      
+
       <build>
         <plugins>
           <plugin>
@@ -571,4 +623,11 @@
       </build>
     </profile>
   </profiles>
+
+  <scm>
+    <connection>scm:git:git@github.com:corunet/kloadgen.git</connection>
+    <url>scm:git:git@github.com:corunet/kloadgen.git</url>
+    <developerConnection>scm:git:git@github.com:corunet/kloadgen.git</developerConnection>
+  </scm>
+
 </project>
