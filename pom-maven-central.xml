@@ -57,6 +57,17 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
+      <id>cmunozgomez</id>
+      <name>Cesar Munoz Gomez</name>
+      <email>cmunoz@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
       <id>jmejutovazquez</id>
       <name>Javier Mejuto Vázquez</name>
       <email>jmejuto@corunet.com</email>
