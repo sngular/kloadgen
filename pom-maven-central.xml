@@ -29,13 +29,13 @@
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
-        <role>principal engineer</role>
-        <role>developer</role>
+        <role>Principal Engineer</role>
+        <role>Team Leader</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
-     <id>Rivarsal</id>
+     <id>rivarsal</id>
       <name>Pablo José López Rivadulla</name>
       <email>plopez@corunet.com</email>
       <organization>Corunet</organization>
