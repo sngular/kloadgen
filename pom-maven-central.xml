@@ -10,7 +10,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>3.13.0</version>
+  <version>4.0.0</version>
 
   <licenses>
     <license>
@@ -42,6 +42,17 @@
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
         <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>vtorres</id>
+      <name>Vanessa Torres Barca</name>
+      <email>vtorres@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
@@ -78,15 +89,18 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>mcabezasp</id>
+      <name>Miguel Cabezas Puerto</name>
+      <email>mcabezas@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
-  <mailingLists>
-    <mailingList>
-      <name>OSS Corunet</name>
-      <subscribe>oss@corunet.com</subscribe>
-      <unsubscribe>oss@corunet.com</unsubscribe>
-      <post>oss@corunet.com</post>
-    </mailingList>
-  </mailingLists>
 
   <distributionManagement>
     <repository>
@@ -209,6 +223,27 @@
       <groupId>io.confluent</groupId>
       <artifactId>kafka-json-schema-provider</artifactId>
       <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-protobuf-serializer</artifactId>
+      <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro-protobuf</artifactId>
+      <version>1.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.os72</groupId>
+      <artifactId>protobuf-dynamic</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.wire</groupId>
+      <artifactId>wire-java-generator</artifactId>
+      <version>4.0.1</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
