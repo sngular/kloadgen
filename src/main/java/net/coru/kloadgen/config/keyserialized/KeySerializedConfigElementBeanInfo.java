@@ -8,6 +8,7 @@ package net.coru.kloadgen.config.keyserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.KeySerializerPropertyEditor;
 import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
@@ -33,7 +34,7 @@ public class KeySerializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(KeySerializedConfigElement.class);
 
-    createPropertyGroup("key_serialized_load_generator", new String[] {
+    createPropertyGroup("key_serialized_load_generator", new String[]{
         KEY_NAME_STRATEGY, KEY_SERIALIZER_PROPERTY, KEY_SUBJECT_NAME, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
     });
 
@@ -53,19 +54,19 @@ public class KeySerializedConfigElementBeanInfo extends BeanInfoSupport {
     PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
-       new String[]{
-           "Field Name",
-           "Field Type",
-           "Field Length",
-           "Field Values List"
-       });
+                             new String[]{
+                                 "Field Name",
+                                 "Field Type",
+                                 "Field Length",
+                                 "Field Values List"
+                             });
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
-       new String[]{
-           FieldValueMapping.FIELD_NAME,
-           FieldValueMapping.FIELD_TYPE,
-           FieldValueMapping.VALUE_LENGTH,
-           FieldValueMapping.FIELD_VALUES_LIST
-       });
+                             new String[]{
+                                 FieldValueMapping.FIELD_NAME,
+                                 FieldValueMapping.FIELD_TYPE,
+                                 FieldValueMapping.VALUE_LENGTH,
+                                 FieldValueMapping.FIELD_VALUES_LIST
+                             });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
 

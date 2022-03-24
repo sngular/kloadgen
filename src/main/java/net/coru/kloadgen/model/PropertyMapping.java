@@ -32,6 +32,10 @@ public class PropertyMapping extends AbstractTestElement {
     init();
   }
 
+  public void init() {
+    this.setName("Config properties");
+  }
+
   public String getPropertyName() {
     return getPropertyAsString(PROPERTY_NAME);
   }
@@ -48,9 +52,5 @@ public class PropertyMapping extends AbstractTestElement {
   public void setPropertyValue(String propertyValue) {
     this.propertyValue = propertyValue;
     setProperty(PROPERTY_VALUE, propertyValue);
-  }
-
-  public void init() {
-    this.setName("Config properties");
   }
 }

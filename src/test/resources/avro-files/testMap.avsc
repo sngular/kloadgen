@@ -99,7 +99,8 @@
                   }
                 }
               }
-            ],"default": "null"
+            ],
+            "default": "null"
           }
         }
       }

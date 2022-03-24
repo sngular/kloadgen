@@ -9,6 +9,7 @@ package net.coru.kloadgen.config.keysimple;
 import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_TYPE;
 
 import java.beans.PropertyDescriptor;
+
 import net.coru.kloadgen.property.editor.PlainKeySerializerPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 

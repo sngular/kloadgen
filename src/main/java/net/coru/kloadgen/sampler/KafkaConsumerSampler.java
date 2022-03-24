@@ -19,6 +19,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Properties;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +46,14 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   private transient KafkaConsumer<Object, Object> consumer;
 
   @Override
-  public Arguments getDefaultParameters() {
-    return SamplerUtil.getCommonConsumerDefaultParameters();
+  public void setupTest(JavaSamplerContext context) {
+
+    Properties props = properties(context);
+    String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
+    consumer = new KafkaConsumer<>(props);
+    configGenericData();
+
+    consumer.subscribe(Collections.singletonList(topic));
   }
 
   public Properties properties(JavaSamplerContext context) {
@@ -59,11 +66,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     return props;
   }
 
-  protected Logger logger() {
-    return KafkaConsumerSampler.log;
-  }
-
-  private void configGenericData(){
+  private void configGenericData() {
     GenericData genericData = GenericData.get();
 
     genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
@@ -78,14 +81,15 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   }
 
   @Override
-  public void setupTest(JavaSamplerContext context) {
+  public void teardownTest(JavaSamplerContext context) {
+    if (Objects.nonNull(consumer)) {
+      consumer.close();
+    }
+  }
 
-    Properties props = properties(context);
-    String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
-    consumer = new KafkaConsumer<>(props);
-    configGenericData();
-
-    consumer.subscribe(Collections.singletonList(topic));
+  @Override
+  public Arguments getDefaultParameters() {
+    return SamplerUtil.getCommonConsumerDefaultParameters();
   }
 
   @Override
@@ -118,14 +122,9 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     } catch (Exception e) {
       logger().error("Failed to receive message", e);
       fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",
-          false);
+                       false);
     }
     return sampleResult;
-  }
-
-  private String prettify(ConsumerRecord<Object, Object> consumerRecord) {
-    return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key() +
-        ", value: " + consumerRecord.value().toString() + " }}";
   }
 
   private void fillSampleResult(SampleResult sampleResult, String responseData, boolean successful) {
@@ -136,11 +135,13 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     }
   }
 
-  @Override
-  public void teardownTest(JavaSamplerContext context) {
-    if (Objects.nonNull(consumer)) {
-      consumer.close();
-    }
+  private String prettify(ConsumerRecord<Object, Object> consumerRecord) {
+    return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key() +
+           ", value: " + consumerRecord.value().toString() + " }}";
+  }
+
+  protected Logger logger() {
+    return KafkaConsumerSampler.log;
   }
 
 }

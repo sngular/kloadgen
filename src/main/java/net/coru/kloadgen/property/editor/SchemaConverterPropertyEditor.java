@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -21,9 +22,9 @@ import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 @Slf4j
 public class SchemaConverterPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private PropertyDescriptor propertyDescriptor;
-
   private final JPanel panel = new JPanel();
+
+  private PropertyDescriptor propertyDescriptor;
 
   private String schemaAsString;
 
@@ -46,16 +47,16 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
   }
 
   @Override
-  public void clearGui() { }
-
-  @Override
-  public Component getCustomEditor() {
-    return this.panel;
-  }
+  public void clearGui() {}
 
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
     propertyDescriptor = descriptor;
+  }
+
+  @Override
+  public Component getCustomEditor() {
+    return this.panel;
   }
 
   @Override
@@ -78,7 +79,7 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public Object getValue() {
-    return schemaAsString;
+    return getAsText();
   }
 
   @Override

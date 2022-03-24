@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,7 +28,7 @@ class RandomArrayTest {
         Arguments.of("double-array", 1, Collections.singletonList("1.0"), 1.0),
         Arguments.of("float-array", 1, Collections.singletonList("1.0"), 1.0f),
         Arguments.of("uuid-array", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
-            UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"))
+                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"))
     );
   }
 

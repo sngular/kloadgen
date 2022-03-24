@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package tutorial;
+
+option java_multiple_files = true;
+option java_package = "com.example.tutorial.protos";
+option java_outer_classname = "AddressBookProtos";
+
+message Person {
+
+  optional PhoneTypes phoneTypes = 1;
+  repeated PhoneTypes phoneTypesArray = 2;
+  map<string, PhoneTypes> phoneTypesMap = 3;
+
+  enum PhoneTypes{
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+}

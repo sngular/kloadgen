@@ -1,7 +1,7 @@
 {
-  "mappings" : [
+  "mappings": [
     {
-      "priority":10,
+      "priority": 10,
       "request": {
         "method": "GET",
         "urlPattern": "/subjects/users/versions/latest"
@@ -13,7 +13,7 @@
           "version": 1,
           "id": 72,
           "schemaType": "AVRO",
-          "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\":[\"null\",\"long\"]}]}}}]}"
+          "schema": "{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\":[\"null\",\"long\"]}]}}}]}"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -21,7 +21,7 @@
       }
     },
     {
-      "priority":10,
+      "priority": 10,
       "request": {
         "method": "GET",
         "urlPattern": "/subjects/avroSubject/versions/latest"
@@ -33,7 +33,7 @@
           "version": 1,
           "id": 71,
           "schemaType": "AVRO",
-          "schema":"{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
+          "schema": "{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -41,7 +41,7 @@
       }
     },
     {
-      "priority":10,
+      "priority": 10,
       "request": {
         "method": "GET",
         "urlPattern": "/subjects/arrayMap/versions/latest"
@@ -53,7 +53,7 @@
           "version": 1,
           "id": 73,
           "schemaType": "AVRO",
-          "schema":"{ \"type\" : \"record\", \"name\" : \"Test\", \"fields\" : [ { \"name\" : \"name\", \"type\" : \"string\" }, { \"name\" : \"values\", \"type\" : { \"type\" : \"array\", \"items\" : { \"type\" : \"map\", \"values\" : \"string\" } } } ] } }"
+          "schema": "{ \"type\" : \"record\", \"name\" : \"Test\", \"fields\" : [ { \"name\" : \"name\", \"type\" : \"string\" }, { \"name\" : \"values\", \"type\" : { \"type\" : \"array\", \"items\" : { \"type\" : \"map\", \"values\" : \"string\" } } } ] } }"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -61,16 +61,15 @@
       }
     },
     {
-      "priority":10,
+      "priority": 10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/71\\?fetchMaxId=false"
+        "urlPattern": "/schemas/ids/71\\?fetchMaxId=false&subject=avroSubject"
       },
       "response": {
         "status": 200,
-        "jsonBody":
-        {
-          "schema":"{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
+        "jsonBody": {
+          "schema": "{\"type\" : \"record\",\"name\":\"test\",\"fields\" : [{\"name\":\"Name\" ,\"type\" : \"string\"},{\"name\":\"Age\", \"type\" : \"int\"}]}"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -78,16 +77,15 @@
       }
     },
     {
-      "priority":10,
+      "priority": 10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/72\\?fetchMaxId=false"
+        "urlPattern": "/schemas/ids/72\\?fetchMaxId=false&subject=users"
       },
       "response": {
         "status": 200,
-        "jsonBody":
-        {
-          "schema":"{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\": \"long\"}]}}}]}"
+        "jsonBody": {
+          "schema": "{\"name\": \"Parent\",\"type\":\"record\",\"fields\":[{\"name\": \"Users\",\"type\": {\"type\": \"array\",\"items\": {\"name\": \"User\",\"type\": \"record\",\"fields\": [{\"name\": \"name\",\"type\": \"string\"},{\"name\": \"id\",\"type\": \"long\"}]}}}]}"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -95,16 +93,15 @@
       }
     },
     {
-      "priority":10,
+      "priority": 10,
       "request": {
         "method": "GET",
-        "urlPattern": "/schemas/ids/73\\?fetchMaxId=false"
+        "urlPattern": "/schemas/ids/73\\?fetchMaxId=false&subject=arrayMap"
       },
       "response": {
         "status": 200,
-        "jsonBody":
-        {
-          "schema":"{ \"type\" : \"record\", \"name\" : \"Test\", \"fields\" : [ { \"name\" : \"name\", \"type\" : \"string\" }, { \"name\" : \"values\", \"type\" : { \"type\" : \"array\", \"items\" : { \"type\" : \"map\", \"values\" : \"string\" } } } ] } }"
+        "jsonBody": {
+          "schema": "{ \"type\" : \"record\", \"name\" : \"Test\", \"fields\" : [ { \"name\" : \"name\", \"type\" : \"string\" }, { \"name\" : \"values\", \"type\" : { \"type\" : \"array\", \"items\" : { \"type\" : \"map\", \"values\" : \"string\" } } } ] } }"
         },
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
@@ -112,16 +109,18 @@
       }
     },
     {
-      "priority":10,
+      "priority": 10,
       "request": {
         "method": "GET",
         "urlPattern": "/subjects"
       },
       "response": {
         "status": 200,
-        "jsonBody":
-         ["avrosubject","users","arrayMap"]
-        ,
+        "jsonBody": [
+          "avrosubject",
+          "users",
+          "arrayMap"
+        ],
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
         }

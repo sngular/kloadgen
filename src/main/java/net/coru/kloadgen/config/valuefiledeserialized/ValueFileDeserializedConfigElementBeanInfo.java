@@ -14,11 +14,12 @@ package net.coru.kloadgen.config.valuefiledeserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.property.editor.ValueDeserializerPropertyEditor;
 import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
-import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaConverterPropertyEditor;
+import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
+import net.coru.kloadgen.property.editor.ValueDeserializerPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
@@ -41,7 +42,7 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
 
     createPropertyGroup("file_deserialized_load_generator", new String[]{
         VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_TYPE, VALUE_SUBJECT_NAME,
-            VALUE_SCHEMA_PROPERTIES,
+        VALUE_SCHEMA_PROPERTIES,
         VALUE_SCHEMA_DEFINITION
     });
 
@@ -73,15 +74,15 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
     PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
-        new String[]{
-            "Field Name",
-            "Field Type"
-        });
+                             new String[]{
+                                 "Field Name",
+                                 "Field Type"
+                             });
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
-        new String[]{
-            FieldValueMapping.FIELD_NAME,
-            FieldValueMapping.FIELD_TYPE
-        });
+                             new String[]{
+                                 FieldValueMapping.FIELD_NAME,
+                                 FieldValueMapping.FIELD_TYPE
+                             });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
   }

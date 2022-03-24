@@ -14,6 +14,7 @@ package net.coru.kloadgen.config.keyfiledeserialized;
 
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.property.editor.FileSubjectPropertyEditor;
 import net.coru.kloadgen.property.editor.KeyDeserializerPropertyEditor;
@@ -41,7 +42,7 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
     createPropertyGroup("key_deserialized_load_generator", new String[]{
         /*KEY_NAME_STRATEGY, */KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION,
-            KEY_SCHEMA_PROPERTIES
+        KEY_SCHEMA_PROPERTIES
     });
 
     PropertyDescriptor serializerPropertyProps = property(KEY_DESERIALIZER_PROPERTY);
@@ -72,15 +73,15 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
-        new String[]{
-            "Field Name",
-            "Field Type"
-        });
+                             new String[]{
+                                 "Field Name",
+                                 "Field Type"
+                             });
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
-        new String[]{
-            FieldValueMapping.FIELD_NAME,
-            FieldValueMapping.FIELD_TYPE
-        });
+                             new String[]{
+                                 FieldValueMapping.FIELD_NAME,
+                                 FieldValueMapping.FIELD_TYPE
+                             });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
   }

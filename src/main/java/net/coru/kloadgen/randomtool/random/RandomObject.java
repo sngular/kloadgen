@@ -6,7 +6,6 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import com.github.curiousoddman.rgxgen.RgxGen;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -20,12 +19,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-
+import com.github.curiousoddman.rgxgen.RgxGen;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-
+import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,101 +49,101 @@ public class RandomObject {
   public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
-        switch (fieldType) {
-          case ValidTypeConstants.STRING:
-            value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
-            break;
-          case ValidTypeConstants.INT:
-            try {
-              value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).intValueExact();
-            } catch (ArithmeticException exception) {
-              value = Integer.MAX_VALUE;
-            }
-            break;
-          case ValidTypeConstants.LONG:
-            try {
-              value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).longValueExact();
-            } catch (ArithmeticException exception) {
-              value = Long.MAX_VALUE;
-            }
-            break;
-          case ValidTypeConstants.SHORT:
-            try {
-              value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).shortValueExact();
-            } catch (ArithmeticException exception) {
-              value = Short.MAX_VALUE;
-            }
-            break;
-          case ValidTypeConstants.DOUBLE:
-            try {
-              value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).doubleValue();
-            } catch (ArithmeticException exception) {
-              value = Double.MAX_VALUE;
-            }
-            break;
-          case ValidTypeConstants.NUMBER:
-          case ValidTypeConstants.FLOAT:
-            try {
-              value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();
-            } catch (ArithmeticException exception) {
-              value = Float.MAX_VALUE;
-            }
-            break;
-          case ValidTypeConstants.BYTES:
-            try {
-              value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
-            } catch (ArithmeticException exception) {
-              value = Byte.MAX_VALUE;
-            }
-            break;
-          case ValidTypeConstants.TIMESTAMP:
-          case ValidTypeConstants.LONG_TIMESTAMP:
-          case ValidTypeConstants.STRING_TIMESTAMP:
-            value = getTimestampValueOrRandom(fieldType, fieldValueList);
-            break;
-          case ValidTypeConstants.UUID:
-            value = getUUIDValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.BOOLEAN:
-            value = getBooleanValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.ENUM:
-            value = getEnumValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.INT_DATE:
-            value = getDateValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.INT_TIME_MILLIS:
-            value = getTimeMillisValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.LONG_TIME_MICROS:
-            value = getTimeMicrosValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.LONG_TIMESTAMP_MILLIS:
-            value = getTimestampMillisValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.LONG_TIMESTAMP_MICROS:
-            value = getTimestampMicrosValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
-            value = getLocalTimestampMillisValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
-            value = getLocalTimestampMicrosValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.STRING_UUID:
-            value = getUUIDValueOrRandom(fieldValueList);
-            break;
-          case ValidTypeConstants.BYTES_DECIMAL:
-            value = getDecimalValueOrRandom(fieldValueList, constrains);
-            break;
-          case ValidTypeConstants.FIXED_DECIMAL:
-            value = getDecimalValueOrRandom(fieldValueList, constrains);
-            break;
-          default:
-            value = fieldType;
-            break;
+    switch (fieldType.toLowerCase()) {
+      case ValidTypeConstants.STRING:
+        value = getStringValueOrRandom(valueLength , fieldValueList , constrains);
+        break;
+      case ValidTypeConstants.INT:
+        try {
+          value = getIntegerValueOrRandom(valueLength , fieldValueList , constrains).intValueExact();
+        } catch (ArithmeticException exception) {
+          value = Integer.MAX_VALUE;
         }
+        break;
+      case ValidTypeConstants.LONG:
+        try {
+          value = getIntegerValueOrRandom(valueLength , fieldValueList , constrains).longValueExact();
+        } catch (ArithmeticException exception) {
+          value = Long.MAX_VALUE;
+        }
+        break;
+      case ValidTypeConstants.SHORT:
+        try {
+          value = getIntegerValueOrRandom(valueLength , fieldValueList , constrains).shortValueExact();
+        } catch (ArithmeticException exception) {
+          value = Short.MAX_VALUE;
+        }
+        break;
+      case ValidTypeConstants.DOUBLE:
+        try {
+          value = getDecimalValueOrRandom(valueLength , fieldValueList , constrains).doubleValue();
+        } catch (ArithmeticException exception) {
+          value = Double.MAX_VALUE;
+        }
+        break;
+      case ValidTypeConstants.NUMBER:
+      case ValidTypeConstants.FLOAT:
+        try {
+          value = getDecimalValueOrRandom(valueLength , fieldValueList , constrains).floatValue();
+        } catch (ArithmeticException exception) {
+          value = Float.MAX_VALUE;
+        }
+        break;
+      case ValidTypeConstants.BYTES:
+        try {
+          value = getIntegerValueOrRandom(valueLength , Collections.emptyList() , Collections.emptyMap()).byteValueExact();
+        } catch (ArithmeticException exception) {
+          value = Byte.MAX_VALUE;
+        }
+        break;
+      case ValidTypeConstants.TIMESTAMP:
+      case ValidTypeConstants.LONG_TIMESTAMP:
+      case ValidTypeConstants.STRING_TIMESTAMP:
+        value = getTimestampValueOrRandom(fieldType , fieldValueList);
+        break;
+      case ValidTypeConstants.UUID:
+        value = getUUIDValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.BOOLEAN:
+        value = getBooleanValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.ENUM:
+        value = getEnumValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.INT_DATE:
+        value = getDateValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.INT_TIME_MILLIS:
+        value = getTimeMillisValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.LONG_TIME_MICROS:
+        value = getTimeMicrosValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.LONG_TIMESTAMP_MILLIS:
+        value = getTimestampMillisValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.LONG_TIMESTAMP_MICROS:
+        value = getTimestampMicrosValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
+        value = getLocalTimestampMillisValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
+        value = getLocalTimestampMicrosValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.STRING_UUID:
+        value = getUUIDValueOrRandom(fieldValueList);
+        break;
+      case ValidTypeConstants.BYTES_DECIMAL:
+        value = getDecimalValueOrRandom(fieldValueList , constrains);
+        break;
+      case ValidTypeConstants.FIXED_DECIMAL:
+        value = getDecimalValueOrRandom(fieldValueList , constrains);
+        break;
+      default:
+        value = fieldType;
+        break;
+    }
 
     return value;
   }

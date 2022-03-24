@@ -2,12 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
+  <version>4.0.0</version>
 
-  <version>3.13.0</version>
   <licenses>
     <license>
       <name>Mozilla Public License 2.0</name>
@@ -40,7 +39,7 @@
     <jmeter.version>5.4.3</jmeter.version>
     <json-path.version>2.6.0</json-path.version>
     <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
-    <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
+    <kafka-schema-registry-client.version>7.0.1</kafka-schema-registry-client.version>
     <kafka.version>3.1.0</kafka.version>
     <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
@@ -103,7 +102,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.10.5</version>
+      <version>2.13.1</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -135,6 +134,27 @@
       <groupId>io.confluent</groupId>
       <artifactId>kafka-json-schema-provider</artifactId>
       <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-protobuf-serializer</artifactId>
+      <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro-protobuf</artifactId>
+      <version>1.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.os72</groupId>
+      <artifactId>protobuf-dynamic</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.wire</groupId>
+      <artifactId>wire-java-generator</artifactId>
+      <version>4.0.1</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

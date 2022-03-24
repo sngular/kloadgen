@@ -6,17 +6,18 @@
 
 package net.coru.kloadgen.serializer;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.CharSet;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
-public class GenericJsonRecordSerializer<T extends ObjectNode>  implements Serializer<T> {
+public class GenericJsonRecordSerializer<T extends ObjectNode> implements Serializer<T> {
 
   @Override
   public byte[] serialize(String topic, T record) {

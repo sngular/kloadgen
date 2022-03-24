@@ -7,9 +7,9 @@ services:
   kafka:
     image: confluentinc/cp-kafka
     depends_on:
-      - zookeeper
+    - zookeeper
     ports:
-      - 29092:29092
+    - 29092:29092
     environment:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092, PLAINTEXT_HOST://localhost:29092
@@ -19,12 +19,12 @@ services:
   schema-registry:
     image: confluentinc/cp-schema-registry
     depends_on:
-      - zookeeper
-      - kafka
+    - zookeeper
+    - kafka
     ports:
-      - 8081:8081
+    - 8081:8081
     volumes:
-      - ./conf:/conf:ro
+    - ./conf:/conf:ro
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092, PLAINTEXT_HOST://localhost:29092
@@ -36,7 +36,7 @@ services:
       SCHEMA_REGISTRY_OPTS: -Djava.security.auth.login.config=/conf/schema-registry/schema-registry.jaas
   kafka-manager:
     image: kafkamanager/kafka-manager
-    environment: 
+    environment:
       ZK_HOSTS: zookeeper
     ports:
-      - 9000:9000
+    - 9000:9000

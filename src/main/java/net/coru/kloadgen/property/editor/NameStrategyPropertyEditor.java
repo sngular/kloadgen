@@ -6,7 +6,8 @@
 
 package net.coru.kloadgen.property.editor;
 
-import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -14,22 +15,23 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
+import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
 @Slf4j
 public class NameStrategyPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private JComboBox<String> nameStrategyComboBox;
-
   private final JPanel panel = new JPanel();
+
+  private JComboBox<String> nameStrategyComboBox;
 
   public NameStrategyPropertyEditor() {
     this.init();
@@ -58,7 +60,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     Reflections reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
-            .setScanners(new SubTypesScanner()));
+            .setScanners(SubTypes));
     ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
   }
 
