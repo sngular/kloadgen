@@ -3,10 +3,23 @@ on:
   push:
     branches: [ master ]
 jobs:
-  changelog:
-    runs-on: ubuntu-18.04
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
     steps:
-    - name: Generate Changelog
-      uses: heinrichreimer/action-github-changelog-generator@v2.2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Generate Changelog
+        uses: mikepenz/release-changelog-builder-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: ${{steps.github_release.outputs.changelog}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

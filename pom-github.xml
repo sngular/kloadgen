@@ -7,6 +7,15 @@
   <artifactId>kloadgen</artifactId>
   <version>4.0.0</version>
 
+  <licenses>
+    <license>
+      <name>Mozilla Public License 2.0</name>
+      <url>https://github.com/corunet/kloadgen/blob/master/LICENSE</url>
+      <distribution>repo</distribution>
+      <comments></comments>
+    </license>
+  </licenses>
+
   <distributionManagement>
     <repository>
       <id>github</id>

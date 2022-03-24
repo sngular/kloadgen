@@ -56,7 +56,7 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
                                 .includePackage("io.confluent.kafka.serializers"))
             .setScanners(SubTypes));
 
-    ReflectionUtils.extractDeserializers(deserializerComboBox, reflections);
+    ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
 
   }
 

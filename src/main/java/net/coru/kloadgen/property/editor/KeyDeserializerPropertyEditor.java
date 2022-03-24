@@ -66,7 +66,7 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
                               .includePackage("net.coru.kloadgen.serializer")
                               .includePackage("io.confluent.kafka.serializers"))
           .setScanners(SubTypes));
-    ReflectionUtils.extractDeserializers(deserializerComboBox, reflections);
+    ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
   }
 
   @Override
