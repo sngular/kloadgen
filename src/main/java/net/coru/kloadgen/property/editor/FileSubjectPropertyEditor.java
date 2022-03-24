@@ -6,6 +6,9 @@
 
 package net.coru.kloadgen.property.editor;
 
+import static net.coru.kloadgen.common.SchemaTypeEnum.AVRO;
+import static net.coru.kloadgen.common.SchemaTypeEnum.JSON;
+import static net.coru.kloadgen.common.SchemaTypeEnum.PROTOBUF;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 
 import java.awt.BorderLayout;
@@ -83,9 +86,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   private void init() {
     schemaTypeComboBox = new JComboBox<>();
     schemaTypeComboBox.setEditable(false);
-    schemaTypeComboBox.insertItemAt("AVRO", 0);
-    schemaTypeComboBox.insertItemAt("JSON-Schema", 1);
-    schemaTypeComboBox.insertItemAt("PROTOBUF", 2);
+    schemaTypeComboBox.insertItemAt(AVRO.name(), 0);
+    schemaTypeComboBox.insertItemAt(JSON.name(), 1);
+    schemaTypeComboBox.insertItemAt(PROTOBUF.name(), 2);
     schemaTypeComboBox.setSelectedIndex(0);
     subjectNameComboBox = new JComboBox<>();
     subjectNameComboBox.setEditable(true);

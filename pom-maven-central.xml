@@ -35,6 +35,17 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
+      <id>cmunozgomez</id>
+      <name>Cesar Munoz Gomez</name>
+      <email>cmunoz@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
      <id>rivarsal</id>
       <name>Pablo José López Rivadulla</name>
       <email>plopez@corunet.com</email>
@@ -53,17 +64,6 @@
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
-      </roles>
-      <timezone>Europe/Madrid</timezone>
-    </developer>
-    <developer>
-      <id>cmunozgomez</id>
-      <name>Cesar Munoz Gomez</name>
-      <email>cmunoz@corunet.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
-      <roles>
-        <role>Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>

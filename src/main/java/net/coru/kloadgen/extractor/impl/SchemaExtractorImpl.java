@@ -11,6 +11,9 @@ import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfi
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
 import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
+import static net.coru.kloadgen.common.SchemaTypeEnum.AVRO;
+import static net.coru.kloadgen.common.SchemaTypeEnum.JSON;
+import static net.coru.kloadgen.common.SchemaTypeEnum.PROTOBUF;
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_YES;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY;
@@ -88,11 +91,11 @@ public class SchemaExtractorImpl implements SchemaExtractor {
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
-    if ("AVRO".equalsIgnoreCase(schema.schemaType())) {
+    if (AVRO.name().equalsIgnoreCase(schema.schemaType())) {
       (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> avroExtractor.processField(field, attributeList));
-    } else if ("JSON".equalsIgnoreCase(schema.schemaType())) {
+    } else if (JSON.name().equalsIgnoreCase(schema.schemaType())) {
       attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
-    } else if ("PROTOBUF".equalsIgnoreCase(schema.schemaType())) {
+    } else if (PROTOBUF.name().equalsIgnoreCase(schema.schemaType())) {
       com.squareup.wire.schema.internal.parser.ProtoFileElement protoFileElement = (((ProtobufSchema) schema).rawSchema());
       protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false));
     } else {
