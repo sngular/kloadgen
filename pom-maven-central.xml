@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <name>KLoadGen</name>
-  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on Data specification</description>
-  <url>https://corunet.github.io/kloadgen/</url>
 
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
 
   <version>4.0.0</version>
+  <name>KLoadGen</name>
+  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on Data specification</description>
+  <url>https://corunet.github.io/kloadgen/</url>
 
   <licenses>
     <license>
@@ -57,7 +57,7 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
-     <id>rivarsal</id>
+      <id>rivarsal</id>
       <name>Pablo José López Rivadulla</name>
       <email>plopez@corunet.com</email>
       <organization>Corunet</organization>
@@ -102,6 +102,12 @@
     </developer>
   </developers>
 
+  <scm>
+    <connection>scm:git:git@github.com:corunet/kloadgen.git</connection>
+    <developerConnection>scm:git:git@github.com:corunet/kloadgen.git</developerConnection>
+    <url>scm:git:git@github.com:corunet/kloadgen.git</url>
+  </scm>
+
   <distributionManagement>
     <repository>
       <id>ossrh</id>
@@ -128,7 +134,7 @@
     <jmeter.version>5.4.3</jmeter.version>
     <json-path.version>2.6.0</json-path.version>
     <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
-    <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
+    <kafka-schema-registry-client.version>7.0.1</kafka-schema-registry-client.version>
     <kafka.version>3.1.0</kafka.version>
     <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
@@ -701,11 +707,5 @@
       </build>
     </profile>
   </profiles>
-
-  <scm>
-    <connection>scm:git:git@github.com:corunet/kloadgen.git</connection>
-    <url>scm:git:git@github.com:corunet/kloadgen.git</url>
-    <developerConnection>scm:git:git@github.com:corunet/kloadgen.git</developerConnection>
-  </scm>
 
 </project>
