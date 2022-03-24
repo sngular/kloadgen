@@ -36,8 +36,8 @@ final class ReflectionUtils {
     serializerComboBox.setSelectedItem(0);
   }
 
-  static void extractDeserializers(JComboBox<String> deserializerComboBox, Reflections reflections) {
-    Set<Class<? extends Deserializer>> subTypes = reflections.getSubTypesOf((Class) Deserializer.class);
+  static void extractDeserializers(JComboBox<String> deserializerComboBox, Reflections reflections, Class subTypeClass) {
+    Set<Class<? extends Deserializer>> subTypes = reflections.getSubTypesOf(subTypeClass);
     List<String> classList = new ArrayList<>();
 
     for (Class deserializer : subTypes) {
