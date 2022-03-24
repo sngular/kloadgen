@@ -19,11 +19,3 @@ It can also connect to the Schema Registry server, where it retrieves the subjec
 KLoadGen is a stable plugin generally available to everyone who would like to use it. 
 
 We are open to your suggestions and ideas to improve our product, so feel free to contact us and give us your feedback. Take a look at the [CONTRIBUTING.MD](https://github.com/corunet/kloadgen/CONTRIBUTING.MD) file to know how you can contribute.
-
-## Tool story
-
-<!--Write a tool story for the plugin
-
-You can use this page to briefly explain the story of your product.
-
-Try to write precisely that, a "story", because it will be more engaging and easy-to-read.-->

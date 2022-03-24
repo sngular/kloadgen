@@ -50,5 +50,5 @@ And some optional ones who will let you configure the JMeter engine and the test
 
 Now you are ready to begin testing your loads!
 
-If you prefer to install the project as a JMeter plugin jar file, see the [Installation as a JMeter library] page.
+If you prefer to install the project as a JMeter plugin jar file, see the [Installation as a JMeter library](installation.md#installation-as-a-jmeter-library) page.
 

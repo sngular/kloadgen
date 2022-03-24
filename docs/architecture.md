@@ -4,7 +4,7 @@
 
 KLoadGen is a JMeter plugin that sends and receives Kafka messages. It also allows to establish a connection to a Schema Registry server to get schemas.
 
-![KLoadGen plugin](https://github.com/corunet/kloadgen/docs/images/kloadgen.png)
+![KLoadGen plugin](images/kloadgen.png)
 
 ## Project structure
 

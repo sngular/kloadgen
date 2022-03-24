@@ -4,8 +4,7 @@ We're constantly improving KLoadGen. For release highlights and feature explanat
 
 ## KLoadGen 3.0.0
 RELEASE DATE: 2020-12-04
-<!--Each change should include a description, and, if possible, images, links to documentation where this new feature is explained, references...--> 
- 
+
 In this release we introduce these major improvements:
  
  - Support for JSON schemas
