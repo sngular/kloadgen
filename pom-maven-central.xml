@@ -67,8 +67,18 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>jmejutovazquez</id>
+      <name>Javier Mejuto Vázquez</name>
+      <email>jmejuto@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
-
   <mailingLists>
     <mailingList>
       <name>OSS Corunet</name>
