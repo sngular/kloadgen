@@ -521,8 +521,8 @@
                   </excludes>
                 </filter>
               </filters>
-              <shadedClassifierName>${lane}</shadedClassifierName>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <finalName>${project.artifactId}-${project.version}</finalName>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
             </configuration>
             <executions>
               <execution>
