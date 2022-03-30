@@ -40,7 +40,7 @@ Here you can find the list of the parameters to be configured when defining the 
 - **max.poll.interval.ms**: the maximum delay between invocations of poll(). If poll() is not called before expiration of this timeout, the consumer is considered failed and the group will rebalance. This value should be less than _timeout.millis_.
 - **group.id**: specifies the name of the consumer group the consumers will belong to.
 
->KLoadGen Consumer Sampler is compatible with **JSON** and **AVRO** messages. If **JSON** is being used, no extra configuration is needed, the sampler will work with the default deserialization settings. If **AVRO** is being used, the deserializer settings need to be configured in order to define how messages will be deserialized. You can choose whether you define the settings manually or whether you load a file with them.
+>The KLoadGen Consumer Sampler is compatible with **JSON** and **AVRO** messages. If **JSON** is being used, no extra configuration is needed, the sampler will work with the default deserialization settings. If **AVRO** is being used, the deserializer settings need to be configured in order to define how messages will be deserialized. You can choose whether you define the settings manually or whether you load a file with them.
 
 ## Kafka consumer configuration elements
 
