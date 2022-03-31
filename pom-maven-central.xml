@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>4.0.1</version>
+  <version>4.0.3</version>
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on Data specification</description>
   <url>https://corunet.github.io/kloadgen/</url>
@@ -430,6 +430,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -442,6 +443,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.3.2</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -576,8 +578,8 @@
                   </excludes>
                 </filter>
               </filters>
-              <shadedClassifierName>${lane}</shadedClassifierName>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <finalName>${project.artifactId}-${project.version}</finalName>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
             </configuration>
             <executions>
               <execution>
