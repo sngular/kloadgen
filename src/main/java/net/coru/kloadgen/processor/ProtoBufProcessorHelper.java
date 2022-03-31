@@ -31,11 +31,10 @@ public class ProtoBufProcessorHelper {
   Descriptors.Descriptor buildDescriptor(ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
 
     DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
-    var lines = new ArrayList<String>();
     List<String> imports = schema.getImports();
     for (String importedClass : imports) {
       String schemaToString = new String(getClass().getClassLoader().getResourceAsStream(importedClass).readAllBytes());
-      lines.addAll(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
+      var lines = new ArrayList<>(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
       if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
         var importedSchema = processImported(lines);
         schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
@@ -163,13 +162,16 @@ public class ProtoBufProcessorHelper {
 
   private MessageDefinition buildMessage(String messageName, ListIterator<String> messageLines) {
 
+    boolean exit = false;
     MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
-    while (messageLines.hasNext()) {
+    while (messageLines.hasNext() && !exit) {
       var field = messageLines.next().trim().split("\\s");
       if (ProtobufHelper.isValidType(field[0])) {
         messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
       } else if (ProtobufHelper.LABEL.contains(field[0])) {
         messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
+      } else if ("}".equalsIgnoreCase(field[0])) {
+        exit = true;
       }
     }
 
