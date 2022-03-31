@@ -67,13 +67,13 @@ public class ValidTypeConstants {
 
   public static final String TIMESTAMP = "timestamp";
 
-  public static final String STRING_TIMESTAMP = "stringTimestamp";
+  public static final String STRING_TIMESTAMP = "stringtimestamp";
 
   public static final String SHORT = "short";
 
   public static final String DOUBLE = "double";
 
-  public static final String LONG_TIMESTAMP = "longTimestamp";
+  public static final String LONG_TIMESTAMP = "longtimestamp";
 
   public static final String UUID = "uuid";
 

@@ -6,14 +6,6 @@
 
 package net.coru.kloadgen.processor;
 
-import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.random.RandomArray;
-import net.coru.kloadgen.randomtool.random.RandomMap;
-import net.coru.kloadgen.randomtool.random.RandomObject;
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jmeter.threads.JMeterContextService;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.random.RandomArray;
+import net.coru.kloadgen.randomtool.random.RandomMap;
+import net.coru.kloadgen.randomtool.random.RandomObject;
+import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 public abstract class SchemaProcessorLib {
 

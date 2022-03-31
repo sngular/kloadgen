@@ -6,6 +6,18 @@
 
 package net.coru.kloadgen.processor;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL_FIELDS;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL_FIELDS;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL;
+import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL_FIELDS;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -39,18 +51,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-
-import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL;
-import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.ARRAY_OPTIONAL_NULL_FIELDS;
-import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL;
-import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.MAP_OPTIONAL_NULL_FIELDS;
-import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL;
-import static net.coru.kloadgen.processor.fixture.AvroSchemaFixturesConstants.BASIC_STRING_ARRAY_MAP_NULL_FIELDS;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class AvroSchemaProcessorTest {
 

@@ -6,6 +6,9 @@
 
 package net.coru.kloadgen.serializer;
 
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -21,9 +24,6 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Deserializer;
-
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 
 @Slf4j
 public class AvroDeserializer implements Deserializer<Object> {
@@ -42,16 +42,6 @@ public class AvroDeserializer implements Deserializer<Object> {
     this.isKey = isKey;
   }
 
-  private ByteBuffer getByteBuffer(byte[] payload) {
-    ByteBuffer buffer = ByteBuffer.wrap(payload);
-    if (buffer.get() != MAGIC_BYTE) {
-      throw new SerializationException("Unknown magic byte!");
-    } else {
-      buffer.position(buffer.position() + ID_SIZE);
-      return buffer;
-    }
-  }
-
   @Override
   public Object deserialize(String topic, byte[] data) {
 
@@ -66,7 +56,7 @@ public class AvroDeserializer implements Deserializer<Object> {
       Schema avroSchema = parser.parse(schemaString);
 
       ByteBuffer buffer = getByteBuffer(data);
-      DatumReader<?> reader = new GenericDatumReader<GenericRecord>(avroSchema);
+      DatumReader<GenericRecord> reader = new GenericDatumReader<>(avroSchema);
 
       int length = buffer.limit() - 1 - 4;
       int start = buffer.position() + buffer.arrayOffset();
@@ -87,11 +77,21 @@ public class AvroDeserializer implements Deserializer<Object> {
 
   @Override
   public Object deserialize(String topic, Headers headers, byte[] data) {
-    return deserialize(topic,  data);
+    return deserialize(topic, data);
+  }
+
+  private ByteBuffer getByteBuffer(byte[] payload) {
+    ByteBuffer buffer = ByteBuffer.wrap(payload);
+    if (buffer.get() != MAGIC_BYTE) {
+      throw new SerializationException("Unknown magic byte!");
+    } else {
+      buffer.position(buffer.position() + ID_SIZE);
+      return buffer;
+    }
   }
 
   @Override
   public void close() {
-
+    // No need to be implemented
   }
 }

@@ -8,6 +8,7 @@ package net.coru.kloadgen.model.json;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

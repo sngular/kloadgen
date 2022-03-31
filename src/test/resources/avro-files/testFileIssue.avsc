@@ -1,0 +1,43 @@
+{
+  "type": "record",
+  "name": "Queue",
+  "namespace": "xxx.xxxx.xxxx.cc.queue.avro",
+  "fields": [
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      },
+      "doc": "Timestamp (milliseconds since epoch) when the event was generated"
+    },
+    {
+      "name": "queueId",
+      "type": "string",
+      "doc": "the generated id (GUID) of this queue"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "the name of this queue"
+    },
+    {
+      "name": "description",
+      "type": [
+        "null",
+        "string"
+      ],
+      "doc": "optional description of the intended usage of this queue"
+    },
+    {
+      "name": "accountDefault",
+      "type": "boolean",
+      "doc": "true when this queue is the default for the specified account"
+    },
+    {
+      "name": "accountId",
+      "type": "string",
+      "doc": "the id of the account which defined this queue"
+    }
+  ]
+}

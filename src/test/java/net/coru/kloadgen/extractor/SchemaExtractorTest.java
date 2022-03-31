@@ -6,6 +6,22 @@
 
 package net.coru.kloadgen.extractor;
 
+import static net.coru.kloadgen.model.ConstraintTypeEnum.MAXIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.MINIMUM_VALUE;
+import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL;
+import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -25,18 +41,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import static net.coru.kloadgen.model.ConstraintTypeEnum.*;
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith({
     WiremockResolver.class,
@@ -65,9 +69,7 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList(
-        "avroSubject"
-    );
+    Pair<String, List<FieldValueMapping>> fieldValueMappingList = schemaExtractor.flatPropertiesList("avroSubject");
 
     assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
@@ -106,7 +108,7 @@ class SchemaExtractorTest {
     assertThat(fieldValueMappingList.getRight())
         .hasSize(2)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("name", "string", 0, null, true, true),
+            new FieldValueMapping("name", "string", 0, "", true, true),
             new FieldValueMapping("values[][:]", "string-map-array", 0, "", true, true)
         );
   }
@@ -122,7 +124,7 @@ class SchemaExtractorTest {
             new FieldValueMapping("fieldMySchema.testInt_id", "int", 0, ""),
             new FieldValueMapping("fieldMySchema.testLong", "long", 0, ""),
             new FieldValueMapping("fieldMySchema.fieldString", "string", 0, ""),
-            new FieldValueMapping("timestamp", "long", 0, null, true, true)
+            new FieldValueMapping("timestamp", "long", 0, "", true, true)
         );
   }
 

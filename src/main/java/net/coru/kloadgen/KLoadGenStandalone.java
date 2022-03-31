@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.util.ListenToTest;
 import org.apache.commons.cli.CommandLine;
@@ -48,7 +49,7 @@ public class KLoadGenStandalone {
         throw new KLoadGenException("JMeter properties File not Valid");
       }
       JMeterUtils.setJMeterHome(jMeterPropsFile.toAbsolutePath().toString());
-      JMeterUtils.loadJMeterProperties(jMeterPropsFile.toAbsolutePath().toString() + "/bin/jmeter.properties");
+      JMeterUtils.loadJMeterProperties(jMeterPropsFile.toAbsolutePath() + "/bin/jmeter.properties");
       if (line.hasOption("o")) {
         Path optionalPropsFile = Paths.get(line.getOptionValue("o"));
         if (!Files.exists(optionalPropsFile) || !Files.isReadable(optionalPropsFile) || Files.isDirectory(optionalPropsFile)) {
@@ -105,6 +106,16 @@ public class KLoadGenStandalone {
 
   }
 
+  private static Options createCLIOptions() {
+    Options options = new Options();
+    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
+    options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
+    options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
+    options.addOption(Option.builder("r").longOpt("reportOutput").hasArg().desc("Report Output Folder").build());
+    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("Jtl File where logs will be dump").build());
+    return options;
+  }
+
   private static ReportGenerator createCollector(HashTree testPlanTree, Path resultsFile) throws ConfigurationException {
     Summariser summariser = null;
     String summariserName = JMeterUtils.getPropDefault("summariser.name", "KLoagGenSummariser");//$NON-NLS-1$
@@ -117,15 +128,5 @@ public class KLoadGenStandalone {
     resultCollector.setFilename(resultsFile.toAbsolutePath().toString());
     testPlanTree.add(testPlanTree.getArray()[0], resultCollector);
     return new ReportGenerator(resultsFile.toAbsolutePath().toString(), resultCollector);
-  }
-
-  private static Options createCLIOptions() {
-    Options options = new Options();
-    options.addOption(Option.builder("h").longOpt("jmeterHome").hasArg().desc("JMeter Properties file").required().build());
-    options.addOption(Option.builder("o").longOpt("optionalPros").hasArg().desc("Optional properties file").build());
-    options.addOption(Option.builder("t").longOpt("testPlan").hasArg().desc("Test plan file").required().build());
-    options.addOption(Option.builder("r").longOpt("reportOutput").hasArg().desc("Report Output Folder").build());
-    options.addOption(Option.builder("l").longOpt("logFileName").hasArg().desc("Jtl File where logs will be dump").build());
-    return options;
   }
 }

@@ -7,7 +7,6 @@
 package net.coru.kloadgen.model;
 
 public enum ConstraintTypeEnum {
-
   MINIMUM_VALUE,
   MAXIMUM_VALUE,
   EXCLUDED_MINIMUM_VALUE,

@@ -20,6 +20,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
 import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

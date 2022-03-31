@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -21,11 +22,7 @@ import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 @Slf4j
 public class SchemaTypePropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private PropertyDescriptor propertyDescriptor;
-
   private final JPanel panel = new JPanel();
-
-  private String schemaType;
 
   public SchemaTypePropertyEditor() {
   }
@@ -37,7 +34,6 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
 
   public SchemaTypePropertyEditor(PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
   }
 
   @Override
@@ -46,7 +42,12 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
   }
 
   @Override
-  public void clearGui() { }
+  public void clearGui() {}
+
+  @Override
+  public void setDescriptor(PropertyDescriptor descriptor) {
+    setSource(descriptor);
+  }
 
   @Override
   public Component getCustomEditor() {
@@ -54,31 +55,25 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
   }
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
-  }
-
-  @Override
   public String getAsText() {
-    return schemaType;
+    return super.getAsText();
   }
 
   @Override
   public void setAsText(String value) throws IllegalArgumentException {
-    propertyDescriptor.setValue("schemaType", value);
-    schemaType = value;
+    super.setValue(value);
   }
 
   @Override
   public void setValue(Object value) {
     if (Objects.nonNull(value)) {
-      setAsText(value.toString());
+      super.setValue(value);
     }
   }
 
   @Override
   public Object getValue() {
-    return schemaType;
+    return super.getValue();
   }
 
   @Override

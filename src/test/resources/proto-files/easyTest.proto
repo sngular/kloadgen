@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package tutorial;
+
+option java_multiple_files = true;
+option java_package = "com.example.tutorial.protos";
+option java_outer_classname = "AddressBookProtos";
+
+
+message Address{
+  optional string street = 1;
+  repeated int32 number = 2;
+  optional int64 zipcode = 3;
+
+}

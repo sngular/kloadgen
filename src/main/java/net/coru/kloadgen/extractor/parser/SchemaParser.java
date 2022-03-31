@@ -11,7 +11,7 @@ import net.coru.kloadgen.model.json.Schema;
 
 public interface SchemaParser {
 
-	Schema parse(String jsonSchema);
+  Schema parse(String jsonSchema);
 
-	Schema parse(JsonNode jsonNode);
+  Schema parse(JsonNode jsonNode);
 }

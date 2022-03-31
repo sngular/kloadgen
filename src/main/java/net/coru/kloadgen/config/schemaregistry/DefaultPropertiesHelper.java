@@ -7,6 +7,7 @@
 package net.coru.kloadgen.config.schemaregistry;
 
 import static java.util.Arrays.asList;
+
 import static net.coru.kloadgen.util.ProducerKeysHelper.FLAG_NO;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_DEFAULT;
@@ -20,6 +21,7 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USE
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.coru.kloadgen.model.PropertyMapping;
 
 class DefaultPropertiesHelper {

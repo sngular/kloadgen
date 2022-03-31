@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+package abc;
+
+import "google/protobuf/timestamp.proto";
+
+option java_package = "com.abc.ingestion.c44.proto";
+option java_multiple_files = true;
+
+message c44LocationUpdate {
+  string load_type = 1;
+  .abc.c44LocationUpdate.Shipment shipment = 2;
+  .abc.c44LocationUpdate.StatusUpdate latest_status_update = 3;
+  repeated .abc.c44LocationUpdate.StopStatus latest_stop_statuses = 4;
+
+  message Shipment {
+    .abc.c44LocationUpdate.Shipment.CarrierIdentifier carrier_identifier = 1;
+    repeated .abc.c44LocationUpdate.Shipment.ShipmentIdentifier shipment_identifiers = 2;
+    repeated .abc.c44LocationUpdate.Shipment.EquipmentIdentifier equipment_identifiers = 3;
+    repeated string attributes = 4;
+
+    message CarrierIdentifier {
+      .abc.c44LocationUpdate.Shipment.CarrierIdentifier.CarrierIdentifierType type = 1;
+      string value = 2;
+
+      enum CarrierIdentifierType {
+        CARRIER_IDENTIFIER_TYPE_UNSPECIFIED = 0;
+        CARRIER_IDENTIFIER_TYPE_DOT_NUMBER = 1;
+      }
+    }
+
+    message ShipmentIdentifier {
+      .abc.c44LocationUpdate.Shipment.ShipmentIdentifier.ShipmentIdentifierType type = 1;
+      string value = 2;
+
+      enum ShipmentIdentifierType {
+        SHIPMENT_IDENTIFIER_TYPE_UNSPECIFIED = 0;
+        SHIPMENT_IDENTIFIER_TYPE_BILL_OF_LADING = 1;
+        SHIPMENT_IDENTIFIER_TYPE_ORDER = 2;
+      }
+    }
+
+    message EquipmentIdentifier {
+      .abc.c44LocationUpdate.Shipment.EquipmentIdentifier.EquipmentIdentifierType type = 1;
+      string value = 2;
+
+      enum EquipmentIdentifierType {
+        EQUIPMENT_IDENTIFIER_TYPE_UNSPECIFIED = 0;
+        EQUIPMENT_IDENTIFIER_TYPE_MOBILE_PHONE_NUMBER = 1;
+        EQUIPMENT_IDENTIFIER_TYPE_VEHICLE_ID = 2;
+        EQUIPMENT_IDENTIFIER_TYPE_LICENSE_PLATE = 3;
+        EQUIPMENT_IDENTIFIER_TYPE_SENSITECH_DEVICE_ID = 4;
+        EQUIPMENT_IDENTIFIER_TYPE_EMERSON_DEVICE_ID = 5;
+        EQUIPMENT_IDENTIFIER_TYPE_TIVE_DEVICE_ID = 6;
+        EQUIPMENT_IDENTIFIER_TYPE_CONTAINER_ID = 7;
+      }
+    }
+  }
+
+  message StatusUpdate {
+    .google.protobuf.Timestamp timestamp = 1;
+    .abc.c44LocationUpdate.StatusUpdate.StatusUpdateCode status_code = 2;
+    .abc.c44LocationUpdate.StatusUpdate.StatusUpdateReason status_reason = 3;
+    .abc.c44LocationUpdate.StatusUpdate.GeoCoordinate geo_coordinates = 4;
+    .abc.c44LocationUpdate.StatusUpdate.Address address = 5;
+    int32 stop_number = 6;
+
+    message GeoCoordinate {
+      double latitude = 1;
+      double longitude = 2;
+    }
+
+    message Address {
+      string postal_code = 1;
+      repeated string address_lines = 2;
+      string city = 3;
+      string state = 4;
+      string country = 5;
+    }
+
+    enum StatusUpdateCode {
+      STATUS_UPDATE_CODE_UNSPECIFIED = 0;
+      STATUS_UPDATE_CODE_DISPATCHED = 1;
+      STATUS_UPDATE_CODE_IN_TRANSIT = 2;
+      STATUS_UPDATE_CODE_AT_STOP = 3;
+      STATUS_UPDATE_CODE_COMPLETED = 4;
+      STATUS_UPDATE_CODE_TRACKING_FAILED = 5;
+      STATUS_UPDATE_CODE_INFO = 6;
+      STATUS_UPDATE_CODE_DELETED = 7;
+    }
+
+    enum StatusUpdateReason {
+      STATUS_UPDATE_REASON_UNSPECIFIED = 0;
+      STATUS_UPDATE_REASON_PENDING_TRACKING_METHOD = 1;
+      STATUS_UPDATE_REASON_SCHEDULED = 2;
+      STATUS_UPDATE_REASON_PENDING_APPROVAL = 3;
+      STATUS_UPDATE_REASON_ACQUIRING_LOCATION = 4;
+      STATUS_UPDATE_REASON_PENDING_CARRIER = 5;
+      STATUS_UPDATE_REASON_IN_MOTION = 6;
+      STATUS_UPDATE_REASON_IDLE = 7;
+      STATUS_UPDATE_REASON_APPROVAL_DENIED = 8;
+      STATUS_UPDATE_REASON_TIMED_OUT = 9;
+      STATUS_UPDATE_REASON_CANCELED = 10;
+      STATUS_UPDATE_REASON_DEPARTED_FINAL_STOP = 11;
+      STATUS_UPDATE_REASON_ARRIVED_FINAL_STOP = 12;
+      STATUS_UPDATE_REASON_ARRIVED_FAILED_TO_ACQUIRE_LOCATION = 13;
+      STATUS_UPDATE_REASON_INFO = 14;
+    }
+  }
+
+  message StopStatus {
+    int32 stop_number = 1;
+    .abc.c44LocationUpdate.StopStatus.StopStatusCode status_code = 2;
+    .abc.c44LocationUpdate.StopStatus.ArrivalEstimate arrival_estimate = 3;
+    .abc.c44LocationUpdate.StopStatus.ArrivalCode arrival_code = 4;
+    repeated string additional_appointment_window_statuses = 5;
+
+    message ArrivalEstimate {
+      .abc.c44LocationUpdate.StopStatus.ArrivalEstimate.EstimatedArrivalWindow estimated_arrival_window = 1;
+      .google.protobuf.Timestamp last_calculated_date_time = 2;
+
+      message EstimatedArrivalWindow {
+        .google.protobuf.Timestamp start_date_time = 1;
+        .google.protobuf.Timestamp end_date_time = 2;
+      }
+    }
+
+    enum StopStatusCode {
+      STOP_STATUS_CODE_UNSPECIFIED = 0;
+      STOP_STATUS_CODE_UNKNOWN = 1;
+      STOP_STATUS_CODE_EN_ROUTE = 2;
+      STOP_STATUS_CODE_ARRIVED = 3;
+      STOP_STATUS_CODE_DEPARTED = 4;
+    }
+
+    enum ArrivalCode {
+      ARRIVAL_CODE_UNSPECIFIED = 0;
+      ARRIVAL_CODE_UNKNOWN = 1;
+      ARRIVAL_CODE_EARLY = 2;
+      ARRIVAL_CODE_ON_TIME = 3;
+      ARRIVAL_CODE_LATE = 4;
+    }
+  }
+}

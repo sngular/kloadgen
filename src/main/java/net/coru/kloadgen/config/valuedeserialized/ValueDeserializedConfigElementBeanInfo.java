@@ -13,6 +13,7 @@
 package net.coru.kloadgen.config.valuedeserialized;
 
 import java.beans.PropertyDescriptor;
+
 import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;
 import net.coru.kloadgen.property.editor.ValueDeserializerPropertyEditor;
@@ -33,7 +34,7 @@ public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     super(ValueDeserializedConfigElement.class);
 
     createPropertyGroup("value_deserialized_load_generator", new String[]{
-            VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
+        VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
     });
 
     PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);

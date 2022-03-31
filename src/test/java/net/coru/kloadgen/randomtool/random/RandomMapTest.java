@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 import org.apache.groovy.util.Maps;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -73,7 +74,8 @@ class RandomMapTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapRandomValueFromList")
-  void generateMapRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected,
+  void generateMapRandomValueFromList(
+      String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected,
       Integer size) {
     Map.Entry<String, Object>[] expectedMap = expected.entrySet().toArray(new Map.Entry[1]);
     Map<String, Object> result =
@@ -83,7 +85,8 @@ class RandomMapTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapArrayRandomValueFromList")
-  void generateMapArrayRandomValueFromList(String fieldType, Integer valueLength, List<String> fieldValuesList,
+  void generateMapArrayRandomValueFromList(
+      String fieldType, Integer valueLength, List<String> fieldValuesList,
       List<Map<String, Object>> expected, Integer size) {
 
     List<Map<String, Object>> result =

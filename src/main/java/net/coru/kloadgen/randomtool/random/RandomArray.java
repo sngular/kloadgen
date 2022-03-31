@@ -6,14 +6,14 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-import org.apache.commons.lang3.RandomUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
+import org.apache.commons.lang3.RandomUtils;
 
 public class RandomArray {
 
@@ -91,11 +91,11 @@ public class RandomArray {
     int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<Object> array = new ArrayList<>(size);
 
-    for (int i = 0; i < size; i++) {
-      array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains));
+      for (int i = 0; i < size; i++) {
+          array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains));
+      }
+      return array;
     }
-    return array;
-  }
 
   private List<Object> generate(
       String type, Integer arraySize, Integer valueLength, List<String> fieldValueList,
@@ -109,6 +109,4 @@ public class RandomArray {
 
     return array;
   }
-
-
 }
