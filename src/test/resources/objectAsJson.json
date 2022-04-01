@@ -1,8 +1,8 @@
 {
-  "name" : "string",
-  "id" : "int",
-  "lectures" : {
-    "room" : "int",
+  "name": "string",
+  "id": "int",
+  "lectures": {
+    "room": "int",
     "subject": "string"
   },
   "exams": [
@@ -11,5 +11,4 @@
       "hour": "string"
     }
   ]
-
 }

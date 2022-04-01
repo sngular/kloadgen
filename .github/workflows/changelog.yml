@@ -6,9 +6,11 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          ref: ${{ github.head_ref }}
+          fetch-depth: 100
+
       - name: Generate Changelog
         uses: mikepenz/release-changelog-builder-action@v1
         with:

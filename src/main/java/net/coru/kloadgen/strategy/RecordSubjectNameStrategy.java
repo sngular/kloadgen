@@ -6,11 +6,12 @@
 
 package net.coru.kloadgen.strategy;
 
+import java.util.Map;
+
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchemaUtils;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
-import java.util.Map;
 import org.apache.kafka.common.errors.SerializationException;
 
 public class RecordSubjectNameStrategy implements io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy {
@@ -37,12 +38,12 @@ public class RecordSubjectNameStrategy implements io.confluent.kafka.serializers
     // isKey is only used to produce more helpful error messages
     if (isKey) {
       throw new SerializationException("In configuration "
-          + AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY + " = "
-          + getClass().getName() + ", the message key must only be a record schema");
+                                       + AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY + " = "
+                                       + getClass().getName() + ", the message key must only be a record schema");
     } else {
       throw new SerializationException("In configuration "
-          + AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY + " = "
-          + getClass().getName() + ", the message value must only be a record schema");
+                                       + AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY + " = "
+                                       + getClass().getName() + ", the message value must only be a record schema");
     }
   }
 

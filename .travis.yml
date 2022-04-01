@@ -1,10 +1,10 @@
 language: java
 jdk:
-  - openjdk11
+- openjdk11
 sudo: false
 install: true
-script :
-  - mvn clean install 
-  - mvn clean install -P standalone
- 
+script:
+- mvn clean install
+- mvn clean install -P standalone
+
 if: (type = push AND branch IN (master, dev)) OR (type = pull_request AND NOT branch =~ /no-ci/)

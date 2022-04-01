@@ -8,7 +8,6 @@ package net.coru.kloadgen.property.editor;
 
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
 
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -21,6 +20,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -46,29 +47,15 @@ import org.apache.jmeter.threads.JMeterContextService;
 @Slf4j
 public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-  private JComboBox<String> subjectNameComboBox;
-
   private final JButton loadClassBtn = new JButton("Load Subject");
 
   private final JPanel panel = new JPanel();
 
-  private PropertyDescriptor propertyDescriptor;
-
   private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
+  private JComboBox<String> subjectNameComboBox;
+
   public SerialisedSubjectPropertyEditor() {
-    this.init();
-  }
-
-  public SerialisedSubjectPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public SerialisedSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.propertyDescriptor = propertyDescriptor;
     this.init();
   }
 
@@ -79,6 +66,17 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     panel.add(loadClassBtn, BorderLayout.AFTER_LINE_ENDS);
     AutoCompletion.enable(subjectNameComboBox);
     this.loadClassBtn.addActionListener(this);
+  }
+
+  public SerialisedSubjectPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public SerialisedSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
   }
 
   @Override
@@ -109,56 +107,13 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
         }
       }
       JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
-          JOptionPane.INFORMATION_MESSAGE);
+                                    JOptionPane.INFORMATION_MESSAGE);
     } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
       JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-          JOptionPane.ERROR_MESSAGE);
+                                    JOptionPane.ERROR_MESSAGE);
       log.error(e.getMessage(), e);
     }
   }
-
-  @SuppressWarnings("unchecked")
-  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
-
-    if (!(tableEditorValue instanceof ArrayList<?>)) {
-      log.error("Table Editor is not array list");
-      return attributeList;
-    }
-
-    List<FieldValueMapping> fieldValueList;
-    try {
-      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
-    }catch(Exception e) {
-      log.error("Table Editor is not FieldValueMapping list", e);
-      return attributeList;
-    }
-
-    if (CollectionUtils.isEmpty(fieldValueList)) {
-      return attributeList;
-    }
-
-    List<FieldValueMapping> result = new ArrayList<>();
-    for(FieldValueMapping fieldValue: attributeList) {
-
-      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
-
-      if (existsValue != null) {
-        result.add(existsValue);
-      } else {
-        result.add(fieldValue);
-      }
-
-    }
-
-    return result;
-  }
-
-  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
-
-    return IterableUtils.find(fieldValueList,
-        v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
-  }
-
 
   @Override
   public void clearGui() {
@@ -167,7 +122,7 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
 
   @Override
   public void setDescriptor(PropertyDescriptor descriptor) {
-    propertyDescriptor = descriptor;
+    super.setSource(descriptor);
   }
 
   @Override
@@ -214,6 +169,48 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
   @Override
   public boolean supportsCustomEditor() {
     return true;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
+
+    if (!(tableEditorValue instanceof ArrayList<?>)) {
+      log.error("Table Editor is not array list");
+      return attributeList;
+    }
+
+    List<FieldValueMapping> fieldValueList;
+    try {
+      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
+    } catch (Exception e) {
+      log.error("Table Editor is not FieldValueMapping list", e);
+      return attributeList;
+    }
+
+    if (CollectionUtils.isEmpty(fieldValueList)) {
+      return attributeList;
+    }
+
+    List<FieldValueMapping> result = new ArrayList<>();
+    for (FieldValueMapping fieldValue : attributeList) {
+
+      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
+
+      if (existsValue != null) {
+        result.add(existsValue);
+      } else {
+        result.add(fieldValue);
+      }
+
+    }
+
+    return result;
+  }
+
+  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
+
+    return IterableUtils.find(fieldValueList,
+                              v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
   }
 
 }

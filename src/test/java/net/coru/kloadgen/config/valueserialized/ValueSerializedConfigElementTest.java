@@ -13,27 +13,23 @@ import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import java.io.File;
 import java.util.Collections;
 import java.util.Locale;
+
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import net.coru.kloadgen.serializer.AvroSerializer;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import ru.lanwen.wiremock.ext.WiremockResolver;
-import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
-import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
-@ExtendWith({
-    WiremockResolver.class,
-    WiremockUriResolver.class
-})
+@WireMockTest
 class ValueSerializedConfigElementTest {
 
   @BeforeEach
@@ -47,15 +43,16 @@ class ValueSerializedConfigElementTest {
   }
 
   @Test
-  public void iterationStart( @Wiremock WireMockServer server) {
+  @DisplayName("Should configure Value Serialized Properties")
+  void iterationStart(WireMockRuntimeInfo wmRuntimeInfo) {
 
-    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
+    JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     ValueSerializedConfigElement
         valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
-            AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
+                                                                        AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     valueSerializedConfigElement.iterationStart(null);
     assertThat(JMeterContextService.getContext().getVariables().getObject(VALUE_SUBJECT_NAME)).isNotNull();
     assertThat(JMeterContextService.getContext().getVariables().getObject(VALUE_SCHEMA_PROPERTIES)).isNotNull();

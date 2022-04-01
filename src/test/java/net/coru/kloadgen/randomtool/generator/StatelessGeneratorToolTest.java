@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,10 +34,10 @@ class StatelessGeneratorToolTest {
         Arguments.of("name", "double", 1, Collections.singletonList("1.0"), 1.0),
         Arguments.of("name", "timestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), FIXED_DATE),
         Arguments.of("name", "longTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"),
-            FIXED_DATE.toInstant(ZoneOffset.UTC).toEpochMilli()),
+                     FIXED_DATE.toInstant(ZoneOffset.UTC).toEpochMilli()),
         Arguments.of("name", "stringTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"), "2019-12-06T12:00"),
         Arguments.of("name", "uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
-            UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
+                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
         Arguments.of("name", "boolean", 1, Collections.singletonList("true"), Boolean.TRUE));
   }
 
@@ -64,14 +65,16 @@ class StatelessGeneratorToolTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
-  void testGenerateRandomValueForField(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
+  void testGenerateRandomValueForField(
+      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
       Object expected) {
     assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
+  void testGenerateSequenceValueForField(
+      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
       Object expectedTyped) {
     assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
   }

@@ -13,6 +13,7 @@
 package net.coru.kloadgen.config.keydeserialized;
 
 import java.beans.PropertyDescriptor;
+
 import net.coru.kloadgen.property.editor.KeyDeserializerPropertyEditor;
 import net.coru.kloadgen.property.editor.NameStrategyPropertyEditor;
 import net.coru.kloadgen.property.editor.SchemaTypePropertyEditor;

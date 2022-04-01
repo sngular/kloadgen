@@ -11,7 +11,7 @@ Check [GitHub Releases](https://github.com/corunet/kloadgen/releases) for a comp
 This is the list of channels where you can find us for contact, support, and suggestions:
 
 - [GitHub issues](https://github.com/corunet/kloadgen/issues/new). For incidents, queries, and suggestions.
-- [Email](info@corunet.com) and [Twitter](https://twitter.com/corunet). For general comments and requests.
+- [Email](oss@corunet.com) and [Twitter](https://twitter.com/corunet). For general comments and requests.
 
 ## Contributing guidelines and best practices
 
