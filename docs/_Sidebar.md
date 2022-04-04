@@ -1,11 +1,22 @@
 # Overview
-  - [About KLoadGen](about.md#about-kloadgen)
-  - [KLoadGen architecture](architecture.md#kloadgen-architecture)
+  - [About KLoadGen](about.md)
+  - [KLoadGen architecture](architecture.md)
 
 # Getting started
   - [Prerequisites](getting-started.md#prerequisites)
   - [Quickstart](getting-started.md#quickstart)
+
+# [Installation](installation.md)
+
+# Configuration
+  - [Producer configuration](producer-configuration.md)
+  - [Consumer configuration](consumer-configuration.md)
+  - [Schemas](schemas.md)
+
+# Knowledge content
+  - [How to run the plugin](how-to-run.md)
+  - [Example test plan](example-test-plan.md)
  
 # Additional information
-  - [Overview](additional-information.md#additional-information)
-  - [Release notes](release-notes.md#release-notes)
+  - [Overview](additional-information.md)
+  - [Release notes](release-notes.md)
