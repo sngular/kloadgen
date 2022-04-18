@@ -86,7 +86,7 @@ You need to provide values for **Name Strategy** and **Serializer** to get the l
 
 ![Value Scheme File Serializer Config](images/Value_Schema_File_Load_Generator_Config.png)
 
-This configuration element allows to load a schema from a file (.avsc or.json).
+This configuration element allows to load a schema from a file (.avsc, .json or .proto).
 
 You need to provide values for **Name Strategy**, **Serializer** and **Schema Type**. 
 

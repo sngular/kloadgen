@@ -106,7 +106,7 @@ The field name will be generated as sequences from 1 to 5.
 
 KLoadGen supports the use of `null` values in **Field Values List** for any optional field defined in a schema.
 
-This applies to any field defined as `"type": ["null", AnyType]`  in an AVRO schema, or to any field not included in the `required` array in a JSON schema, that **has `null` included** in the corresponding **Field Values List**.
+This applies to any field defined as `"type": ["null", AnyType]` in an AVRO schema or as `optional` in a PROTOBUF schema, or to any field not included in the `required` array in a JSON Schema structure, that **has `null` included** in the corresponding **Field Values List**.
 
 This feature works with simple fields, such as `string`, and also with further complex structures, such as a `string` field inside a `record` field.
 
@@ -150,10 +150,10 @@ O3-Required{
 
 The same applies when there is more than one level. The last child in the last level will be forcely generated as a random value in order to avoid the violation of the main object. In this case, `C7` is the value that gets changed. Therefore, the final result will be `O3: {C5: null, O4: {C6: null, C7: ramdonValue}}` ('04' automatically changes as per the change in 'C7').
 
-### JSON schemas
+### JSON Schema
 
-The other exception applies to JSON schemas: in order to support `null`values, the collections within objects (type : object) cannot be null. Therefore, they will be **required by default** and they will be **initialized as an empty collection** if the object than contains them is not null.
+The other exception applies to JSON Schema: in order to support `null`values, the collections within objects (type : object) cannot be null. Therefore, they will be **required by default** and they will be **initialized as an empty collection** if the object than contains them is not null.
 
-> Within JSON schemas, a maximum of **2 nesting levels** is allowed.
+> Within JSON Schema, a maximum of **2 nesting levels** is allowed.
  
 
