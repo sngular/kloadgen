@@ -44,9 +44,9 @@ public class AvroGeneratorTool {
     boolean logicalType = Objects.nonNull(field.schema().getLogicalType());
 
     Object value;
-    if (ENUM == field.schema().getType()) {
+    if (ENUM == field.schema().getType() && !"seq".equalsIgnoreCase(fieldType)) {
       value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, field.schema(), parameterList, field.schema().getType().getName());
-    } else if (UNION == field.schema().getType()) {
+    } else if (UNION == field.schema().getType() && !"seq".equalsIgnoreCase(fieldType)) {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
 
@@ -61,10 +61,12 @@ public class AvroGeneratorTool {
         }
       }
     } else if ("seq".equalsIgnoreCase(fieldType)) {
+      String type = UNION.getName().equals(getValidTypeFromSchema(field.schema())) ? getRecordUnion(field.schema().getTypes()).getName()
+          : getValidTypeFromSchema(field.schema());
       if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
-        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), getValidTypeFromSchema(field.schema()), fieldValuesList, context);
+        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), type, fieldValuesList, context);
       } else {
-        value = randomObject.generateSeq(field.name(), getValidTypeFromSchema(field.schema()), parameterList, context);
+        value = randomObject.generateSeq(field.name(), type, parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
 

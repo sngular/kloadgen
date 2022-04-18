@@ -174,6 +174,20 @@ class AvroGeneratorToolTest {
     assertThat(intList).containsExactlyElementsOf(expected);
   }
 
+  @ParameterizedTest
+  @DisplayName("Testing generate an optional sequence of a list of values")
+  @MethodSource("parametersForGenerateFieldValuesListSequence")
+  void testGenerateFieldValuesListOptionalSequence(int size, List<String> fieldValuesList, List<Integer> expected){
+    var intList = new ArrayList<>();
+    Field field = new Field("name", SchemaBuilder.builder().nullable().intType());
+    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList), false, true);
+    AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
+    for (int i = 0; i <= size; i++) {
+      intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
+    }
+    assertThat(intList).containsExactlyElementsOf(expected);
+  }
+
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
     return Stream.of(
         Arguments.of("enum", 1, Collections.singletonList("RED"),

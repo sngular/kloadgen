@@ -13,6 +13,10 @@
   - [Consumer configuration](consumer-configuration.md)
   - [Schemas](schemas.md)
 
+# Knowledge content
+  - [How to run the plugin](how-to-run.md)
+  - [Example test plan](example-test-plan.md)
+ 
 # Additional information
   - [Overview](additional-information.md)
   - [Release notes](release-notes.md)
