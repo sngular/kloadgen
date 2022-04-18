@@ -1,6 +1,6 @@
 # About KLoadGen
 
-KLoadGen is a plugin for JMeter which acts as a load generator designed to send Kafka messages and that supports both AVRO, JSON Schema and PROTOBUF structures. 
+KLoadGen is a plugin for JMeter which acts as a load generator designed to send Kafka messages and that supports AVRO, JSON Schema and PROTOBUF structures.
 
 It can also connect to the Schema Registry server, where it retrieves the subjects to send.
 
