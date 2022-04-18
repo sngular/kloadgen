@@ -82,7 +82,6 @@ public class JsonSchemaProcessorTest {
     jsonSchemaProcessor.processSchema(SCHEMA_COMPLEX_COLLECTIONS);
     ObjectNode message = jsonSchemaProcessor.next();
 
-    System.out.println(SCHEMA_COMPLEX_COLLECTIONS);
     assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
                                   .contains("\"birds\":[[{\"nameBird\":")
                                   .contains("\"animals\":{").contains("nameAnimal\":");
