@@ -10,24 +10,24 @@ body:
     id: what-happened
     attributes:
       label: What's the problem folk?
-      description: Tell us the documentation error
+      description: Tell us the documentation changes that need to be done.
       placeholder: Tell us what needs to be changed!
-      value: "Please tell us what needs to be changed in the documentation."
+      value: "What's the change that needs to be done? (be as specific as possible)"
     validations:
       required: true
   - type: checkboxes
     id: check
     attributes:
-      label: Have you checked that this is on the documentation already?
-      description: Please check the documentation
+      label: Have you found it in the docs folder? 
+      description: Please check the docs folder
       options:
-        - label: I have already checked the documentation
+        - label: I have already checked the docs folder
           required: true
   - type: checkboxes
     id: doublecheck
     attributes:
-      label: Have you checked that this issue is being taken care of already?
+      label: Have you checked whether this issue is already being taken care of?
       description: In order to have an ordered workspace, please make sure this is doublechecked.
       options:
-        - label: I have already checked that this issue is being taken care of.
+        - label: I have already checked whether this issue is being taken care of.
           required: true
