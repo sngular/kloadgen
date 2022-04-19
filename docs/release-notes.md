@@ -7,7 +7,7 @@ RELEASE DATE: 2020-12-04
 
 In this release we introduce these major improvements:
  
- - Support for JSON schemas
+ - Support for JSON Schema structures
  - Kafka and Schema Registry versions updated
  - Code improvements and polishing
 

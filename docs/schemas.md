@@ -1,6 +1,6 @@
 # Schemas
 
-This page includes information regarding the schemas that applies to this plugin.
+This page includes information regarding the schemas in relation to this plugin.
 
 ## Field types
 
@@ -41,11 +41,11 @@ These are the field types that are supported in the schemas for this plugin.
 The `array` and `map` types are shown as `*-array` and `*-map`, respectively, in the column **Field Type**. See each field on detail in the next table. 
 
 **Notes for array fields**:
- - Arrays appear in the Field Name column with **[]** at the end of the field name (i.e. metadata.extensions.flows[].correlation[]).
+ - Arrays appear in the **Field Name** column with **[]** at the end of the field name (i.e. metadata.extensions.flows[].correlation[]).
  - The sample data for array fields will be generated using the data included in **Field Values List** as a comma separated value list.
  
 **Notes for map fields**:
- - Maps appear in the Field Name colum with **[:]** at the end of the field name (i.e. metadata.extensions.flows[].correlation[:]).
+ - Maps appear in the **Field Name** colum with **[:]** at the end of the field name (i.e. metadata.extensions.flows[].correlation[:]).
  - The sample data for map fields will be generated using the data included in **Field Values List** as a comma separated value list. These values can be sets of pairs _key:value_ (key1:value, key2:value, key3:value) or just as a set of keys ((key1,key2,key3). In this last case, the values will be randomly generated following the applicable constraints.
 
 | Type           | Details                                | Returns                                                         |
@@ -73,7 +73,7 @@ The `array` and `map` types are shown as `*-array` and `*-map`, respectively, in
 
 ### Arrays and maps combined
 
-You can also have these special types::
+You can also have these special types:
 
 - An array of maps, **( * )-map-array**, following this pattern: ArrayOfMaps[ArraySize][MapSize:].
 - A map of arrays, **( * )-array-map**, following this pattern: MapOfArrays[MapSize:][ArraySize].

@@ -17,7 +17,7 @@ Here you can find the list of the parameters to be configured when defining the 
 - **send.buffer.bytes**: the size of the TCP send buffer (SO_SNDBUF) to use when sending data. If the value is _-1_, the OS default will be used. The default value is _131072_.
 - **receive.buffer.bytes**: the size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is _-1_, the OS default will be used. The default value is _32768_.
 - **security.protocol**: Kafka producer protocol. Valid values are: PLAINTEXT/SSL/SASL_PLAINTEXT/SASL_SSL. The default value is _PLAINTEXT_.
-- **kerberos.auth.enabled**: establishes whether the Kerberos authorization is enabled or disabled. If it is disabled, the next two properties will be ignored. The default value is _NO_.
+- **kerberos.auth.enabled**: establishes whether the Kerberos authorization is enabled or disabled. If it is disabled, the two following properties will be ignored. The default value is _NO_.
 - **java.security.krb5.conf**: location of the krb5.conf file for the Kerberos server.
 - **sasl.kerberos.service.name**: Kafka Kerberos service name. The default value is _kafka_.
 - **jaas.enabled**: establishes whether JAAS is enabled or disabled. The default value is _NO_.
@@ -135,4 +135,4 @@ This configuration element allows to specify a list of headers which will be inc
 
 The headers specified here will be included in every message after they are serialized.
 
-Values will also be included and they will be considered of type `string`, whether they are supplied in the table or randomly generated.
+Values will also be included. They will be considered of type `string`, whether they are supplied in the table or randomly generated.

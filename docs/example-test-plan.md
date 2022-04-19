@@ -6,6 +6,6 @@ The repository includes a [sample file](https://github.com/corunet/kloadgen/blob
 
 This test plan will only inject messages in a Kafka cluster. 
 
-**Note:** Before executing it, you should add the Schema Registry information in order to retrieve the schema and extract the entity structure.
+**Note:** Before executing it, you should add the Schema Registry information in order to retrieve the schema and extract the entities' structure.
 
 > In a future we will include support to read AVRO files.
