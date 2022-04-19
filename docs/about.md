@@ -12,7 +12,7 @@ It can also connect to the Schema Registry server, where it retrieves the subjec
 - Generate key values. You can also define keys that match your structure while improving your cluster performance.
 - Dependency-free. You don't need external libraries and there are no other dependencies; the plugin automatically embeds the latest supported version of Kafka libraries.
 - AVRO, JSON Schema and PROTOBUF. This plugin supports these three structures.
-- Arrays and maps. KLoadgen generates messages both from basic data types and from complex structures, such as arrays or maps.
+- Arrays and maps. KLoadGen generates messages both from basic data types and from complex structures, such as arrays or maps.
 
 ## Product roadmap
 

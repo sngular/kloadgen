@@ -25,7 +25,7 @@ After cloning the repository, run the following command:
 >
 > - jmeter.properties
 > - saveservice.properties
-> - upgrade.properties> 
+> - upgrade.properties 
 
 ### Execution 
 

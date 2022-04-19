@@ -11,7 +11,7 @@ Here you will see how to create and run a test plan that includes both the produ
 5. In the dropdown box, choose **net.coru.kloadgen.sampler.KafkaSchemaSampler**. 
 6. Provide the corresponding values for this sampler, as explained in [Kafka Producer Sampler configuration](producer-configuration.md#kafka-producer-sampler-configuration).
 7. Under **Thread Group**, add the configuration elements for this sampler, as seen in [Kafka producer configuration elements](producer-configuration.md#kafka-producer-configuration-elements).
-8. In the value and key schema (file) configuration elements, complete the table with the corresponding information regarding **Field Name**, **Field Type**, **Field Length** and **Field Value List**.
+8. In the value and key schema (file) configuration elements, complete the table with the corresponding information regarding **Field Name**, **Field Type**, **Field Length**, and **Field Value List**.
   **Note:** The values you include in **Field Values List** will be used by the random tool. Instead of creating random values, it will choose the values randomly between the ones included here. 
 9. (Optional) You can assign sizes to any map or array field ([10] for arrays, [10:] for maps).
 10. If you want to assign a sequence to any field, see [Sequences](producer-configuration.md#sequences).
@@ -24,3 +24,11 @@ Here you will see how to create and run a test plan that includes both the produ
 17. Save the test plan.
 18. Run the test plan.
 19. Check your results.
+
+The following screenshots show the load test process in JMeter:
+
+![Load test starting](images/load_test_process_1.png)
+
+![Load test in progress](images/load_test_process_2.png)
+
+![Load test results](images/load_test_process_2.png)
