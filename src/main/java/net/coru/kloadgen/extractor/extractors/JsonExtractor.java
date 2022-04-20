@@ -175,7 +175,7 @@ public class JsonExtractor {
         List<String> requiredInternalFields = ((ObjectField) value).getRequired();
         for (Field propertiesField : value.getProperties()) {
           List<FieldValueMapping> processedField = processField(propertiesField, false, isAncestorRequired);
-          processedField.get(0).setParentRequired(isAncestorRequired != null && isAncestorRequired);
+          processedField.get(0).setAncestorRequired(isAncestorRequired != null && isAncestorRequired);
           processedField.get(0).setRequired(checkRequiredByType(propertiesField, requiredInternalFields, processedField.get(0)));
           CollectionUtils.collect(
               processedField,
@@ -198,7 +198,7 @@ public class JsonExtractor {
                              .fieldType(value.getType() + "-array" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? "-array" :
                                  (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" : breadCrumb))
                              .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
-                             .isParentRequired(!isRootElement && (isAncestorRequired != null && isAncestorRequired))
+                             .isAncestorRequired(!isRootElement && (isAncestorRequired != null && isAncestorRequired))
                              .build());
       }
     }
@@ -225,7 +225,7 @@ public class JsonExtractor {
       List<String> requiredInternalFields = ((ObjectField) value).getRequired();
       for (Field propertiesField : value.getProperties()) {
         List<FieldValueMapping> processedField = processField(propertiesField, false, isAncestorRequired);
-        processedField.get(0).setParentRequired(isAncestorRequired != null && isAncestorRequired);
+        processedField.get(0).setAncestorRequired(isAncestorRequired != null && isAncestorRequired);
         processedField.get(0).setRequired(checkRequiredByType(propertiesField, requiredInternalFields, processedField.get(0)));
         CollectionUtils.collect(
             processedField,
@@ -247,7 +247,7 @@ public class JsonExtractor {
                            .fieldType(value.getType() + "-map" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" :
                                (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? "-array" : breadCrumb))
                            .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
-                           .isParentRequired(!isRootElement && (isAncestorRequired != null && isAncestorRequired))
+                           .isAncestorRequired(!isRootElement && (isAncestorRequired != null && isAncestorRequired))
                            .build());
     }
     return completeFieldList;
@@ -266,7 +266,7 @@ public class JsonExtractor {
       String parentName = splittedName[splittedName.length - 2];
       parentName = parentName.replace("[]", "");
       if (fieldName.equals(parentName)) {
-        internalField.setParentRequired(isAncestorRequired);
+        internalField.setAncestorRequired(isAncestorRequired);
       }
       completeFieldList.add(internalField);
     });

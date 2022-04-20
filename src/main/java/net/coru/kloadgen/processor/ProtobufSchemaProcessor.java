@@ -85,7 +85,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         String fieldType = fieldValueMapping.getFieldType();
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
-            && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()) {
+            && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getAncestorRequired()) {
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
@@ -191,7 +191,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
         if (Boolean.TRUE.equals((fieldExpMappingsQueue.peek() == null || !Objects.requireNonNull(nextField).getFieldName().contains(parentFieldName))
-                                && Objects.requireNonNull(actualField).getParentRequired())
+                                && Objects.requireNonNull(actualField).getAncestorRequired())
             && (generatedProperties == elapsedProperties && generatedProperties > 0)) {
 
           fieldValueMapping = actualField;
