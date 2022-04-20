@@ -146,7 +146,7 @@ public class ProtoBufExtractor {
       completeFieldList
           .add(new FieldValueMapping(subfield.getName() + "[]",
                                      subfield.getType().replace(subfield.getType(),
-                                     ProtobufHelper.translateType(subfield.getType())) + ARRAY_POSTFIX,
+                                                                ProtobufHelper.translateType(subfield.getType())) + ARRAY_POSTFIX,
                                      0, "", isRequired, isParentRequired));
     } else {
       completeFieldList
@@ -178,12 +178,13 @@ public class ProtoBufExtractor {
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if ("enum".equals(fieldValueMapping.getFieldType())) {
         if (isArray) {
-          completeFieldList.add(new FieldValueMapping( subfield.getName() + "[]",
-                                                       fieldValueMapping.getFieldType() + ARRAY_POSTFIX,
-                                                       0, getValueList(fieldValueMapping), isRequired, isParentRequired));
+          completeFieldList.add(new FieldValueMapping(subfield.getName() + "[]",
+                                                      fieldValueMapping.getFieldType() + ARRAY_POSTFIX,
+                                                      0, getValueList(fieldValueMapping), isRequired, isParentRequired));
         } else {
           completeFieldList.add(
-              new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."), fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping), isRequired, isParentRequired));
+              new FieldValueMapping(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."), fieldValueMapping.getFieldType(), 0, getValueList(fieldValueMapping),
+                                    isRequired, isParentRequired));
         }
       } else {
         if (isArray) {

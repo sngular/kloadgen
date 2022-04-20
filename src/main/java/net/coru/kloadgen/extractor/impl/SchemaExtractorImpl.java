@@ -87,7 +87,8 @@ public class SchemaExtractorImpl implements SchemaExtractor {
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
     SchemaRegistryClient schemaRegistryClient = new CachedSchemaRegistryClient(List.of(originals.get(SCHEMA_REGISTRY_URL_CONFIG)), 1000,
-                                                                               List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), originals);
+                                                                               List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()),
+                                                                               originals);
 
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());

@@ -91,11 +91,11 @@ public class RandomArray {
     int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
     List<Object> array = new ArrayList<>(size);
 
-      for (int i = 0; i < size; i++) {
-          array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains));
-      }
-      return array;
+    for (int i = 0; i < size; i++) {
+      array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constrains));
     }
+    return array;
+  }
 
   private List<Object> generate(
       String type, Integer arraySize, Integer valueLength, List<String> fieldValueList,

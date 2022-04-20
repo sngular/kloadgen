@@ -47,7 +47,7 @@ public class ProtobufLoadGenerator extends AbstractLoadGenerator implements Base
   @Override
   public EnrichedRecord nextMessage() {
 
-      return protobufSchemaProcessor.next();
+    return protobufSchemaProcessor.next();
   }
 
 }

@@ -36,47 +36,48 @@ public class RandomObject {
 
   public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
     return context.compute(fieldName, (fieldNameMap, seqObject) ->
-            seqObject == null
+        seqObject == null
             ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
             : addOneCasted(seqObject, fieldType));
   }
 
   public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer)seqObject) + 1) % fieldValueList.size());
+    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
     return ValueUtils.castValue(fieldValueList.get(index), fieldType);
   }
 
-  public Object generateRandom(String fieldType, Integer valueLength, List<String> fieldValueList,
+  public Object generateRandom(
+      String fieldType, Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     Object value;
     switch (fieldType.toLowerCase()) {
       case ValidTypeConstants.STRING:
-        value = getStringValueOrRandom(valueLength , fieldValueList , constrains);
+        value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
         break;
       case ValidTypeConstants.INT:
         try {
-          value = getIntegerValueOrRandom(valueLength , fieldValueList , constrains).intValueExact();
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).intValueExact();
         } catch (ArithmeticException exception) {
           value = Integer.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.LONG:
         try {
-          value = getIntegerValueOrRandom(valueLength , fieldValueList , constrains).longValueExact();
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).longValueExact();
         } catch (ArithmeticException exception) {
           value = Long.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.SHORT:
         try {
-          value = getIntegerValueOrRandom(valueLength , fieldValueList , constrains).shortValueExact();
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).shortValueExact();
         } catch (ArithmeticException exception) {
           value = Short.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.DOUBLE:
         try {
-          value = getDecimalValueOrRandom(valueLength , fieldValueList , constrains).doubleValue();
+          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).doubleValue();
         } catch (ArithmeticException exception) {
           value = Double.MAX_VALUE;
         }
@@ -84,14 +85,14 @@ public class RandomObject {
       case ValidTypeConstants.NUMBER:
       case ValidTypeConstants.FLOAT:
         try {
-          value = getDecimalValueOrRandom(valueLength , fieldValueList , constrains).floatValue();
+          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();
         } catch (ArithmeticException exception) {
           value = Float.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.BYTES:
         try {
-          value = getIntegerValueOrRandom(valueLength , Collections.emptyList() , Collections.emptyMap()).byteValueExact();
+          value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
         } catch (ArithmeticException exception) {
           value = Byte.MAX_VALUE;
         }
@@ -99,7 +100,7 @@ public class RandomObject {
       case ValidTypeConstants.TIMESTAMP:
       case ValidTypeConstants.LONG_TIMESTAMP:
       case ValidTypeConstants.STRING_TIMESTAMP:
-        value = getTimestampValueOrRandom(fieldType , fieldValueList);
+        value = getTimestampValueOrRandom(fieldType, fieldValueList);
         break;
       case ValidTypeConstants.UUID:
         value = getUUIDValueOrRandom(fieldValueList);
@@ -135,10 +136,10 @@ public class RandomObject {
         value = getUUIDValueOrRandom(fieldValueList);
         break;
       case ValidTypeConstants.BYTES_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList , constrains);
+        value = getDecimalValueOrRandom(fieldValueList, constrains);
         break;
       case ValidTypeConstants.FIXED_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList , constrains);
+        value = getDecimalValueOrRandom(fieldValueList, constrains);
         break;
       default:
         value = fieldType;
@@ -148,7 +149,7 @@ public class RandomObject {
     return value;
   }
 
-  private Object getFirstValueOrDefaultForType(List<String> fieldValueList, String fieldType){
+  private Object getFirstValueOrDefaultForType(List<String> fieldValueList, String fieldType) {
     if (!fieldValueList.isEmpty()) {
       return ValueUtils.castValue(fieldValueList.get(0), fieldType);
     }
@@ -194,7 +195,8 @@ public class RandomObject {
       default:
         castValue = new BigDecimal(seqObject.toString()).add(BigDecimal.ONE);
         break;
-    } return castValue;
+    }
+    return castValue;
   }
 
   private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
@@ -245,7 +247,8 @@ public class RandomObject {
     return value;
   }
 
-  private String getStringValueOrRandom(Integer valueLength, List<String> fieldValueList,
+  private String getStringValueOrRandom(
+      Integer valueLength, List<String> fieldValueList,
       Map<ConstraintTypeEnum, String> constrains) {
     String value;
     if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0))) {
@@ -345,22 +348,22 @@ public class RandomObject {
     LocalDate resultDate;
     int minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
     int maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();
-    long randomDay = minDay + RandomUtils.nextInt(0,maxDay - minDay);
-    if (fieldValueList.isEmpty()){
+    long randomDay = minDay + RandomUtils.nextInt(0, maxDay - minDay);
+    if (fieldValueList.isEmpty()) {
       resultDate = LocalDate.ofEpochDay(randomDay);
     } else {
-      resultDate = LocalDate.parse(fieldValueList.get(RandomUtils.nextInt(0,fieldValueList.size())).trim());
+      resultDate = LocalDate.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     }
     return resultDate;
   }
 
-  private static LocalTime getRandomLocalTime(List<String> fieldValueList){
+  private static LocalTime getRandomLocalTime(List<String> fieldValueList) {
     long nanoMin = 0;
     long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
-    if (fieldValueList.isEmpty()){
+    if (fieldValueList.isEmpty()) {
       return LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
     } else {
-      return LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0,fieldValueList.size())).trim());
+      return LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     }
   }
 
@@ -372,15 +375,15 @@ public class RandomObject {
     return getRandomLocalTime(fieldValueList);
   }
 
-  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList){
-    long minDay = LocalDateTime.of(1900,1,1,0,0).toEpochSecond(ZoneOffset.UTC);
-    long maxDay = LocalDateTime.of(2100,1,1,0,0).toEpochSecond(ZoneOffset.UTC);
+  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList) {
+    long minDay = LocalDateTime.of(1900, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
+    long maxDay = LocalDateTime.of(2100, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
     long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
 
-    if (fieldValueList.isEmpty()){
-      return LocalDateTime.ofEpochSecond(randomSeconds,RandomUtils.nextInt(0, 1_000_000_000 - 1),ZoneOffset.UTC);
+    if (fieldValueList.isEmpty()) {
+      return LocalDateTime.ofEpochSecond(randomSeconds, RandomUtils.nextInt(0, 1_000_000_000 - 1), ZoneOffset.UTC);
     } else {
-      return LocalDateTime.parse(fieldValueList.get(RandomUtils.nextInt(0,fieldValueList.size())).trim());
+      return LocalDateTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     }
   }
 
@@ -405,25 +408,26 @@ public class RandomObject {
     return RandomUtils.nextLong(min, min * 10);
   }
 
-   private static BigDecimal getDecimalValueOrRandom(List<String> fieldValueList,
-                                                     Map<ConstraintTypeEnum, String> constrains){
+  private static BigDecimal getDecimalValueOrRandom(
+      List<String> fieldValueList,
+      Map<ConstraintTypeEnum, String> constrains) {
     int scale;
     int precision;
 
-    if (Objects.nonNull(constrains.get(ConstraintTypeEnum.PRECISION))){
+    if (Objects.nonNull(constrains.get(ConstraintTypeEnum.PRECISION))) {
       precision = Integer.parseInt(constrains.get(ConstraintTypeEnum.PRECISION));
       scale = Objects.nonNull(constrains.get(ConstraintTypeEnum.SCALE)) ?
-              Integer.parseInt(constrains.get(ConstraintTypeEnum.SCALE)) : 0;
+          Integer.parseInt(constrains.get(ConstraintTypeEnum.SCALE)) : 0;
 
-      if (precision <= 0){
+      if (precision <= 0) {
         throw new KLoadGenException("Decimal precision must be greater dan 0");
       }
-      if (scale < 0 || scale > precision){
+      if (scale < 0 || scale > precision) {
         throw new KLoadGenException("Scale must be zero or a positive integer less than or equal to the precision");
       }
 
-      if (fieldValueList.isEmpty()){
-        return BigDecimal.valueOf(randomNumberWithLength(precision),scale);
+      if (fieldValueList.isEmpty()) {
+        return BigDecimal.valueOf(randomNumberWithLength(precision), scale);
       } else {
         return new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
       }
