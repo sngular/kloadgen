@@ -184,7 +184,7 @@ public final class SamplerUtil {
 
     if (Objects.nonNull(context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
-          context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+                context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
     Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
@@ -353,9 +353,9 @@ public final class SamplerUtil {
     props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
 
     props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-        propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
-            DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
-            ""));
+              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
+                                DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
+                                ""));
 
     props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
     props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
@@ -397,7 +397,7 @@ public final class SamplerUtil {
     }
 
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-        Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
+              Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
@@ -455,7 +455,7 @@ public final class SamplerUtil {
     }
 
     props.put(KEY_SERIALIZER_CLASS_CONFIG,
-        Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
+              Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
@@ -490,8 +490,8 @@ public final class SamplerUtil {
     List<String> headersSB = new ArrayList<>();
     for (HeaderMapping kafkaHeader : kafkaHeaders) {
       String headerValue = statelessGeneratorTool.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
-          10,
-          emptyList()).toString();
+                                                                 10,
+                                                                 emptyList()).toString();
       headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
       producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
     }

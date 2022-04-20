@@ -28,8 +28,8 @@ public class ValueUtils {
     List<String> parameterList = new ArrayList<>(fieldValuesList);
 
     parameterList.replaceAll(fieldValue ->
-        fieldValue.matches("\\$\\{\\w*}") ?
-            JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
+                                 fieldValue.matches("\\$\\{\\w*}") ?
+                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
     return parameterList;
   }
 
@@ -96,7 +96,7 @@ public class ValueUtils {
 
   public static String getValidTypeFromSchema(Schema schema) {
     return schema.getLogicalType() == null
-            ? schema.getType().getName()
-            : String.format("%s_%s", schema.getType().getName(), schema.getLogicalType().getName());
+        ? schema.getType().getName()
+        : String.format("%s_%s", schema.getType().getName(), schema.getLogicalType().getName());
   }
 }
