@@ -99,7 +99,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         String typeFilter = cleanPath.replaceAll(fieldName, "");
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
-            && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()) {
+            && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getAncestorRequired()) {
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
@@ -328,7 +328,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
 
         if (((fieldExpMappingsQueue.peek() != null && !Objects.requireNonNull(nextField).getFieldName().contains(rootFieldName))
              || fieldExpMappingsQueue.peek() == null)
-            && actualField.getParentRequired()
+            && actualField.getAncestorRequired()
             && (generatedProperties == elapsedProperties && generatedProperties > 0)) {
 
           fieldValueMapping = actualField;

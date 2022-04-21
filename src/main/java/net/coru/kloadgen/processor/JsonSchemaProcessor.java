@@ -51,7 +51,7 @@ public class JsonSchemaProcessor {
         String fieldName = getCleanMethodName(fieldValueMapping, "");
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
-            && (generatedProperties == elapsedProperties && generatedProperties > 0) && Objects.requireNonNull(fieldValueMapping).getParentRequired()) {
+            && (generatedProperties == elapsedProperties && generatedProperties > 0) && Objects.requireNonNull(fieldValueMapping).getAncestorRequired()) {
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
@@ -59,7 +59,7 @@ public class JsonSchemaProcessor {
 
         } else if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
                    && (generatedProperties == elapsedProperties && generatedProperties == 0)
-                   && Objects.requireNonNull(fieldValueMapping).getParentRequired()
+                   && Objects.requireNonNull(fieldValueMapping).getAncestorRequired()
                    && checkIfNestedCollection(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
           fieldValueMapping.setRequired(true);
         } else {
@@ -75,7 +75,7 @@ public class JsonSchemaProcessor {
           FieldValueMapping fieldValueMappingCopy = fieldValueMapping;
           fieldValueMapping = fieldExpMappingsQueue.peek();
 
-          if (fieldExpMappingsQueue.isEmpty() && elapsedProperties == generatedProperties && fieldValueMappingCopy.getParentRequired()) {
+          if (fieldExpMappingsQueue.isEmpty() && elapsedProperties == generatedProperties && fieldValueMappingCopy.getAncestorRequired()) {
             fieldValueMappingCopy.setRequired(true);
             List<String> temporalFieldValueList = fieldValueMappingCopy.getFieldValuesList();
             temporalFieldValueList.remove("null");
@@ -85,7 +85,7 @@ public class JsonSchemaProcessor {
 
           } else if (fieldExpMappingsQueue != null && !fieldExpMappingsQueue.isEmpty()
                      && !getNameObjectCollection(fieldExpMappingsQueueCopy.peek().getFieldName()).contains(getNameObjectCollection(fieldExpMappingsQueue.peek().getFieldName()))
-                     && elapsedProperties == generatedProperties && fieldValueMappingCopy.getParentRequired()) {
+                     && elapsedProperties == generatedProperties && fieldValueMappingCopy.getAncestorRequired()) {
             fieldValueMapping = fieldExpMappingsQueueCopy.peek();
             fieldValueMapping.setRequired(true);
             fieldExpMappingsQueue = fieldExpMappingsQueueCopy.clone();
@@ -170,7 +170,7 @@ public class JsonSchemaProcessor {
         fieldExpMappingsQueue.remove();
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
-        if ((nextField == null && Objects.requireNonNull(actualField).getParentRequired()
+        if ((nextField == null && Objects.requireNonNull(actualField).getAncestorRequired()
              && (generatedProperties == elapsedProperties && generatedProperties > 0))) {
 
           if (fieldValueMapping.getFieldName().split(cleanFieldName)[0].endsWith("[].") || fieldValueMapping.getFieldName().split(cleanFieldName)[0].endsWith("[:].")) {
@@ -186,7 +186,7 @@ public class JsonSchemaProcessor {
 
         } else if (nextField == null
                    && (!actualField.getRequired()
-                       || (!actualField.getRequired() && !actualField.getParentRequired()))) {
+                       || (!actualField.getRequired() && !actualField.getAncestorRequired()))) {
           fieldValueMapping = null;
 
         } else if (checkIfOptionalCollection(fieldValueMapping, cleanFieldName)) {
@@ -194,7 +194,7 @@ public class JsonSchemaProcessor {
           fieldValueMapping.setRequired(true);
 
         } else if ((!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
-                    && Objects.requireNonNull(actualField).getParentRequired()
+                    && Objects.requireNonNull(actualField).getAncestorRequired()
                     && fieldExpMappingsQueue.peek() != null
                     && (generatedProperties == elapsedProperties && generatedProperties > 0))) {
 
@@ -505,7 +505,7 @@ public class JsonSchemaProcessor {
   }
 
   private boolean checkIfObjectOptional(FieldValueMapping field, String fieldName) {
-    if (fieldName != null && !field.getParentRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("["))) {
+    if (fieldName != null && !field.getAncestorRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("["))) {
       return true;
     }
     return fieldName != null ? checkIfObjectNullNotRequired(field, fieldName) : checkIfObjectNullNotRequired(field, cleanUpPath(field, ""));

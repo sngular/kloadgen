@@ -24,7 +24,7 @@ public class JsonSchemaFixturesConstants {
                        .valueLength(0)
                        .fieldValueList("null")
                        .required(false)
-                       .isParentRequired(false)
+                       .isAncestorRequired(false)
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                          put(MINIMUM_VALUE, "0");
                          put(MAXIMUM_VALUE, "0");
@@ -61,7 +61,7 @@ public class JsonSchemaFixturesConstants {
                        .valueLength(0)
                        .fieldValueList("null")
                        .required(true)
-                       .isParentRequired(false)
+                       .isAncestorRequired(false)
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
                        .build(),
@@ -71,7 +71,7 @@ public class JsonSchemaFixturesConstants {
                        .valueLength(0)
                        .fieldValueList("null")
                        .required(true)
-                       .isParentRequired(false)
+                       .isAncestorRequired(false)
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
                        .build()
@@ -86,7 +86,7 @@ public class JsonSchemaFixturesConstants {
                        .valueLength(0)
                        .fieldValueList("null")
                        .required(false)
-                       .isParentRequired(false)
+                       .isAncestorRequired(false)
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                          put(MINIMUM_VALUE, "0");
                          put(MAXIMUM_VALUE, "0");
@@ -118,7 +118,7 @@ public class JsonSchemaFixturesConstants {
                        .valueLength(0)
                        .fieldValueList("null")
                        .required(true)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .build(),
       FieldValueMapping.builder()
                        .fieldName("testMap.itemTipo[:]")
@@ -126,7 +126,7 @@ public class JsonSchemaFixturesConstants {
                        .valueLength(0)
                        .fieldValueList("null")
                        .required(true)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .build()
   ));
 
@@ -223,7 +223,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("email")
                            .required(true)
-                           .isParentRequired(false)
+                           .isAncestorRequired(false)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -235,7 +235,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("firstname")
                            .required(true)
-                           .isParentRequired(false)
+                           .isAncestorRequired(false)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -247,7 +247,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(false)
+                           .isAncestorRequired(false)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -259,7 +259,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(false)
+                           .isAncestorRequired(false)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -271,7 +271,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(false)
+                           .isAncestorRequired(false)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -283,7 +283,7 @@ public class JsonSchemaFixturesConstants {
                            .fieldType("string")
                            .valueLength(0)
                            .required(false)
-                           .isParentRequired(false)
+                           .isAncestorRequired(false)
                            .fieldValueList("null")
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
@@ -295,7 +295,7 @@ public class JsonSchemaFixturesConstants {
                            .fieldType("string")
                            .valueLength(0)
                            .required(false)
-                           .isParentRequired(false)
+                           .isAncestorRequired(false)
                            .fieldValueList("null")
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
@@ -386,7 +386,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "2");
                              put(MAXIMUM_VALUE, "3");
@@ -398,7 +398,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null, freeForm")
                            .required(false)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "1");
                              put(MAXIMUM_VALUE, "256");
@@ -476,7 +476,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {
                            })
                            .build(),
@@ -486,7 +486,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("createdBy")
                            .required(true)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -498,7 +498,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {
                            })
                            .build(),
@@ -508,7 +508,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("lastUpdated")
                            .required(true)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -520,7 +520,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {
                            })
                            .build(),
@@ -530,7 +530,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("projectVersion")
                            .required(true)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -542,7 +542,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("projectName")
                            .required(true)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -554,7 +554,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("null")
                            .required(false)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -566,7 +566,7 @@ public class JsonSchemaFixturesConstants {
                            .valueLength(0)
                            .fieldValueList("schema")
                            .required(true)
-                           .isParentRequired(true)
+                           .isAncestorRequired(true)
                            .constrains(new HashMap<ConstraintTypeEnum, String>() {{
                              put(MINIMUM_VALUE, "0");
                              put(MAXIMUM_VALUE, "0");
@@ -607,7 +607,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string-map-array")
                        .valueLength(0)
                        .required(false)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -617,7 +617,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string-array-map")
                        .valueLength(0)
                        .required(false)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -627,7 +627,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string-array-array")
                        .valueLength(0)
                        .required(true)
-                       .isParentRequired(false)
+                       .isAncestorRequired(false)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -637,7 +637,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string-map-map")
                        .valueLength(0)
                        .required(true)
-                       .isParentRequired(false)
+                       .isAncestorRequired(false)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -650,7 +650,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string-array")
                        .valueLength(0)
                        .required(true)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -660,7 +660,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string-map")
                        .valueLength(0)
                        .required(true)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -670,7 +670,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string")
                        .valueLength(0)
                        .required(false)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -680,7 +680,7 @@ public class JsonSchemaFixturesConstants {
                        .fieldType("string")
                        .valueLength(0)
                        .required(false)
-                       .isParentRequired(true)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constrains(new HashMap<ConstraintTypeEnum, String>() {
                        })
