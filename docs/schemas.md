@@ -84,15 +84,15 @@ You can also have these special types:
 
 A special type has also been created, `seq`, to allow creating a custom sequence of values. 
 
-In order to create a sequence, you need to specify `seq` as **Field Type** and include `{` in front of the **Field Values List** field.
+In order to create a sequence, you need to specify `seq` as **Field Type**.
 
-> This requirement has been in place since KLoadGen 3.6.3. **In future versions**, typing `{` in **Field Value List** will not be required or supported.
+> In previous versions (up to 4.0.0), typing `{` in **Field Value List** was another requirement in order to create sequences. This is no longer required or supported.
 
 | Type | Details                                                             |  Returns |
 |----------|-------------------------------------------------------------------------------|--------|
 | seq | Generates a numeric sequence starting in 1. Will cast to the AVRO Field Type. | Returns a sequence starting in 1 |
 
-**Note:** If you want to specify a starting value, put it in the first position after `{` in the **Field Values List** field. The other values within the field will be considered constants for this field and converted to the corresponding field type.
+**Note:** If you want to specify a starting value, put it in the first position in the **Field Values List** field. The other values within the field will be considered constants for this field and converted to the corresponding field type.
 
 > Keep in mind to avoid Cast exceptions.
 
