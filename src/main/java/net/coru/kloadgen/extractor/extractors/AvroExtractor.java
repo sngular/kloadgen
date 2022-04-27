@@ -49,7 +49,7 @@ public class AvroExtractor {
   public ParsedSchema getParsedSchema(String schema) {
     ParsedSchema parsed = new AvroSchema(schema);
     Schema schemaObj = (Schema) parsed.rawSchema();
-    if (schemaObj.getType().equals(Schema.Type.UNION)) {
+    if (checkIfUnion(schemaObj)) {
       Schema lastElement = schemaObj.getTypes().get(schemaObj.getTypes().size() - 1);
       return new AvroSchema(lastElement.toString());
     }
@@ -66,7 +66,7 @@ public class AvroExtractor {
       }
       completeFieldList.addAll(internalFields);
     } else if (checkIfMap(innerField.schema())) {
-      List<FieldValueMapping> internalFields = extractMapInternalFields(innerField.name() + "[:]", innerField.schema().getValueType(), isAncestorRequired);
+      List<FieldValueMapping> internalFields = extractMapInternalFields(postFixNameMap(innerField.name()), innerField.schema().getValueType(), isAncestorRequired);
       completeFieldList.addAll(internalFields);
     } else if (checkIfUnion(innerField.schema())) {
       if (isAncestor) {
@@ -79,19 +79,41 @@ public class AvroExtractor {
     }
   }
 
-  private void processField(String fieldName, List<FieldValueMapping> completeFieldList, Schema recordUnion, boolean isAncestorRequired) {
+  private void processUnionField(String fieldName, List<FieldValueMapping> completeFieldList, Schema recordUnion, boolean isAncestorRequired) {
     if (checkIfRecord(recordUnion)) {
       processRecordFieldList(fieldName, ".", processFieldList(recordUnion.getFields(), isAncestorRequired), completeFieldList);
     } else if (checkIfArray(recordUnion)) {
       extractArray(fieldName, completeFieldList, recordUnion.getElementType(), isAncestorRequired);
     } else if (checkIfMap(recordUnion)) {
-      List<FieldValueMapping> internalFields = extractMapInternalFields(fieldName + "[:]", recordUnion.getValueType(), isAncestorRequired);
+      List<FieldValueMapping> internalFields = extractMapInternalFields(postFixNameMap(fieldName), recordUnion.getValueType(), isAncestorRequired);
       if (internalFields.size() == 1 && internalFields.get(0).getFieldName().endsWith("[:][:]")) {
         tweakType(internalFields.get(0), MAP_POSTFIX);
       }
       completeFieldList.addAll(internalFields);
     } else {
-      completeFieldList.add(new FieldValueMapping(fieldName, recordUnion.getType().getName(), 0, "", checkIfRequiredField(recordUnion), isAncestorRequired));
+      completeFieldList.add(
+          FieldValueMapping.builder()
+                           .fieldName(fieldName)
+                           .fieldType(recordUnion.getType().getName())
+                           .required(checkIfRequiredField(recordUnion))
+                           .isAncestorRequired(isAncestorRequired)
+                           .build()
+      );
+    }
+  }
+
+  private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields, List<FieldValueMapping> completeFieldList) {
+    if (completeFieldList.isEmpty()) {
+      internalFields.forEach(internalField -> {
+        if (internalField.getFieldName().startsWith(fieldName + ".")) {
+          internalField.setFieldName(fieldName + internalField.getFieldName().replace(fieldName, splitter.replace(".", "")));
+        } else {
+          internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
+        }
+        completeFieldList.add(internalField);
+      });
+    } else {
+      internalFields.forEach(internalField -> internalField.setFieldName(fieldName + splitter + internalField.getFieldName()));
     }
   }
 
@@ -111,84 +133,22 @@ public class AvroExtractor {
       for (Schema.Field arrayElementField : innerField.getFields()) {
         processField(arrayElementField, completeFieldList, isAncestorRequired, false);
       }
-      processRecordFieldList(fieldName, ".", completeFieldList, null);
+      processRecordFieldList(fieldName, ".", completeFieldList, new ArrayList<>());
     } else if (checkIfMap(innerField)) {
-      completeFieldList.addAll(extractMapInternalFields(fieldName + "[:]", innerField.getValueType(), isAncestorRequired));
+      completeFieldList.addAll(extractMapInternalFields(postFixNameMap(fieldName), innerField.getValueType(), isAncestorRequired));
     } else if (checkIfArray(innerField)) {
-      completeFieldList.addAll(extractArrayInternalFields(fieldName + "[]", innerField.getElementType(), isAncestorRequired));
+      completeFieldList.addAll(extractArrayInternalFields(postFixNameArray(fieldName), innerField.getElementType(), isAncestorRequired));
     } else if (typesSet.contains(innerField.getType())) {
-      completeFieldList.add(new FieldValueMapping(fieldName, innerField.getName() + ARRAY_POSTFIX, 0, "", isAncestorRequired, isAncestorRequired));
+      completeFieldList.add(
+          FieldValueMapping.builder()
+                           .fieldName(fieldName)
+                           .fieldType(innerField.getName() + ARRAY_POSTFIX)
+                           .required(isAncestorRequired)
+                           .isAncestorRequired(isAncestorRequired)
+                           .build()
+      );
     }
     return completeFieldList;
-  }
-
-  private List<FieldValueMapping> extractMapInternalFields(String fieldName, Schema innerField, boolean isAncestorRequired) {
-    List<FieldValueMapping> completeFieldList = new ArrayList<>();
-    if (checkIfUnion(innerField)) {
-      completeFieldList.add(new FieldValueMapping(fieldName, getNotNullType(innerField.getTypes()) + MAP_POSTFIX, 0, "", checkIfRequiredField(innerField), isAncestorRequired));
-    } else if (checkIfRecord(innerField)) {
-      if (innerField.getFields().size() > 1) {
-        processRecordFieldList(fieldName, ".", processFieldList(innerField.getFields(), isAncestorRequired), completeFieldList);
-      } else {
-        processRecordFieldList(innerField.getName(), ".", processFieldList(innerField.getFields().get(0).schema().getFields(), isAncestorRequired), completeFieldList);
-      }
-    } else if (checkIfArray(innerField)) {
-      List<FieldValueMapping> internalFields = extractArrayInternalFields(fieldName + "[]", innerField.getElementType(), isAncestorRequired);
-      internalFields.forEach(field -> {
-        if (field.getFieldType().endsWith(ARRAY_POSTFIX) && field.getFieldName().endsWith("[:][]")) {
-          tweakType(field, MAP_POSTFIX);
-        }
-      });
-      completeFieldList.addAll(internalFields);
-    } else if (checkIfMap(innerField) && !checkIfRecord(innerField.getValueType())) {
-      List<FieldValueMapping> internalFields = extractMapInternalFields(fieldName + "[:]", innerField.getValueType(), isAncestorRequired);
-      completeFieldList.addAll(internalFields);
-    } else {
-      completeFieldList.add(new FieldValueMapping(fieldName, innerField.getType().getName() + MAP_POSTFIX, 0, "", isAncestorRequired, isAncestorRequired));
-    }
-    return completeFieldList;
-  }
-
-  private void addFieldToList(Schema.Field innerField, List<FieldValueMapping> completeFieldList, boolean isAncestorRequired) {
-    String typeName = innerField.schema().getType().getName();
-    if (checkIfLogicalType(innerField.schema())) {
-      typeName += "_" + innerField.schema().getLogicalType().getName();
-    }
-    if (checkIfEnumField(innerField.schema().getType())) {
-      String fieldValueList = String.join(",", innerField.schema().getEnumSymbols());
-      completeFieldList.add(new FieldValueMapping(innerField.name(), typeName, 0, fieldValueList, checkIfRequiredField(innerField.schema()), isAncestorRequired));
-    } else {
-      completeFieldList.add(new FieldValueMapping(innerField.name(), typeName, 0, "", checkIfRequiredField(innerField.schema()), isAncestorRequired));
-    }
-  }
-
-  private boolean checkIfLogicalType(Schema innerSchema) {
-    return Objects.nonNull(innerSchema.getLogicalType());
-  }
-
-  private boolean checkIfRequiredField(Schema innerSchema) {
-    if (checkIfUnion(innerSchema)) {
-      return !IteratorUtils.matchesAny(innerSchema.getTypes().iterator(), type -> type.getType() == NULL);
-    } else {
-      return true;
-    }
-  }
-
-  private void extractUnionRecord(String fieldName, Schema innerField, List<FieldValueMapping> completeFieldList, boolean isAncestorRequired) {
-    Schema recordUnion = getRecordUnion(innerField.getTypes());
-    if (null != recordUnion) {
-      if (typesSet.contains(recordUnion.getType())) {
-        completeFieldList.add(new FieldValueMapping(fieldName, getNotNullType(innerField.getTypes()), 0, "", false, isAncestorRequired));
-      } else if (recordUnion.getType().equals(ARRAY) && typesSet.contains(recordUnion.getElementType().getType())) {
-        completeFieldList.add(new FieldValueMapping(fieldName + "[]", getNotNullType(innerField.getTypes()), 0, "", false, isAncestorRequired));
-      } else if (recordUnion.getType().equals(MAP) && typesSet.contains(recordUnion.getValueType().getType())) {
-        completeFieldList.add(new FieldValueMapping(fieldName + "[:]", getNotNullType(innerField.getTypes()), 0, "", false, isAncestorRequired));
-      } else {
-        processField(fieldName, completeFieldList, recordUnion, isAncestorRequired);
-      }
-    } else {
-      completeFieldList.add(new FieldValueMapping(innerField.getName(), getNotNullType(innerField.getTypes()), 0, "", checkIfRequiredField(innerField), isAncestorRequired));
-    }
   }
 
   private void extractArray(String fieldName, List<FieldValueMapping> completeFieldList, Schema recordUnion, boolean isAncestorRequired) {
@@ -205,44 +165,128 @@ public class AvroExtractor {
       });
     } else if (checkIfArray(recordUnion)) {
       tweakType(internalFields.get(0), ARRAY_POSTFIX);
-      createArrayType(completeFieldList, internalFields, fieldName + "[]");
+      createArrayType(completeFieldList, internalFields, postFixNameArray(fieldName));
     } else {
-      renameArrayType(completeFieldList, internalFields, fieldName + "[]");
+      renameArrayType(completeFieldList, internalFields, postFixNameArray(fieldName));
     }
   }
 
-  private void tweakType(FieldValueMapping internalField, String postfix) {
-    internalField.setFieldType(internalField.getFieldType() + postfix);
-  }
+  private List<FieldValueMapping> extractMapInternalFields(String fieldName, Schema innerField, boolean isAncestorRequired) {
+    List<FieldValueMapping> completeFieldList = new ArrayList<>();
+    if (checkIfUnion(innerField)) {
+      completeFieldList.add(
+          FieldValueMapping.builder()
+                           .fieldName(fieldName)
+                           .fieldType(getNotNullType(innerField.getTypes()) + MAP_POSTFIX)
+                           .required(checkIfRequiredField(innerField))
+                           .isAncestorRequired(isAncestorRequired)
+                           .build()
+      );
 
-  private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
-    internalFields.forEach(internalField -> {
-      if (!internalField.getFieldName().contains(MAP_ARRAY) && !internalField.getFieldName().contains("[][]")) {
-        internalField.setFieldName(internalField.getFieldName().replace(fieldName, fieldName + "[:]"));
+    } else if (checkIfRecord(innerField)) {
+      if (innerField.getFields().size() > 1) {
+        processRecordFieldList(fieldName, ".", processFieldList(innerField.getFields(), isAncestorRequired), completeFieldList);
+      } else {
+        processRecordFieldList(innerField.getName(), ".", processFieldList(innerField.getFields().get(0).schema().getFields(), isAncestorRequired), completeFieldList);
       }
-    });
-    completeFieldList.addAll(internalFields);
+    } else if (checkIfArray(innerField)) {
+      List<FieldValueMapping> internalFields = extractArrayInternalFields(postFixNameArray(fieldName), innerField.getElementType(), isAncestorRequired);
+      internalFields.forEach(field -> {
+        if (field.getFieldType().endsWith(ARRAY_POSTFIX) && field.getFieldName().endsWith("[:][]")) {
+          tweakType(field, MAP_POSTFIX);
+        }
+      });
+      completeFieldList.addAll(internalFields);
+    } else if (checkIfMap(innerField) && !checkIfRecord(innerField.getValueType())) {
+      List<FieldValueMapping> internalFields = extractMapInternalFields(postFixNameMap(fieldName), innerField.getValueType(), isAncestorRequired);
+      completeFieldList.addAll(internalFields);
+    } else {
+      completeFieldList.add(
+          FieldValueMapping.builder()
+                           .fieldName(fieldName)
+                           .fieldType(innerField.getType().getName() + MAP_POSTFIX)
+                           .required(isAncestorRequired)
+                           .isAncestorRequired(isAncestorRequired)
+                           .build()
+      );
+
+    }
+    return completeFieldList;
   }
 
-  private void renameArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
-    internalFields.forEach(internalField -> internalField.setFieldName(fieldName));
-    completeFieldList.addAll(internalFields);
+  private void addFieldToList(Schema.Field innerField, List<FieldValueMapping> completeFieldList, boolean isAncestorRequired) {
+    String typeName = innerField.schema().getType().getName();
+    if (checkIfLogicalType(innerField.schema())) {
+      typeName += "_" + innerField.schema().getLogicalType().getName();
+    }
+    if (checkIfEnumField(innerField.schema().getType())) {
+      String fieldValueList = String.join(",", innerField.schema().getEnumSymbols());
+      completeFieldList.add(
+          FieldValueMapping.builder()
+                           .fieldName(innerField.name())
+                           .fieldType(typeName)
+                           .fieldValueList(fieldValueList)
+                           .required(checkIfRequiredField(innerField.schema()))
+                           .isAncestorRequired(isAncestorRequired)
+                           .build()
+      );
+
+    } else {
+      completeFieldList.add(
+          FieldValueMapping.builder()
+                           .fieldName(innerField.name())
+                           .fieldType(typeName)
+                           .required(checkIfRequiredField(innerField.schema()))
+                           .isAncestorRequired(isAncestorRequired)
+                           .build()
+      );
+    }
   }
 
-  private boolean checkIfRecord(Schema innerSchema) {
-    return RECORD.equals(innerSchema.getType());
-  }
+  private void extractUnionRecord(String fieldName, Schema innerField, List<FieldValueMapping> completeFieldList, boolean isAncestorRequired) {
+    Schema recordUnion = getRecordUnion(innerField.getTypes());
+    if (Objects.nonNull(recordUnion)) {
+      if (typesSet.contains(recordUnion.getType())) {
+        completeFieldList.add(
+            FieldValueMapping.builder()
+                             .fieldName(fieldName)
+                             .fieldType(getNotNullType(innerField.getTypes()))
+                             .required(false)
+                             .isAncestorRequired(isAncestorRequired)
+                             .build()
+        );
+      } else if (checkIfArray(recordUnion) && typesSet.contains(recordUnion.getElementType().getType())) {
+        completeFieldList.add(
+            FieldValueMapping.builder()
+                             .fieldName(postFixNameArray(fieldName))
+                             .fieldType(getNotNullType(innerField.getTypes()))
+                             .required(false)
+                             .isAncestorRequired(isAncestorRequired)
+                             .build()
+        );
 
-  private boolean checkIfMap(Schema innerSchema) {
-    return MAP.equals(innerSchema.getType());
-  }
-
-  private boolean checkIfArray(Schema innerSchema) {
-    return ARRAY.equals(innerSchema.getType());
-  }
-
-  private boolean checkIfUnion(Schema innerSchema) {
-    return UNION.equals(innerSchema.getType());
+      } else if (checkIfMap(recordUnion) && typesSet.contains(recordUnion.getValueType().getType())) {
+        completeFieldList.add(
+            FieldValueMapping.builder()
+                             .fieldName(postFixNameMap(fieldName))
+                             .fieldType(getNotNullType(innerField.getTypes()))
+                             .required(false)
+                             .isAncestorRequired(isAncestorRequired)
+                             .build()
+        );
+      } else {
+        processUnionField(fieldName, completeFieldList, recordUnion, isAncestorRequired);
+      }
+    } else {
+      completeFieldList.add(
+          FieldValueMapping.builder()
+                           .fieldName(innerField.getName())
+                           .fieldType(getNotNullType(innerField.getTypes()))
+                           .required(checkIfRequiredField(innerField))
+                           .isAncestorRequired(isAncestorRequired)
+                           .build()
+      );
+    }
   }
 
   private String getNotNullType(List<Schema> types) {
@@ -262,34 +306,73 @@ public class AvroExtractor {
   private Schema getRecordUnion(List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (RECORD == schema.getType() || ARRAY == schema.getType() || MAP == schema.getType() || typesSet.contains(schema.getType())) {
+      if (checkIfRecord(schema) || checkIfArray(schema) || checkIfMap(schema) || typesSet.contains(schema.getType())) {
         isRecord = schema;
       }
     }
     return isRecord;
   }
 
-  private void processRecordFieldList(String fieldName, String splitter, List<FieldValueMapping> internalFields, List<FieldValueMapping> completeFieldList) {
-    if (completeFieldList != null) {
-      internalFields.forEach(internalField -> {
-        if (internalField.getFieldName().startsWith(fieldName + ".")) {
-          internalField.setFieldName(fieldName + internalField.getFieldName().replace(fieldName, splitter.replace(".", "")));
-        } else {
-          internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
-        }
-        completeFieldList.add(internalField);
-      });
-    } else {
-      internalFields.forEach(internalField -> internalField.setFieldName(fieldName + splitter + internalField.getFieldName()));
-    }
+  private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
+    internalFields.forEach(internalField -> {
+      if (!internalField.getFieldName().contains(MAP_ARRAY) && !internalField.getFieldName().contains("[][]")) {
+        internalField.setFieldName(internalField.getFieldName().replace(fieldName, postFixNameMap(fieldName)));
+      }
+    });
+    completeFieldList.addAll(internalFields);
+  }
 
+  private void renameArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
+    internalFields.forEach(internalField -> internalField.setFieldName(fieldName));
+    completeFieldList.addAll(internalFields);
+  }
+
+  private void tweakType(FieldValueMapping internalField, String postfix) {
+    internalField.setFieldType(internalField.getFieldType() + postfix);
+  }
+
+  private String postFixNameArray(String fieldName) {
+    return fieldName + "[]";
+  }
+
+  private String postFixNameMap(String fieldName) {
+    return fieldName + "[:]";
   }
 
   private String extractTypeName(Schema schema) {
     return schema.getType().getName();
   }
 
+  private boolean checkIfRecord(Schema innerSchema) {
+    return RECORD.equals(innerSchema.getType());
+  }
+
+  private boolean checkIfMap(Schema innerSchema) {
+    return MAP.equals(innerSchema.getType());
+  }
+
+  private boolean checkIfArray(Schema innerSchema) {
+    return ARRAY.equals(innerSchema.getType());
+  }
+
+  private boolean checkIfUnion(Schema innerSchema) {
+    return UNION.equals(innerSchema.getType());
+  }
+
   private boolean checkIfEnumField(Schema.Type type) {
     return type.equals(ENUM);
   }
+
+  private boolean checkIfLogicalType(Schema innerSchema) {
+    return Objects.nonNull(innerSchema.getLogicalType());
+  }
+
+  private boolean checkIfRequiredField(Schema innerSchema) {
+    if (checkIfUnion(innerSchema)) {
+      return !IteratorUtils.matchesAny(innerSchema.getTypes().iterator(), type -> type.getType() == NULL);
+    } else {
+      return true;
+    }
+  }
+
 }
