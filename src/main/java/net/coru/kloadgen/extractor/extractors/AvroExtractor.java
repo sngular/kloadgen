@@ -1,5 +1,11 @@
 package net.coru.kloadgen.extractor.extractors;
 
+import static net.coru.kloadgen.extractor.extractors.SchemaExtractorUtil.ARRAY_NAME_POSTFIX;
+import static net.coru.kloadgen.extractor.extractors.SchemaExtractorUtil.ARRAY_TYPE_POSTFIX;
+import static net.coru.kloadgen.extractor.extractors.SchemaExtractorUtil.MAP_NAME_POSTFIX;
+import static net.coru.kloadgen.extractor.extractors.SchemaExtractorUtil.MAP_TYPE_POSTFIX;
+import static net.coru.kloadgen.extractor.extractors.SchemaExtractorUtil.postFixNameArray;
+import static net.coru.kloadgen.extractor.extractors.SchemaExtractorUtil.postFixNameMap;
 import static org.apache.avro.Schema.Type.ARRAY;
 import static org.apache.avro.Schema.Type.BOOLEAN;
 import static org.apache.avro.Schema.Type.BYTES;
@@ -30,12 +36,6 @@ import org.apache.commons.collections4.IteratorUtils;
 
 public class AvroExtractor {
 
-  public static final String ARRAY_POSTFIX = "-array";
-
-  public static final String MAP_POSTFIX = "-map";
-
-  public static final String MAP_ARRAY = "[][:]";
-
   private final Set<Schema.Type> typesSet = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
 
   private final RandomObject randomObject = new RandomObject();
@@ -61,8 +61,9 @@ public class AvroExtractor {
       processRecordFieldList(innerField.name(), ".", processFieldList(innerField.schema().getFields(), isAncestorRequired), completeFieldList);
     } else if (checkIfArray(innerField.schema())) {
       List<FieldValueMapping> internalFields = extractArrayInternalFields(innerField.name(), innerField.schema(), isAncestorRequired);
-      if (internalFields.size() == 1 && (internalFields.get(0).getFieldName().endsWith(MAP_ARRAY) || internalFields.get(0).getFieldName().endsWith("[][]"))) {
-        tweakType(internalFields.get(0), ARRAY_POSTFIX);
+      if (internalFields.size() == 1 &&
+          (internalFields.get(0).getFieldName().endsWith(ARRAY_NAME_POSTFIX + MAP_NAME_POSTFIX) || internalFields.get(0).getFieldName().endsWith(ARRAY_NAME_POSTFIX + ARRAY_NAME_POSTFIX))) {
+        tweakType(internalFields.get(0), ARRAY_TYPE_POSTFIX);
       }
       completeFieldList.addAll(internalFields);
     } else if (checkIfMap(innerField.schema())) {
@@ -86,8 +87,8 @@ public class AvroExtractor {
       extractArray(fieldName, completeFieldList, recordUnion.getElementType(), isAncestorRequired);
     } else if (checkIfMap(recordUnion)) {
       List<FieldValueMapping> internalFields = extractMapInternalFields(postFixNameMap(fieldName), recordUnion.getValueType(), isAncestorRequired);
-      if (internalFields.size() == 1 && internalFields.get(0).getFieldName().endsWith("[:][:]")) {
-        tweakType(internalFields.get(0), MAP_POSTFIX);
+      if (internalFields.size() == 1 && internalFields.get(0).getFieldName().endsWith(MAP_NAME_POSTFIX + MAP_NAME_POSTFIX)) {
+        tweakType(internalFields.get(0), MAP_TYPE_POSTFIX);
       }
       completeFieldList.addAll(internalFields);
     } else {
@@ -142,7 +143,7 @@ public class AvroExtractor {
       completeFieldList.add(
           FieldValueMapping.builder()
                            .fieldName(fieldName)
-                           .fieldType(innerField.getName() + ARRAY_POSTFIX)
+                           .fieldType(innerField.getName() + ARRAY_TYPE_POSTFIX)
                            .required(isAncestorRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build()
@@ -154,17 +155,17 @@ public class AvroExtractor {
   private void extractArray(String fieldName, List<FieldValueMapping> completeFieldList, Schema recordUnion, boolean isAncestorRequired) {
     List<FieldValueMapping> internalFields = extractArrayInternalFields(fieldName, recordUnion, isAncestorRequired);
     if (checkIfRecord(recordUnion)) {
-      processRecordFieldList(fieldName, "[].", internalFields, completeFieldList);
+      processRecordFieldList(fieldName, ARRAY_NAME_POSTFIX + ".", internalFields, completeFieldList);
     } else if (checkIfMap(recordUnion)) {
       internalFields.forEach(field -> {
-        field.setFieldName(field.getFieldName().replace("[:]", MAP_ARRAY));
+        field.setFieldName(field.getFieldName().replace(MAP_NAME_POSTFIX, ARRAY_NAME_POSTFIX + MAP_NAME_POSTFIX));
         if (field.getFieldName().matches(".*\\[:?](\\[:?])?$")) {
-          tweakType(field, ARRAY_POSTFIX);
+          tweakType(field, ARRAY_TYPE_POSTFIX);
         }
         completeFieldList.add(field);
       });
     } else if (checkIfArray(recordUnion)) {
-      tweakType(internalFields.get(0), ARRAY_POSTFIX);
+      tweakType(internalFields.get(0), ARRAY_TYPE_POSTFIX);
       createArrayType(completeFieldList, internalFields, postFixNameArray(fieldName));
     } else {
       renameArrayType(completeFieldList, internalFields, postFixNameArray(fieldName));
@@ -177,7 +178,7 @@ public class AvroExtractor {
       completeFieldList.add(
           FieldValueMapping.builder()
                            .fieldName(fieldName)
-                           .fieldType(getNotNullType(innerField.getTypes()) + MAP_POSTFIX)
+                           .fieldType(getNotNullType(innerField.getTypes()) + MAP_TYPE_POSTFIX)
                            .required(checkIfRequiredField(innerField))
                            .isAncestorRequired(isAncestorRequired)
                            .build()
@@ -192,8 +193,8 @@ public class AvroExtractor {
     } else if (checkIfArray(innerField)) {
       List<FieldValueMapping> internalFields = extractArrayInternalFields(postFixNameArray(fieldName), innerField.getElementType(), isAncestorRequired);
       internalFields.forEach(field -> {
-        if (field.getFieldType().endsWith(ARRAY_POSTFIX) && field.getFieldName().endsWith("[:][]")) {
-          tweakType(field, MAP_POSTFIX);
+        if (field.getFieldType().endsWith(ARRAY_TYPE_POSTFIX) && field.getFieldName().endsWith(MAP_NAME_POSTFIX + ARRAY_NAME_POSTFIX)) {
+          tweakType(field, MAP_TYPE_POSTFIX);
         }
       });
       completeFieldList.addAll(internalFields);
@@ -204,7 +205,7 @@ public class AvroExtractor {
       completeFieldList.add(
           FieldValueMapping.builder()
                            .fieldName(fieldName)
-                           .fieldType(innerField.getType().getName() + MAP_POSTFIX)
+                           .fieldType(innerField.getType().getName() + MAP_TYPE_POSTFIX)
                            .required(isAncestorRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build()
@@ -251,7 +252,6 @@ public class AvroExtractor {
             FieldValueMapping.builder()
                              .fieldName(fieldName)
                              .fieldType(getNotNullType(innerField.getTypes()))
-                             .required(false)
                              .isAncestorRequired(isAncestorRequired)
                              .build()
         );
@@ -260,7 +260,6 @@ public class AvroExtractor {
             FieldValueMapping.builder()
                              .fieldName(postFixNameArray(fieldName))
                              .fieldType(getNotNullType(innerField.getTypes()))
-                             .required(false)
                              .isAncestorRequired(isAncestorRequired)
                              .build()
         );
@@ -270,7 +269,6 @@ public class AvroExtractor {
             FieldValueMapping.builder()
                              .fieldName(postFixNameMap(fieldName))
                              .fieldType(getNotNullType(innerField.getTypes()))
-                             .required(false)
                              .isAncestorRequired(isAncestorRequired)
                              .build()
         );
@@ -296,9 +294,9 @@ public class AvroExtractor {
     if (!randomObject.isTypeValid(chosenTypeName)) {
       chosenTypeName = "null";
     } else if ("array".equalsIgnoreCase(chosenTypeName)) {
-      chosenTypeName = chosenType.getElementType().getName() + ARRAY_POSTFIX;
+      chosenTypeName = chosenType.getElementType().getName() + ARRAY_TYPE_POSTFIX;
     } else if ("map".equalsIgnoreCase(chosenTypeName)) {
-      chosenTypeName = chosenType.getValueType().getName() + MAP_POSTFIX;
+      chosenTypeName = chosenType.getValueType().getName() + MAP_TYPE_POSTFIX;
     }
     return chosenTypeName;
   }
@@ -315,7 +313,7 @@ public class AvroExtractor {
 
   private void createArrayType(List<FieldValueMapping> completeFieldList, List<FieldValueMapping> internalFields, String fieldName) {
     internalFields.forEach(internalField -> {
-      if (!internalField.getFieldName().contains(MAP_ARRAY) && !internalField.getFieldName().contains("[][]")) {
+      if (!internalField.getFieldName().contains(ARRAY_NAME_POSTFIX + MAP_NAME_POSTFIX) && !internalField.getFieldName().contains(ARRAY_NAME_POSTFIX + ARRAY_NAME_POSTFIX)) {
         internalField.setFieldName(internalField.getFieldName().replace(fieldName, postFixNameMap(fieldName)));
       }
     });
@@ -329,14 +327,6 @@ public class AvroExtractor {
 
   private void tweakType(FieldValueMapping internalField, String postfix) {
     internalField.setFieldType(internalField.getFieldType() + postfix);
-  }
-
-  private String postFixNameArray(String fieldName) {
-    return fieldName + "[]";
-  }
-
-  private String postFixNameMap(String fieldName) {
-    return fieldName + "[:]";
   }
 
   private String extractTypeName(Schema schema) {
