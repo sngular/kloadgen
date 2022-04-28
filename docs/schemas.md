@@ -98,7 +98,7 @@ In order to create a sequence, you need to specify `seq` as **Field Type** and i
 
 This screenshot shows an example of how KLoadGen generates sequences:
 
-![Sequence generator](images/Sequence_Generator.png)
+![Sequence generator](images/sequence-generator.png)
 
 The field name will be generated as sequences from 1 to 5.
 
