@@ -19,19 +19,19 @@ Check our [wiki](https://github.com/corunet/kloadgen/wiki) for more details on K
 
 ## 🚀 Getting Started
 
-Take a look at the [prerequisites](https://github.com/corunet/kloadgen/wiki/getting-started.html#prerequisites) for KLoadGen. 
+Take a look at the [prerequisites](https://github.com/corunet/kloadgen/wiki/getting-started#prerequisites) for KLoadGen. 
 
-If you want to start right away with your load tests, follow the [quickstart](https://github.com/corunet/kloadgen/wiki/getting-started.html#quickstart) and see [how to run a test plan](https://github.com/corunet/kloadgen/wiki/run-test-plan.html).
+If you want to start right away with your load tests, follow the [quickstart](https://github.com/corunet/kloadgen/wiki/getting-started#quickstart) and see [how to run a test plan](https://github.com/corunet/kloadgen/wiki/run-test-plan).
 
 ### Installation
 
-Check how to install KLoadGen as a JMeter library, how to download a prebuilt version from Maven, and how to install the plugin as a dependency in the [Installation](https://github.com/corunet/kloadgen/wiki/installation.html) page.
+Check how to install KLoadGen as a JMeter library, how to download a prebuilt version from Maven, and how to install the plugin as a dependency in the [Installation](https://github.com/corunet/kloadgen/wiki/installation) page.
 
 ## 🧑🏻‍💻 Usage
 
 ### Configuration
 
-See the [Producer configuration](https://github.com/corunet/kloadgen/wiki/producer-configuration.html) and [Consumer configuration](https://github.com/corunet/kloadgen/wiki/consumer-configuration.html) pages on our wiki for details on how to set up both ends of the message, producer and consumer, for this plugin.
+See the [Producer configuration](https://github.com/corunet/kloadgen/wiki/producer-configuration) and [Consumer configuration](https://github.com/corunet/kloadgen/wiki/consumer-configuration) pages on our wiki for details on how to set up both ends of the message, producer and consumer, for this plugin.
 
 ### Schemas
 
@@ -39,11 +39,11 @@ KLoadGen supports schemas with both primitive and complex data types, including 
 
 It also allows creating custom sequences of values and supports null values.
 
-You can find more details in [Schemas](https://github.com/corunet/kloadgen/wiki/schemas.html).
+You can find more details in [Schemas](https://github.com/corunet/kloadgen/wiki/schemas).
 
 ## 📊 Technical design
 
-See the architecture and project structure of KLoadGen in the [Architecture](https://github.com/corunet/kloadgen/wiki/architecture.html) page.
+See the architecture and project structure of KLoadGen in the [Architecture](https://github.com/corunet/kloadgen/wiki/architecture) page.
 
 ## 🧰 Support
 
