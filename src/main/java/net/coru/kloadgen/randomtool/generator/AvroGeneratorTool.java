@@ -20,6 +20,7 @@ import java.util.Objects;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomObject;
+import net.coru.kloadgen.randomtool.random.SequenceSupport;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -63,7 +64,7 @@ public class AvroGeneratorTool {
     } else if ("seq".equalsIgnoreCase(fieldType)) {
       String type = UNION.getName().equals(getValidTypeFromSchema(field.schema())) ? getRecordUnion(field.schema().getTypes()).getName()
           : getValidTypeFromSchema(field.schema());
-      if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(type))) {
         return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), type, fieldValuesList, context);
       } else {
         value = randomObject.generateSeq(field.name(), type, parameterList, context);

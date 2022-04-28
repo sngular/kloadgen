@@ -6,6 +6,7 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
@@ -26,6 +27,7 @@ import java.util.stream.Stream;
 
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -154,18 +156,25 @@ class AvroGeneratorToolTest {
     return Stream.of(
             Arguments.of(18,
                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                    ValidTypeConstants.INT,
                     List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20)),
             Arguments.of(20,
                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20, 1, 2)));
+                    ValidTypeConstants.INT,
+                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20, 1, 2)),
+            Arguments.of(4,
+                    List.of("first", "second", "third"),
+                    ValidTypeConstants.STRING,
+                    List.of("first", "second", "third", "first", "second")));
   }
 
   @ParameterizedTest
   @DisplayName("Testing generate a sequence of a list of values")
   @MethodSource("parametersForGenerateFieldValuesListSequence")
-  void testGenerateFieldValuesListSequence(int size, List<String> fieldValuesList, List<Integer> expected) {
+  void testGenerateFieldValuesListSequence(int size, List<String> fieldValuesList, String fieldType, List<Object> expected) {
     var intList = new ArrayList<>();
-    Field field = new Field("name", SchemaBuilder.builder().intType());
+    Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
+    Field field = new Field("name", schema);
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList));
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
@@ -177,9 +186,10 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @DisplayName("Testing generate an optional sequence of a list of values")
   @MethodSource("parametersForGenerateFieldValuesListSequence")
-  void testGenerateFieldValuesListOptionalSequence(int size, List<String> fieldValuesList, List<Integer> expected){
+  void testGenerateFieldValuesListOptionalSequence(int size, List<String> fieldValuesList, String fieldType, List<Integer> expected){
     var intList = new ArrayList<>();
-    Field field = new Field("name", SchemaBuilder.builder().nullable().intType());
+    Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().nullable().intType() : SchemaBuilder.builder().nullable().stringType();
+    Field field = new Field("name", schema);
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList), false, true);
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {

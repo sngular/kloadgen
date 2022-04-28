@@ -19,6 +19,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
+import net.coru.kloadgen.randomtool.random.SequenceSupport;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -154,12 +155,11 @@ public abstract class SchemaProcessorLib {
 
     var value = new HashMap<>(mapSize);
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(fieldType))) {
         value.put(generateMapKey(), randomObject.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
       } else {
         for (int i = mapSize; i > 0; i--) {
-          value.put(generateMapKey(),
-                    randomObject.generateSeq(fieldName, fieldType, parameterList, context));
+          value.put(generateMapKey(), randomObject.generateSeq(fieldName, fieldType, parameterList, context));
         }
       }
     } else {
@@ -179,7 +179,7 @@ public abstract class SchemaProcessorLib {
     );
     List value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(fieldType))) {
         value.add(randomObject.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
       } else {
         for (int i = arraySize; i > 0; i--) {

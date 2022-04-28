@@ -15,6 +15,7 @@ import java.util.Map;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
+import net.coru.kloadgen.randomtool.random.SequenceSupport;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 
@@ -38,7 +39,7 @@ public class StatelessGeneratorTool {
     Object value;
 
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && fieldValuesList.size() > 1) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(fieldType))) {
         return randomObject.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
       } else {
         value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
