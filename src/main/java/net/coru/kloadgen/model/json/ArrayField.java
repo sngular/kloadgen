@@ -25,16 +25,16 @@ public class ArrayField extends Field {
 
   boolean uniqueItems;
 
-	boolean isFieldRequired;
+  boolean isFieldRequired;
 
-	@Builder(toBuilder = true)
-	public ArrayField(String name, List<Field> values, int minItems, boolean uniqueItems, boolean isFieldRequired) {
-		super(name, "array");
-		this.values = values;
-		this.minItems = minItems;
-		this.uniqueItems = uniqueItems;
-		this.isFieldRequired = isFieldRequired;
-	}
+  @Builder(toBuilder = true)
+  public ArrayField(String name, List<Field> values, int minItems, boolean uniqueItems, boolean isFieldRequired) {
+    super(name, "array");
+    this.values = values;
+    this.minItems = minItems;
+    this.uniqueItems = uniqueItems;
+    this.isFieldRequired = isFieldRequired;
+  }
 
   @Override
   public Field cloneField(String fieldName) {

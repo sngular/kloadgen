@@ -34,7 +34,7 @@ public class ValueSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(ValueSerializedConfigElement.class);
 
-    createPropertyGroup("value_serialized_load_generator", new String[] {
+    createPropertyGroup("value_serialized_load_generator", new String[]{
         VALUE_NAME_STRATEGY, VALUE_SERIALIZER_PROPERTY, VALUE_SUBJECT_NAME, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
     });
 

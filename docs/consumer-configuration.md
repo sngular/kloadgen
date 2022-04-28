@@ -4,7 +4,7 @@ Here you can find the list of the parameters to be configured when defining the 
 
 ## Kafka Consumer Sampler configuration
 
-![Kafka Consumer Sampler configuration](images/Kafka_Consumer_Properties.png)
+![Kafka Consumer Sampler configuration](images/kafka-consumer-properties.png)
 
 - **bootstrap.servers**: list of Bootstrap servers with format: broker-ip-1:port, broker-ip-2:port, broker-ip-3:port.
 - **zookeeper.servers**: list of Zookeeper servers with format: zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port.
@@ -48,7 +48,7 @@ These are the configuration elements corresponding to the Kafka consumer. See be
 
 ### Value Schema Deserializer Config
 
-![Value Schema Deserializer Config](images/Value_Schema_Deserialization_Config.png)
+![Value Schema Deserializer Config](images/value-schema-deserialization-config.png)
 
 This configuration element allows to get the correct schema from the Schema Registry and use it to deserialize the read messages.
 
@@ -58,7 +58,7 @@ You need to provide values for **Name Strategy** and **Deserializer**.
 
 ### Value Schema File Deserializer Config
 
-![Value Schema File Deserializer Config](images/Value_Schema_File_Deserialization_Config.png)
+![Value Schema File Deserializer Config](images/value-schema-file-deserialization-config.png)
 
 This configuration element allows to select a schema from a file (.avsc).
 

@@ -85,7 +85,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         String fieldType = fieldValueMapping.getFieldType();
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
-            && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getParentRequired()){
+            && (generatedProperties == elapsedProperties && generatedProperties > 0) && fieldValueMapping.getAncestorRequired()) {
           fieldValueMapping.setRequired(true);
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
@@ -98,7 +98,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         }
         generatedProperties++;
 
-        if (isOptionalField(messageBuilder, fieldName) && !fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")){
+        if (isOptionalField(messageBuilder, fieldName) && !fieldValueMapping.getRequired() && fieldValueMapping.getFieldValuesList().contains("null")) {
           elapsedProperties++;
           fieldExpMappingsQueue.remove();
         } else {
@@ -119,11 +119,11 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
             if (checkIfRecordMap(typeFilter)) {
               processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldName);
             } else if (checkIfRecordArray(typeFilter)) {
-              processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , messageBuilder , fieldName);
-            } else if (checkIfMap(typeFilter , fieldType)) {
-              processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , messageBuilder , fieldName);
-            } else if (checkIfArray(typeFilter , fieldType)) {
-              processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , messageBuilder , "" , fieldName);
+              processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldName);
+            } else if (checkIfMap(typeFilter, fieldType)) {
+              processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldName);
+            } else if (checkIfArray(typeFilter, fieldType)) {
+              processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, "", fieldName);
             } else {
               throw new KLoadGenException("Wrong configuration Map - Array");
             }
@@ -191,7 +191,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
         FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
         if (Boolean.TRUE.equals((fieldExpMappingsQueue.peek() == null || !Objects.requireNonNull(nextField).getFieldName().contains(parentFieldName))
-                                && Objects.requireNonNull(actualField).getParentRequired())
+                                && Objects.requireNonNull(actualField).getAncestorRequired())
             && (generatedProperties == elapsedProperties && generatedProperties > 0)) {
 
           fieldValueMapping = actualField;
@@ -199,10 +199,10 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
           List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
-          if (fieldExpMappingsQueue.peek() == null){
+          if (fieldExpMappingsQueue.peek() == null) {
             fieldExpMappingsQueue.add(fieldValueMapping);
           }
-        } else{
+        } else {
           fieldValueMapping = nextField;
         }
       } else {
@@ -221,11 +221,11 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
           if (checkIfRecordMap(methodName)) {
             processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, messageBuilder, fieldName);
           } else if (checkIfRecordArray(methodName)) {
-            processFieldValueMappingAsRecordArray(fieldExpMappingsQueue , messageBuilder , fieldName);
+            processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, messageBuilder, fieldName);
           } else if (checkIfMap(collectionTail, fieldType)) {
-            processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue , messageBuilder , fieldName);
-          } else if (checkIfArray(collectionTail , fieldType)) {
-            processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue , messageBuilder , parentFieldName , fieldName);
+            processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, messageBuilder, fieldName);
+          } else if (checkIfArray(collectionTail, fieldType)) {
+            processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, parentFieldName, fieldName);
           }
         } else if (collectionTail.startsWith(".")) {
           String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, parentFieldName);
@@ -270,7 +270,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
   private void processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
-    createObjectArray(messageBuilder, fieldName, arraySize,fieldExpMappingsQueue);
+    createObjectArray(messageBuilder, fieldName, arraySize, fieldExpMappingsQueue);
   }
 
   private void processFieldValueMappingAsRecordMap(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, DynamicMessage.Builder messageBuilder, String fieldName) {

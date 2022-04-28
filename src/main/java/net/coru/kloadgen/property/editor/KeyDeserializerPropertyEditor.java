@@ -61,11 +61,11 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
     deserializerComboBox = objectJComboBox;
     Reflections reflections = new Reflections(
         new ConfigurationBuilder()
-          .addUrls(ClasspathHelper.forClass(Deserializer.class))
-          .filterInputsBy(new FilterBuilder()
-                              .includePackage("net.coru.kloadgen.serializer")
-                              .includePackage("io.confluent.kafka.serializers"))
-          .setScanners(SubTypes));
+            .addUrls(ClasspathHelper.forClass(Deserializer.class))
+            .filterInputsBy(new FilterBuilder()
+                                .includePackage("net.coru.kloadgen.serializer")
+                                .includePackage("io.confluent.kafka.serializers"))
+            .setScanners(SubTypes));
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
   }
 

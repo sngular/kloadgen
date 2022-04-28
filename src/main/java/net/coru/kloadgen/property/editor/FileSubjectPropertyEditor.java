@@ -115,7 +115,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         subjectNameComboBox.setSelectedItem(parserSchema.name());
       } catch (IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-            JOptionPane.ERROR_MESSAGE);
+                                      JOptionPane.ERROR_MESSAGE);
         log.error(e.getMessage(), e);
       }
       subjectNameComboBox.addFocusListener(new ComboFiller());
@@ -127,7 +127,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   public List<FieldValueMapping> getAttributeList(ParsedSchema selectedSchema) {
-    if(Objects.nonNull(selectedSchema)) {
+    if (Objects.nonNull(selectedSchema)) {
       return schemaExtractor.flatPropertiesList(selectedSchema);
     }
     return new ArrayList<>();
@@ -136,7 +136,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   @Override
   public void actionPerformed(ActionEvent event) {
     if (subjectNameComboBox.getItemCount() != 0) {
-      String schemaType =  schemaTypeComboBox.getSelectedItem().toString();
+      String schemaType = schemaTypeComboBox.getSelectedItem().toString();
       String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
       List<FieldValueMapping> attributeList = getAttributeList(selectedSchema);
@@ -167,18 +167,18 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         } catch (NoSuchFieldException | IllegalAccessException e) {
           JOptionPane
               .showMessageDialog(panel, "Failed to retrieve schema : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
-                  JOptionPane.ERROR_MESSAGE);
+                                 JOptionPane.ERROR_MESSAGE);
           log.error(e.getMessage(), e);
         } catch (AvroRuntimeException ex) {
           JOptionPane
               .showMessageDialog(panel, "Failed to process schema : " + ex.getMessage(), "ERROR: Failed to retrieve properties!",
-                  JOptionPane.ERROR_MESSAGE);
+                                 JOptionPane.ERROR_MESSAGE);
           log.error(ex.getMessage(), ex);
         }
       } else {
         JOptionPane
             .showMessageDialog(panel, "No schema has been loaded, we cannot extract properties", "ERROR: Failed to retrieve properties!",
-                JOptionPane.WARNING_MESSAGE);
+                               JOptionPane.WARNING_MESSAGE);
       }
     }
   }
