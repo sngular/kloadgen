@@ -1,6 +1,18 @@
 # Release notes
 
-We're constantly improving KLoadGen. For release highlights and feature explanations, check the sections below. For a complete list of changes, fixes, and deprecations, see the [changelog](https://github.com/corunet/kloadgen/changelog.md).
+We're constantly improving KLoadGen. For release highlights and feature explanations, check the sections below. For a complete list of changes, fixes, and deprecations, see the [GitHub Releases](https://github.com/corunet/kloadgen/releases) page.
+
+## KLoadGen 4.0.0
+RELEASE DATE: 2022-03-24
+
+These are the main highlights for this release:
+
+- Now you can download KLoadGen from Maven Central Repository
+- Support for PROTOBUF structures
+- Support for sequence generation
+- Improvements on handling the optional value generation
+- Documentation is now available on the [wiki](https://github.com/corunet/kloadgen/wiki)
+ - Some bugs have been fixed
 
 ## KLoadGen 3.0.0
 RELEASE DATE: 2020-12-04
