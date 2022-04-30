@@ -12,7 +12,3 @@ This is the list of channels where you can find us for contact, support, and sug
 
 - [GitHub issues](https://github.com/corunet/kloadgen/issues/new). For incidents, queries, and suggestions.
 - [Email](oss@corunet.com) and [Twitter](https://twitter.com/corunet). For general comments and requests.
-
-## Contributing guidelines and best practices
-
-Contributions to KLoadGen are welcome. Please follow our [guidelines](https://github.com/corunet/kloadgen/CONTRIBUTING.md) to create an issue. Thank you for helping us to improve our product!
