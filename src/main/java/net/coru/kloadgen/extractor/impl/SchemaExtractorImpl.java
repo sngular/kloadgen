@@ -93,7 +93,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     SchemaMetadata schemaMetadata = schemaRegistryClient.getLatestSchemaMetadata(subjectName);
     ParsedSchema schema = schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
     if (AVRO.name().equalsIgnoreCase(schema.schemaType())) {
-      (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> avroExtractor.processField(field, attributeList));
+      (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> avroExtractor.processField(field, attributeList, true, false));
     } else if (JSON.name().equalsIgnoreCase(schema.schemaType())) {
       attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
     } else if (PROTOBUF.name().equalsIgnoreCase(schema.schemaType())) {
