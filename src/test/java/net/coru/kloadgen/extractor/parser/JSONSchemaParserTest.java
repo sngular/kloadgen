@@ -58,9 +58,7 @@ class JSONSchemaParserTest {
 
     Schema result = jsonSchemaParser.parse(resourceAsFile.getContent("/jsonschema/multiple-type.jcs"));
 
-    assertThat(result)
-        .extracting(Schema::getProperties)
-        .satisfies(this::multiTypeTestStringOrNumber);
+    assertThat(result).extracting(Schema::getProperties).satisfies(this::multiTypeTestStringOrNumber);
   }
 
   private boolean multiTypeTestStringOrNumber(Object field) {
