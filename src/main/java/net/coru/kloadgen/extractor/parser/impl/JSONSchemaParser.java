@@ -77,6 +77,7 @@ public class JSONSchemaParser implements SchemaParser {
 
   @Override
   public Schema parse(JsonNode jsonNode) {
+
     
     definitionsMap.clear();
     List<Field> fields = new ArrayList<>();
