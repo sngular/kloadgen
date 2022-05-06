@@ -23,7 +23,6 @@ import com.github.curiousoddman.rgxgen.RgxGen;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,18 +31,6 @@ public class RandomObject {
 
   public boolean isTypeValid(String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
-  }
-
-  public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    return context.compute(fieldName, (fieldNameMap, seqObject) ->
-        seqObject == null
-            ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
-            : addOneCasted(seqObject, fieldType));
-  }
-
-  public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
-    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
   }
 
   public Object generateRandom(
@@ -147,56 +134,6 @@ public class RandomObject {
     }
 
     return value;
-  }
-
-  private Object getFirstValueOrDefaultForType(List<String> fieldValueList, String fieldType) {
-    if (!fieldValueList.isEmpty()) {
-      return ValueUtils.castValue(fieldValueList.get(0), fieldType);
-    }
-
-    switch (fieldType) {
-      case ValidTypeConstants.INT:
-        return 1;
-      case ValidTypeConstants.DOUBLE:
-        return 1.0;
-      case ValidTypeConstants.LONG:
-        return 1L;
-      case ValidTypeConstants.FLOAT:
-        return 1.0f;
-      case ValidTypeConstants.SHORT:
-        return (short) 1;
-      case ValidTypeConstants.BYTES_DECIMAL:
-      case ValidTypeConstants.FIXED_DECIMAL:
-      default:
-        return BigDecimal.ONE;
-    }
-  }
-
-  private Object addOneCasted(Object seqObject, String fieldType) {
-    Object castValue;
-    switch (fieldType) {
-      case ValidTypeConstants.INT:
-        castValue = Integer.parseInt(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.DOUBLE:
-        castValue = Double.parseDouble(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.LONG:
-        castValue = Long.parseLong(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.FLOAT:
-        castValue = Float.parseFloat(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.SHORT:
-        castValue = Short.parseShort(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.BYTES_DECIMAL:
-      case ValidTypeConstants.FIXED_DECIMAL:
-      default:
-        castValue = new BigDecimal(seqObject.toString()).add(BigDecimal.ONE);
-        break;
-    }
-    return castValue;
   }
 
   private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
