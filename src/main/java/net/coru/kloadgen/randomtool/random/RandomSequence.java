@@ -1,3 +1,9 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package net.coru.kloadgen.randomtool.random;
 
 import com.google.common.collect.ImmutableMap;
@@ -7,10 +13,8 @@ import net.coru.kloadgen.randomtool.util.ValueUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
-public class SequenceSupport {
+public class RandomSequence {
 
     private static final Map<String, SequenceType<?>> supportedSequenceTypes = ImmutableMap.<String, SequenceType<?>>builder()
             .put(ValidTypeConstants.INT, SequenceType.of(() -> 1, seqObject -> Integer.parseInt(seqObject.toString()) + 1))
@@ -24,6 +28,18 @@ public class SequenceSupport {
 
     public static boolean isTypeSupported(String fieldType) {
         return supportedSequenceTypes.containsKey(fieldType);
+    }
+
+    public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
+        return context.compute(fieldName, (fieldNameMap, seqObject) ->
+                seqObject == null
+                        ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
+                        : addOneCasted(seqObject, fieldType));
+    }
+
+    public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
+        Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
+        return ValueUtils.castValue(fieldValueList.get(index), fieldType);
     }
 
     public Object getFirstValueOrDefaultForType(List<String> fieldValueList, String fieldType) {
@@ -41,26 +57,6 @@ public class SequenceSupport {
         if (!isTypeSupported(fieldType)) {
             throw new IllegalArgumentException("Field type is not supported for sequences");
         }
-        return supportedSequenceTypes.get(fieldType).addOneCasted.apply(seqObject);
-    }
-
-
-    private static class SequenceType<T> {
-
-        private final Supplier<T> getDefaultForType;
-        private final Function<Object, T> addOneCasted;
-
-        public SequenceType(Supplier<T> getDefaultForType, Function<Object, T> addOneCasted) {
-            this.getDefaultForType = getDefaultForType;
-            this.addOneCasted = addOneCasted;
-        }
-
-        public static <T> SequenceType<T> of(Supplier<T> getDefaultForType, Function<Object, T> addOneCasted) {
-            return new SequenceType<T>(getDefaultForType, addOneCasted);
-        }
-
-        private Object getDefaultForType() {
-            return getDefaultForType.get();
-        }
+        return supportedSequenceTypes.get(fieldType).addOneCasted(seqObject);
     }
 }

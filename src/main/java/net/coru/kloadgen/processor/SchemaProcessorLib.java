@@ -19,7 +19,7 @@ import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
-import net.coru.kloadgen.randomtool.random.SequenceSupport;
+import net.coru.kloadgen.randomtool.random.RandomSequence;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -33,6 +33,8 @@ public abstract class SchemaProcessorLib {
   private static final RandomMap randomMap = new RandomMap();
 
   private static final RandomArray randomArray = new RandomArray();
+
+  private static final RandomSequence randomSequence = new RandomSequence();
 
   static boolean checkIfIsRecordMapArray(String cleanPath) {
     var indexOfArrayIdentifier = StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]"));
@@ -155,11 +157,11 @@ public abstract class SchemaProcessorLib {
 
     var value = new HashMap<>(mapSize);
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(fieldType))) {
-        value.put(generateMapKey(), randomObject.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(fieldType))) {
+        value.put(generateMapKey(), randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
       } else {
         for (int i = mapSize; i > 0; i--) {
-          value.put(generateMapKey(), randomObject.generateSeq(fieldName, fieldType, parameterList, context));
+          value.put(generateMapKey(), randomSequence.generateSeq(fieldName, fieldType, parameterList, context));
         }
       }
     } else {
@@ -179,11 +181,11 @@ public abstract class SchemaProcessorLib {
     );
     List value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(fieldType))) {
-        value.add(randomObject.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(fieldType))) {
+        value.add(randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
       } else {
         for (int i = arraySize; i > 0; i--) {
-          value.add(randomObject.generateSeq(fieldName, fieldType, parameterList, context));
+          value.add(randomSequence.generateSeq(fieldName, fieldType, parameterList, context));
         }
       }
     } else {

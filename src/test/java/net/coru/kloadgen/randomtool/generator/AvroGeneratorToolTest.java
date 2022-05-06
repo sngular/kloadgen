@@ -6,7 +6,6 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 

@@ -20,7 +20,7 @@ import java.util.Objects;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomObject;
-import net.coru.kloadgen.randomtool.random.SequenceSupport;
+import net.coru.kloadgen.randomtool.random.RandomSequence;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -35,6 +35,8 @@ public class AvroGeneratorTool {
   private final Map<String, Object> context = new HashMap<>();
 
   private final RandomObject randomObject = new RandomObject();
+
+  private final RandomSequence randomSequence = new RandomSequence();
 
   public Object generateObject(Field field, FieldValueMapping fieldValueMapping, Map<ConstraintTypeEnum, String> constrains) {
     String fieldType = fieldValueMapping.getFieldType();
@@ -64,10 +66,10 @@ public class AvroGeneratorTool {
     } else if ("seq".equalsIgnoreCase(fieldType)) {
       String type = UNION.getName().equals(getValidTypeFromSchema(field.schema())) ? getRecordUnion(field.schema().getTypes()).getName()
           : getValidTypeFromSchema(field.schema());
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(type))) {
-        return randomObject.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), type, fieldValuesList, context);
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(type))) {
+        return randomSequence.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), type, fieldValuesList, context);
       } else {
-        value = randomObject.generateSeq(field.name(), type, parameterList, context);
+        value = randomSequence.generateSeq(field.name(), type, parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
 
@@ -140,7 +142,7 @@ public class AvroGeneratorTool {
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
       } else {
         if ("Seq".equalsIgnoreCase(fieldType)) {
-          value = new GenericData.EnumSymbol(schema, randomObject.generateSequenceForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));
+          value = new GenericData.EnumSymbol(schema, randomSequence.generateSequenceForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));
         } else {
           value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
         }

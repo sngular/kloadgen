@@ -23,29 +23,14 @@ import com.github.curiousoddman.rgxgen.RgxGen;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class RandomObject {
 
-  private static final SequenceSupport sequenceSupport = new SequenceSupport();
-
   public boolean isTypeValid(String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
-  }
-
-  public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    return context.compute(fieldName, (fieldNameMap, seqObject) ->
-        seqObject == null
-            ? sequenceSupport.getFirstValueOrDefaultForType(fieldValueList, fieldType)
-            : sequenceSupport.addOneCasted(seqObject, fieldType));
-  }
-
-  public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
-    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
   }
 
   public Object generateRandom(

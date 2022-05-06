@@ -15,7 +15,7 @@ import java.util.Map;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
-import net.coru.kloadgen.randomtool.random.SequenceSupport;
+import net.coru.kloadgen.randomtool.random.RandomSequence;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 
@@ -29,6 +29,8 @@ public class StatelessGeneratorTool {
 
   private final RandomObject randomObject = new RandomObject();
 
+  private final RandomSequence randomSequence = new RandomSequence();
+
   public String generateRandomString(Integer valueLength) {
     return (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), Collections.emptyMap());
   }
@@ -39,10 +41,10 @@ public class StatelessGeneratorTool {
     Object value;
 
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !SequenceSupport.isTypeSupported(fieldType))) {
-        return randomObject.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(fieldType))) {
+        return randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
       } else {
-        value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
+        value = randomSequence.generateSeq(fieldName, fieldType, parameterList, context);
       }
     } else {
       value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
@@ -68,7 +70,7 @@ public class StatelessGeneratorTool {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     Object value = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     if ("seq".equals(fieldType)) {
-      value = randomObject.generateSeq(fieldName, fieldType, parameterList, context);
+      value = randomSequence.generateSeq(fieldName, fieldType, parameterList, context);
     }
 
     return value;
