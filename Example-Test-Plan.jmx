@@ -26,7 +26,7 @@
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
       <hashTree>
-        <net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement" testname="Kafka Headers Config Element" enabled="true">
+        <net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement" testname="KLG - Kafka Headers Config Element" enabled="true">
           <collectionProp name="kafkaHeaders">
             <elementProp name="" elementType="net.coru.kloadgen.model.HeaderMapping">
               <stringProp name="headerName">message_id</stringProp>
@@ -55,7 +55,7 @@
           </collectionProp>
         </net.coru.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
-        <net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="Value Schema Load Generator Config" enabled="true">
+        <net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="KLG - Value Schema Load Generator Config" enabled="true">
           <stringProp name="avroSubject"></stringProp>
           <collectionProp name="valueSchemaProperties">
             <elementProp name="" elementType="net.coru.kloadgen.model.FieldValueMapping">
@@ -409,7 +409,7 @@
           </collectionProp>
         </net.coru.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
         <hashTree/>
-        <net.coru.kloadgen.config.keysimple.KeySimpleConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.keysimple.KeySimpleConfigElement" testname="Key Plain Load Generator Config" enabled="true">
+        <net.coru.kloadgen.config.keysimple.KeySimpleConfigElement guiclass="TestBeanGUI" testclass="net.coru.kloadgen.config.keysimple.KeySimpleConfigElement" testname="KLG - Key Plain Load Generator Config" enabled="true">
           <stringProp name="keySerializerConfiguration">org.apache.kafka.common.serialization.StringSerializer</stringProp>
           <stringProp name="keyType">string</stringProp>
           <stringProp name="keyValue">${__RandomString(5,,)}</stringProp>
