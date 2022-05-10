@@ -1,4 +1,4 @@
-package net.coru.kloadgen.extractor;
+package net.coru.kloadgen.extractor.extractors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
-import net.coru.kloadgen.extractor.extractors.ProtoBufExtractor;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.jmeter.threads.JMeterContext;
