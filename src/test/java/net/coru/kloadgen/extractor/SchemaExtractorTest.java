@@ -296,25 +296,25 @@ class SchemaExtractorTest {
     constraints.put(MAXIMUM_VALUE, "0");
 
     FieldValueMapping second = new FieldValueMapping("arrayOfObjectsOfBasicTypes[].stringOfObject", "string", 0, "", false, true);
-    second.setConstrains(constraints);
+    second.setConstraints(constraints);
 
     FieldValueMapping objectCollectionsBasicTypesStringControl = new FieldValueMapping("objectOfCollectionsOfBasicTypes.stringControl", "string", 0, "", false, true);
-    objectCollectionsBasicTypesStringControl.setConstrains(constraints);
+    objectCollectionsBasicTypesStringControl.setConstraints(constraints);
 
     FieldValueMapping objectCollectionsObjectStringControl = new FieldValueMapping("objectOfCollectionsOfObject.stringControl", "string", 0, "", false, true);
-    objectCollectionsObjectStringControl.setConstrains(constraints);
+    objectCollectionsObjectStringControl.setConstraints(constraints);
 
     FieldValueMapping objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson = new FieldValueMapping("objectOfCollectionsOfObject.arrayOfObjectsPerson[].namePerson", "string"
         , 0, "", false, true);
-    objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson.setConstrains(constraints);
+    objectOfCollectionsOfObjectArrayOfObjectsPersonNamePerson.setConstraints(constraints);
 
     FieldValueMapping objectOfCollectionsOfObjectMapOfObjectsDogNameDog = new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].nameDog", "string", 0, "",
                                                                                                 false, true);
-    objectOfCollectionsOfObjectMapOfObjectsDogNameDog.setConstrains(constraints);
+    objectOfCollectionsOfObjectMapOfObjectsDogNameDog.setConstraints(constraints);
 
     FieldValueMapping objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName = new FieldValueMapping("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.breedName",
                                                                                                          "string", 0, "", false, true);
-    objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName.setConstrains(constraints);
+    objectOfCollectionsOfObjectMapOfObjectsDogVetDataBreedName.setConstraints(constraints);
 
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
     assertThat(fieldValueMappingList)
@@ -346,14 +346,14 @@ class SchemaExtractorTest {
     constraints.put(MAXIMUM_VALUE, "0");
 
     FieldValueMapping arrayOfMapsOfObjectsStringObject = new FieldValueMapping("arrayOfMapsOfObjects[][:].stringObject", "string", 0, "", false, true);
-    arrayOfMapsOfObjectsStringObject.setConstrains(constraints);
+    arrayOfMapsOfObjectsStringObject.setConstraints(constraints);
 
     FieldValueMapping mapOfMapsOfObjectsName4Object = new FieldValueMapping("mapOfMapsOfObjects[:][:].name4Object", "string", 0, "", false, true);
-    mapOfMapsOfObjectsName4Object.setConstrains(constraints);
+    mapOfMapsOfObjectsName4Object.setConstraints(constraints);
 
     FieldValueMapping mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl = new FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].stringControl",
                                                                                                         "string", 0, "", false, true);
-    mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl.setConstrains(constraints);
+    mapOfObjectsOfCollectionsArrayOfMapsOfObjectStringControl.setConstraints(constraints);
 
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "JSON"));
     assertThat(fieldValueMappingList)

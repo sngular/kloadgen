@@ -38,7 +38,7 @@ public class AvroGeneratorTool {
 
   private final RandomSequence randomSequence = new RandomSequence();
 
-  public Object generateObject(Field field, FieldValueMapping fieldValueMapping, Map<ConstraintTypeEnum, String> constrains) {
+  public Object generateObject(Field field, FieldValueMapping fieldValueMapping, Map<ConstraintTypeEnum, String> constraints) {
     String fieldType = fieldValueMapping.getFieldType();
     Integer valueLength = fieldValueMapping.getValueLength();
     List<String> fieldValuesList = fieldValueMapping.getFieldValuesList();
@@ -53,12 +53,12 @@ public class AvroGeneratorTool {
       Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
 
-        value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
+        value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
         value = ValueUtils.castValue(value, field.schema().getType().getName());
       } else if (ENUM == safeSchema.getType()) {
         value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, safeSchema, parameterList, field.schema().getType().getName());
       } else {
-        value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
+        value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
         if ("null".equalsIgnoreCase(value.toString())) {
           value = null;
         }
@@ -73,12 +73,12 @@ public class AvroGeneratorTool {
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
 
-      value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
+      value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
       value = ValueUtils.castValue(value, field.schema().getType().getName());
     } else if (!logicalType && FIXED == field.schema().getType()) {
       value = getFixedOrGenerate(field.schema());
     } else {
-      value = randomObject.generateRandom(fieldType, valueLength, parameterList, constrains);
+      value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
     }
     return value;
   }

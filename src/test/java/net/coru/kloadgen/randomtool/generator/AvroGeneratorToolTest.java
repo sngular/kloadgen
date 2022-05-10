@@ -85,9 +85,9 @@ class AvroGeneratorToolTest {
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
-    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
-    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
     return Stream.of(
             Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), new Field("name",
@@ -108,9 +108,9 @@ class AvroGeneratorToolTest {
                     SchemaBuilder.builder().stringType()),
                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
             Arguments.of("bytes_decimal", 1, Collections.singletonList("44.444"), new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
+                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
             Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
+                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstraints)
     );
   }
 
@@ -127,9 +127,9 @@ class AvroGeneratorToolTest {
   @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
   void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
                                                    Field field, Object expected,
-                                                   Map<ConstraintTypeEnum, String> constrains) {
+                                                   Map<ConstraintTypeEnum, String> constraints) {
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constrains)).isEqualTo(expected);
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constraints)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
@@ -253,9 +253,9 @@ class AvroGeneratorToolTest {
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
-    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
-    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
     return Stream.of(
             Arguments.of("int_date", 1, DATE_STRING, new Field("name",
@@ -276,9 +276,9 @@ class AvroGeneratorToolTest {
                             SchemaBuilder.builder().stringType()),
                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
             Arguments.of("bytes_decimal", 1, "44.444", new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
+                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
             Arguments.of("fixed_decimal", 1, "55.555", new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
+                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstraints)
     );
   }
 
@@ -298,12 +298,12 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Recover Variable from Context Logical Types")
   @MethodSource("parametersForShouldRecoverVariableFromContextLogicalTypes")
   void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field,
-                                        Object expected, Map<ConstraintTypeEnum, String> constrains) {
+                                        Object expected, Map<ConstraintTypeEnum, String> constraints) {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constrains))
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constraints))
             .isEqualTo(expected);
   }
 }

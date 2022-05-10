@@ -261,7 +261,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                                                            fieldValueMapping.getFieldType(),
                                                            fieldValueMapping.getValueLength(),
                                                            fieldValueMapping.getFieldValuesList(),
-                                                           fieldValueMapping.getConstrains()
+                                                           fieldValueMapping.getConstraints()
                               )
       );
     }
@@ -328,7 +328,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
 
     var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), fieldValueMapping.getValueLength(), arraySize,
-                                         fieldValueMapping.getConstrains());
+                                         fieldValueMapping.getConstraints());
 
     messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName), mapArray);
   }
@@ -448,7 +448,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
                            fieldValueMappingCleanType,
                            fieldValueMapping.getValueLength(),
                            fieldValueMapping.getFieldValuesList(),
-                           fieldValueMapping.getConstrains()));
+                           fieldValueMapping.getConstraints()));
     }
 
     return builder.build();
