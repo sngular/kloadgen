@@ -1,13 +1,12 @@
-package net.coru.kloadgen.extractor;
+package net.coru.kloadgen.extractor.extractors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.jmeter.threads.JMeterContext;
@@ -22,7 +21,7 @@ class ProtobufExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
+  private final ProtoBufExtractor protoBufExtractor = new ProtoBufExtractor();
 
   @BeforeEach
   public void setUp() {
@@ -36,9 +35,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with simple proto file")
-  void testFlatProperties() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+  void testFlatProperties() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/easyTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
@@ -50,9 +49,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with data structure map and array")
-  void testEmbeddedTypes() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+  void testEmbeddedTypes() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/embeddedTypeTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(2)
         .containsExactlyInAnyOrder(
@@ -63,9 +62,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with data structure enums and collections")
-  void testEnumType() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/enumTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+  void testEnumType() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/enumTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
@@ -77,9 +76,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with data structure Any of")
-  void testOneOfsType() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/oneOfTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+  void testOneOfsType() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/oneOfTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(4)
         .contains(
@@ -96,9 +95,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with complex structure")
-  void testComplexProto() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUFF"));
+  void testComplexProto() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/complexTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(13)
         .containsExactlyInAnyOrder(
@@ -120,9 +119,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with real proto")
-  void testProvided() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/providedTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+  void testProvided() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/providedTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(32)
         .containsExactlyInAnyOrder(
@@ -164,9 +163,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with data structure maps")
-  void testMap() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+  void testMap() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/mapTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(7)
         .containsExactlyInAnyOrder(
@@ -182,9 +181,9 @@ class ProtobufExtractorTest {
 
   @Test
   @DisplayName("Test Extractor with multi types")
-  void completeTest() throws IOException {
-    File testFile = fileHelper.getFile("/proto-files/completeProto.proto");
-    List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
+  void completeTest() throws Exception {
+    String testFile = fileHelper.getContent("/proto-files/completeProto.proto");
+    List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(new ProtobufSchema(testFile).rawSchema());
     assertThat(fieldValueMappingList)
         .hasSize(11)
         .containsExactlyInAnyOrder(
