@@ -139,9 +139,9 @@ public class JsonExtractor {
     return completeFieldList;
   }
 
-  private void addConstraint(FieldValueMapping.FieldValueMappingBuilder builder, ConstraintTypeEnum constrain, String constrainValue) {
+  private void addConstraint(FieldValueMapping.FieldValueMappingBuilder builder, ConstraintTypeEnum constraint, String constrainValue) {
     if (StringUtils.isNotBlank(constrainValue)) {
-      builder.constrain(constrain, constrainValue);
+      builder.constraint(constraint, constrainValue);
     }
   }
 

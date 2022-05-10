@@ -63,9 +63,9 @@ class RandomObjectTest {
   }
 
   private static Stream<Arguments> parametersForGenerateSingleLogicalTypeRandomValue() {
-    Map<ConstraintTypeEnum, String> decimalConstrains = new HashMap<>();
-    decimalConstrains.put(ConstraintTypeEnum.SCALE , "2");
-    decimalConstrains.put(ConstraintTypeEnum.PRECISION , "5");
+    Map<ConstraintTypeEnum, String> decimalConstraints = new HashMap<>();
+    decimalConstraints.put(ConstraintTypeEnum.SCALE , "2");
+    decimalConstraints.put(ConstraintTypeEnum.PRECISION , "5");
     return Stream.of(
         Arguments.of("int_date" , 1 , singletonList(DATE_STRING) , FIXED_DATE , emptyMap()) ,
         Arguments.of("int_time-millis" , 1 , singletonList(TIME_STRING) , FIXED_TIME , emptyMap()) ,
@@ -83,9 +83,9 @@ class RandomObjectTest {
                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"), emptyMap()
             ),
             Arguments.of("bytes_decimal", 1, singletonList("55.555"), new BigDecimal("55.555"),
-                    decimalConstrains),
+                    decimalConstraints),
             Arguments.of("fixed_decimal", 1, singletonList("55.555"), new BigDecimal("55.555"),
-                    decimalConstrains)
+                    decimalConstraints)
 
     );
   }
@@ -99,7 +99,7 @@ class RandomObjectTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateSingleLogicalTypeRandomValue")
   void generateSingleLogicalTypeRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList,
-                                            Object expected, Map<ConstraintTypeEnum,String> constrains) {
-    assertThat(new RandomObject().generateRandom(fieldType, valueLength, fieldValuesList, constrains)).isEqualTo(expected);
+                                            Object expected, Map<ConstraintTypeEnum,String> constraints) {
+    assertThat(new RandomObject().generateRandom(fieldType, valueLength, fieldValuesList, constraints)).isEqualTo(expected);
   }
 }
