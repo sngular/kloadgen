@@ -55,10 +55,10 @@ public class ProtoBufGeneratorTool {
 
   public Object generateObject(
       FieldDescriptor descriptor, String fieldType, Integer valueLength, List<String> fieldValuesList,
-      Map<ConstraintTypeEnum, String> constrains) {
+      Map<ConstraintTypeEnum, String> constraints) {
     Object result = null;
     if (Objects.nonNull(descriptor.getJavaType())) {
-      result = RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constrains);
+      result = RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
     }
     return result;
   }

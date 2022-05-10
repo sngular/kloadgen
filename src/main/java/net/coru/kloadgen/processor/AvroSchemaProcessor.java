@@ -164,17 +164,17 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
   }
 
   private Map<ConstraintTypeEnum, String> extractConstraints(Schema.Field field) {
-    Map<ConstraintTypeEnum, String> constrains = new HashMap<>();
+    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
 
     if (Objects.nonNull(field.schema().getObjectProp("precision"))) {
-      constrains.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
+      constraints.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
     }
 
     if (Objects.nonNull(field.schema().getObjectProp("scale"))) {
-      constrains.put(ConstraintTypeEnum.SCALE, field.schema().getObjectProp("scale").toString());
+      constraints.put(ConstraintTypeEnum.SCALE, field.schema().getObjectProp("scale").toString());
     }
 
-    return constrains;
+    return constraints;
   }
 
   private FieldValueMapping processFieldValueMappingAsRecordArray(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, GenericRecord entity, String fieldName) {
@@ -235,7 +235,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
     Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
 
     var mapArray = randomMap.generateMap(fieldValueMapping.getFieldType(), mapSize, fieldValueMapping.getFieldValuesList(), fieldValueMapping.getValueLength(), arraySize,
-                                         fieldValueMapping.getConstrains());
+                                         fieldValueMapping.getConstraints());
 
     entity.put(fieldName, mapArray);
     return getSafeGetElement(fieldExpMappingsQueue);
