@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -28,6 +29,7 @@ class JsonExtractorTest {
   private final JsonExtractor jsonExtractor = new JsonExtractor();
 
   @Test
+  @DisplayName("Should extract basic types")
   void testBasic() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/basic.jcs");
 
@@ -47,6 +49,7 @@ class JsonExtractorTest {
   }
 
   @Test
+  @DisplayName("Should extract a basic array")
   void testBasicArray() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/basic-array.jcs");
 
@@ -66,6 +69,7 @@ class JsonExtractorTest {
   }
 
   @Test
+  @DisplayName("Should extract basic number type")
   void testBasicNumber() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/basic-number.jcs");
 
@@ -121,6 +125,7 @@ class JsonExtractorTest {
   }
 
   @Test
+  @DisplayName("Should extract maps, arrays or objects of other maps, arrays or objects")
   void testComplexDefinitions() throws Exception{
     String testFile = fileHelper.getContent("/jsonschema/complex-definitions.jcs");
 
@@ -190,69 +195,18 @@ class JsonExtractorTest {
   }
 
   @Test
+  @DisplayName("Should choose one or another type")
   void testMultipleType() throws Exception {
-    String testFile = fileHelper.getContent("/jsonschema/multiple-type.jcs");
-
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
+    String testFile = fileHelper.getContent("/jsonschema/multiple-type-single.jcs");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
     assertThat(fieldValueMappingList)
-        .hasSize(5)
-        .containsAnyOf(
-            new FieldValueMapping("id", "number", 0, "", false, false),
-            new FieldValueMapping("id", "uuid", 0, "", false, false)
+        .hasSize(1)
+        .satisfiesExactly(
+            fieldValueMapping -> Set.of("number", "uuid").contains(fieldValueMapping.getFieldType())
         );
   }
-
-  @Test
-  void testNestedCollections() throws Exception{
-    String testFile = fileHelper.getContent("/jsonschema/nested-collections.jcs");
-
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
-
-    List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
-
-    assertThat(fieldValueMappingList)
-        .hasSize(8)
-        .containsExactlyInAnyOrder(
-            new FieldValueMapping("arrayOfMapsOfObjects[][:].stringObject", "string", 0, "", constraints, false, true),
-            new	FieldValueMapping("arrayOfMapsOfObjects[][:].numberObject", "number", 0, "", false, true),
-            new	FieldValueMapping("arrayOfArraysOfStrings[][]", "string-array-array", 0, "", false, true),
-            new	FieldValueMapping("mapOfArraysOfStrings[:][]", "string-array-map", 0, "", false, true),
-            new	FieldValueMapping("mapOfMapsOfObjects[:][:].name4Object", "string", 0, "", constraints, false, true),
-            new	FieldValueMapping("mapOfMapsOfObjects[:][:].number4Object", "number", 0, "", false, true),
-            new	FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].stringControl", "string", 0, "", constraints, false, true),
-            new	FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl", "number", 0, "", false, true)
-        );
-  }
-
-  @Test
-  @DisplayName("Should extract maps of simple data-types from JsonSchema")
-  void testShouldExtractMapSimpleDataType() throws Exception {
-    String testFile = fileHelper.getContent("/jsonschema/test-map.jcs");
-
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
-
-    List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
-
-    assertThat(fieldValueMappingList).contains(
-        new FieldValueMapping("firstName", "string", 0, "", constraints, false, false),
-        new FieldValueMapping("lastName", "string", 0, "", constraints, true, false),
-        new FieldValueMapping("age", "number", 0, "", true, false),
-        new FieldValueMapping("testMap.itemType[:]", "number-map", 0, "", true, true),
-        new FieldValueMapping("testMap.itemTipo[:]", "string-map", 0, "", true, true)
-
-    );
-  }
-
-
 
   @Test
   @DisplayName("Should extract optional nested-collections and optional nested-collections inside objects")
@@ -278,6 +232,28 @@ class JsonExtractorTest {
             new FieldValueMapping("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl", "number", 0, "", false, true)
         );
   }
+
+  @Test
+  @DisplayName("Should extract maps of simple data-types from JsonSchema")
+  void testShouldExtractMapSimpleDataType() throws Exception {
+    String testFile = fileHelper.getContent("/jsonschema/test-map.jcs");
+
+    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
+    constraints.put(MINIMUM_VALUE, "0");
+    constraints.put(MAXIMUM_VALUE, "0");
+
+    List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+
+    assertThat(fieldValueMappingList).contains(
+        new FieldValueMapping("firstName", "string", 0, "", constraints, false, false),
+        new FieldValueMapping("lastName", "string", 0, "", constraints, true, false),
+        new FieldValueMapping("age", "number", 0, "", true, false),
+        new FieldValueMapping("testMap.itemType[:]", "number-map", 0, "", true, true),
+        new FieldValueMapping("testMap.itemTipo[:]", "string-map", 0, "", true, true)
+
+    );
+  }
+
 
   @Test
   @DisplayName("Should capture 3+ level exception in collections. Three levels of nested collections are not allowed")
