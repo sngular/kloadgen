@@ -9,7 +9,6 @@ import static net.coru.kloadgen.model.ConstraintTypeEnum.REGEX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,9 +32,7 @@ class JsonExtractorTest {
   void testBasic() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/basic.jcs");
 
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
+    Map<ConstraintTypeEnum, String> constraints = Map.of(MINIMUM_VALUE, "0", MAXIMUM_VALUE, "0");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
@@ -53,9 +50,7 @@ class JsonExtractorTest {
   void testBasicArray() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/basic-array.jcs");
 
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
+    Map<ConstraintTypeEnum, String> constraints = Map.of(MINIMUM_VALUE, "0", MAXIMUM_VALUE, "0");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
@@ -73,25 +68,19 @@ class JsonExtractorTest {
   void testBasicNumber() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/basic-number.jcs");
 
+    Map<ConstraintTypeEnum, String> constraintsLatitude = Map.of(MINIMUM_VALUE, "-90", MAXIMUM_VALUE, "90",
+                                                                 EXCLUDED_MINIMUM_VALUE, "0", EXCLUDED_MAXIMUM_VALUE, "0", MULTIPLE_OF, "0");
+
+    Map<ConstraintTypeEnum, String> constraintsLongitude = Map.of(MINIMUM_VALUE, "-180", MAXIMUM_VALUE, "180",
+                                                                 EXCLUDED_MINIMUM_VALUE, "0", EXCLUDED_MAXIMUM_VALUE, "0", MULTIPLE_OF, "0");
+
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
     assertThat(fieldValueMappingList)
         .hasSize(2)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("latitude", "number", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "-90");
-              put(MAXIMUM_VALUE, "90");
-              put(EXCLUDED_MINIMUM_VALUE, "0");
-              put(EXCLUDED_MAXIMUM_VALUE, "0");
-              put(MULTIPLE_OF, "0");
-            }}, true, false),
-            new FieldValueMapping("longitude", "number", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "-180");
-              put(MAXIMUM_VALUE, "180");
-              put(EXCLUDED_MINIMUM_VALUE, "0");
-              put(EXCLUDED_MAXIMUM_VALUE, "0");
-              put(MULTIPLE_OF, "0");
-            }}, true, false)
+            new FieldValueMapping("latitude", "number", 0, "", constraintsLatitude, true, false),
+            new FieldValueMapping("longitude", "number", 0, "", constraintsLongitude, true, false)
         );
   }
 
@@ -100,9 +89,7 @@ class JsonExtractorTest {
   void testFlatPropertiesOptionalCollections() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/collections.jcs");
 
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
+    Map<ConstraintTypeEnum, String> constraints = Map.of(MINIMUM_VALUE, "0", MAXIMUM_VALUE, "0");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
@@ -129,9 +116,7 @@ class JsonExtractorTest {
   void testComplexDefinitions() throws Exception{
     String testFile = fileHelper.getContent("/jsonschema/complex-definitions.jcs");
 
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
+    Map<ConstraintTypeEnum, String> constraints = Map.of(MINIMUM_VALUE, "0", MAXIMUM_VALUE, "0");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
@@ -154,26 +139,17 @@ class JsonExtractorTest {
   void testRequiredPropagationChildrenFields() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/complex-document.jcs");
 
+    Map<ConstraintTypeEnum, String> constraintsCode = Map.of(MINIMUM_VALUE, "2", MAXIMUM_VALUE, "3");
+    Map<ConstraintTypeEnum, String> constraintsFreeForm = Map.of(MINIMUM_VALUE, "1", MAXIMUM_VALUE, "256");
+
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
     assertThat(fieldValueMappingList)
         .contains(
-            new FieldValueMapping("geopoliticalSubdivisions.level1.code", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "2");
-              put(MAXIMUM_VALUE, "3");
-            }}, false, true),
-            new FieldValueMapping("geopoliticalSubdivisions.level1.freeForm", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "1");
-              put(MAXIMUM_VALUE, "256");
-            }}, false, true),
-            new FieldValueMapping("geopoliticalSubdivisions.level2.code", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "2");
-              put(MAXIMUM_VALUE, "3");
-            }}, false, true),
-            new FieldValueMapping("geopoliticalSubdivisions.level2.freeForm", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
-              put(MINIMUM_VALUE, "1");
-              put(MAXIMUM_VALUE, "256");
-            }}, false, true)
+            new FieldValueMapping("geopoliticalSubdivisions.level1.code", "string", 0, "", constraintsCode, false, true),
+            new FieldValueMapping("geopoliticalSubdivisions.level1.freeForm", "string", 0, "", constraintsFreeForm, false, true),
+            new FieldValueMapping("geopoliticalSubdivisions.level2.code", "string", 0, "", constraintsCode, false, true),
+            new FieldValueMapping("geopoliticalSubdivisions.level2.freeForm", "string", 0, "", constraintsFreeForm, false, true)
         );
   }
 
@@ -182,15 +158,13 @@ class JsonExtractorTest {
   void testShouldExtractJsonSchemaDefinitions() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/medium-document.jcs");
 
+    Map<ConstraintTypeEnum, String> constraints = Map.of(MINIMUM_VALUE, "0", MAXIMUM_VALUE, "0", REGEX, "^(.*)$");
+
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
     assertThat(fieldValueMappingList).contains(
         new FieldValueMapping("duty.amount.value", "number", 0, "", false, false),
-        new FieldValueMapping("duty.amount.currency", "string", 0, "", new HashMap<ConstraintTypeEnum, String>() {{
-          put(MINIMUM_VALUE, "0");
-          put(MAXIMUM_VALUE, "0");
-          put(REGEX, "^(.*)$");
-        }}, false, false),
+        new FieldValueMapping("duty.amount.currency", "string", 0, "", constraints, false, false),
         new FieldValueMapping("duty.amount.exponent", "number", 0, "", false, false));
   }
 
@@ -213,9 +187,7 @@ class JsonExtractorTest {
   void testFlatPropertiesOptionalNestedCollections() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/nested-collections.jcs");
 
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
+    Map<ConstraintTypeEnum, String> constraints = Map.of(MINIMUM_VALUE, "0", MAXIMUM_VALUE, "0");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
@@ -238,9 +210,7 @@ class JsonExtractorTest {
   void testShouldExtractMapSimpleDataType() throws Exception {
     String testFile = fileHelper.getContent("/jsonschema/test-map.jcs");
 
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-    constraints.put(MINIMUM_VALUE, "0");
-    constraints.put(MAXIMUM_VALUE, "0");
+    Map<ConstraintTypeEnum, String> constraints = Map.of(MINIMUM_VALUE, "0", MAXIMUM_VALUE, "0");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
