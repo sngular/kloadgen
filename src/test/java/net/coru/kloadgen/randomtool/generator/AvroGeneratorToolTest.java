@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -84,9 +85,9 @@ class AvroGeneratorToolTest {
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
-    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
-    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
     return Stream.of(
             Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), new Field("name",
@@ -107,9 +108,9 @@ class AvroGeneratorToolTest {
                     SchemaBuilder.builder().stringType()),
                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
             Arguments.of("bytes_decimal", 1, Collections.singletonList("44.444"), new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
+                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
             Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
+                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstraints)
     );
   }
 
@@ -126,9 +127,9 @@ class AvroGeneratorToolTest {
   @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
   void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
                                                    Field field, Object expected,
-                                                   Map<ConstraintTypeEnum, String> constrains) {
+                                                   Map<ConstraintTypeEnum, String> constraints) {
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constrains)).isEqualTo(expected);
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constraints)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
@@ -154,18 +155,25 @@ class AvroGeneratorToolTest {
     return Stream.of(
             Arguments.of(18,
                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                    ValidTypeConstants.INT,
                     List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20)),
             Arguments.of(20,
                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20, 1, 2)));
+                    ValidTypeConstants.INT,
+                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20, 1, 2)),
+            Arguments.of(4,
+                    List.of("first", "second", "third"),
+                    ValidTypeConstants.STRING,
+                    List.of("first", "second", "third", "first", "second")));
   }
 
   @ParameterizedTest
   @DisplayName("Testing generate a sequence of a list of values")
   @MethodSource("parametersForGenerateFieldValuesListSequence")
-  void testGenerateFieldValuesListSequence(int size, List<String> fieldValuesList, List<Integer> expected) {
+  void testGenerateFieldValuesListSequence(int size, List<String> fieldValuesList, String fieldType, List<Object> expected) {
     var intList = new ArrayList<>();
-    Field field = new Field("name", SchemaBuilder.builder().intType());
+    Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
+    Field field = new Field("name", schema);
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList));
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
@@ -177,9 +185,10 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @DisplayName("Testing generate an optional sequence of a list of values")
   @MethodSource("parametersForGenerateFieldValuesListSequence")
-  void testGenerateFieldValuesListOptionalSequence(int size, List<String> fieldValuesList, List<Integer> expected){
+  void testGenerateFieldValuesListOptionalSequence(int size, List<String> fieldValuesList, String fieldType, List<Integer> expected){
     var intList = new ArrayList<>();
-    Field field = new Field("name", SchemaBuilder.builder().nullable().intType());
+    Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().nullable().intType() : SchemaBuilder.builder().nullable().stringType();
+    Field field = new Field("name", schema);
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList), false, true);
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
@@ -244,9 +253,9 @@ class AvroGeneratorToolTest {
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
-    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
-    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
     return Stream.of(
             Arguments.of("int_date", 1, DATE_STRING, new Field("name",
@@ -267,9 +276,9 @@ class AvroGeneratorToolTest {
                             SchemaBuilder.builder().stringType()),
                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
             Arguments.of("bytes_decimal", 1, "44.444", new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
+                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
             Arguments.of("fixed_decimal", 1, "55.555", new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
+                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstraints)
     );
   }
 
@@ -289,12 +298,12 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Recover Variable from Context Logical Types")
   @MethodSource("parametersForShouldRecoverVariableFromContextLogicalTypes")
   void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field,
-                                        Object expected, Map<ConstraintTypeEnum, String> constrains) {
+                                        Object expected, Map<ConstraintTypeEnum, String> constraints) {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
     FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constrains))
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constraints))
             .isEqualTo(expected);
   }
 }

@@ -23,7 +23,6 @@ import com.github.curiousoddman.rgxgen.RgxGen;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-import net.coru.kloadgen.randomtool.util.ValueUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,50 +33,38 @@ public class RandomObject {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
   }
 
-  public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    return context.compute(fieldName, (fieldNameMap, seqObject) ->
-        seqObject == null
-            ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
-            : addOneCasted(seqObject, fieldType));
-  }
-
-  public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-    Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
-    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
-  }
-
   public Object generateRandom(
       String fieldType, Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
+      Map<ConstraintTypeEnum, String> constraints) {
     Object value;
     switch (fieldType.toLowerCase()) {
       case ValidTypeConstants.STRING:
-        value = getStringValueOrRandom(valueLength, fieldValueList, constrains);
+        value = getStringValueOrRandom(valueLength, fieldValueList, constraints);
         break;
       case ValidTypeConstants.INT:
         try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).intValueExact();
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).intValueExact();
         } catch (ArithmeticException exception) {
           value = Integer.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.LONG:
         try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).longValueExact();
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).longValueExact();
         } catch (ArithmeticException exception) {
           value = Long.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.SHORT:
         try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constrains).shortValueExact();
+          value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).shortValueExact();
         } catch (ArithmeticException exception) {
           value = Short.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.DOUBLE:
         try {
-          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).doubleValue();
+          value = getDecimalValueOrRandom(valueLength, fieldValueList, constraints).doubleValue();
         } catch (ArithmeticException exception) {
           value = Double.MAX_VALUE;
         }
@@ -85,7 +72,7 @@ public class RandomObject {
       case ValidTypeConstants.NUMBER:
       case ValidTypeConstants.FLOAT:
         try {
-          value = getDecimalValueOrRandom(valueLength, fieldValueList, constrains).floatValue();
+          value = getDecimalValueOrRandom(valueLength, fieldValueList, constraints).floatValue();
         } catch (ArithmeticException exception) {
           value = Float.MAX_VALUE;
         }
@@ -136,10 +123,10 @@ public class RandomObject {
         value = getUUIDValueOrRandom(fieldValueList);
         break;
       case ValidTypeConstants.BYTES_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList, constrains);
+        value = getDecimalValueOrRandom(fieldValueList, constraints);
         break;
       case ValidTypeConstants.FIXED_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList, constrains);
+        value = getDecimalValueOrRandom(fieldValueList, constraints);
         break;
       default:
         value = fieldType;
@@ -149,67 +136,17 @@ public class RandomObject {
     return value;
   }
 
-  private Object getFirstValueOrDefaultForType(List<String> fieldValueList, String fieldType) {
-    if (!fieldValueList.isEmpty()) {
-      return ValueUtils.castValue(fieldValueList.get(0), fieldType);
-    }
-
-    switch (fieldType) {
-      case ValidTypeConstants.INT:
-        return 1;
-      case ValidTypeConstants.DOUBLE:
-        return 1.0;
-      case ValidTypeConstants.LONG:
-        return 1L;
-      case ValidTypeConstants.FLOAT:
-        return 1.0f;
-      case ValidTypeConstants.SHORT:
-        return (short) 1;
-      case ValidTypeConstants.BYTES_DECIMAL:
-      case ValidTypeConstants.FIXED_DECIMAL:
-      default:
-        return BigDecimal.ONE;
-    }
-  }
-
-  private Object addOneCasted(Object seqObject, String fieldType) {
-    Object castValue;
-    switch (fieldType) {
-      case ValidTypeConstants.INT:
-        castValue = Integer.parseInt(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.DOUBLE:
-        castValue = Double.parseDouble(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.LONG:
-        castValue = Long.parseLong(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.FLOAT:
-        castValue = Float.parseFloat(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.SHORT:
-        castValue = Short.parseShort(seqObject.toString()) + 1;
-        break;
-      case ValidTypeConstants.BYTES_DECIMAL:
-      case ValidTypeConstants.FIXED_DECIMAL:
-      default:
-        castValue = new BigDecimal(seqObject.toString()).add(BigDecimal.ONE);
-        break;
-    }
-    return castValue;
-  }
-
-  private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
+  private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constraints) {
     BigInteger value;
 
     if (!fieldValueList.isEmpty()) {
       value = new BigInteger(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      Number minimum = calculateMinimum(valueLength, constrains);
-      Number maximum = calculateMaximum(valueLength, constrains);
+      Number minimum = calculateMinimum(valueLength, constraints);
+      Number maximum = calculateMaximum(valueLength, constraints);
 
-      if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
-        int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+      if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+        int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
         value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()) * multipleOf);
       } else {
@@ -220,22 +157,22 @@ public class RandomObject {
     return value;
   }
 
-  private BigDecimal getDecimalValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constrains) {
+  private BigDecimal getDecimalValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constraints) {
     BigDecimal value;
 
     if (!fieldValueList.isEmpty()) {
       value = new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      Number minimum = calculateMinimum(valueLength - 1, constrains);
-      Number maximum = calculateMaximum(valueLength - 1, constrains);
+      Number minimum = calculateMinimum(valueLength - 1, constraints);
+      Number maximum = calculateMaximum(valueLength - 1, constraints);
 
-      if (constrains.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
-        int multipleOf = Integer.parseInt(constrains.get(ConstraintTypeEnum.MULTIPLE_OF));
+      if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+        int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
         value = BigDecimal.valueOf(RandomUtils.nextDouble(minimum.doubleValue(), maximum.doubleValue()) * multipleOf);
       } else {
         if (valueLength < 3) {
-          value = new BigDecimal(getIntegerValueOrRandom(valueLength, fieldValueList, constrains));
+          value = new BigDecimal(getIntegerValueOrRandom(valueLength, fieldValueList, constraints));
         } else {
           BigDecimal aux = BigDecimal.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
           int decLength = RandomUtils.nextInt(1, valueLength / 2);
@@ -249,16 +186,16 @@ public class RandomObject {
 
   private String getStringValueOrRandom(
       Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
+      Map<ConstraintTypeEnum, String> constraints) {
     String value;
     if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0))) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
-      if (constrains.containsKey(ConstraintTypeEnum.REGEX)) {
-        RgxGen rxGenerator = new RgxGen(constrains.get(ConstraintTypeEnum.REGEX));
+      if (constraints.containsKey(ConstraintTypeEnum.REGEX)) {
+        RgxGen rxGenerator = new RgxGen(constraints.get(ConstraintTypeEnum.REGEX));
         value = rxGenerator.generate();
-        if (valueLength > 0 || constrains.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
-          value = value.substring(0, getMaxLength(valueLength, constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE)));
+        if (valueLength > 0 || constraints.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
+          value = value.substring(0, getMaxLength(valueLength, constraints.get(ConstraintTypeEnum.MAXIMUM_VALUE)));
         }
       } else {
         value = RandomStringUtils.randomAlphabetic(valueLength == 0 ? RandomUtils.nextInt(1, 20) : valueLength);
@@ -316,13 +253,13 @@ public class RandomObject {
     return value;
   }
 
-  private Number calculateMaximum(int valueLength, Map<ConstraintTypeEnum, String> constrains) {
+  private Number calculateMaximum(int valueLength, Map<ConstraintTypeEnum, String> constraints) {
     Number maximum;
-    if (constrains.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
-      if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) {
-        maximum = Long.parseLong(constrains.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1L;
+    if (constraints.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
+      if (constraints.containsKey(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) {
+        maximum = Long.parseLong(constraints.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1L;
       } else {
-        maximum = Long.parseLong(constrains.get(ConstraintTypeEnum.MAXIMUM_VALUE));
+        maximum = Long.parseLong(constraints.get(ConstraintTypeEnum.MAXIMUM_VALUE));
       }
     } else {
       maximum = new BigDecimal(StringUtils.rightPad("9", valueLength, '0'));
@@ -330,13 +267,13 @@ public class RandomObject {
     return maximum;
   }
 
-  private Number calculateMinimum(int valueLength, Map<ConstraintTypeEnum, String> constrains) {
+  private Number calculateMinimum(int valueLength, Map<ConstraintTypeEnum, String> constraints) {
     Number minimum;
-    if (constrains.containsKey(ConstraintTypeEnum.MINIMUM_VALUE)) {
-      if (constrains.containsKey(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) {
-        minimum = Long.parseLong(constrains.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
+    if (constraints.containsKey(ConstraintTypeEnum.MINIMUM_VALUE)) {
+      if (constraints.containsKey(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) {
+        minimum = Long.parseLong(constraints.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
       } else {
-        minimum = Long.parseLong(constrains.get(ConstraintTypeEnum.MINIMUM_VALUE));
+        minimum = Long.parseLong(constraints.get(ConstraintTypeEnum.MINIMUM_VALUE));
       }
     } else {
       minimum = Long.parseLong(StringUtils.rightPad("1", valueLength, '0'));
@@ -410,14 +347,14 @@ public class RandomObject {
 
   private static BigDecimal getDecimalValueOrRandom(
       List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains) {
+      Map<ConstraintTypeEnum, String> constraints) {
     int scale;
     int precision;
 
-    if (Objects.nonNull(constrains.get(ConstraintTypeEnum.PRECISION))) {
-      precision = Integer.parseInt(constrains.get(ConstraintTypeEnum.PRECISION));
-      scale = Objects.nonNull(constrains.get(ConstraintTypeEnum.SCALE)) ?
-          Integer.parseInt(constrains.get(ConstraintTypeEnum.SCALE)) : 0;
+    if (Objects.nonNull(constraints.get(ConstraintTypeEnum.PRECISION))) {
+      precision = Integer.parseInt(constraints.get(ConstraintTypeEnum.PRECISION));
+      scale = Objects.nonNull(constraints.get(ConstraintTypeEnum.SCALE)) ?
+          Integer.parseInt(constraints.get(ConstraintTypeEnum.SCALE)) : 0;
 
       if (precision <= 0) {
         throw new KLoadGenException("Decimal precision must be greater dan 0");

@@ -27,7 +27,7 @@ class FieldValueMappingTest {
         .fieldValueList(
             "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}," +
             "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}")
-        .constrain(ConstraintTypeEnum.MAXIMUM_VALUE, "5")
+        .constraint(ConstraintTypeEnum.MAXIMUM_VALUE, "5")
         .build();
   }
 
