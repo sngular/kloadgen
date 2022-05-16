@@ -61,6 +61,8 @@ public class FieldValueMapping extends AbstractTestElement {
 
   private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
+
+
   public FieldValueMapping(String fieldName, String fieldType) {
     this.setFieldName(fieldName);
     this.setValueLength(0);
@@ -96,8 +98,8 @@ public class FieldValueMapping extends AbstractTestElement {
     this.setFieldType(fieldType);
     this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
     this.setConstraints(constraints);
-    this.setRequired(required != null && required);
-    this.setAncestorRequired(isAncestorRequired != null && isAncestorRequired);
+    this.setRequired(Objects.requireNonNullElse(required, true));
+    this.setAncestorRequired(Objects.requireNonNullElse(isAncestorRequired, true));
   }
 
   public String getFieldName() {

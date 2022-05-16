@@ -85,9 +85,8 @@ class AvroSchemaProcessorTest {
     @Test
     void testAvroSchemaProcessorWithSubEntitySimpleArray() throws IOException {
         List<FieldValueMapping> fieldValueMappings = asList(
-                new FieldValueMapping("subEntity.anotherLevel.subEntityIntArray[2]", "int-array", 0, "[1]"),
-                new FieldValueMapping("topLevelIntArray[3]", "int-array", 0, "[2]")
-        );
+                FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1]").build(),
+                FieldValueMapping.builder().fieldName("topLevelIntArray[3]").fieldType("int-array").valueLength(0).fieldValueList("[2]").build());
 
         File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
         ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
@@ -126,9 +125,8 @@ class AvroSchemaProcessorTest {
     @Test
     void testAvroSchemaProcessorWithSubEntityArray() throws IOException {
         List<FieldValueMapping> fieldValueMappings = asList(
-                new FieldValueMapping("subEntity.anotherLevel.subEntityRecordArray[2].name", "string", 0, "second"),
-                new FieldValueMapping("topLevelRecordArray[1].name", "string", 0, "third")
-        );
+                FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityRecordArray[2].name").fieldType("string").valueLength(0).fieldValueList("second").build(),
+                FieldValueMapping.builder().fieldName("topLevelRecordArray[1].name").fieldType("string").valueLength(0).fieldValueList("third").build());
 
         File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
         ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
@@ -159,10 +157,10 @@ class AvroSchemaProcessorTest {
     @Test
     void testEmbeddedAvroSchemaProcessor() throws IOException {
         List<FieldValueMapping> fieldValueMappings = asList(
-                new FieldValueMapping("fieldMySchema.testInt_id", "int", 0, "4"),
-                new FieldValueMapping("fieldMySchema.testLong", "long", 0, "3"),
-                new FieldValueMapping("fieldMySchema.fieldString", "string", 0, "testing"),
-                new FieldValueMapping("timestamp", "long", 0, "5")
+                FieldValueMapping.builder().fieldName("fieldMySchema.testInt_id").fieldType("int").valueLength(0).fieldValueList("4").build(),
+                FieldValueMapping.builder().fieldName("fieldMySchema.testLong").fieldType("long").valueLength(0).fieldValueList("3").build(),
+                FieldValueMapping.builder().fieldName("fieldMySchema.fieldString").fieldType("string").valueLength(0).fieldValueList("testing").build(),
+                FieldValueMapping.builder().fieldName("timestamp").fieldType("long").valueLength(0).fieldValueList("5").build()
         );
         File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
         ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
@@ -179,8 +177,8 @@ class AvroSchemaProcessorTest {
     @Test
     void textAvroSchemaProcessor() throws KLoadGenException {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("name", "string", 0, "Jose"),
-                new FieldValueMapping("age", "int", 0, "43"));
+                FieldValueMapping.builder().fieldName("name").fieldType("string").valueLength(0).fieldValueList("Jose").build(),
+                FieldValueMapping.builder().fieldName("age").fieldType("int").valueLength(0).fieldValueList("43").build());
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(
                 SchemaBuilder.builder().record("testing").fields().requiredString("name").optionalInt("age").endRecord(),
@@ -197,8 +195,8 @@ class AvroSchemaProcessorTest {
         LogicalTypes.decimal(5, 2).addToSchema(decimalSchemaBytes);
 
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("name", "string", 0, "Jose"),
-                new FieldValueMapping("decimal", "bytes_decimal", 0, "44.444"));
+                FieldValueMapping.builder().fieldName("name").fieldType("string").valueLength(0).fieldValueList("Jose").build(),
+                FieldValueMapping.builder().fieldName("decimal").fieldType("bytes_decimal").valueLength(0).fieldValueList("44.444").build());
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(SchemaBuilder.builder().record("testing").fields().requiredString("name").name(
@@ -214,8 +212,8 @@ class AvroSchemaProcessorTest {
     @Test
     void textAvroSchemaProcessorArrayMap() throws KLoadGenException {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[2][2:]", "string-map-array", 2, "n:1, t:2"),
-                new FieldValueMapping("topLevelRecord.subvalues[2][2:]", "string-map-array", 2, "n:1, t:2"));
+                FieldValueMapping.builder().fieldName("values[2][2:]").fieldType("string-map-array").valueLength(2).fieldValueList("n:1, t:2").build(),
+                FieldValueMapping.builder().fieldName("topLevelRecord.subvalues[2][2:]").fieldType("string-map-array").valueLength(2).fieldValueList("n:1, t:2").build());
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(SchemaBuilder
@@ -274,8 +272,8 @@ class AvroSchemaProcessorTest {
     @Test
     void textAvroSchemaProcessorArrayRecord() throws KLoadGenException {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[2].name", "string", 2, "Jose, Andres"),
-                new FieldValueMapping("values[].amount", "float", 2, "0.5, 0.6"));
+                FieldValueMapping.builder().fieldName("values[2].name").fieldType("string").valueLength(2).fieldValueList("Jose, Andres").build(),
+                FieldValueMapping.builder().fieldName("values[].amount").fieldType("float").valueLength(2).fieldValueList("0.5, 0.6").build());
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(SchemaBuilder
@@ -314,7 +312,7 @@ class AvroSchemaProcessorTest {
     @Test
     void textAvroSchemaProcessorMap() throws KLoadGenException {
         List<FieldValueMapping> fieldValueMappingList = singletonList(
-                new FieldValueMapping("values[2:]", "string-map", 2, "n:1, t:2"));
+                FieldValueMapping.builder().fieldName("values[2:]").fieldType("string-map").valueLength(2).fieldValueList("n:1, t:2").build());
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         avroSchemaProcessor.processSchema(SchemaBuilder
@@ -377,7 +375,6 @@ class AvroSchemaProcessorTest {
         GenericRecord record = (GenericRecord) message.getGenericRecord();
         assertThat(record.get(0)).isNotNull();
         assertThat(record.get(1)).isNull();
-
     }
 
     private GenericRecord entityForCustomSequenceOfValuesWithSameStartingStartingValue(Schema schema, List<String> idValues, List<String> otherIdValues) {
@@ -398,8 +395,8 @@ class AvroSchemaProcessorTest {
     @Test
     void testCustomSequenceOfValuesWithSameStartingStartingValue() {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[3].id", "seq", 0, "[1,2]"),
-                new FieldValueMapping("values[3].otherId", "seq", 0, "[1,3]"));
+            FieldValueMapping.builder().fieldName("values[3].id").fieldType("seq").valueLength(0).fieldValueList("[1,2]").build(),
+            FieldValueMapping.builder().fieldName("values[3].otherId").fieldType("seq").valueLength(0).fieldValueList("[1,3]").build());
 
         AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
         Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
@@ -455,8 +452,8 @@ class AvroSchemaProcessorTest {
     @Test
     void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
         List<FieldValueMapping> fieldValueMappingList = asList(
-                new FieldValueMapping("values[4].id", "seq", 0, "[1,2.44,3.6]"),
-                new FieldValueMapping("otherValues[4].id", "seq", 0, "[1,3.02,4.98]"));
+            FieldValueMapping.builder().fieldName("values[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,2.44,3.6]").build(),
+            FieldValueMapping.builder().fieldName("otherValues[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,3.02,4.98]").build());
 
         Schema idSchema = LogicalTypes.decimal(5, 2).addToSchema(SchemaBuilder.builder().bytesBuilder().endBytes());
 

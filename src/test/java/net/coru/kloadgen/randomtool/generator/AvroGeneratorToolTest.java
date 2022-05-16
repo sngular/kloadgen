@@ -118,7 +118,12 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Random Value for Field")
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
@@ -128,7 +133,12 @@ class AvroGeneratorToolTest {
   void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
                                                    Field field, Object expected,
                                                    Map<ConstraintTypeEnum, String> constraints) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constraints)).isEqualTo(expected);
   }
 
@@ -145,7 +155,12 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Generate a Random Value")
   @MethodSource("parametersForGenerateRandomValue")
   void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .build();
     Object number = new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap());
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
     assertThat(String.valueOf(number)).hasSize(valueLength);
@@ -174,7 +189,12 @@ class AvroGeneratorToolTest {
     var intList = new ArrayList<>();
     Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
     Field field = new Field("name", schema);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType("seq")
+                                                           .valueLength(0)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .build();
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
       intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
@@ -189,8 +209,16 @@ class AvroGeneratorToolTest {
     var intList = new ArrayList<>();
     Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().nullable().intType() : SchemaBuilder.builder().nullable().stringType();
     Field field = new Field("name", schema);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList), false, true);
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
+
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType("seq")
+                                                           .valueLength(0)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(false)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     for (int i = 0; i <= size; i++) {
       intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
     }
@@ -207,7 +235,12 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Generate a Random Value for Enums")
   @MethodSource("parametersForGenerateRandomValueForEnums")
   void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap()))
         .hasFieldOrPropertyWithValue("symbol", expected);
   }
@@ -224,7 +257,12 @@ class AvroGeneratorToolTest {
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
       Object expectedTyped) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
   }
 
@@ -289,8 +327,13 @@ class AvroGeneratorToolTest {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,Collections.emptyMap()))
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList("${VARIABLE}")
+                                                           .build();
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap()))
         .isEqualTo(expected);
   }
 
@@ -302,8 +345,13 @@ class AvroGeneratorToolTest {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constraints))
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList("${VARIABLE}")
+                                                           .build();
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constraints))
             .isEqualTo(expected);
   }
 }

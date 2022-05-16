@@ -37,25 +37,26 @@ class SerialisedSubjectPropertyEditorTest {
 
   private static Stream<Arguments> parametersForMergeValue() {
     return Stream.of(Arguments.of(new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>(), new ArrayList<FieldValueMapping>()),
-                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldName", "fieldType"))),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(FieldValueMapping.builder().fieldName("fieldName").fieldType("fieldType").build())),
                                   new ArrayList<FieldValueMapping>(),
                                   new ArrayList<FieldValueMapping>()),
-                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldName", "fieldType"))),
-                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
-                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
-                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldSchema1", "int"))),
-                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
-                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
-                     Arguments.of(new ArrayList<>(Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
-                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string")),
-                                  Collections.singletonList(new FieldValueMapping("fieldSchema1", "string"))),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(FieldValueMapping.builder().fieldName("fieldName").fieldType("fieldType").build())),
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build()),
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build())),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("int").build())),
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build()),
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build())),
+                     Arguments.of(new ArrayList<>(Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build())),
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build()),
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build())),
                      Arguments.of(new ArrayList<>(
-                                      Collections.singletonList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"))),
-                                  Arrays.asList(new FieldValueMapping("fieldSchema1", "string"), new FieldValueMapping("field2", "string")),
-                                  Arrays.asList(new FieldValueMapping("fieldSchema1", "string", 0, "[\"value1\"]"), new FieldValueMapping("field2", "string"))),
+                                      Collections.singletonList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").fieldValueList("[\"value1\"]").build())),
+                                  Arrays.asList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").build(),
+                                                FieldValueMapping.builder().fieldName("field2").fieldType("string").build()),
+                                  Arrays.asList(FieldValueMapping.builder().fieldName("fieldSchema1").fieldType("string").fieldValueList("[\"value1\"]").build(), FieldValueMapping.builder().fieldName("field2").fieldType("string").build())),
                      Arguments.of("value",
-                                  Collections.singletonList(new FieldValueMapping("field2", "string")),
-                                  Collections.singletonList(new FieldValueMapping("field2", "string"))));
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("field2").fieldType("string").build()),
+                                  Collections.singletonList(FieldValueMapping.builder().fieldName("field2").fieldType("string").build())));
   }
 
   @BeforeEach
