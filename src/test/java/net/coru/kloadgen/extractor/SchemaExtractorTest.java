@@ -13,14 +13,23 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.squareup.wire.schema.internal.parser.TypeElement;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.rest.RestService;
+import io.confluent.kafka.schemaregistry.client.rest.entities.Schema;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import net.coru.kloadgen.extractor.extractors.AvroExtractor;
 import net.coru.kloadgen.extractor.extractors.JsonExtractor;
 import net.coru.kloadgen.extractor.extractors.ProtoBufExtractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
+import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.testutil.FileHelper;
 import org.apache.avro.Schema.Field;
 import org.apache.jmeter.threads.JMeterContext;
@@ -61,6 +70,12 @@ class SchemaExtractorTest {
   @Mock
   private ProtoBufExtractor protoBufExtractor = Mockito.mock(ProtoBufExtractor.class);
 
+  @Mock
+  private RestService restService = Mockito.mock(RestService.class);
+
+  @Mock
+  private SchemaRegistryClient schemaRegistryClient = Mockito.mock(SchemaRegistryClient.class);
+
   @BeforeEach
   public void setUp() {
     schemaExtractor = new SchemaExtractorImpl(avroExtractor, jsonExtractor, protoBufExtractor);
@@ -85,7 +100,7 @@ class SchemaExtractorTest {
 
     schemaExtractor.flatPropertiesList("avroSubject");
 
-    Mockito.verify(avroExtractor);
+    Mockito.verify(avroExtractor, Mockito.times(2)).processField(Mockito.any(Field.class), Mockito.anyList(), eq(true), eq(false));
 
   }
 
@@ -96,12 +111,17 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_URL, "http://localhost:" + server.port());
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+    List<FieldValueMapping> fields = new ArrayList<>();
+    Schema schema = new Schema("jsonSubject", 1, 1, "JSON" , null, "schema");
+    SchemaMetadata schemaMetaData = new SchemaMetadata(1, 1, "JSON", null, "schema");
 
-//    Mockito.when(jsonExtractor.processSchema(Mockito.any(JsonNode.class))).thenReturn();
+    Mockito.when(restService.getLatestVersion(Mockito.anyString())).thenReturn(schema);
+    Mockito.when(schemaRegistryClient.getLatestSchemaMetadata(Mockito.anyString())).thenReturn(schemaMetaData);
+    Mockito.when(jsonExtractor.processSchema(Mockito.any(JsonNode.class))).thenReturn(fields);
 
     schemaExtractor.flatPropertiesList("jsonSubject");
 
-    Mockito.verify(avroExtractor);
+    Mockito.verify(jsonExtractor).processSchema(Mockito.any(JsonNode.class));
 
   }
 
@@ -113,11 +133,11 @@ class SchemaExtractorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    Mockito.doNothing().when(avroExtractor).processField(Mockito.any(Field.class), Mockito.anyList(), eq(true), eq(false));
+    Mockito.doNothing().when(protoBufExtractor).processField(Mockito.any(TypeElement.class), Mockito.anyList(), Mockito.anyList(), eq(false));
 
-    schemaExtractor.flatPropertiesList("avroSubject");
+    schemaExtractor.flatPropertiesList("protobufSubject");
 
-    Mockito.verify(avroExtractor);
+    Mockito.verify(protoBufExtractor).processField(Mockito.any(TypeElement.class), Mockito.anyList(), Mockito.anyList(), eq(false));
 
   }
 
