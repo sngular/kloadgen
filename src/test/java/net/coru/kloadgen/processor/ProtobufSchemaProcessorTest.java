@@ -50,9 +50,8 @@ class ProtobufSchemaProcessorTest {
   void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
     List<FieldValueMapping> fieldValueMappingList = List.of(
-        FieldValueMapping.builder().fieldName("phones.addressesPhone[1:].id[1]").fieldType("string-array").valueLength(0).fieldValueList("Pablo").build(),
-        FieldValueMapping.builder().fieldName("phones.phoneType").fieldType("enum").valueLength(0).fieldValueList("[MOBILE, HOME, WORK]").build());
-
+        FieldValueMapping.builder().fieldName("phones.addressesPhone[1:].id[1]").fieldType("string-array").fieldValueList("Pablo").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("phones.phoneType").fieldType("enum").fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build());
     ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
     protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
     EnrichedRecord message = protobufSchemaProcessor.next();
@@ -187,14 +186,13 @@ class ProtobufSchemaProcessorTest {
   void testProtoBufMapTestProcessor() throws IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/mapTest.proto");
     List<FieldValueMapping> fieldValueMappingList = asList(
-        FieldValueMapping.builder().fieldName("name[:]").fieldType("string-map").valueLength(0).fieldValueList("Pablo").build(),
-        FieldValueMapping.builder().fieldName("addresses[:].street").fieldType("string").valueLength(0).fieldValueList("Sor Joaquina").build(),
-        FieldValueMapping.builder().fieldName("addresses[:].number").fieldType("int").valueLength(0).fieldValueList("2").build(),
-        FieldValueMapping.builder().fieldName("addresses[:].zipcode").fieldType("int").valueLength(0).fieldValueList("15011").build(),
-        FieldValueMapping.builder().fieldName("addressesNoDot[:].street").fieldType("string").valueLength(0).fieldValueList("Sor Joaquina").build(),
-        FieldValueMapping.builder().fieldName("addressesNoDot[:].number").fieldType("int").valueLength(0).fieldValueList("6").build(),
-        FieldValueMapping.builder().fieldName("addressesNoDot[:].zipcode").fieldType("int").valueLength(0).fieldValueList("15011").build());
-
+        FieldValueMapping.builder().fieldName("name[:]").fieldType("string-map").fieldValueList("Pablo").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("addresses[:].street").fieldType("string").fieldValueList("Sor Joaquina").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("addresses[:].number").fieldType("int").fieldValueList("2").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("addresses[:].zipcode").fieldType("int").fieldValueList("15011").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("addressesNoDot[:].street").fieldType("string").fieldValueList("Sor Joaquina").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("addressesNoDot[:].number").fieldType("int").fieldValueList("6").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("addressesNoDot[:].zipcode").fieldType("int").fieldValueList("15011").required(true).isAncestorRequired(true).build());
     ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
     protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
     EnrichedRecord message = protobufSchemaProcessor.next();
@@ -245,20 +243,19 @@ class ProtobufSchemaProcessorTest {
   void testProtoBufComplexTestProcessor() throws IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
     List<FieldValueMapping> fieldValueMappingList = asList(
-        FieldValueMapping.builder().fieldName("phone_types[].phone").fieldType("long").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("phone_types[].principal").fieldType("boolean").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("name").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("age").fieldType("int").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("address[].street[]").fieldType("string-array").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("address[].number_street").fieldType("int").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("pets[:].pet_name").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("pets[:].pet_age").fieldType("int").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("pets[:].owner").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("descriptors[:]").fieldType("string-map").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("dates[]").fieldType("string-array").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("response").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("presents[:].options[]").fieldType("string-array").valueLength(0).fieldValueList("").build());
-
+        FieldValueMapping.builder().fieldName("phone_types[].phone").fieldType("long").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("phone_types[].principal").fieldType("boolean").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("name").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("age").fieldType("int").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("address[].street[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("address[].number_street").fieldType("int").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("pets[:].pet_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("pets[:].pet_age").fieldType("int").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("pets[:].owner").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("descriptors[:]").fieldType("string-map").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("dates[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("response").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("presents[:].options[]").fieldType("string-array").required(true).isAncestorRequired(true).build());
     ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
     protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
     EnrichedRecord message = protobufSchemaProcessor.next();
@@ -297,39 +294,38 @@ class ProtobufSchemaProcessorTest {
   void testProtoBufProvidedComplexTestProcessor() throws IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/providedTest.proto");
     List<FieldValueMapping> fieldValueMappingList = asList(
-        FieldValueMapping.builder().fieldName("id").fieldType("int").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("occurrence_id").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("load_number").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("claim_type.code").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("claim_type.description").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("collision_type.code").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("collision_type.description").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_cause_type.code").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_cause_type.description").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_type.code").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_type.description").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("review_status_type.code").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("review_status_type.description").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_latitude").fieldType("double").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_longitude").fieldType("double").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_date").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_time").fieldType(".google.protobuf.Timestamp").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_city").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_state").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("location_description").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_number").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_type").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_prefix").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("driver.driver_id").fieldType("int").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("driver.driver_first_name").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("driver.driver_last_name").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("dot_accident_indicator").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("drug_test_required_indicator").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("hazardous_material_indicator").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("preventable_indicator").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("report_by_name").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("create_user_id").fieldType("string").valueLength(0).fieldValueList("").build());
-
+        FieldValueMapping.builder().fieldName("id").fieldType("int").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("occurrence_id").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("load_number").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("claim_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("claim_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("collision_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("collision_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_cause_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_cause_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("review_status_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("review_status_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_latitude").fieldType("double").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_longitude").fieldType("double").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_date").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_city").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_state").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("location_description").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_number").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_type").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_prefix").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("driver.driver_id").fieldType("int").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("driver.driver_first_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("driver.driver_last_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("dot_accident_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("drug_test_required_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("hazardous_material_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("preventable_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("report_by_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("create_user_id").fieldType("string").required(true).isAncestorRequired(true).build());
     ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
     protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
     EnrichedRecord message = protobufSchemaProcessor.next();
@@ -380,47 +376,47 @@ class ProtobufSchemaProcessorTest {
   void testFailing() throws IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/deveTest.proto");
     List<FieldValueMapping> fieldValueMappingList = asList(
-        FieldValueMapping.builder().fieldName("load_type").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("shipment.carrier_identifier.type").fieldType("enum").valueLength(0).fieldValueList("[CARRIER_IDENTIFIER_TYPE_UNSPECIFIED, CARRIER_IDENTIFIER_TYPE_DOT_NUMBER]").build(),
-        FieldValueMapping.builder().fieldName("shipment.carrier_identifier.value").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("shipment.shipment_identifiers[].type").fieldType("enum").valueLength(0).fieldValueList("[SHIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
-                                                                                                                                      "SHIPMENT_IDENTIFIER_TYPE_BILL_OF_LADING, SHIPMENT_IDENTIFIER_TYPE_ORDER]").build(),
-        FieldValueMapping.builder().fieldName("shipment.shipment_identifiers[].value").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("shipment.equipment_identifiers[].type").fieldType("enum").valueLength(0).fieldValueList("[EQUIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
-                                                                                                                                       "EQUIPMENT_IDENTIFIER_TYPE_MOBILE_PHONE_NUMBER, " +
-                                                                                                                                       "EQUIPMENT_IDENTIFIER_TYPE_VEHICLE_ID, " +
-                                                                                                                                       "EQUIPMENT_IDENTIFIER_TYPE_LICENSE_PLATE, " +
-                                                                                                                                       "EQUIPMENT_IDENTIFIER_TYPE_SENSITECH_DEVICE_ID, " +
-                                                                                                                                       "EQUIPMENT_IDENTIFIER_TYPE_EMERSON_DEVICE_ID, " +
-                                                                                                                                       "EQUIPMENT_IDENTIFIER_TYPE_TIVE_DEVICE_ID, " +
-                                                                                                                                       "EQUIPMENT_IDENTIFIER_TYPE_CONTAINER_ID]").build(),
-        FieldValueMapping.builder().fieldName("shipment.equipment_identifiers[].value").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("shipment.attributes[]").fieldType("string-array").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.timestamp").fieldType(".google.protobuf.Timestamp").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.stop_number").fieldType("int").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.status_code").fieldType("enum").valueLength(0).fieldValueList("[STATUS_UPDATE_CODE_UNSPECIFIED, STATUS_UPDATE_CODE_DISPATCHED, STATUS_UPDATE_CODE_IN_TRANSIT, " +
-                                                                                                                                  "STATUS_UPDATE_CODE_AT_STOP, STATUS_UPDATE_CODE_COMPLETED, STATUS_UPDATE_CODE_TRACKING_FAILED, " +
-                                                                                                                                  "STATUS_UPDATE_CODE_INFO, STATUS_UPDATE_CODE_DELETED]").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.status_reason").fieldType("enum").valueLength(0).fieldValueList("[STATUS_UPDATE_REASON_UNSPECIFIED, STATUS_UPDATE_REASON_PENDING_TRACKING_METHOD, " +
-                                                                                                                                    "STATUS_UPDATE_REASON_SCHEDULED, STATUS_UPDATE_REASON_PENDING_APPROVAL, " +
-                                                                                                                                    "STATUS_UPDATE_REASON_ACQUIRING_LOCATION, STATUS_UPDATE_REASON_PENDING_CARRIER, STATUS_UPDATE_REASON_IN_MOTION, STATUS_UPDATE_REASON_IDLE, STATUS_UPDATE_REASON_APPROVAL_DENIED, STATUS_UPDATE_REASON_TIMED_OUT, STATUS_UPDATE_REASON_CANCELED, STATUS_UPDATE_REASON_DEPARTED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FAILED_TO_ACQUIRE_LOCATION, STATUS_UPDATE_REASON_INFO]").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.geo_coordinates.latitude").fieldType("double").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.geo_coordinates.longitude").fieldType("double").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.address.postal_code").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.address.address_lines[]").fieldType("string-array").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.address.city").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.address.state").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.address.country").fieldType("string").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].stop_number").fieldType("int").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].status_code").fieldType("enum").valueLength(0).fieldValueList("[STOP_STATUS_CODE_UNSPECIFIED, STOP_STATUS_CODE_UNKNOWN, STOP_STATUS_CODE_EN_ROUTE, " +
-                                                                                                                                    "STOP_STATUS_CODE_ARRIVED, STOP_STATUS_CODE_DEPARTED]").build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.start_date_time").fieldType(".google.protobuf.Timestamp").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.end_date_time").fieldType(".google.protobuf.Timestamp").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.last_calculated_date_time").fieldType(".google.protobuf.Timestamp").valueLength(0).fieldValueList("").build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_code").fieldType("enum").valueLength(0).fieldValueList("[ARRIVAL_CODE_UNSPECIFIED, ARRIVAL_CODE_UNKNOWN, ARRIVAL_CODE_EARLY, ARRIVAL_CODE_ON_TIME, " +
-                                                                                                                                     "ARRIVAL_CODE_LATE]").build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].additional_appointment_window_statuses[]").fieldType("string-array").valueLength(0).fieldValueList("").build()
-        );
+        FieldValueMapping.builder().fieldName("load_type").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.carrier_identifier.type").fieldType("enum").fieldValueList("[CARRIER_IDENTIFIER_TYPE_UNSPECIFIED, CARRIER_IDENTIFIER_TYPE_DOT_NUMBER]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.carrier_identifier.value").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.shipment_identifiers[].type").fieldType("enum").fieldValueList("[SHIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
+                                                                                                                       "SHIPMENT_IDENTIFIER_TYPE_BILL_OF_LADING, SHIPMENT_IDENTIFIER_TYPE_ORDER]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.shipment_identifiers[].value").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.equipment_identifiers[].type").fieldType("enum").fieldValueList("[EQUIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_MOBILE_PHONE_NUMBER, " +
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_VEHICLE_ID, " +
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_LICENSE_PLATE, " +
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_SENSITECH_DEVICE_ID, " +
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_EMERSON_DEVICE_ID, " +
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_TIVE_DEVICE_ID, " +
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_CONTAINER_ID]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.equipment_identifiers[].value").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.attributes[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.timestamp").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.stop_number").fieldType("int").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.status_code").fieldType("enum").fieldValueList("[STATUS_UPDATE_CODE_UNSPECIFIED, STATUS_UPDATE_CODE_DISPATCHED, STATUS_UPDATE_CODE_IN_TRANSIT, " +
+                                                                                                                   "STATUS_UPDATE_CODE_AT_STOP, STATUS_UPDATE_CODE_COMPLETED, STATUS_UPDATE_CODE_TRACKING_FAILED, " +
+                                                                                                                   "STATUS_UPDATE_CODE_INFO, STATUS_UPDATE_CODE_DELETED]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.status_reason").fieldType("enum").fieldValueList("[STATUS_UPDATE_REASON_UNSPECIFIED, STATUS_UPDATE_REASON_PENDING_TRACKING_METHOD, " +
+                                                                                                                     "STATUS_UPDATE_REASON_SCHEDULED, STATUS_UPDATE_REASON_PENDING_APPROVAL, " +
+                                                                                                                     "STATUS_UPDATE_REASON_ACQUIRING_LOCATION, STATUS_UPDATE_REASON_PENDING_CARRIER, STATUS_UPDATE_REASON_IN_MOTION, STATUS_UPDATE_REASON_IDLE, STATUS_UPDATE_REASON_APPROVAL_DENIED, STATUS_UPDATE_REASON_TIMED_OUT, STATUS_UPDATE_REASON_CANCELED, STATUS_UPDATE_REASON_DEPARTED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FAILED_TO_ACQUIRE_LOCATION, STATUS_UPDATE_REASON_INFO]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.geo_coordinates.latitude").fieldType("double").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.geo_coordinates.longitude").fieldType("double").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.address.postal_code").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.address.address_lines[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.address.city").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.address.state").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.address.country").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].stop_number").fieldType("int").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].status_code").fieldType("enum").fieldValueList("[STOP_STATUS_CODE_UNSPECIFIED, STOP_STATUS_CODE_UNKNOWN, STOP_STATUS_CODE_EN_ROUTE, " +
+                                                                                                                     "STOP_STATUS_CODE_ARRIVED, STOP_STATUS_CODE_DEPARTED]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.start_date_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.end_date_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.last_calculated_date_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_code").fieldType("enum").fieldValueList("[ARRIVAL_CODE_UNSPECIFIED, ARRIVAL_CODE_UNKNOWN, ARRIVAL_CODE_EARLY, ARRIVAL_CODE_ON_TIME, " +
+                                                                                                                      "ARRIVAL_CODE_LATE]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].additional_appointment_window_statuses[]").fieldType("string-array").required(true).isAncestorRequired(true).build()
+    );
 
     ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
     protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);

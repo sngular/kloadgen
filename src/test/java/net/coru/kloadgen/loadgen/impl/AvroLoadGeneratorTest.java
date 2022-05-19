@@ -48,9 +48,8 @@ class AvroLoadGeneratorTest {
   void testAvroLoadGenerator(WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     List<FieldValueMapping> fieldValueMappingList = asList(
-        FieldValueMapping.builder().fieldName("Name").fieldType("string").valueLength(0).fieldValueList("Jose").build(),
-        FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").build()
-    );
+        FieldValueMapping.builder().fieldName("Name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
 
     Map<String, String> originals = new HashMap<>();
     originals.put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());

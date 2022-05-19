@@ -76,6 +76,8 @@ public class ProtoBufExtractor {
                              .fieldType("enum")
                              .valueLength(0)
                              .fieldValueList(values)
+                             .required(true)
+                             .isAncestorRequired(true)
                              .build());
       }
     } else {
@@ -99,8 +101,6 @@ public class ProtoBufExtractor {
               FieldValueMapping.builder()
                                .fieldName(subField.getName())
                                .fieldType(ProtobufHelper.translateType(subField.getType()))
-                               .valueLength(0)
-                               .fieldValueList("")
                                .required(true)
                                .isAncestorRequired(isAncestorRequired)
                                .build());
@@ -114,12 +114,11 @@ public class ProtoBufExtractor {
               FieldValueMapping.builder()
                                .fieldName(subField.getName())
                                .fieldType(subField.getType())
-                               .valueLength(0)
-                               .fieldValueList("")
                                .required(true)
                                .isAncestorRequired(isAncestorRequired)
                                .build());
         }
+
       }
     }
   }
@@ -131,8 +130,6 @@ public class ProtoBufExtractor {
           FieldValueMapping.builder()
                            .fieldName(subfield.getName() + "[]")
                            .fieldType(dotType + ARRAY_POSTFIX)
-                           .valueLength(0)
-                           .fieldValueList("")
                            .required(isRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build());
@@ -141,8 +138,6 @@ public class ProtoBufExtractor {
           FieldValueMapping.builder()
                            .fieldName(subfield.getName())
                            .fieldType(dotType)
-                           .valueLength(0)
-                           .fieldValueList("")
                            .required(isRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build());
@@ -159,8 +154,6 @@ public class ProtoBufExtractor {
           FieldValueMapping.builder()
                            .fieldName(subfield.getName() + "[:]")
                            .fieldType(subFieldType.replace(subFieldType, ProtobufHelper.translateType(subFieldType)) + MAP_POSTFIX)
-                           .valueLength(0)
-                           .fieldValueList("")
                            .required(isRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build());
@@ -173,8 +166,6 @@ public class ProtoBufExtractor {
           FieldValueMapping.builder()
                            .fieldName(subfield.getName() + "[:]")
                            .fieldType(ProtobufHelper.translateType("string") + MAP_POSTFIX)
-                           .valueLength(0)
-                           .fieldValueList("")
                            .required(isRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build());
@@ -194,8 +185,6 @@ public class ProtoBufExtractor {
           FieldValueMapping.builder()
                            .fieldName(subfield.getName() + "[]")
                            .fieldType(subfield.getType().replace(subfield.getType(),ProtobufHelper.translateType(subfield.getType())) + ARRAY_POSTFIX)
-                           .valueLength(0)
-                           .fieldValueList("")
                            .required(isRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build());
@@ -204,8 +193,6 @@ public class ProtoBufExtractor {
           FieldValueMapping.builder()
                            .fieldName(subfield.getName())
                            .fieldType(subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())))
-                           .valueLength(0)
-                           .fieldValueList("")
                            .required(isRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build());
@@ -274,8 +261,6 @@ public class ProtoBufExtractor {
               FieldValueMapping.builder()
                                .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."))
                                .fieldType(fieldValueMapping.getFieldType())
-                               .valueLength(0)
-                               .fieldValueList("")
                                .required(isRequired)
                                .isAncestorRequired(isAncestorRequired)
                                .build());
@@ -284,8 +269,6 @@ public class ProtoBufExtractor {
               FieldValueMapping.builder()
                                .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."))
                                .fieldType(fieldValueMapping.getFieldType())
-                               .valueLength(0)
-                               .fieldValueList("")
                                .required(isRequired)
                                .isAncestorRequired(isAncestorRequired)
                                .build());
@@ -318,8 +301,6 @@ public class ProtoBufExtractor {
             FieldValueMapping.builder()
                              .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."))
                              .fieldType(fieldValueMapping.getFieldType())
-                             .valueLength(0)
-                             .fieldValueList("")
                              .required(isRequired)
                              .isAncestorRequired(isAncestorRequired)
                              .build());
@@ -341,8 +322,6 @@ public class ProtoBufExtractor {
           FieldValueMapping.builder()
                            .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."))
                            .fieldType(fieldValueMapping.getFieldType())
-                           .valueLength(0)
-                           .fieldValueList("")
                            .required(isRequired)
                            .isAncestorRequired(isAncestorRequired)
                            .build());

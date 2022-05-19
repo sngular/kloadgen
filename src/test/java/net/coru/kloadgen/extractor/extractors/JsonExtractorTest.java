@@ -39,9 +39,9 @@ class JsonExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
-            FieldValueMapping.builder().fieldName("firstName").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(false).build(),
-            FieldValueMapping.builder().fieldName("lastName").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(true).isAncestorRequired(false).build(),
-            FieldValueMapping.builder().fieldName("age").fieldType("number").valueLength(0).fieldValueList("").required(true).isAncestorRequired(false).build()
+            FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
+            FieldValueMapping.builder().fieldName("lastName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(false).build(),
+            FieldValueMapping.builder().fieldName("age").fieldType("number").required(true).isAncestorRequired(false).build()
         );
   }
 
@@ -57,9 +57,9 @@ class JsonExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
-            FieldValueMapping.builder().fieldName("fruits[]").fieldType("string-array").valueLength(0).fieldValueList("").required(true).isAncestorRequired(false).build(),
-            FieldValueMapping.builder().fieldName("vegetables[].veggieName").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("vegetables[].veggieLike").fieldType("boolean").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build()
+            FieldValueMapping.builder().fieldName("fruits[]").fieldType("string-array").required(true).isAncestorRequired(false).build(),
+            FieldValueMapping.builder().fieldName("vegetables[].veggieName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("vegetables[].veggieLike").fieldType("boolean").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -72,15 +72,15 @@ class JsonExtractorTest {
                                                                  EXCLUDED_MINIMUM_VALUE, "0", EXCLUDED_MAXIMUM_VALUE, "0", MULTIPLE_OF, "0");
 
     Map<ConstraintTypeEnum, String> constraintsLongitude = Map.of(MINIMUM_VALUE, "-180", MAXIMUM_VALUE, "180",
-                                                                 EXCLUDED_MINIMUM_VALUE, "0", EXCLUDED_MAXIMUM_VALUE, "0", MULTIPLE_OF, "0");
+                                                                  EXCLUDED_MINIMUM_VALUE, "0", EXCLUDED_MAXIMUM_VALUE, "0", MULTIPLE_OF, "0");
 
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
     assertThat(fieldValueMappingList)
         .hasSize(2)
         .containsExactlyInAnyOrder(
-            FieldValueMapping.builder().fieldName("latitude").fieldType("number").valueLength(0).fieldValueList("").constraints(constraintsLatitude).required(true).isAncestorRequired(false).build(),
-            FieldValueMapping.builder().fieldName("longitude").fieldType("number").valueLength(0).fieldValueList("").constraints(constraintsLongitude).required(true).isAncestorRequired(false).build()
+            FieldValueMapping.builder().fieldName("latitude").fieldType("number").constraints(constraintsLatitude).required(true).isAncestorRequired(false).build(),
+            FieldValueMapping.builder().fieldName("longitude").fieldType("number").constraints(constraintsLongitude).required(true).isAncestorRequired(false).build()
         );
   }
 
@@ -96,18 +96,18 @@ class JsonExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(12)
         .containsExactlyInAnyOrder(
-            FieldValueMapping.builder().fieldName("mapOfStrings[:]").fieldType("string-map").valueLength(0).fieldValueList("").required(true).isAncestorRequired(false).build(),
-            FieldValueMapping.builder().fieldName("arrayOfObjectsOfBasicTypes[].stringOfObject").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("arrayOfObjectsOfBasicTypes[].numberOfObject").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfBasicTypes.arrayOfStrings[]").fieldType("string-array").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfBasicTypes.mapOfIntegers[:]").fieldType("number-map").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfBasicTypes.stringControl").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.stringControl").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.arrayOfObjectsPerson[].namePerson").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.arrayOfObjectsPerson[].phonePerson").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].nameDog").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.dogId").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.breedName").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build()
+            FieldValueMapping.builder().fieldName("mapOfStrings[:]").fieldType("string-map").required(true).isAncestorRequired(false).build(),
+            FieldValueMapping.builder().fieldName("arrayOfObjectsOfBasicTypes[].stringOfObject").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("arrayOfObjectsOfBasicTypes[].numberOfObject").fieldType("number").required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfBasicTypes.arrayOfStrings[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfBasicTypes.mapOfIntegers[:]").fieldType("number-map").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfBasicTypes.stringControl").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.stringControl").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.arrayOfObjectsPerson[].namePerson").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.arrayOfObjectsPerson[].phonePerson").fieldType("number").required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].nameDog").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.dogId").fieldType("number").required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.breedName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build()
         );
   }
 
@@ -123,14 +123,14 @@ class JsonExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(8)
         .containsExactlyInAnyOrder(
-            FieldValueMapping.builder().fieldName("objectOfDefinitions.stringControl").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfDefinitions.arrayOfStrings[]").fieldType("string-array").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("objectOfDefinitions.mapOfStrings[:]").fieldType("string-map").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("arrayOfObjects[].stringOfObject").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("arrayOfObjects[].numberOfObject").fieldType("number").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfObjects[:].arrayOfInternalObject[]").fieldType("string-array").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfMaps[:][:].stringControlObject").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfMaps[:][:].arrayOfArraysOfStrings[][]").fieldType("string-array-array").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build()
+            FieldValueMapping.builder().fieldName("objectOfDefinitions.stringControl").fieldType("string").constraints(constraints).required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfDefinitions.arrayOfStrings[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("objectOfDefinitions.mapOfStrings[:]").fieldType("string-map").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("arrayOfObjects[].stringOfObject").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("arrayOfObjects[].numberOfObject").fieldType("number").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfObjects[:].arrayOfInternalObject[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfMaps[:][:].stringControlObject").fieldType("string").constraints(constraints).required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfMaps[:][:].arrayOfArraysOfStrings[][]").fieldType("string-array-array").required(false).isAncestorRequired(true).build()
         );
   }
 
@@ -146,10 +146,10 @@ class JsonExtractorTest {
 
     assertThat(fieldValueMappingList)
         .contains(
-            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level1.code").fieldType("string").valueLength(0).fieldValueList("").constraints(constraintsCode).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level1.freeForm").fieldType("string").valueLength(0).fieldValueList("").constraints(constraintsFreeForm).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level2.code").fieldType("string").valueLength(0).fieldValueList("").constraints(constraintsCode).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level2.freeForm").fieldType("string").valueLength(0).fieldValueList("").constraints(constraintsFreeForm).required(false).isAncestorRequired(true).build()
+            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level1.code").fieldType("string").constraints(constraintsCode).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level1.freeForm").fieldType("string").constraints(constraintsFreeForm).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level2.code").fieldType("string").constraints(constraintsCode).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level2.freeForm").fieldType("string").constraints(constraintsFreeForm).required(false).isAncestorRequired(true).build()
         );
   }
 
@@ -164,9 +164,9 @@ class JsonExtractorTest {
 
     assertThat(fieldValueMappingList)
         .contains(
-          FieldValueMapping.builder().fieldName("duty.amount.value").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(false).build(),
-          FieldValueMapping.builder().fieldName("duty.amount.currency").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(false).build(),
-          FieldValueMapping.builder().fieldName("duty.amount.exponent").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(false).build()
+            FieldValueMapping.builder().fieldName("duty.amount.value").fieldType("number").required(false).isAncestorRequired(false).build(),
+            FieldValueMapping.builder().fieldName("duty.amount.currency").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
+            FieldValueMapping.builder().fieldName("duty.amount.exponent").fieldType("number").required(false).isAncestorRequired(false).build()
         );
   }
 
@@ -196,14 +196,14 @@ class JsonExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(8)
         .containsExactlyInAnyOrder(
-            FieldValueMapping.builder().fieldName("arrayOfMapsOfObjects[][:].stringObject").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("arrayOfMapsOfObjects[][:].numberObject").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("arrayOfArraysOfStrings[][]").fieldType("string-array-array").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfArraysOfStrings[:][]").fieldType("string-array-map").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfMapsOfObjects[:][:].name4Object").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfMapsOfObjects[:][:].number4Object").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].stringControl").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl").fieldType("number").valueLength(0).fieldValueList("").required(false).isAncestorRequired(true).build()
+            FieldValueMapping.builder().fieldName("arrayOfMapsOfObjects[][:].stringObject").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("arrayOfMapsOfObjects[][:].numberObject").fieldType("number").required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("arrayOfArraysOfStrings[][]").fieldType("string-array-array").required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfArraysOfStrings[:][]").fieldType("string-array-map").required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfMapsOfObjects[:][:].name4Object").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfMapsOfObjects[:][:].number4Object").fieldType("number").required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].stringControl").fieldType("string").constraints(constraints).required(false).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl").fieldType("number").required(false).isAncestorRequired(true).build()
         );
   }
 
@@ -217,11 +217,11 @@ class JsonExtractorTest {
     List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
 
     assertThat(fieldValueMappingList).contains(
-        FieldValueMapping.builder().fieldName("firstName").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(false).isAncestorRequired(false).build(),
-        FieldValueMapping.builder().fieldName("lastName").fieldType("string").valueLength(0).fieldValueList("").constraints(constraints).required(true).isAncestorRequired(false).build(),
-        FieldValueMapping.builder().fieldName("age").fieldType("number").valueLength(0).fieldValueList("").required(true).isAncestorRequired(false).build(),
-        FieldValueMapping.builder().fieldName("testMap.itemType[:]").fieldType("number-map").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("testMap.itemTipo[:]").fieldType("string-map").valueLength(0).fieldValueList("").required(true).isAncestorRequired(true).build()
+        FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
+        FieldValueMapping.builder().fieldName("lastName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(false).build(),
+        FieldValueMapping.builder().fieldName("age").fieldType("number").required(true).isAncestorRequired(false).build(),
+        FieldValueMapping.builder().fieldName("testMap.itemType[:]").fieldType("number-map").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("testMap.itemTipo[:]").fieldType("string-map").required(true).isAncestorRequired(true).build()
     );
   }
 

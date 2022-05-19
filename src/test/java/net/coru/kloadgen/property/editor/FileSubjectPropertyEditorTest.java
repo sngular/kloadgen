@@ -38,10 +38,10 @@ class FileSubjectPropertyEditorTest {
     assertThat(fieldValueMappingList)
         .hasSize(4)
         .containsExactlyInAnyOrder(
-            FieldValueMapping.builder().fieldName("fieldMySchema.testInt_id").fieldType("int").build(),
-            FieldValueMapping.builder().fieldName("fieldMySchema.testLong").fieldType("long").build(),
-            FieldValueMapping.builder().fieldName("fieldMySchema.fieldString").fieldType("string").build(),
-            FieldValueMapping.builder().fieldName("timestamp").fieldType("long").build()
+            FieldValueMapping.builder().fieldName("fieldMySchema.testInt_id").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("fieldMySchema.testLong").fieldType("long").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("fieldMySchema.fieldString").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("timestamp").fieldType("long").required(true).isAncestorRequired(true).build()
         );
   }
 }
