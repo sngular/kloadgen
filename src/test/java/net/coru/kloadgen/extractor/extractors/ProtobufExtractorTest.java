@@ -41,9 +41,9 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("street", "string", 0, ""),
-            new FieldValueMapping("number[]", "int-array", 0, ""),
-            new FieldValueMapping("zipcode", "long", 0, "")
+            FieldValueMapping.builder().fieldName("street").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("number[]").fieldType("int-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -55,8 +55,8 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(2)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("phones.addressesPhone[:].id[]", "string-array", 0, ""),
-            new FieldValueMapping("phones.phoneType", "enum", 0, "[MOBILE, HOME, WORK]")
+            FieldValueMapping.builder().fieldName("phones.addressesPhone[:].id[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("phones.phoneType").fieldType("enum").valueLength(0).fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -68,9 +68,9 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(3)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("phoneTypes", "enum", 0, "[MOBILE, HOME, WORK]"),
-            new FieldValueMapping("phoneTypesArray[]", "enum-array", 0, "[MOBILE, HOME, WORK]"),
-            new FieldValueMapping("phoneTypesMap[:]", "enum-map", 0, "[MOBILE, HOME, WORK]")
+            FieldValueMapping.builder().fieldName("phoneTypes").fieldType("enum").valueLength(0).fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("phoneTypesArray[]").fieldType("enum-array").valueLength(0).fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("phoneTypesMap[:]").fieldType("enum-map").valueLength(0).fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -82,14 +82,14 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(4)
         .contains(
-            new FieldValueMapping("type.street", "string", 0, ""),
-            new FieldValueMapping("type.number", "int", 0, ""),
-            new FieldValueMapping("type.test", "string", 0, "")
+            FieldValueMapping.builder().fieldName("type.street").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("type.number").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("type.test").fieldType("string").required(true).isAncestorRequired(true).build()
         )
         .containsAnyOf(
-            new FieldValueMapping("optionString", "string", 0, ""),
-            new FieldValueMapping("optionLong", "long", 0, ""),
-            new FieldValueMapping("optionInt", "int", 0, "")
+            FieldValueMapping.builder().fieldName("optionString").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("optionLong").fieldType("long").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("optionInt").fieldType("int").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -101,19 +101,19 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(13)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("phone_types[].phone", "long", 0, ""),
-            new FieldValueMapping("phone_types[].principal", "boolean", 0, ""),
-            new FieldValueMapping("name", "string", 0, ""),
-            new FieldValueMapping("age", "int", 0, ""),
-            new FieldValueMapping("address[].street[]", "string-array", 0, ""),
-            new FieldValueMapping("address[].number_street", "int", 0, ""),
-            new FieldValueMapping("pets[:].pet_name", "string", 0, ""),
-            new FieldValueMapping("pets[:].pet_age", "int", 0, ""),
-            new FieldValueMapping("pets[:].owner", "string", 0, ""),
-            new FieldValueMapping("descriptors[:]", "string-map", 0, ""),
-            new FieldValueMapping("dates[]", "string-array", 0, ""),
-            new FieldValueMapping("response", "string", 0, ""),
-            new FieldValueMapping("presents[:].options[]", "string-array", 0, "")
+            FieldValueMapping.builder().fieldName("phone_types[].phone").fieldType("long").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("phone_types[].principal").fieldType("boolean").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("name").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("age").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("address[].street[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("address[].number_street").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("pets[:].pet_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("pets[:].pet_age").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("pets[:].owner").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("descriptors[:]").fieldType("string-map").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("dates[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("response").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("presents[:].options[]").fieldType("string-array").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -125,39 +125,38 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(32)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("id", "int", 0, ""),
-            new FieldValueMapping("occurrence_id", "string", 0, ""),
-            new FieldValueMapping("load_number", "string", 0, ""),
-            new FieldValueMapping("claim_type.code", "string", 0, ""),
-            new FieldValueMapping("claim_type.description", "string", 0, ""),
-            new FieldValueMapping("collision_type.code", "string", 0, ""),
-            new FieldValueMapping("collision_type.description", "string", 0, ""),
-            new FieldValueMapping("incident_cause_type.code", "string", 0, ""),
-            new FieldValueMapping("incident_cause_type.description", "string", 0, ""),
-            new FieldValueMapping("incident_type.code", "string", 0, ""),
-            new FieldValueMapping("incident_type.description", "string", 0, ""),
-            new FieldValueMapping("review_status_type.code", "string", 0, ""),
-            new FieldValueMapping("review_status_type.description", "string", 0, ""),
-            new FieldValueMapping("incident_latitude", "double", 0, ""),
-            new FieldValueMapping("incident_longitude", "double", 0, ""),
-            new FieldValueMapping("incident_date", "string", 0, ""),
-            new FieldValueMapping("incident_time", ".google.protobuf.Timestamp", 0, ""),
-            new FieldValueMapping("incident_city", "string", 0, ""),
-            new FieldValueMapping("incident_state", "string", 0, ""),
-            new FieldValueMapping("location_description", "string", 0, ""),
-            new FieldValueMapping("incident_equipment_details[].equipment_number", "string", 0, ""),
-            new FieldValueMapping("incident_equipment_details[].equipment_type", "string", 0, ""),
-            new FieldValueMapping("incident_equipment_details[].equipment_prefix", "string", 0, ""),
-            new FieldValueMapping("driver.driver_id", "int", 0, ""),
-            new FieldValueMapping("driver.driver_first_name", "string", 0, ""),
-            new FieldValueMapping("driver.driver_last_name", "string", 0, ""),
-            new FieldValueMapping("dot_accident_indicator", "string", 0, ""),
-            new FieldValueMapping("drug_test_required_indicator", "string", 0, ""),
-            new FieldValueMapping("hazardous_material_indicator", "string", 0, ""),
-            new FieldValueMapping("preventable_indicator", "string", 0, ""),
-            new FieldValueMapping("report_by_name", "string", 0, ""),
-            new FieldValueMapping("create_user_id", "string", 0, "")
-
+            FieldValueMapping.builder().fieldName("id").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("occurrence_id").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("load_number").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("claim_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("claim_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("collision_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("collision_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_cause_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_cause_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("review_status_type.code").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("review_status_type.description").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_latitude").fieldType("double").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_longitude").fieldType("double").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_date").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_city").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_state").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("location_description").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_number").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_type").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("incident_equipment_details[].equipment_prefix").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("driver.driver_id").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("driver.driver_first_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("driver.driver_last_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("dot_accident_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("drug_test_required_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("hazardous_material_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("preventable_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("report_by_name").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("create_user_id").fieldType("string").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -169,13 +168,13 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(7)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("name[:]", "string-map", 0, ""),
-            new FieldValueMapping("addresses[:].street", "string", 0, ""),
-            new FieldValueMapping("addresses[:].number", "int", 0, ""),
-            new FieldValueMapping("addresses[:].zipcode", "int", 0, ""),
-            new FieldValueMapping("addressesNoDot[:].street", "string", 0, ""),
-            new FieldValueMapping("addressesNoDot[:].number", "int", 0, ""),
-            new FieldValueMapping("addressesNoDot[:].zipcode", "int", 0, "")
+            FieldValueMapping.builder().fieldName("name[:]").fieldType("string-map").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addresses[:].street").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addresses[:].number").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addresses[:].zipcode").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesNoDot[:].street").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesNoDot[:].number").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesNoDot[:].zipcode").fieldType("int").required(true).isAncestorRequired(true).build()
         );
   }
 
@@ -187,17 +186,17 @@ class ProtobufExtractorTest {
     assertThat(fieldValueMappingList)
         .hasSize(11)
         .containsExactlyInAnyOrder(
-            new FieldValueMapping("name", "string", 0, ""),
-            new FieldValueMapping("id", "int", 0, ""),
-            new FieldValueMapping("addressesArray[].id[]", "string-array", 0, ""),
-            new FieldValueMapping("addressesArray[].zipcode", "long", 0, ""),
-            new FieldValueMapping("addressesDot[].id[]", "string-array", 0, ""),
-            new FieldValueMapping("addressesDot[].zipcode", "long", 0, ""),
-            new FieldValueMapping("addressesMap[:].id[]", "string-array", 0, ""),
-            new FieldValueMapping("addressesMap[:].zipcode", "long", 0, ""),
-            new FieldValueMapping("addressesNoDotMap[:].id[]", "string-array", 0, ""),
-            new FieldValueMapping("addressesNoDotMap[:].zipcode", "long", 0, ""),
-            new FieldValueMapping("phones[]", "enum-array", 0, "[MOBILE, HOME, WORK]")
+            FieldValueMapping.builder().fieldName("name").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("id").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesArray[].id[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesArray[].zipcode").fieldType("long").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesDot[].id[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesDot[].zipcode").fieldType("long").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesMap[:].id[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesMap[:].zipcode").fieldType("long").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesNoDotMap[:].id[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("addressesNoDotMap[:].zipcode").fieldType("long").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("phones[]").fieldType("enum-array").valueLength(0).fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build()
         );
   }
 }

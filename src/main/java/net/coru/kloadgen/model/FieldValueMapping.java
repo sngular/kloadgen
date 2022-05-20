@@ -61,32 +61,6 @@ public class FieldValueMapping extends AbstractTestElement {
 
   private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
-  public FieldValueMapping(String fieldName, String fieldType) {
-    this.setFieldName(fieldName);
-    this.setValueLength(0);
-    this.setFieldType(fieldType);
-    this.setRequired(true);
-    this.setAncestorRequired(true);
-  }
-
-  public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList) {
-    this.setFieldName(fieldName);
-    this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
-    this.setFieldType(fieldType);
-    this.setFieldValuesList(valueList);
-    this.setRequired(true);
-    this.setAncestorRequired(true);
-  }
-
-  public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList, Boolean required, Boolean isAncestorRequired) {
-    this.setFieldName(fieldName);
-    this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
-    this.setFieldType(fieldType);
-    this.setFieldValuesList(valueList);
-    this.setRequired(required != null && required);
-    this.setAncestorRequired(isAncestorRequired != null && isAncestorRequired);
-  }
-
   @Builder
   public FieldValueMapping(
       String fieldName, String fieldType, Integer valueLength, String fieldValueList,
