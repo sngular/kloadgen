@@ -72,6 +72,37 @@ class ProtobufSchemaProcessorTest {
     assertThat(idField).isEqualTo("[Pablo]");
   }
 
+  @Test
+  @DisplayName("Be able to process complex types like StringValue or Int32Value and get values by default")
+  void testProtobufGoogleTypes() throws IOException, DescriptorValidationException {
+    File testFile = fileHelper.getFile("/proto-files/googleTypesTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = List.of(
+        FieldValueMapping.builder().fieldName("id").fieldType("Int32Value").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("occurrence_id").fieldType("StringValue").fieldValueList("Isabel").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("load_number").fieldType("Int32Value").required(true).isAncestorRequired(true).build());
+    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = protobufSchemaProcessor.next();
+    DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+    Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+    List<String> assertKeys = new ArrayList<>();
+    List<Object> assertValues = new ArrayList<>();
+    map.forEach((key, value) ->
+                {
+                  assertKeys.add(key.getFullName());
+                  assertValues.add(value);
+                }
+    );
+    DynamicMessage dynamicMessage = (DynamicMessage) assertValues.get(1);
+    String secondValue = (String) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("value"));
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(secondValue).isEqualTo("Isabel");
+    assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("abc.Incident.id",
+                                                                "abc.Incident.occurrence_id",
+                                                                "abc.Incident.load_number");
+  }
+
   private String getIdFieldForEmbeddedTypeTest(List<Object> assertValues) {
     DynamicMessage dynamicMessage = (DynamicMessage) assertValues.get(0);
     DynamicMessage firstMap = (DynamicMessage) ((List) dynamicMessage.getField(dynamicMessage.getDescriptorForType().findFieldByName("addressesPhone"))).get(0);
