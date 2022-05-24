@@ -51,7 +51,7 @@ class AvroGeneratorToolTest {
   private static Stream<Arguments> parametersForGenerateRandomValueForField() {
     return Stream.of(
         Arguments.of("string", 1, Collections.singletonList("testString"), new Field("name", SchemaBuilder.builder().stringType()),
-            "testString"),
+                     "testString"),
         Arguments.of("string", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
         Arguments.of("int", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().stringType()), "1"),
         Arguments.of("int", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
@@ -66,16 +66,16 @@ class AvroGeneratorToolTest {
             .of("longTimestamp", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name", SchemaBuilder.builder().longType()),
                 FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC).toEpochMilli()),
         Arguments.of("stringTimestamp", 1, Collections.singletonList("2019-12-06T12:00:00"),
-            new Field("name", SchemaBuilder.builder().stringType()),
-            "2019-12-06T12:00"),
+                     new Field("name", SchemaBuilder.builder().stringType()),
+                     "2019-12-06T12:00"),
         Arguments.of("uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
-            new Field("name", SchemaBuilder.builder().stringType()), UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
+                     new Field("name", SchemaBuilder.builder().stringType()), UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
         Arguments
             .of("boolean", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE),
         Arguments.of("boolean", 1, Collections.singletonList("true"), new Field("name", SchemaBuilder.builder().stringType()), "true"),
         Arguments
             .of("string", 1, Collections.singletonList("true"), new Field("name",
-                    SchemaBuilder.builder().booleanType()), Boolean.TRUE)
+                                                                          SchemaBuilder.builder().booleanType()), Boolean.TRUE)
     );
   }
 
@@ -85,32 +85,32 @@ class AvroGeneratorToolTest {
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
-    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
-    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
     return Stream.of(
-            Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), new Field("name",
-                    SchemaBuilder.builder().intType()), FIXED_DATE, Collections.emptyMap()),
-            Arguments.of("int_time-millis", 1, Collections.singletonList(TIME_STRING), new Field("name",
-                    SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
-            Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING), new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
-            Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-            Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-            Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-            Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-            Arguments.of("string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"), new Field("name",
-                    SchemaBuilder.builder().stringType()),
-                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
-            Arguments.of("bytes_decimal", 1, Collections.singletonList("44.444"), new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
-            Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
+        Arguments.of("int_date", 1, Collections.singletonList(DATE_STRING), new Field("name",
+                                                                                      SchemaBuilder.builder().intType()), FIXED_DATE, Collections.emptyMap()),
+        Arguments.of("int_time-millis", 1, Collections.singletonList(TIME_STRING), new Field("name",
+                                                                                             SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
+        Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING), new Field("name",
+                                                                                              SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
+        Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                                                                                                        SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                                                                                                        SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                                                                                                              SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
+                                                                                                              SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of("string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"), new Field("name",
+                                                                                                                    SchemaBuilder.builder().stringType()),
+                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
+        Arguments.of("bytes_decimal", 1, Collections.singletonList("44.444"), new Field(
+            "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
+        Arguments.of("fixed_decimal", 1, Collections.singletonList("55.555"), new Field(
+            "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstraints)
     );
   }
 
@@ -118,7 +118,14 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Random Value for Field")
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
@@ -126,10 +133,17 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Random Value for Field with Logical Types")
   @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
   void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
-                                                   Field field, Object expected,
-                                                   Map<ConstraintTypeEnum, String> constrains) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constrains)).isEqualTo(expected);
+      Field field, Object expected,
+      Map<ConstraintTypeEnum, String> constraints) {
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constraints)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
@@ -145,7 +159,14 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Generate a Random Value")
   @MethodSource("parametersForGenerateRandomValue")
   void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     Object number = new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap());
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
     assertThat(String.valueOf(number)).hasSize(valueLength);
@@ -153,18 +174,18 @@ class AvroGeneratorToolTest {
 
   private static Stream<Arguments> parametersForGenerateFieldValuesListSequence() {
     return Stream.of(
-            Arguments.of(18,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    ValidTypeConstants.INT,
-                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20)),
-            Arguments.of(20,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    ValidTypeConstants.INT,
-                    List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20, 1, 2)),
-            Arguments.of(4,
-                    List.of("first", "second", "third"),
-                    ValidTypeConstants.STRING,
-                    List.of("first", "second", "third", "first", "second")));
+        Arguments.of(18,
+                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                     ValidTypeConstants.INT,
+                     List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20)),
+        Arguments.of(20,
+                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
+                     ValidTypeConstants.INT,
+                     List.of(1, 2, 3, 5, 6, 7, 7, 9, 9, 9, 10, 14, 17, 17, 17, 17, 18, 19, 20, 1, 2)),
+        Arguments.of(4,
+                     List.of("first", "second", "third"),
+                     ValidTypeConstants.STRING,
+                     List.of("first", "second", "third", "first", "second")));
   }
 
   @ParameterizedTest
@@ -174,7 +195,14 @@ class AvroGeneratorToolTest {
     var intList = new ArrayList<>();
     Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
     Field field = new Field("name", schema);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType("seq")
+                                                           .valueLength(0)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
       intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
@@ -189,7 +217,14 @@ class AvroGeneratorToolTest {
     var intList = new ArrayList<>();
     Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().nullable().intType() : SchemaBuilder.builder().nullable().stringType();
     Field field = new Field("name", schema);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), "seq", 0, String.join(",", fieldValuesList), false, true);
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType("seq")
+                                                           .valueLength(0)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(false)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
       intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
@@ -200,14 +235,21 @@ class AvroGeneratorToolTest {
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
     return Stream.of(
         Arguments.of("enum", 1, Collections.singletonList("RED"),
-            new Field("name", SchemaBuilder.builder().enumeration("ENUM1").symbols("RED", "BLUE", "GREEN")), "RED"));
+                     new Field("name", SchemaBuilder.builder().enumeration("ENUM1").symbols("RED", "BLUE", "GREEN")), "RED"));
   }
 
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value for Enums")
   @MethodSource("parametersForGenerateRandomValueForEnums")
   void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap()))
         .hasFieldOrPropertyWithValue("symbol", expected);
   }
@@ -224,7 +266,14 @@ class AvroGeneratorToolTest {
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
       Object expectedTyped) {
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, String.join(",", fieldValuesList));
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList(String.join(",", fieldValuesList))
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
   }
 
@@ -237,12 +286,12 @@ class AvroGeneratorToolTest {
         Arguments.of("double", 1, "1.0", new Field("name", SchemaBuilder.builder().doubleType()), 1.0),
         Arguments.of("float", 1, "1.0", new Field("name", SchemaBuilder.builder().floatType()), 1.0f),
         Arguments.of("timestamp", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().stringType()),
-                FIXED_TIMESTAMP),
+                     FIXED_TIMESTAMP),
         Arguments.of("longTimestamp", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().longType()),
-            FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC).toEpochMilli()),
+                     FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC).toEpochMilli()),
         Arguments.of("stringTimestamp", 1, "2019-12-06T12:00", new Field("name", SchemaBuilder.builder().stringType()), "2019-12-06T12:00"),
         Arguments.of("uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name", SchemaBuilder.builder().stringType()),
-            UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
+                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")),
         Arguments.of("boolean", 1, "true", new Field("name", SchemaBuilder.builder().booleanType()), Boolean.TRUE)
     );
   }
@@ -253,32 +302,32 @@ class AvroGeneratorToolTest {
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
     LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstrains = new HashMap<>();
-    decimalConstrains.put(ConstraintTypeEnum.SCALE, "2");
-    decimalConstrains.put(ConstraintTypeEnum.PRECISION, "5");
+    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
+    decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
     return Stream.of(
-            Arguments.of("int_date", 1, DATE_STRING, new Field("name",
-                    SchemaBuilder.builder().intType()), FIXED_DATE, Collections.emptyMap()),
-            Arguments.of("int_time-millis", 1, TIME_STRING, new Field("name",
-                    SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
-            Arguments.of("long_time-micros", 1, TIME_STRING, new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
-            Arguments.of("long_timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-            Arguments.of("long_timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-            Arguments.of("long_local-timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-            Arguments.of("long_local-timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
-                    SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-            Arguments.of("string_uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name",
-                            SchemaBuilder.builder().stringType()),
-                    UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
-            Arguments.of("bytes_decimal", 1, "44.444", new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstrains),
-            Arguments.of("fixed_decimal", 1, "55.555", new Field(
-                    "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstrains)
+        Arguments.of("int_date", 1, DATE_STRING, new Field("name",
+                                                           SchemaBuilder.builder().intType()), FIXED_DATE, Collections.emptyMap()),
+        Arguments.of("int_time-millis", 1, TIME_STRING, new Field("name",
+                                                                  SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
+        Arguments.of("long_time-micros", 1, TIME_STRING, new Field("name",
+                                                                   SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
+        Arguments.of("long_timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
+                                                                             SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
+                                                                             SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
+                                                                                   SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
+                                                                                   SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of("string_uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name",
+                                                                                         SchemaBuilder.builder().stringType()),
+                     UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
+        Arguments.of("bytes_decimal", 1, "44.444", new Field(
+            "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
+        Arguments.of("fixed_decimal", 1, "55.555", new Field(
+            "name", decimalSchemaBytes), new BigDecimal("55.555").toString(), decimalConstraints)
     );
   }
 
@@ -289,7 +338,14 @@ class AvroGeneratorToolTest {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList("${VARIABLE}")
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
     assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,Collections.emptyMap()))
         .isEqualTo(expected);
   }
@@ -298,12 +354,19 @@ class AvroGeneratorToolTest {
   @DisplayName("Testing Recover Variable from Context Logical Types")
   @MethodSource("parametersForShouldRecoverVariableFromContextLogicalTypes")
   void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field,
-                                        Object expected, Map<ConstraintTypeEnum, String> constrains) {
+      Object expected, Map<ConstraintTypeEnum, String> constraints) {
     JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    FieldValueMapping fieldValueMapping = new FieldValueMapping(field.name(), fieldType, valueLength, "${VARIABLE}");
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constrains))
-            .isEqualTo(expected);
+    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+                                                           .fieldName(field.name())
+                                                           .fieldType(fieldType)
+                                                           .valueLength(valueLength)
+                                                           .fieldValueList("${VARIABLE}")
+                                                           .required(true)
+                                                           .isAncestorRequired(true)
+                                                           .build();
+    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constraints))
+        .isEqualTo(expected);
   }
 }

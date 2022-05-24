@@ -31,7 +31,7 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 @EqualsAndHashCode(callSuper = false)
 public class FieldValueMapping extends AbstractTestElement {
 
-  public static final String FIELD_CONSTRAINTS = "constrains";
+  public static final String FIELD_CONSTRAINTS = "constraints";
 
   public static final String FIELD_REQUIRED = "required";
 
@@ -57,45 +57,19 @@ public class FieldValueMapping extends AbstractTestElement {
 
   private Boolean isAncestorRequired = true;
 
-  private Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
+  private Map<ConstraintTypeEnum, String> constraints = new EnumMap<>(ConstraintTypeEnum.class);
 
   private static final ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-
-  public FieldValueMapping(String fieldName, String fieldType) {
-    this.setFieldName(fieldName);
-    this.setValueLength(0);
-    this.setFieldType(fieldType);
-    this.setRequired(true);
-    this.setAncestorRequired(true);
-  }
-
-  public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList) {
-    this.setFieldName(fieldName);
-    this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
-    this.setFieldType(fieldType);
-    this.setFieldValuesList(valueList);
-    this.setRequired(true);
-    this.setAncestorRequired(true);
-  }
-
-  public FieldValueMapping(String fieldName, String fieldType, Integer valueLength, String valueList, Boolean required, Boolean isAncestorRequired) {
-    this.setFieldName(fieldName);
-    this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
-    this.setFieldType(fieldType);
-    this.setFieldValuesList(valueList);
-    this.setRequired(required != null && required);
-    this.setAncestorRequired(isAncestorRequired != null && isAncestorRequired);
-  }
 
   @Builder
   public FieldValueMapping(
       String fieldName, String fieldType, Integer valueLength, String fieldValueList,
-      Map<ConstraintTypeEnum, String> constrains, Boolean required, Boolean isAncestorRequired) {
+      Map<ConstraintTypeEnum, String> constraints, Boolean required, Boolean isAncestorRequired) {
     this.setFieldName(fieldName);
     this.setValueLength(Objects.requireNonNullElse(valueLength, 0));
     this.setFieldType(fieldType);
     this.setFieldValuesList(Objects.requireNonNullElse(fieldValueList, ""));
-    this.setConstrains(constrains);
+    this.setConstraints(constraints);
     this.setRequired(required != null && required);
     this.setAncestorRequired(isAncestorRequired != null && isAncestorRequired);
   }
@@ -186,30 +160,30 @@ public class FieldValueMapping extends AbstractTestElement {
     this.setName("Object Field");
   }
 
-  public Map<ConstraintTypeEnum, String> getConstrains() {
-    return constrains;
+  public Map<ConstraintTypeEnum, String> getConstraints() {
+    return constraints;
   }
 
-  public void setConstrains(Map<ConstraintTypeEnum, String> constrains) {
-    this.constrains = constrains;
+  public void setConstraints(Map<ConstraintTypeEnum, String> constraints) {
+    this.constraints = constraints;
   }
 
   public static class FieldValueMappingBuilder {
 
-    private final Map<ConstraintTypeEnum, String> constrains = new EnumMap<>(ConstraintTypeEnum.class);
+    private final Map<ConstraintTypeEnum, String> constraints = new EnumMap<>(ConstraintTypeEnum.class);
 
-    public FieldValueMappingBuilder constrain(ConstraintTypeEnum key, String value) {
-      constrains.putIfAbsent(key, value);
+    public FieldValueMappingBuilder constraint(ConstraintTypeEnum key, String value) {
+      constraints.putIfAbsent(key, value);
       return this;
     }
 
-    public FieldValueMappingBuilder constrains(Map<ConstraintTypeEnum, String> newConstrains) {
-      constrains.putAll(newConstrains);
+    public FieldValueMappingBuilder constraints(Map<ConstraintTypeEnum, String> newConstraints) {
+      constraints.putAll(newConstraints);
       return this;
     }
 
-    public FieldValueMappingBuilder clearConstrains() {
-      constrains.clear();
+    public FieldValueMappingBuilder clearConstraints() {
+      constraints.clear();
       return this;
     }
   }
