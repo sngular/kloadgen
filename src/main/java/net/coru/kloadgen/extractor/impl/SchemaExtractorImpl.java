@@ -36,23 +36,13 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractorImpl implements SchemaExtractor {
 
-  private AvroExtractor avroExtractor = new AvroExtractor();
+  private final AvroExtractor avroExtractor = new AvroExtractor();
 
-  private JsonExtractor jsonExtractor = new JsonExtractor();
+  private final JsonExtractor jsonExtractor = new JsonExtractor();
 
-  private ProtoBufExtractor protoBufExtractor = new ProtoBufExtractor();
+  private final ProtoBufExtractor protoBufExtractor = new ProtoBufExtractor();
 
-  private JMeterHelper jMeterHelper = new JMeterHelper();
-
-  public SchemaExtractorImpl() {
-  }
-
-  public SchemaExtractorImpl(final AvroExtractor avroExtractor, final JsonExtractor jsonExtractor, final ProtoBufExtractor protoBufExtractor, final JMeterHelper jMeterHelper) {
-    this.avroExtractor = avroExtractor;
-    this.jsonExtractor = jsonExtractor;
-    this.protoBufExtractor = protoBufExtractor;
-    this.jMeterHelper = jMeterHelper;
-  }
+  private final JMeterHelper jMeterHelper = new JMeterHelper();
 
   @Override
   public Pair<String, List<FieldValueMapping>> flatPropertiesList(String subjectName) throws IOException, RestClientException {

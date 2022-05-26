@@ -39,13 +39,13 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class SchemaExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
@@ -54,21 +54,19 @@ class SchemaExtractorTest {
   private SchemaExtractorImpl schemaExtractor;
 
   @Mock
-  private AvroExtractor avroExtractor = Mockito.mock(AvroExtractor.class);
+  private AvroExtractor avroExtractor;
 
   @Mock
-  private JsonExtractor jsonExtractor = Mockito.mock(JsonExtractor.class);
+  private JsonExtractor jsonExtractor;
 
   @Mock
-  private ProtoBufExtractor protoBufExtractor = Mockito.mock(ProtoBufExtractor.class);
+  private ProtoBufExtractor protoBufExtractor;
 
   @Mock
-  private JMeterHelper jMeterHelper = Mockito.mock(JMeterHelper.class);
+  private JMeterHelper jMeterHelper;
 
   @BeforeEach
-  public void setUp() {
-    schemaExtractor = new SchemaExtractorImpl(avroExtractor, jsonExtractor, protoBufExtractor, jMeterHelper);
-
+  void setUp() {
     File file = new File("src/test/resources");
     String absolutePath = file.getAbsolutePath();
     JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
@@ -79,7 +77,7 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList with AVRO")
-  public void testFlatPropertiesListWithAVRO() throws IOException, RestClientException {
+  void testFlatPropertiesListWithAVRO() throws IOException, RestClientException {
 
     File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
 
@@ -97,14 +95,13 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList with Json")
-  public void testFlatPropertiesListWithJson() throws IOException, RestClientException {
+  void testFlatPropertiesListWithJson() throws IOException, RestClientException {
 
     File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
-    List<FieldValueMapping> fields = new ArrayList<>();
     ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "JSON");
 
     Mockito.when(jMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
-    Mockito.when(jsonExtractor.processSchema(Mockito.any(JsonNode.class))).thenReturn(fields);
+    Mockito.when(jsonExtractor.processSchema(Mockito.any(JsonNode.class))).thenReturn(new ArrayList<>());
 
     schemaExtractor.flatPropertiesList("jsonSubject");
 
@@ -114,7 +111,7 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList with Protobuf")
-  public void testFlatPropertiesListWithProtobuf() throws RestClientException, IOException {
+  void testFlatPropertiesListWithProtobuf() throws RestClientException, IOException {
 
     File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
     ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "PROTOBUF");
@@ -130,13 +127,11 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList throws exception schema type not supported")
-  public void testFlatPropertiesListWithException() throws IOException, RestClientException {
+  void testFlatPropertiesListWithException() throws IOException, RestClientException {
 
-    List<FieldValueMapping> fields = new ArrayList<>();
     ParsedSchema parsedSchema = new ParsedSchemaUtil();
 
     Mockito.when(jMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
-    Mockito.doNothing().when(protoBufExtractor).processField(Mockito.any(TypeElement.class), Mockito.anyList(), Mockito.anyList(), eq(false));
 
     assertThatExceptionOfType(KLoadGenException.class)
         .isThrownBy(() -> {
