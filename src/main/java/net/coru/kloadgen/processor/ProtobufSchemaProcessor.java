@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.DynamicMessage;
@@ -152,13 +153,35 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
     for (var field : descriptor.getFields()) {
       messageBuilder.setField(field,
                               randomObject.generateRandom(
-                                  field.getType().getJavaType().name(),
+                                  getFieldType(field),
                                   fieldValueMapping.getValueLength(),
                                   fieldValueMapping.getFieldValuesList(),
                                   fieldValueMapping.getConstraints()));
     }
 
     return messageBuilder.build();
+  }
+
+  private String getFieldType(Descriptors.FieldDescriptor field){
+    String type = "";
+    if(field.getFullName().endsWith("Date.year")){
+      type = "INT_YEAR";
+    } else if (field.getFullName().endsWith("Date.month")){
+      type = "INT_MONTH";
+    } else if (field.getFullName().endsWith("Date.day")){
+      type = "INT_DAY";
+    } else if (field.getFullName().endsWith("TimeOfDay.hours")) {
+      type = "INT_HOURS";
+    } else if (field.getFullName().endsWith("TimeOfDay.minutes")){
+      type = "INT_MINUTES";
+    } else if (field.getFullName().endsWith("TimeOfDay.seconds")){
+      type = "INT_SECONDS";
+    } else if (field.getFullName().endsWith("TimeOfDay.nanos")){
+      type = "INT_NANOS";
+    } else {
+      type = field.getType().getJavaType().name();
+    }
+    return type;
   }
 
   private DynamicMessage createObject(final Descriptors.Descriptor subMessageDescriptor, final String parentFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {

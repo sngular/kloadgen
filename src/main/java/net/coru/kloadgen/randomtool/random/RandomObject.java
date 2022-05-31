@@ -13,11 +13,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -127,6 +130,17 @@ public class RandomObject {
         break;
       case ValidTypeConstants.FIXED_DECIMAL:
         value = getDecimalValueOrRandom(fieldValueList, constraints);
+        break;
+      case ValidTypeConstants.INT_YEAR:
+      case ValidTypeConstants.INT_MONTH:
+      case ValidTypeConstants.INT_DAY:
+        value = getDateValueOrRandom(fieldType, fieldValueList);
+        break;
+      case ValidTypeConstants.INT_HOURS:
+      case ValidTypeConstants.INT_MINUTES:
+      case ValidTypeConstants.INT_SECONDS:
+      case ValidTypeConstants.INT_NANOS:
+        value = getTimeOfDayValueOrRandom(fieldType, fieldValueList);
         break;
       default:
         value = fieldType;
@@ -300,7 +314,29 @@ public class RandomObject {
     if (fieldValueList.isEmpty()) {
       return LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
     } else {
-      return LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      return getLocalTime(fieldValueList);
+    }
+  }
+
+  private static LocalTime getLocalTime(final List<String> fieldValueList) {
+    String fieldValue = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
+    Pattern pattern = Pattern.compile("([+|-]\\d{2}:\\d{2})");
+    Matcher matcher = pattern.matcher(fieldValue);
+    if(matcher.find()){
+      String offSet = matcher.group(1);
+      DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_TIME;
+      LocalTime localtime = LocalTime.parse(fieldValue, formatter);
+
+      int hours = Integer.parseInt(offSet.substring(2,3));
+      int minutes = Integer.parseInt(offSet.substring(5,6));
+
+      if(offSet.startsWith("-")){
+        return localtime.minusHours(hours).minusMinutes(minutes);
+      }else{
+        return localtime.plusHours(hours).plusMinutes(minutes);
+      }
+    }else{
+      return LocalTime.parse(fieldValue);
     }
   }
 
@@ -371,6 +407,36 @@ public class RandomObject {
 
     } else {
       throw new KLoadGenException("Missing decimal precision");
+    }
+  }
+
+  private Integer getDateValueOrRandom (String fieldType, List<String> fieldValueList) {
+    LocalDate localDate = getDateValueOrRandom(fieldValueList);
+
+    if ("int_year".equalsIgnoreCase(fieldType)) {
+      return localDate.getYear();
+    } else if ("int_month".equalsIgnoreCase(fieldType)) {
+      return localDate.getMonthValue();
+    } else if ("int_day".equalsIgnoreCase(fieldType)) {
+      return localDate.getDayOfMonth();
+    } else{
+      throw new KLoadGenException("FieldType wrong or not supported");
+    }
+  }
+
+  private Integer getTimeOfDayValueOrRandom (String fieldType, List<String> fieldValueList){
+    LocalTime localTime = getRandomLocalTime(fieldValueList);
+
+    if ("int_hours".equalsIgnoreCase(fieldType)) {
+      return localTime.getHour();
+    } else if ("int_minutes".equalsIgnoreCase(fieldType)) {
+      return localTime.getMinute();
+    } else if ("int_seconds".equalsIgnoreCase(fieldType)) {
+      return localTime.getSecond();
+    } else if ("int_nanos".equalsIgnoreCase(fieldType)) {
+      return localTime.getNano();
+    } else{
+      throw new KLoadGenException("FieldType wrong or not supported");
     }
   }
 
