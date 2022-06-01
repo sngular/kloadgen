@@ -72,6 +72,8 @@ The subject list will be used when configuring the AVRO schema to download.
 
 ### Serializer configuration elements
 
+KLoadGen includes five serializers, apart from the ones from Kafka. [Make sure to choose the best option for you.](#custom-serializers)
+
 KLoadGen includes four elements to configure the schema that will be used to serialize the data: [Value Schema Serializer Config](#value-schema-serializer-config), [Value Schema File Serializer Config](#value-schema-file-serializer-config), [Key Schema Serializer Config](#key-schema-serializer-config), and [Key Schema File Serializer Config](#key-schema-file-serializer-config).
 
 #### Value Schema Serializer Config
@@ -136,3 +138,15 @@ This configuration element allows to specify a list of headers which will be inc
 The headers specified here will be included in every message after they are serialized.
 
 Values will also be included. They will be considered of type `string`, whether they are supplied in the table or randomly generated.
+
+## Custom Serializers
+
+- **AvroSerializer**: adds a header with the id of the schema, uses GenericDatumWriter to transform the data into an array of bytes and sends it.
+
+- **GenericAvroRecordBinarySerializer**: uses SpecificDatumWriter to transform the data into an array of bytes and sends it.
+
+- **GenericAvroRecordSerializer**: uses SpecificDatumWriter to transform the data into JSON and sends it.
+
+- **GenericJsonRecordSerializer**: maps the data and sends it.
+
+- **ProtobufSerializer**: transforms the data into an array of bytes and sends it.

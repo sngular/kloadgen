@@ -46,6 +46,8 @@ Here you can find the list of the parameters to be configured when defining the 
 
 These are the configuration elements corresponding to the Kafka consumer. See below the details for each one.
 
+KLoadGen includes a deserializer, apart from the ones from Kafka. [Make sure to choose the best option for you.](#custom-deserializer)
+
 ### Value Schema Deserializer Config
 
 ![Value Schema Deserializer Config](images/value-schema-deserialization-config.png)
@@ -87,3 +89,7 @@ Whatever schema you define and configure here will be used to deserialize the me
 This configuration element is similar to [Value Schema File Deserializer Config](#value-schema-file-deserializer-config), except that it is focused in a key schema instead of a value schema.
 
 Whatever schema you define and configure here will be used to deserialize the message key.
+
+## Custom Deserializer
+
+- **AvroDeserializer**: uses GenericDatumReader to read the data and transform it into an Object, then sends it.
