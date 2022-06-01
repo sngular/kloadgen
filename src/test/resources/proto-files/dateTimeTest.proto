@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package abc;
+
+import "google/type/date.proto";
+import "google/type/timeofday.proto";
+import "google/protobuf/wrappers.proto";
+
+option java_package = "com.abc.infra.proto";
+option java_multiple_files = true;
+
+message Incident {
+
+  .google.type.Date incident_date = 11;
+  .google.type.TimeOfDay incident_time = 12;
+
+}
