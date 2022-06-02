@@ -295,6 +295,22 @@ public class RandomObject {
     return minimum;
   }
 
+  private Integer getDateValueOrRandom(final String fieldType, final List<String> fieldValueList) {
+    final LocalDate localDate = getDateValueOrRandom(fieldValueList);
+    final int result;
+
+    if ("int_year".equalsIgnoreCase(fieldType)) {
+      result = localDate.getYear();
+    } else if ("int_month".equalsIgnoreCase(fieldType)) {
+      result = localDate.getMonthValue();
+    } else if ("int_day".equalsIgnoreCase(fieldType)) {
+      result = localDate.getDayOfMonth();
+    } else {
+      throw new KLoadGenException("FieldType wrong or not supported");
+    }
+    return result;
+  }
+
   private static LocalDate getDateValueOrRandom(List<String> fieldValueList) {
     LocalDate resultDate;
     int minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
@@ -308,6 +324,24 @@ public class RandomObject {
     return resultDate;
   }
 
+  private Integer getTimeOfDayValueOrRandom(final String fieldType, final List<String> fieldValueList) {
+    final LocalTime localTime = getRandomLocalTime(fieldValueList);
+    final int result;
+
+    if ("int_hours".equalsIgnoreCase(fieldType)) {
+      result = localTime.getHour();
+    } else if ("int_minutes".equalsIgnoreCase(fieldType)) {
+      result = localTime.getMinute();
+    } else if ("int_seconds".equalsIgnoreCase(fieldType)) {
+      result = localTime.getSecond();
+    } else if ("int_nanos".equalsIgnoreCase(fieldType)) {
+      result = localTime.getNano();
+    } else {
+      throw new KLoadGenException("FieldType wrong or not supported");
+    }
+    return result;
+  }
+
   private static LocalTime getRandomLocalTime(List<String> fieldValueList) {
     long nanoMin = 0;
     long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
@@ -319,25 +353,27 @@ public class RandomObject {
   }
 
   private static LocalTime getLocalTime(final List<String> fieldValueList) {
-    String fieldValue = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
-    Pattern pattern = Pattern.compile("([+|-]\\d{2}:\\d{2})");
-    Matcher matcher = pattern.matcher(fieldValue);
-    if(matcher.find()){
-      String offSet = matcher.group(1);
-      DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_TIME;
-      LocalTime localtime = LocalTime.parse(fieldValue, formatter);
+    final String fieldValue = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
+    final Pattern pattern = Pattern.compile("([+|-]\\d{2}:\\d{2})");
+    final Matcher matcher = pattern.matcher(fieldValue);
+    final LocalTime result;
+    if (matcher.find()) {
+      final String offSet = matcher.group(1);
+      final DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_TIME;
+      final LocalTime localtime = LocalTime.parse(fieldValue, formatter);
 
-      int hours = Integer.parseInt(offSet.substring(2,3));
-      int minutes = Integer.parseInt(offSet.substring(5,6));
+      final int hours = Integer.parseInt(offSet.substring(2, 3));
+      final int minutes = Integer.parseInt(offSet.substring(5, 6));
 
-      if(offSet.startsWith("-")){
-        return localtime.minusHours(hours).minusMinutes(minutes);
-      }else{
-        return localtime.plusHours(hours).plusMinutes(minutes);
+      if (offSet.startsWith("-")) {
+        result = localtime.minusHours(hours).minusMinutes(minutes);
+      } else {
+        result = localtime.plusHours(hours).plusMinutes(minutes);
       }
-    }else{
-      return LocalTime.parse(fieldValue);
+    } else {
+      result = LocalTime.parse(fieldValue);
     }
+    return result;
   }
 
   private static LocalTime getTimeMillisValueOrRandom(List<String> fieldValueList) {
@@ -409,35 +445,4 @@ public class RandomObject {
       throw new KLoadGenException("Missing decimal precision");
     }
   }
-
-  private Integer getDateValueOrRandom (String fieldType, List<String> fieldValueList) {
-    LocalDate localDate = getDateValueOrRandom(fieldValueList);
-
-    if ("int_year".equalsIgnoreCase(fieldType)) {
-      return localDate.getYear();
-    } else if ("int_month".equalsIgnoreCase(fieldType)) {
-      return localDate.getMonthValue();
-    } else if ("int_day".equalsIgnoreCase(fieldType)) {
-      return localDate.getDayOfMonth();
-    } else{
-      throw new KLoadGenException("FieldType wrong or not supported");
-    }
-  }
-
-  private Integer getTimeOfDayValueOrRandom (String fieldType, List<String> fieldValueList){
-    LocalTime localTime = getRandomLocalTime(fieldValueList);
-
-    if ("int_hours".equalsIgnoreCase(fieldType)) {
-      return localTime.getHour();
-    } else if ("int_minutes".equalsIgnoreCase(fieldType)) {
-      return localTime.getMinute();
-    } else if ("int_seconds".equalsIgnoreCase(fieldType)) {
-      return localTime.getSecond();
-    } else if ("int_nanos".equalsIgnoreCase(fieldType)) {
-      return localTime.getNano();
-    } else{
-      throw new KLoadGenException("FieldType wrong or not supported");
-    }
-  }
-
 }
