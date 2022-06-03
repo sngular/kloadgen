@@ -119,7 +119,9 @@ The four previous configuration elements share the same table, which includes th
   - **Field Type**: field type, such as String, Int, Double, Array, etc.  For a complete list of field types, see [Field types](schemas.md#field-types).
   - **Field Length**: field length configuration for the Random Tool. For strings, it indicates the number of characters. For numbers, it indicates the number of digits.
   - **Field Values List**: possible list of values for the field, which will be used by the Random Tool to generate values.
-    **Note**: If the field type is an array or a map, you can define a specific list of values  (*[1,2,3,4,5]* or *[key1:value1, key2:value2, key3:value3]*).
+    **Note**: 
+       - For reading context values by default in Jmeter, they must be in the way: ${name_of_variable}
+       - If the field type is an array or a map, you can define a specific list of values  (*[1,2,3,4,5]* or *[key1:value1, key2:value2, key3:value3]*).
 
 ### Simple Key Config
 

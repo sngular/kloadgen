@@ -102,6 +102,15 @@ This screenshot shows an example of how KLoadGen generates sequences:
 
 The field name will be generated as sequences from 1 to 5.
 
+### Date and Time types
+
+Every kind of schema manage date and time types in a different way when they are passed as constant values from Jmeter, at the moment of random values generation:
+- Avro has its own dates system, so it's no necessary implement anything.
+- In Json, these types are implemented as a String with a specific format properly defined by KLoadGen.
+- For Protobuf definition, KLoadGen only supports `Date` and `TimeOfDay`. The rest of types are in development.
+  - If specific values wants to be passed from Jmeter they must be strings compatibles with `ISO_LOCAL_DATE` for Date and `ISO_LOCAL_TIME` or `ISO_OFFSET_TIME` for TimeOfDay.
+  - If the offset is indicated (for example 10:20:30-04:00), the value of return will have the amount of time subtracted or added it. Otherwise, the offset value will be established by default according to local zone.
+
 ## Null values
 
 KLoadGen supports the use of `null` values in **Field Values List** for any optional field defined in a schema.
