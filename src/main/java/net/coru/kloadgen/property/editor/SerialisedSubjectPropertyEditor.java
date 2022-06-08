@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.property.editor;
 
-import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -16,26 +14,26 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.AutoCompletion;
 import net.coru.kloadgen.util.PropsKeysHelper;
-import org.apache.commons.collections4.CollectionUtils;
+import net.coru.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.collections4.Predicate;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -59,6 +57,17 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     this.init();
   }
 
+  public SerialisedSubjectPropertyEditor(final Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public SerialisedSubjectPropertyEditor(final PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
+
   private void init() {
     subjectNameComboBox = new JComboBox<>();
     panel.setLayout(new BorderLayout());
@@ -68,40 +77,28 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     this.loadClassBtn.addActionListener(this);
   }
 
-  public SerialisedSubjectPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public SerialisedSubjectPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
-  }
-
   @Override
-  public void actionPerformed(ActionEvent event) {
-    String subjectName = Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
+  public final void actionPerformed(final ActionEvent event) {
+    final var subjectName = Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
 
     try {
-      Pair<String, List<FieldValueMapping>> attributeList = schemaExtractor.flatPropertiesList(subjectName);
+      final var attributeList = schemaExtractor.flatPropertiesList(subjectName);
 
-      //Get current test GUI component
-      TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
-      Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
+      final var testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
+      final var customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
       customizer.setAccessible(true);
 
-      //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
-      GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
-      Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
+      final var testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
+      final var editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
       editors.setAccessible(true);
 
-      //Retrieve TableEditor and set all fields with default values to it
-      PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
+      final var propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
-          TableEditor tableEditor = (TableEditor) propertyEditor;
-          propertyEditor.setValue(mergeValue(tableEditor.getValue(), attributeList.getRight()));
+          final var tableEditor = (TableEditor) propertyEditor;
+          if (tableEditor.getValue() instanceof List && ((List<?>) tableEditor.getValue()).get(0) instanceof FieldValueMapping) {
+            propertyEditor.setValue(mergeValue((List<FieldValueMapping>) tableEditor.getValue(), attributeList.getRight()));
+          }
         } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
           propertyEditor.setValue(attributeList.getKey());
         }
@@ -116,27 +113,27 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
   }
 
   @Override
-  public void clearGui() {
+  public final void clearGui() {
 
   }
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
     super.setSource(descriptor);
   }
 
   @Override
-  public String getAsText() {
+  public final String getAsText() {
     return Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
   }
 
   @Override
-  public Component getCustomEditor() {
+  public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public void setAsText(String text) throws IllegalArgumentException {
+  public final void setAsText(final String text) throws IllegalArgumentException {
     if (this.subjectNameComboBox.getModel().getSize() == 0) {
       this.subjectNameComboBox.addItem(text);
     }
@@ -144,10 +141,10 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
   }
 
   @Override
-  public void setValue(Object value) {
-    String subjects = JMeterContextService.getContext().getProperties().getProperty(SCHEMA_REGISTRY_SUBJECTS);
+  public final void setValue(final Object value) {
+    final var subjects = JMeterContextService.getContext().getProperties().getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS);
     if (Objects.nonNull(subjects)) {
-      String[] subjectsList = subjects.split(",");
+      final var subjectsList = subjects.split(",");
       subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjectsList));
     }
     if (value != null) {
@@ -162,55 +159,31 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
   }
 
   @Override
-  public Object getValue() {
+  public final Object getValue() {
     return this.subjectNameComboBox.getSelectedItem();
   }
 
   @Override
-  public boolean supportsCustomEditor() {
+  public final boolean supportsCustomEditor() {
     return true;
   }
 
-  @SuppressWarnings("unchecked")
-  protected List<FieldValueMapping> mergeValue(Object tableEditorValue, List<FieldValueMapping> attributeList) {
-
-    if (!(tableEditorValue instanceof ArrayList<?>)) {
-      log.error("Table Editor is not array list");
-      return attributeList;
-    }
-
-    List<FieldValueMapping> fieldValueList;
-    try {
-      fieldValueList = (ArrayList<FieldValueMapping>) tableEditorValue;
-    } catch (Exception e) {
-      log.error("Table Editor is not FieldValueMapping list", e);
-      return attributeList;
-    }
-
-    if (CollectionUtils.isEmpty(fieldValueList)) {
-      return attributeList;
-    }
-
-    List<FieldValueMapping> result = new ArrayList<>();
-    for (FieldValueMapping fieldValue : attributeList) {
-
-      FieldValueMapping existsValue = checkExists(fieldValue, fieldValueList);
-
-      if (existsValue != null) {
-        result.add(existsValue);
+  final List<FieldValueMapping> mergeValue(final List<FieldValueMapping> tableEditorValue, final List<FieldValueMapping> attributeList) {
+    final var result = new ArrayList<FieldValueMapping>();
+    for (final var value : attributeList) {
+      final var fFieldValueMapping = IterableUtils.find(tableEditorValue, fieldValueMapping -> compare(value).evaluate(fieldValueMapping));
+      if (Objects.isNull(fFieldValueMapping)) {
+        result.add(value);
       } else {
-        result.add(fieldValue);
+        result.add(fFieldValueMapping);
       }
-
     }
-
     return result;
   }
 
-  private FieldValueMapping checkExists(FieldValueMapping fieldValue, List<FieldValueMapping> fieldValueList) {
-
-    return IterableUtils.find(fieldValueList,
-                              v -> v.getFieldName().equals(fieldValue.getFieldName()) && v.getFieldType().equals(fieldValue.getFieldType()));
+  private Predicate<FieldValueMapping> compare(final FieldValueMapping fieldValue2) {
+    return fieldValue -> fieldValue.getFieldName().equalsIgnoreCase(fieldValue2.getFieldName())
+                         && fieldValue.getFieldType().equalsIgnoreCase(fieldValue2.getFieldType());
   }
 
 }

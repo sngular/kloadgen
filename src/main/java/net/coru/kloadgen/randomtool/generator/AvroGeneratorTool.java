@@ -36,21 +36,19 @@ public class AvroGeneratorTool {
 
   private final RandomObject randomObject = new RandomObject();
 
-  private final RandomSequence randomSequence = new RandomSequence();
+  public Object generateObject(final Field field, final FieldValueMapping fieldValueMapping, final Map<ConstraintTypeEnum, String> constraints) {
+    final String fieldType = fieldValueMapping.getFieldType();
+    final Integer valueLength = fieldValueMapping.getValueLength();
+    final List<String> fieldValuesList = fieldValueMapping.getFieldValuesList();
 
-  public Object generateObject(Field field, FieldValueMapping fieldValueMapping, Map<ConstraintTypeEnum, String> constraints) {
-    String fieldType = fieldValueMapping.getFieldType();
-    Integer valueLength = fieldValueMapping.getValueLength();
-    List<String> fieldValuesList = fieldValueMapping.getFieldValuesList();
-
-    List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-    boolean logicalType = Objects.nonNull(field.schema().getLogicalType());
+    final List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
+    final boolean logicalType = Objects.nonNull(field.schema().getLogicalType());
 
     Object value;
     if (ENUM == field.schema().getType() && !"seq".equalsIgnoreCase(fieldType)) {
       value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, field.schema(), parameterList, field.schema().getType().getName());
     } else if (UNION == field.schema().getType() && !"seq".equalsIgnoreCase(fieldType)) {
-      Schema safeSchema = getRecordUnion(field.schema().getTypes());
+      final Schema safeSchema = getRecordUnion(field.schema().getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
 
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
@@ -64,12 +62,12 @@ public class AvroGeneratorTool {
         }
       }
     } else if ("seq".equalsIgnoreCase(fieldType)) {
-      String type = UNION.getName().equals(getValidTypeFromSchema(field.schema())) ? getRecordUnion(field.schema().getTypes()).getName()
+      final String type = UNION.getName().equals(getValidTypeFromSchema(field.schema())) ? getRecordUnion(field.schema().getTypes()).getName()
           : getValidTypeFromSchema(field.schema());
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(type))) {
-        return randomSequence.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), type, fieldValuesList, context);
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(type))) {
+        return RandomSequence.generateSequenceForFieldValueList(fieldValueMapping.getFieldName(), type, fieldValuesList, context);
       } else {
-        value = randomSequence.generateSeq(field.name(), type, parameterList, context);
+        value = RandomSequence.generateSeq(field.name(), type, parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
 
@@ -83,7 +81,8 @@ public class AvroGeneratorTool {
     return value;
   }
 
-  private boolean differentTypesNeedCast(String fieldType, Type fieldTypeSchema) {
+  private boolean differentTypesNeedCast(final String fieldType, final Type fieldTypeSchema) {
+    final boolean result;
     switch (fieldTypeSchema) {
       case RECORD:
       case ENUM:
@@ -92,57 +91,70 @@ public class AvroGeneratorTool {
       case UNION:
       case FIXED:
       case NULL:
-        return false;
+        result = false;
+        break;
       case STRING:
-        return needCastForString(fieldType);
+        result = needCastForString(fieldType);
+        break;
       case INT:
-        return needCastForInt(fieldType);
+        result = needCastForInt(fieldType);
+        break;
       case LONG:
       case FLOAT:
       case DOUBLE:
       case BOOLEAN:
       case BYTES:
       default:
-        return !fieldTypeSchema.getName().equals(fieldType.split("_")[0]);
+        result = !fieldTypeSchema.getName().equals(fieldType.split("_")[0]);
+        break;
     }
+    return result;
   }
 
-  private GenericFixed getFixedOrGenerate(Schema schema) {
+  private GenericFixed getFixedOrGenerate(final Schema schema) {
 
-    byte[] bytes = new byte[schema.getFixedSize()];
+    final byte[] bytes = new byte[schema.getFixedSize()];
 
     return new GenericData.Fixed(schema, bytes);
   }
 
-  private boolean needCastForInt(String fieldType) {
+  private boolean needCastForInt(final String fieldType) {
+    final boolean result;
     switch (fieldType) {
       case "short":
       case "int":
-        return false;
+        result = false;
+        break;
       default:
-        return !Type.INT.getName().equals(fieldType.split("_")[0]);
+        result = !Type.INT.getName().equals(fieldType.split("_")[0]);
+        break;
     }
+    return result;
   }
 
-  private boolean needCastForString(String fieldType) {
+  private boolean needCastForString(final String fieldType) {
+    final boolean result;
     switch (fieldType) {
       case "timestamp":
       case "uuid":
-        return false;
+        result = false;
+        break;
       default:
-        return !Type.STRING.getName().equals(fieldType);
+        result = !Type.STRING.getName().equals(fieldType);
+        break;
     }
+    return result;
   }
 
-  private Object getEnumOrGenerate(String fieldName, String fieldType, Schema schema, List<String> parameterList, String fieldValueMappingType) {
-    Object value;
+  private Object getEnumOrGenerate(final String fieldName, final String fieldType, final Schema schema, final List<String> parameterList, final String fieldValueMappingType) {
+    final Object value;
     if ("ENUM".equalsIgnoreCase(fieldValueMappingType)) {
       if (parameterList.isEmpty()) {
-        List<String> enumValueList = schema.getEnumSymbols();
+        final List<String> enumValueList = schema.getEnumSymbols();
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
       } else {
         if ("Seq".equalsIgnoreCase(fieldType)) {
-          value = new GenericData.EnumSymbol(schema, randomSequence.generateSequenceForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));
+          value = new GenericData.EnumSymbol(schema, RandomSequence.generateSequenceForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));
         } else {
           value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
         }
@@ -153,7 +165,7 @@ public class AvroGeneratorTool {
     return value;
   }
 
-  private Schema getRecordUnion(List<Schema> types) {
+  private Schema getRecordUnion(final List<Schema> types) {
     return IterableUtils.find(types, schema -> !schema.getType().equals(NULL));
   }
 }

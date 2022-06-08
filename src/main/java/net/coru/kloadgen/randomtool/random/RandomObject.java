@@ -27,15 +27,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class RandomObject {
+public final class RandomObject {
 
-  public boolean isTypeValid(String type) {
+  public boolean isTypeValid(final String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
   }
 
   public Object generateRandom(
-      String fieldType, Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constraints) {
+      final String fieldType, final Integer valueLength, final List<String> fieldValueList,
+      final Map<ConstraintTypeEnum, String> constraints) {
     Object value;
     switch (fieldType.toLowerCase()) {
       case ValidTypeConstants.STRING:
@@ -44,28 +44,28 @@ public class RandomObject {
       case ValidTypeConstants.INT:
         try {
           value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).intValueExact();
-        } catch (ArithmeticException exception) {
+        } catch (final ArithmeticException exception) {
           value = Integer.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.LONG:
         try {
           value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).longValueExact();
-        } catch (ArithmeticException exception) {
+        } catch (final ArithmeticException exception) {
           value = Long.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.SHORT:
         try {
           value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).shortValueExact();
-        } catch (ArithmeticException exception) {
+        } catch (final ArithmeticException exception) {
           value = Short.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.DOUBLE:
         try {
           value = getDecimalValueOrRandom(valueLength, fieldValueList, constraints).doubleValue();
-        } catch (ArithmeticException exception) {
+        } catch (final ArithmeticException exception) {
           value = Double.MAX_VALUE;
         }
         break;
@@ -73,14 +73,14 @@ public class RandomObject {
       case ValidTypeConstants.FLOAT:
         try {
           value = getDecimalValueOrRandom(valueLength, fieldValueList, constraints).floatValue();
-        } catch (ArithmeticException exception) {
+        } catch (final ArithmeticException exception) {
           value = Float.MAX_VALUE;
         }
         break;
       case ValidTypeConstants.BYTES:
         try {
           value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
-        } catch (ArithmeticException exception) {
+        } catch (final ArithmeticException exception) {
           value = Byte.MAX_VALUE;
         }
         break;
@@ -88,9 +88,6 @@ public class RandomObject {
       case ValidTypeConstants.LONG_TIMESTAMP:
       case ValidTypeConstants.STRING_TIMESTAMP:
         value = getTimestampValueOrRandom(fieldType, fieldValueList);
-        break;
-      case ValidTypeConstants.UUID:
-        value = getUUIDValueOrRandom(fieldValueList);
         break;
       case ValidTypeConstants.BOOLEAN:
         value = getBooleanValueOrRandom(fieldValueList);
@@ -119,12 +116,11 @@ public class RandomObject {
       case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
         value = getLocalTimestampMicrosValueOrRandom(fieldValueList);
         break;
+      case ValidTypeConstants.UUID:
       case ValidTypeConstants.STRING_UUID:
         value = getUUIDValueOrRandom(fieldValueList);
         break;
       case ValidTypeConstants.BYTES_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList, constraints);
-        break;
       case ValidTypeConstants.FIXED_DECIMAL:
         value = getDecimalValueOrRandom(fieldValueList, constraints);
         break;
@@ -136,17 +132,17 @@ public class RandomObject {
     return value;
   }
 
-  private BigInteger getIntegerValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constraints) {
-    BigInteger value;
+  private BigInteger getIntegerValueOrRandom(final Integer valueLength, final List<String> fieldValueList, final Map<ConstraintTypeEnum, String> constraints) {
+    final BigInteger value;
 
     if (!fieldValueList.isEmpty()) {
       value = new BigInteger(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      Number minimum = calculateMinimum(valueLength, constraints);
+      final Number minimum = calculateMinimum(valueLength, constraints);
       Number maximum = calculateMaximum(valueLength, constraints);
 
       if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
-        int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
+        final int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
         value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()) * multipleOf);
       } else {
@@ -157,25 +153,25 @@ public class RandomObject {
     return value;
   }
 
-  private BigDecimal getDecimalValueOrRandom(Integer valueLength, List<String> fieldValueList, Map<ConstraintTypeEnum, String> constraints) {
-    BigDecimal value;
+  private BigDecimal getDecimalValueOrRandom(final Integer valueLength, final List<String> fieldValueList, final Map<ConstraintTypeEnum, String> constraints) {
+    final BigDecimal value;
 
     if (!fieldValueList.isEmpty()) {
       value = new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
-      Number minimum = calculateMinimum(valueLength - 1, constraints);
+      final Number minimum = calculateMinimum(valueLength - 1, constraints);
       Number maximum = calculateMaximum(valueLength - 1, constraints);
 
       if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
-        int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
+        final int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
         value = BigDecimal.valueOf(RandomUtils.nextDouble(minimum.doubleValue(), maximum.doubleValue()) * multipleOf);
       } else {
         if (valueLength < 3) {
           value = new BigDecimal(getIntegerValueOrRandom(valueLength, fieldValueList, constraints));
         } else {
-          BigDecimal aux = BigDecimal.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
-          int decLength = RandomUtils.nextInt(1, valueLength / 2);
+          final BigDecimal aux = BigDecimal.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
+          final int decLength = RandomUtils.nextInt(1, valueLength / 2);
           value = aux.multiply(BigDecimal.valueOf(0.1).pow(decLength));
         }
       }
@@ -184,15 +180,46 @@ public class RandomObject {
     return value;
   }
 
+  private static BigDecimal getDecimalValueOrRandom(
+      final List<String> fieldValueList,
+      final Map<ConstraintTypeEnum, String> constraints) {
+    final BigDecimal result;
+    final int scale;
+    final int precision;
+
+    if (Objects.nonNull(constraints.get(ConstraintTypeEnum.PRECISION))) {
+      precision = Integer.parseInt(constraints.get(ConstraintTypeEnum.PRECISION));
+      scale = Objects.nonNull(constraints.get(ConstraintTypeEnum.SCALE))
+          ? Integer.parseInt(constraints.get(ConstraintTypeEnum.SCALE)) : 0;
+
+      if (precision <= 0) {
+        throw new KLoadGenException("Decimal precision must be greater dan 0");
+      }
+      if (scale < 0 || scale > precision) {
+        throw new KLoadGenException("Scale must be zero or a positive integer less than or equal to the precision");
+      }
+
+      if (fieldValueList.isEmpty()) {
+        result = BigDecimal.valueOf(randomNumberWithLength(precision), scale);
+      } else {
+        result = new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      }
+
+    } else {
+      throw new KLoadGenException("Missing decimal precision");
+    }
+    return result;
+  }
+
   private String getStringValueOrRandom(
-      Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constraints) {
+      final Integer valueLength, final List<String> fieldValueList,
+      final Map<ConstraintTypeEnum, String> constraints) {
     String value;
     if (!fieldValueList.isEmpty() && !StringUtils.isEmpty(fieldValueList.get(0))) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
       if (constraints.containsKey(ConstraintTypeEnum.REGEX)) {
-        RgxGen rxGenerator = new RgxGen(constraints.get(ConstraintTypeEnum.REGEX));
+        final RgxGen rxGenerator = new RgxGen(constraints.get(ConstraintTypeEnum.REGEX));
         value = rxGenerator.generate();
         if (valueLength > 0 || constraints.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
           value = value.substring(0, getMaxLength(valueLength, constraints.get(ConstraintTypeEnum.MAXIMUM_VALUE)));
@@ -204,7 +231,7 @@ public class RandomObject {
     return value;
   }
 
-  private int getMaxLength(Integer valueLength, String maxValueStr) {
+  private int getMaxLength(final Integer valueLength, final String maxValueStr) {
     int maxValue = Integer.parseInt(StringUtils.defaultIfEmpty(maxValueStr, "0"));
     if (valueLength > 0 && maxValue == 0) {
       maxValue = valueLength;
@@ -212,22 +239,24 @@ public class RandomObject {
     return maxValue;
   }
 
-  private Object getTimestampValueOrRandom(String type, List<String> fieldValueList) {
-    LocalDateTime value;
+  private Object getTimestampValueOrRandom(final String type, final List<String> fieldValueList) {
+    final LocalDateTime value;
     if (!fieldValueList.isEmpty()) {
       value = LocalDateTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
       value = LocalDateTime.now();
     }
+    Object resultValue = value;
     if ("longTimestamp".equalsIgnoreCase(type)) {
-      return value.toInstant(ZoneOffset.UTC).toEpochMilli();
+      resultValue = value.toInstant(ZoneOffset.UTC).toEpochMilli();
     } else if ("stringTimestamp".equalsIgnoreCase(type)) {
-      return value.toString();
+      resultValue = value.toString();
     }
-    return value;
+    return resultValue;
   }
 
-  private UUID getUUIDValueOrRandom(List<String> fieldValueList) {
+  @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+  private UUID getUUIDValueOrRandom(final List<String> fieldValueList) {
     UUID value = UUID.randomUUID();
     if (!fieldValueList.isEmpty()) {
       value = UUID.fromString(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
@@ -235,7 +264,7 @@ public class RandomObject {
     return value;
   }
 
-  private Boolean getBooleanValueOrRandom(List<String> fieldValueList) {
+  private Boolean getBooleanValueOrRandom(final List<String> fieldValueList) {
     boolean value = RandomUtils.nextBoolean();
     if (!fieldValueList.isEmpty()) {
       value = Boolean.parseBoolean(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
@@ -243,8 +272,8 @@ public class RandomObject {
     return value;
   }
 
-  private String getEnumValueOrRandom(List<String> fieldValueList) {
-    String value;
+  private String getEnumValueOrRandom(final List<String> fieldValueList) {
+    final String value;
     if (!fieldValueList.isEmpty()) {
       value = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
     } else {
@@ -253,8 +282,8 @@ public class RandomObject {
     return value;
   }
 
-  private Number calculateMaximum(int valueLength, Map<ConstraintTypeEnum, String> constraints) {
-    Number maximum;
+  private Number calculateMaximum(final int valueLength, final Map<ConstraintTypeEnum, String> constraints) {
+    final Number maximum;
     if (constraints.containsKey(ConstraintTypeEnum.MAXIMUM_VALUE)) {
       if (constraints.containsKey(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) {
         maximum = Long.parseLong(constraints.get(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE)) - 1L;
@@ -267,8 +296,8 @@ public class RandomObject {
     return maximum;
   }
 
-  private Number calculateMinimum(int valueLength, Map<ConstraintTypeEnum, String> constraints) {
-    Number minimum;
+  private Number calculateMinimum(final int valueLength, final Map<ConstraintTypeEnum, String> constraints) {
+    final Number minimum;
     if (constraints.containsKey(ConstraintTypeEnum.MINIMUM_VALUE)) {
       if (constraints.containsKey(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) {
         minimum = Long.parseLong(constraints.get(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE)) - 1;
@@ -281,11 +310,11 @@ public class RandomObject {
     return minimum;
   }
 
-  private static LocalDate getDateValueOrRandom(List<String> fieldValueList) {
-    LocalDate resultDate;
-    int minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
-    int maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();
-    long randomDay = minDay + RandomUtils.nextInt(0, maxDay - minDay);
+  private static LocalDate getDateValueOrRandom(final List<String> fieldValueList) {
+    final LocalDate resultDate;
+    final long minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
+    final long maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();
+    final long randomDay = minDay + RandomUtils.nextLong(0, maxDay - minDay);
     if (fieldValueList.isEmpty()) {
       resultDate = LocalDate.ofEpochDay(randomDay);
     } else {
@@ -294,84 +323,59 @@ public class RandomObject {
     return resultDate;
   }
 
-  private static LocalTime getRandomLocalTime(List<String> fieldValueList) {
-    long nanoMin = 0;
-    long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
+  private static LocalTime getRandomLocalTime(final List<String> fieldValueList) {
+    final long nanoMin = 0;
+    final long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
+    final LocalTime result;
     if (fieldValueList.isEmpty()) {
-      return LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
+      result = LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
     } else {
-      return LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      result = LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     }
+    return result;
   }
 
-  private static LocalTime getTimeMillisValueOrRandom(List<String> fieldValueList) {
+  private static LocalTime getTimeMillisValueOrRandom(final List<String> fieldValueList) {
     return getRandomLocalTime(fieldValueList);
   }
 
-  private static LocalTime getTimeMicrosValueOrRandom(List<String> fieldValueList) {
+  private static LocalTime getTimeMicrosValueOrRandom(final List<String> fieldValueList) {
     return getRandomLocalTime(fieldValueList);
   }
 
-  private static LocalDateTime getRandomLocalDateTime(List<String> fieldValueList) {
-    long minDay = LocalDateTime.of(1900, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
-    long maxDay = LocalDateTime.of(2100, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
-    long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
+  private static LocalDateTime getRandomLocalDateTime(final List<String> fieldValueList) {
+    final LocalDateTime value;
+    final long minDay = LocalDateTime.of(1900, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
+    final long maxDay = LocalDateTime.of(2100, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
+    final long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
 
     if (fieldValueList.isEmpty()) {
-      return LocalDateTime.ofEpochSecond(randomSeconds, RandomUtils.nextInt(0, 1_000_000_000 - 1), ZoneOffset.UTC);
+      value = LocalDateTime.ofEpochSecond(randomSeconds, RandomUtils.nextInt(0, 1_000_000_000 - 1), ZoneOffset.UTC);
     } else {
-      return LocalDateTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      value = LocalDateTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     }
+    return value;
   }
 
-  private static Instant getTimestampMillisValueOrRandom(List<String> fieldValueList) {
+  private static Instant getTimestampMillisValueOrRandom(final List<String> fieldValueList) {
     return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
   }
 
-  private static Instant getTimestampMicrosValueOrRandom(List<String> fieldValueList) {
+  private static Instant getTimestampMicrosValueOrRandom(final List<String> fieldValueList) {
     return getRandomLocalDateTime(fieldValueList).toInstant(ZoneOffset.UTC);
   }
 
-  private static LocalDateTime getLocalTimestampMillisValueOrRandom(List<String> fieldValueList) {
+  private static LocalDateTime getLocalTimestampMillisValueOrRandom(final List<String> fieldValueList) {
     return getRandomLocalDateTime(fieldValueList);
   }
 
-  private static LocalDateTime getLocalTimestampMicrosValueOrRandom(List<String> fieldValueList) {
+  private static LocalDateTime getLocalTimestampMicrosValueOrRandom(final List<String> fieldValueList) {
     return getRandomLocalDateTime(fieldValueList);
   }
 
-  private static long randomNumberWithLength(int n) {
-    long min = (long) Math.pow(10, n - 1);
+  private static long randomNumberWithLength(final int n) {
+    final long min = (long) Math.pow(10, n - 1.0);
     return RandomUtils.nextLong(min, min * 10);
-  }
-
-  private static BigDecimal getDecimalValueOrRandom(
-      List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constraints) {
-    int scale;
-    int precision;
-
-    if (Objects.nonNull(constraints.get(ConstraintTypeEnum.PRECISION))) {
-      precision = Integer.parseInt(constraints.get(ConstraintTypeEnum.PRECISION));
-      scale = Objects.nonNull(constraints.get(ConstraintTypeEnum.SCALE)) ?
-          Integer.parseInt(constraints.get(ConstraintTypeEnum.SCALE)) : 0;
-
-      if (precision <= 0) {
-        throw new KLoadGenException("Decimal precision must be greater dan 0");
-      }
-      if (scale < 0 || scale > precision) {
-        throw new KLoadGenException("Scale must be zero or a positive integer less than or equal to the precision");
-      }
-
-      if (fieldValueList.isEmpty()) {
-        return BigDecimal.valueOf(randomNumberWithLength(precision), scale);
-      } else {
-        return new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
-      }
-
-    } else {
-      throw new KLoadGenException("Missing decimal precision");
-    }
   }
 
 }

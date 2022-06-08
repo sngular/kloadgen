@@ -28,7 +28,7 @@ public class StringField extends Field {
   String format;
 
   @Builder(toBuilder = true)
-  public StringField(String name, String regex, int minLength, int maxlength, String format) {
+  public StringField(final String name, final String regex, final int minLength, final int maxlength, final String format) {
     super(name, "string");
     this.regex = regex;
     this.maxlength = maxlength;
@@ -37,12 +37,12 @@ public class StringField extends Field {
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
   @Override
-  public List<Field> getProperties() {
+  public final List<Field> getProperties() {
     return Collections.singletonList(this);
   }
 }

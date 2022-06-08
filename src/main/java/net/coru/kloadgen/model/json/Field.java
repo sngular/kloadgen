@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+@SuppressWarnings("checkstyle:AbstractClassName")
 @Getter
 @ToString
 @AllArgsConstructor
@@ -23,7 +24,8 @@ public abstract class Field {
 
   String type;
 
-  public abstract Field cloneField(String fieldName);
+  public abstract Field cloneField(final String fieldName);
 
   public abstract List<Field> getProperties();
 }
+

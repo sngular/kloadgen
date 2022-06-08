@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
@@ -38,13 +39,13 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
     this.init();
   }
 
-  public KeyDeserializerPropertyEditor(Object source) {
+  public KeyDeserializerPropertyEditor(final Object source) {
     super(source);
     this.init();
     this.setValue(source);
   }
 
-  public KeyDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+  public KeyDeserializerPropertyEditor(final PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
     this.init();
   }
@@ -57,9 +58,9 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
     deserializerComboBox.addActionListener(this);
   }
 
-  private void fillDeserializer(JComboBox<String> objectJComboBox) {
+  private void fillDeserializer(final JComboBox<String> objectJComboBox) {
     deserializerComboBox = objectJComboBox;
-    Reflections reflections = new Reflections(
+    final Reflections reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Deserializer.class))
             .filterInputsBy(new FilterBuilder()
@@ -70,7 +71,7 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
   }
 
   @Override
-  public void actionPerformed(ActionEvent event) {
+  public void actionPerformed(final ActionEvent event) {
     // Not implementation required
   }
 
@@ -80,37 +81,37 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
   }
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
     super.setSource(descriptor);
   }
 
   @Override
-  public String getAsText() {
+  public final String getAsText() {
     return Objects.requireNonNull(this.deserializerComboBox.getSelectedItem()).toString();
   }
 
   @Override
-  public void setAsText(String text) throws IllegalArgumentException {
+  public final void setAsText(final String text) throws IllegalArgumentException {
     this.deserializerComboBox.setSelectedItem(text);
   }
 
   @Override
-  public Component getCustomEditor() {
+  public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public Object getValue() {
+  public final Object getValue() {
     return this.deserializerComboBox.getSelectedItem();
   }
 
   @Override
-  public void setValue(Object value) {
+  public final void setValue(final Object value) {
     this.deserializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override
-  public boolean supportsCustomEditor() {
+  public final boolean supportsCustomEditor() {
     return true;
   }
 }

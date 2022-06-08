@@ -26,30 +26,30 @@ public class HeaderMapping extends AbstractTestElement {
 
   private String headerValue;
 
-  public HeaderMapping(String headerName, String headerValue) {
+  public HeaderMapping(final String headerName, final String headerValue) {
     this.setHeaderName(headerName);
     this.setHeaderValue(headerValue);
     init();
   }
 
-  public void init() {
+  public final void init() {
     this.setName("Header Field");
   }
 
-  public String getHeaderName() {
+  public final String getHeaderName() {
     return getPropertyAsString(HEADER_NAME);
   }
 
-  public void setHeaderName(String headerName) {
+  public final void setHeaderName(final String headerName) {
     this.headerName = headerName;
     setProperty(HEADER_NAME, headerName);
   }
 
-  public String getHeaderValue() {
+  public final String getHeaderValue() {
     return getPropertyAsString(HEADER_VALUE);
   }
 
-  public void setHeaderValue(String headerValue) {
+  public final void setHeaderValue(final String headerValue) {
     this.headerValue = headerValue;
     setProperty(HEADER_VALUE, headerValue);
   }

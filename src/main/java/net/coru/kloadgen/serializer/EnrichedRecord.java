@@ -16,3 +16,4 @@ public class EnrichedRecord {
 
   Object genericRecord;
 }
+

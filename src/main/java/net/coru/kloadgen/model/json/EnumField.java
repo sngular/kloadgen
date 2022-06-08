@@ -26,19 +26,19 @@ public class EnumField extends Field {
   List<String> enumValues;
 
   @Builder(toBuilder = true)
-  public EnumField(String name, String defaultValue, List<String> enumValues) {
+  public EnumField(final String name, final String defaultValue, final List<String> enumValues) {
     super(name, "enum");
     this.defaultValue = defaultValue;
     this.enumValues = enumValues;
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
   @Override
-  public List<Field> getProperties() {
+  public final List<Field> getProperties() {
     return Collections.singletonList(this);
   }
 }

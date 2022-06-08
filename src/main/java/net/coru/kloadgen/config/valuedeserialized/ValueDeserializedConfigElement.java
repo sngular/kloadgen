@@ -48,9 +48,9 @@ public class ValueDeserializedConfigElement extends ConfigTestElement implements
   private String valueNameStrategy;
 
   @Override
-  public void iterationStart(LoopIterationEvent loopIterationEvent) {
+  public final void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
-    JMeterVariables variables = JMeterContextService.getContext().getVariables();
+    final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
     variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
     variables.putObject(VALUE_DESERIALIZER_CLASS_PROPERTY, valueDeSerializerConfiguration);

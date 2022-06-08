@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
@@ -22,26 +21,26 @@ import org.apache.kafka.common.serialization.Serializer;
 public class GenericAvroRecordSerializer<T extends GenericRecord> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String topic, T record) {
+  public final byte[] serialize(final String topic, final T data) {
 
-    DatumWriter<T> writer = new SpecificDatumWriter<>(record.getSchema());
-    byte[] data = new byte[0];
-    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    Encoder jsonEncoder;
+    final var writer = new SpecificDatumWriter<>(data.getSchema());
+    byte[] dataBytes = new byte[0];
+    final var stream = new ByteArrayOutputStream();
+    final Encoder jsonEncoder;
     try {
       jsonEncoder = EncoderFactory.get().jsonEncoder(
-          record.getSchema(), stream);
-      writer.write(record, jsonEncoder);
+          data.getSchema(), stream);
+      writer.write(data, jsonEncoder);
       jsonEncoder.flush();
-      data = stream.toByteArray();
-    } catch (IOException e) {
-      log.error("Serialization error:" + e.getMessage());
+      dataBytes = stream.toByteArray();
+    } catch (final IOException ex) {
+      log.error("Serialization error:" + ex.getMessage());
     }
-    return data;
+    return dataBytes;
   }
 
   @Override
-  public byte[] serialize(String topic, Headers headers, T data) {
+  public final byte[] serialize(final String topic, final Headers headers, final T data) {
     return serialize(topic, data);
   }
 }

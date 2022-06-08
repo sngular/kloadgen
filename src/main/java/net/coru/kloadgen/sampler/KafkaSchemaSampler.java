@@ -6,32 +6,16 @@
 
 package net.coru.kloadgen.sampler;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
-import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT;
-import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_VALUE;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY;
-import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
-import static org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG;
-
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 
-import lombok.SneakyThrows;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
@@ -39,6 +23,8 @@ import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import net.coru.kloadgen.serializer.AvroSerializer;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.serializer.ProtobufSerializer;
+import net.coru.kloadgen.util.ProducerKeysHelper;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.avro.Conversions;
 import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;
@@ -50,11 +36,14 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 
-public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
+public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
+
+  private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
 
   private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
 
@@ -79,44 +68,44 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
   private transient Properties props;
 
   @Override
-  public void setupTest(JavaSamplerContext context) {
+  public final void setupTest(final JavaSamplerContext context) {
     props = properties(context);
     generator = SamplerUtil.configureValueGenerator(props);
 
     configGenericData();
 
-    if ("true".equals(context.getJMeterVariables().get(SCHEMA_KEYED_MESSAGE_KEY)) ||
-        "true".equals(context.getJMeterVariables().get(SIMPLE_KEYED_MESSAGE_KEY))) {
+    if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
+        || "true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
       keyMessageFlag = true;
-      if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME))) {
+      if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(PropsKeysHelper.KEY_SUBJECT_NAME))) {
         keyGenerator = SamplerUtil.configureKeyGenerator(props);
       } else {
-        msgKeyType = props.getProperty(MESSAGE_KEY_KEY_TYPE);
-        msgKeyValue = MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(MESSAGE_KEY_KEY_VALUE))
-            ? emptyList() : singletonList(props.getProperty(MESSAGE_KEY_KEY_VALUE));
+        msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
+        msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
+            ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
       }
     } else {
-      props.put(KEY_SERIALIZER_CLASS_CONFIG, KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
+      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
     }
 
-    topic = context.getParameter(KAFKA_TOPIC_CONFIG);
+    topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
     try {
       producer = new KafkaProducer<>(props);
-    } catch (KafkaException e) {
-      getNewLogger().error(e.getMessage(), e);
+    } catch (final KafkaException ex) {
+      getNewLogger().error(ex.getMessage(), ex);
     }
   }
 
-  protected Properties properties(JavaSamplerContext context) {
-    Properties commonProps = SamplerUtil.setupCommonProperties(context);
-    if (Objects.nonNull(context.getParameter(VALUE_NAME_STRATEGY))) {
-      commonProps.put(VALUE_NAME_STRATEGY, context.getParameter(VALUE_NAME_STRATEGY));
+  private Properties properties(final JavaSamplerContext context) {
+    final var commonProps = SamplerUtil.setupCommonProperties(context);
+    if (Objects.nonNull(context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
+      commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY));
     }
     return commonProps;
   }
 
   private void configGenericData() {
-    GenericData genericData = GenericData.get();
+    final var genericData = GenericData.get();
 
     genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
     genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
@@ -130,7 +119,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
   }
 
   @Override
-  public void teardownTest(JavaSamplerContext context) {
+  public void teardownTest(final JavaSamplerContext context) {
     if (Objects.nonNull(producer)) {
       producer.close();
     }
@@ -141,27 +130,25 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     return SamplerUtil.getCommonDefaultParameters();
   }
 
-  @SneakyThrows
   @Override
-  public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
+  public SampleResult runTest(final JavaSamplerContext javaSamplerContext) {
 
-    SampleResult sampleResult = new SampleResult();
+    final var sampleResult = new SampleResult();
     sampleResult.sampleStart();
-    JMeterContext jMeterContext = JMeterContextService.getContext();
-    EnrichedRecord messageVal = generator.nextMessage();
-    List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
+    final var jMeterContext = JMeterContextService.getContext();
+    final var messageVal = generator.nextMessage();
+    final var kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
     if (Objects.nonNull(messageVal)) {
 
-      ProducerRecord<Object, Object> producerRecord;
       try {
-        producerRecord = getProducerRecord(messageVal, enrichedKeyFlag(), enrichedValueFlag());
-        List<String> headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
+        final var producerRecord = getProducerRecord(messageVal, enrichedKeyFlag(), enrichedValueFlag());
+        final var headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
 
         sampleResult.setRequestHeaders(StringUtils.join(headersSB, ","));
         fillSamplerResult(producerRecord, sampleResult);
 
-        Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
+        final var result = producer.send(producerRecord, (metadata, e) -> {
           if (e != null) {
             super.getNewLogger().error("Send failed for record {}", producerRecord, e);
             throw new KLoadGenException("Failed to sent message due ", e);
@@ -171,7 +158,7 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
         super.getNewLogger().info("Send message with key: {} and body: {} and headers: {}",
                                   producerRecord.key(), producerRecord.value(), producerRecord.headers());
         fillSampleResult(sampleResult, prettyPrint(result.get()), true);
-      } catch (Exception e) {
+      } catch (KLoadGenException | InterruptedException | ExecutionException e) {
         super.getNewLogger().error("Failed to send message", e);
         fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "", false);
       }
@@ -182,23 +169,23 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     return sampleResult;
   }
 
-  private List<HeaderMapping> safeGetKafkaHeaders(JMeterContext jMeterContext) {
-    List<HeaderMapping> headerMappingList = new ArrayList<>();
-    Object headers = jMeterContext.getSamplerContext().get(KAFKA_HEADERS);
+  private List<HeaderMapping> safeGetKafkaHeaders(final JMeterContext jmeterContext) {
+    final var headerMappingList = new ArrayList<HeaderMapping>();
+    final var headers = jmeterContext.getSamplerContext().get(ProducerKeysHelper.KAFKA_HEADERS);
     if (null != headers) {
       headerMappingList.addAll((List) headers);
     }
     return headerMappingList;
   }
 
-  private ProducerRecord<Object, Object> getProducerRecord(EnrichedRecord messageVal, boolean keyFlag, boolean valueFlag) {
-    ProducerRecord<Object, Object> producerRecord;
+  private ProducerRecord<Object, Object> getProducerRecord(final EnrichedRecord messageVal, final boolean keyFlag, final boolean valueFlag) {
+    final ProducerRecord<Object, Object> producerRecord;
     if (keyMessageFlag) {
       if (Objects.isNull(keyGenerator)) {
-        Object key = statelessGeneratorTool.generateObject("key", msgKeyType, 0, msgKeyValue).toString();
+        final var key = statelessGeneratorTool.generateObject("key", msgKeyType, 0, msgKeyValue).toString();
         producerRecord = new ProducerRecord<>(topic, key, getObject(messageVal, valueFlag));
       } else {
-        EnrichedRecord key = keyGenerator.nextMessage();
+        final var key = keyGenerator.nextMessage();
         producerRecord = new ProducerRecord<>(topic, getObject(key, keyFlag), getObject(messageVal, valueFlag));
       }
     } else {
@@ -208,14 +195,14 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
   }
 
   private Boolean enrichedKeyFlag() {
-    return SERIALIZER_SET.contains(props.get(KEY_SERIALIZER_CLASS_CONFIG).toString());
+    return SERIALIZER_SET.contains(props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toString());
   }
 
   private Boolean enrichedValueFlag() {
-    return SERIALIZER_SET.contains(props.get(VALUE_SERIALIZER_CLASS_CONFIG).toString());
+    return SERIALIZER_SET.contains(props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG).toString());
   }
 
-  private void fillSamplerResult(ProducerRecord<Object, Object> producerRecord, SampleResult sampleResult) {
+  private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
     if (Objects.isNull(producerRecord.key())) {
       sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
     } else {
@@ -224,18 +211,17 @@ public class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Ser
     }
   }
 
-  private void fillSampleResult(SampleResult sampleResult, String respondeData, boolean successful) {
+  private void fillSampleResult(final SampleResult sampleResult, final String respondeData, final boolean successful) {
     sampleResult.setResponseData(respondeData, StandardCharsets.UTF_8.name());
     sampleResult.setSuccessful(successful);
     sampleResult.sampleEnd();
   }
 
-  private String prettyPrint(RecordMetadata recordMetadata) {
-    String template = "Topic: %s, partition: %s, offset: %s";
-    return String.format(template, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
+  private String prettyPrint(final RecordMetadata recordMetadata) {
+    return String.format(TEMPLATE, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
   }
 
-  private Object getObject(EnrichedRecord messageVal, boolean valueFlag) {
+  private Object getObject(final EnrichedRecord messageVal, final boolean valueFlag) {
     return valueFlag ? messageVal : messageVal.getGenericRecord();
   }
 }

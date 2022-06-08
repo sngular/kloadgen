@@ -52,9 +52,9 @@ public class KeyFileDeserializedConfigElement extends ConfigTestElement implemen
   private String keyDeserializerConfiguration;
 
   @Override
-  public void iterationStart(LoopIterationEvent loopIterationEvent) {
+  public final void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
-    JMeterVariables variables = JMeterContextService.getContext().getVariables();
+    final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(KEY_SCHEMA, keySchemaDefinition);
     variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
     variables.putObject(KEY_SUBJECT_NAME, keySubjectName);

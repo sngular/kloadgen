@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE suppressions PUBLIC
+  "-//Checkstyle//DTD SuppressionXpathFilter Experimental Configuration 1.2//EN"
+  "https://checkstyle.org/dtds/suppressions_1_2_xpath_experimental.dtd">
+
+<suppressions>
+  <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='UtilityClass']]"/>
+  <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='Getter']]"/>
+  <suppress-xpath checks="HideUtilityClassConstructor" query="//CLASS_DEF[.//ANNOTATION/IDENT[@text='Setter']]"/>
+  <suppress-xpath checks="VisibilityModifier" query="//*[MODIFIERS//*[@text = 'Value']]/descendant-or-self::node()"/>
+
+</suppressions>

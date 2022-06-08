@@ -49,9 +49,9 @@ public class KeyDeserializedConfigElement extends ConfigTestElement implements T
   private String keyNameStrategy;
 
   @Override
-  public void iterationStart(LoopIterationEvent loopIterationEvent) {
+  public final void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
-    JMeterVariables variables = JMeterContextService.getContext().getVariables();
+    final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
     variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
     variables.putObject(KEY_DESERIALIZER_CLASS_PROPERTY, keyDeserializerConfiguration);

@@ -52,14 +52,14 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   private List<PropertyMapping> schemaRegistryProperties;
 
   @Override
-  public void iterationStart(LoopIterationEvent iterEvent) {
+  public final void iterationStart(final LoopIterationEvent iterEvent) {
     serializeProperties();
   }
 
   private void serializeProperties() {
-    JMeterVariables jMeterVariables = getThreadContext().getVariables();
+    final JMeterVariables jMeterVariables = getThreadContext().getVariables();
 
-    Map<String, String> schemaProperties = getProperties();
+    final Map<String, String> schemaProperties = getProperties();
 
     jMeterVariables.put(SCHEMA_REGISTRY_URL, checkPropertyOrVariable(getRegistryUrl()));
     if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
@@ -78,7 +78,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   }
 
   private Map<String, String> getProperties() {
-    Map<String, String> result = new HashMap<>();
+    final Map<String, String> result = new HashMap<>();
     if (Objects.nonNull(getProperty("schemaRegistryProperties"))) {
       result.putAll(
           this.fromTestElementToPropertiesMap((List<TestElementProperty>) getProperty("schemaRegistryProperties").getObjectValue()));
@@ -88,7 +88,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     return result;
   }
 
-  private String checkPropertyOrVariable(String textToCheck) {
+  private String checkPropertyOrVariable(final String textToCheck) {
     if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
       return JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
     } else if (textToCheck.matches("\\$\\{\\w*}")) {
@@ -106,17 +106,17 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     return registryUrl;
   }
 
-  private Map<String, String> fromTestElementToPropertiesMap(List<TestElementProperty> schemaProperties) {
-    Map<String, String> propertiesMap = new HashMap<>();
+  private Map<String, String> fromTestElementToPropertiesMap(final List<TestElementProperty> schemaProperties) {
+    final Map<String, String> propertiesMap = new HashMap<>();
     for (TestElementProperty property : schemaProperties) {
-      PropertyMapping propertyMapping = (PropertyMapping) property.getObjectValue();
+      final PropertyMapping propertyMapping = (PropertyMapping) property.getObjectValue();
       propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
   }
 
-  private Map<String, String> fromPropertyMappingToPropertiesMap(List<PropertyMapping> schemaProperties) {
-    Map<String, String> propertiesMap = new HashMap<>();
+  private Map<String, String> fromPropertyMappingToPropertiesMap(final List<PropertyMapping> schemaProperties) {
+    final Map<String, String> propertiesMap = new HashMap<>();
     for (PropertyMapping propertyMapping : schemaProperties) {
       propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
