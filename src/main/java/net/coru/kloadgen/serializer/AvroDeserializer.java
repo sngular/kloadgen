@@ -6,12 +6,14 @@
 
 package net.coru.kloadgen.serializer;
 
-import java.io.ByteArrayInputStream;
+import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
+import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
+
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
@@ -22,9 +24,6 @@ import org.apache.avro.io.DecoderFactory;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Deserializer;
-
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
 
 @Slf4j
 public class AvroDeserializer implements Deserializer<Object> {
@@ -56,15 +55,15 @@ public class AvroDeserializer implements Deserializer<Object> {
       Schema.Parser parser = new Schema.Parser();
       Schema avroSchema = parser.parse(schemaString);
 
-      DatumReader<?> reader = new GenericDatumReader<GenericRecord>(avroSchema);
+      ByteBuffer buffer = getByteBuffer(data);
+      DatumReader<GenericRecord> reader = new GenericDatumReader<>(avroSchema);
+
+      int length = buffer.limit() - 1 - 4;
+      int start = buffer.position() + buffer.arrayOffset();
 
       try {
-        log.info("[AvroDeserializer] to deserialize = {}", DatatypeConverter.printHexBinary(data));
-
-        ByteArrayInputStream bufferArrayInputStream = new ByteArrayInputStream(data);
-        decoder = DecoderFactory.get().binaryDecoder(bufferArrayInputStream,null);
+        decoder = DecoderFactory.get().binaryDecoder(buffer.array(), start, length, null);
         result = reader.read(null, decoder);
-        log.info("[AvroDeserializer] retrieved = {}", result);
       } catch (RuntimeException | IOException ex) {
         throw new SerializationException("Error deserializing Avro message");
       }
@@ -78,12 +77,21 @@ public class AvroDeserializer implements Deserializer<Object> {
 
   @Override
   public Object deserialize(String topic, Headers headers, byte[] data) {
-    return deserialize(topic,  data);
+    return deserialize(topic, data);
+  }
+
+  private ByteBuffer getByteBuffer(byte[] payload) {
+    ByteBuffer buffer = ByteBuffer.wrap(payload);
+    if (buffer.get() != MAGIC_BYTE) {
+      throw new SerializationException("Unknown magic byte!");
+    } else {
+      buffer.position(buffer.position() + ID_SIZE);
+      return buffer;
+    }
   }
 
   @Override
   public void close() {
-
+    // No need to be implemented
   }
-
 }

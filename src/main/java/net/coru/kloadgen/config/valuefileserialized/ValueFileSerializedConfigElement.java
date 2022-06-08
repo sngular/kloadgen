@@ -14,6 +14,7 @@ import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROP
 import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

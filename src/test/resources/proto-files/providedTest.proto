@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package company;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/descriptor.proto";
+
+option java_package = "com.company.finance.proto";
+option java_multiple_files = true;
+
+message IncidentEvent {
+  int32 id = 1;
+  string occurrence_id = 2;
+  string load_number = 3;
+  .company.IncidentEvent.AttributeType claim_type = 4;
+  .company.IncidentEvent.AttributeType collision_type = 5;
+  .company.IncidentEvent.AttributeType incident_cause_type = 6;
+  .company.IncidentEvent.AttributeType incident_type = 7;
+  .company.IncidentEvent.AttributeType review_status_type = 8;
+  double incident_latitude = 9;
+  double incident_longitude = 10;
+  string incident_date = 11;
+  .google.protobuf.Timestamp incident_time = 12;
+  string incident_city = 13;
+  string incident_state = 14;
+  string location_description = 15;
+  repeated .company.IncidentEvent.IncidentEquipment incident_equipment_details = 16;
+  .company.IncidentEvent.Driver driver = 17;
+  string dot_accident_indicator = 18;
+  string drug_test_required_indicator = 19;
+  string hazardous_material_indicator = 20;
+  string preventable_indicator = 21;
+  string report_by_name = 22;
+  string create_user_id = 23;
+
+  message AttributeType {
+    string code = 1;
+    string description = 2;
+  }
+
+  message IncidentEquipment {
+    string equipment_number = 1;
+    string equipment_type = 2;
+    string equipment_prefix = 3;
+  }
+
+  message Driver {
+    int32  driver_id = 1;
+    string driver_first_name = 2;
+    string driver_last_name = 3;
+  }
+}

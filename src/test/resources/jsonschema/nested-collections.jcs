@@ -1,0 +1,91 @@
+{
+  "$id": "https://example.com/nested-collections.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "complex collections",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "arrayOfMapsOfObjects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "stringObject": {
+              "type": "string"
+            },
+            "numberObject": {
+              "type": "integer"
+            }
+          },
+          "required": []
+        }
+      },
+      "minItems": 1
+    },
+    "arrayOfArraysOfStrings": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1
+      }
+    },
+    "mapOfArraysOfStrings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "mapOfMapsOfObjects": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "name4Object": {
+              "type": "string"
+            },
+            "number4Object": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "mapOfObjectsOfCollections": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "arrayOfMapsOfObject": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "stringControl": {
+                    "type": "string"
+                  },
+                  "numberControl": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": []
+      }
+    }
+  },
+  "required": []
+}

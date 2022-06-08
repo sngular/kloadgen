@@ -1,0 +1,45 @@
+name: Java CI with Maven (Push)
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Publish to Maven Central Packages
+        run: mvn deploy --file pom-maven-central.xml
+        env:
+          MAVEN_USERNAME: ${{ secrets.JIRAID }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.JIRAPASS }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Maven version
+        uses: JActions/maven-version@v1.0.0
+        id: get-version
+
+      - name: Create a Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ steps.get-version.outputs.version }}
+          prerelease: false
+          title: "Release ${{ steps.get-version.outputs.version }}"

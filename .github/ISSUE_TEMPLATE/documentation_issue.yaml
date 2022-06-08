@@ -1,0 +1,33 @@
+name: Documentation Issue Report
+description: File a documentation Issue report
+title: "[Documentation Issue]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this Issue report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What's the problem folk?
+      description: Tell us the documentation changes that need to be done.
+      placeholder: Tell us what needs to be changed!
+      value: "What's the change that needs to be done? (be as specific as possible)"
+    validations:
+      required: true
+  - type: checkboxes
+    id: check
+    attributes:
+      label: Have you found it in the docs folder? 
+      description: Please check the docs folder
+      options:
+        - label: I have already checked the docs folder
+          required: true
+  - type: checkboxes
+    id: doublecheck
+    attributes:
+      label: Have you checked whether this issue is already being taken care of?
+      description: In order to have an ordered workspace, please make sure this is doublechecked.
+      options:
+        - label: I have already checked whether this issue is being taken care of.
+          required: true

@@ -43,7 +43,8 @@
           }
         ]
       }
-    },{
+    },
+    {
       "name": "topLevelIntArray",
       "type": {
         "type": "array",

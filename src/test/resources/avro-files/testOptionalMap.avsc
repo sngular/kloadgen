@@ -1,37 +1,117 @@
 {
-    "type": "record",
-    "name": "test10",
-    "fields": [
-        { "name": "mapOfString", "type": ["null", { "type": "map", "values": ["null", "string"] }], "default": null },
-        { "name": "arrayOfString", "type": ["null", { "type": "array", "items": "string" }], "default": null },
-        { "name": "arrayOfMap", "type": ["null", { "type": "array", "items": { "type": "map", "values": ["null", "string"] }}], "default": null },
-        { "name" : "mapOfArray", "type": ["null", { "type": "map",  "values": { "type" : "array" , "items": "int" }}], "default": null },
-        { "name" : "mapOfArrayOfRecord", "type": ["null", { "type": "map",  "values": { "type" : "array" , "items": {
-            "name": "record",
-            "fields": [
+  "type": "record",
+  "name": "test10",
+  "fields": [
+    {
+      "name": "mapOfString",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": "string"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "arrayOfString",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "string"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "arrayOfMap",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": {
+            "type": "map",
+            "values": "string"
+          }
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "mapOfArray",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": {
+            "type": "array",
+            "items": "int"
+          }
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "mapOfArrayOfRecord",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": {
+            "type": "array",
+            "items": {
+              "name": "record",
+              "fields": [
                 {
-                    "name": "name",
-                    "type": "string"
+                  "name": "name",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
                 },
                 {
-                    "name": "age",
-                    "type": "int"
+                  "name": "age",
+                  "type": "int"
                 }
-            ],
-            "type": "record"
-        }}}], "default": null },
-        { "name": "arrayOfMapOfRecord", "type": ["null", { "type": "array", "items": { "type": "map", "values": {"name": "records",
-                                                                                                                             "fields": [
-                                                                                                                                 {
-                                                                                                                                     "name": "name",
-                                                                                                                                     "type": "string"
-                                                                                                                                 },
-                                                                                                                                 {
-                                                                                                                                     "name": "age",
-                                                                                                                                     "type": "int"
-                                                                                                                                 }
-                                                                                                                             ],
-                                                                                                                             "type": "record"} }}], "default": null }
-    ]
+              ],
+              "type": "record"
+            }
+          }
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "arrayOfMapOfRecord",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": {
+            "type": "map",
+            "values": {
+              "name": "records",
+              "fields": [
+                {
+                  "name": "name",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                {
+                  "name": "age",
+                  "type": "int"
+                }
+              ],
+              "type": "record"
+            }
+          }
+        }
+      ],
+      "default": null
+    }
+  ]
 }
 

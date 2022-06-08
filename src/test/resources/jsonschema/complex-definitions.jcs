@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "objectOfDefinitions": {
+      "type": "object",
+      "properties": {
+        "stringControl": {
+          "type": "string"
+        },
+        "arrayOfStrings": {
+          "$ref": "#/definitions/arrayOfStringsDef"
+        },
+        "mapOfStrings": {
+          "$ref": "#/definitions/mapOfStringsDef"
+        }
+      },
+      "required": [
+        "stringControl",
+        "arrayOfStrings"
+      ]
+    },
+    "arrayOfObjects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/objectDef"
+      },
+      "minItems": 0
+    },
+    "mapOfObjects": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/objectOfArraysDef"
+      }
+    },
+    "mapOfMaps": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/mapOfObjectsDef"
+      }
+    }
+  },
+  "required": [
+    "objectOfDefinitions"
+  ],
+  "definitions": {
+    "objectDef": {
+      "type": "object",
+      "properties": {
+        "stringOfObject": {
+          "type": "string"
+        },
+        "numberOfObject": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "numberOfObject"
+      ]
+    },
+    "mapOfStringsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "mapOfObjectsDef": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "stringControlObject": {
+            "type": "string"
+          },
+          "arrayOfArraysOfStrings": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "required": [
+          "stringControlObject"
+        ]
+      }
+    },
+    "objectOfArraysDef": {
+      "type": "object",
+      "properties": {
+        "arrayOfInternalObject": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "arrayOfInternalObject"
+      ]
+    },
+    "arrayOfStringsDef": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  }
+}

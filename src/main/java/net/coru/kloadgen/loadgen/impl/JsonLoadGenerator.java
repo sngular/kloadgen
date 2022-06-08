@@ -6,32 +6,27 @@
 
 package net.coru.kloadgen.loadgen.impl;
 
-import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
-
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
-import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.JsonSchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
-public class JsonLoadGenerator implements BaseLoadGenerator {
-
-  private SchemaRegistryClient schemaRegistryClient;
-
-  private SchemaMetadata metadata;
+public class JsonLoadGenerator extends AbstractLoadGenerator implements BaseLoadGenerator {
 
   private final JsonSchemaProcessor jsonSchemaProcessor;
+
+  private Pair<SchemaMetadata, ParsedSchema> metadata;
 
   public JsonLoadGenerator() {
     jsonSchemaProcessor = new JsonSchemaProcessor();
@@ -39,9 +34,9 @@ public class JsonLoadGenerator implements BaseLoadGenerator {
 
   public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
     try {
-      metadata = schemaRegistryClient.getLatestSchemaMetadata(avroSchemaName);
+      metadata = retrieveSchema(originals, avroSchemaName);
       this.jsonSchemaProcessor.processSchema(fieldExprMappings);
-    } catch (Exception exc){
+    } catch (Exception exc) {
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
     }
@@ -49,14 +44,17 @@ public class JsonLoadGenerator implements BaseLoadGenerator {
 
   public void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings) {
     try {
+      var parsedSchema = new JsonSchemaProvider().parseSchema(schema, Collections.emptyList(), true);
+      metadata = parsedSchema.map(parsSchema -> Pair.of(new SchemaMetadata(1, 1, "JSON", Collections.emptyList(), schema), parsSchema)).orElse(null);
       this.jsonSchemaProcessor.processSchema(fieldExprMappings);
-    } catch (Exception exc){
+    } catch (Exception exc) {
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
     }
   }
 
   public EnrichedRecord nextMessage() {
-    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(jsonSchemaProcessor.next()).build();
+    return new EnrichedRecord(metadata.getLeft(), jsonSchemaProcessor.next());
   }
+
 }

@@ -6,6 +6,8 @@
 
 package net.coru.kloadgen.property.editor;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
+
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +23,6 @@ import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
@@ -33,17 +35,6 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
   private JComboBox<String> deserializerComboBox;
 
   public ValueDeserializerPropertyEditor() {
-    this.init();
-  }
-
-  public ValueDeserializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public ValueDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
     this.init();
   }
 
@@ -61,12 +52,23 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Deserializer.class))
             .filterInputsBy(new FilterBuilder()
-                .includePackage("net.coru.kloadgen.serializer",
-                    "io.confluent.kafka.serializers"))
-            .setScanners(new SubTypesScanner()));
+                                .includePackage("net.coru.kloadgen.serializer")
+                                .includePackage("io.confluent.kafka.serializers"))
+            .setScanners(SubTypes));
 
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
 
+  }
+
+  public ValueDeserializerPropertyEditor(Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public ValueDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
   }
 
   @Override

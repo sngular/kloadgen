@@ -6,12 +6,13 @@
 
 package net.coru.kloadgen.sampler;
 
+import static java.util.Collections.emptyList;
+
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG;
 import static io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig.USER_INFO_CONFIG;
 import static io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
-import static java.util.Collections.emptyList;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ACKS_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BATCH_SIZE_CONFIG_DEFAULT;
 import static net.coru.kloadgen.util.ProducerKeysHelper.BOOTSTRAP_SERVERS_CONFIG_DEFAULT;
@@ -85,10 +86,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.AvroLoadGenerator;
 import net.coru.kloadgen.loadgen.impl.JsonLoadGenerator;
+import net.coru.kloadgen.loadgen.impl.ProtobufLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.model.HeaderMapping;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
@@ -139,13 +142,11 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "<Keystore Password>");
     defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "<Truststore Location>");
     defaultParameters.addArgument(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "<Truststore Password>");
-
     defaultParameters.addArgument(ProducerConfig.CLIENT_ID_CONFIG, "");
     defaultParameters.addArgument(ProducerConfig.SECURITY_PROVIDERS_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
     defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "<Ssl identification algorithm>");
     defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
-    defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
@@ -183,7 +184,7 @@ public final class SamplerUtil {
 
     if (Objects.nonNull(context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
-          context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+                context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
     Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
@@ -195,6 +196,10 @@ public final class SamplerUtil {
     verifySecurity(context, props);
 
     return props;
+  }
+
+  private static String propertyOrDefault(String property, String defaultToken, String valueToSent) {
+    return defaultToken.equals(property) ? valueToSent : property;
   }
 
   public static Arguments getCommonConsumerDefaultParameters() {
@@ -226,7 +231,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ConsumerConfig.SECURITY_PROVIDERS_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
     defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-        SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
+                                  SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
     defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
@@ -251,14 +256,31 @@ public final class SamplerUtil {
   }
 
   public static void setupConsumerSchemaRegistryProperties(JavaSamplerContext context, Properties props) {
-    if (Objects.nonNull(context.getJMeterVariables().get(SCHEMA_REGISTRY_URL))) {
-      props.put(SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SCHEMA_REGISTRY_URL));
-    }
+    Map<String, String> originals = new HashMap<>();
+    setupSchemaRegistryAuthenticationProperties(context.getJMeterVariables(), originals);
+    props.putAll(originals);
+
     if (Objects.nonNull(context.getJMeterVariables().get(VALUE_NAME_STRATEGY))) {
       props.put(VALUE_NAME_STRATEGY, context.getJMeterVariables().get(VALUE_NAME_STRATEGY));
     }
     if (Objects.nonNull(context.getJMeterVariables().get(KEY_NAME_STRATEGY))) {
       props.put(KEY_NAME_STRATEGY, context.getJMeterVariables().get(KEY_NAME_STRATEGY));
+    }
+  }
+
+  private static void setupSchemaRegistryAuthenticationProperties(JMeterVariables context, Map<String, String> props) {
+    if (Objects.nonNull(context.get(SCHEMA_REGISTRY_URL))) {
+      props.put(SCHEMA_REGISTRY_URL, context.get(SCHEMA_REGISTRY_URL));
+
+      if (FLAG_YES.equals(context.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SCHEMA_REGISTRY_AUTH_KEY))) {
+          props.put(BASIC_AUTH_CREDENTIALS_SOURCE, context.get(BASIC_AUTH_CREDENTIALS_SOURCE));
+          props.put(USER_INFO_CONFIG, context.get(USER_INFO_CONFIG));
+        } else {
+          props.put(BEARER_AUTH_CREDENTIALS_SOURCE, context.get(BEARER_AUTH_CREDENTIALS_SOURCE));
+          props.put(BEARER_AUTH_TOKEN_CONFIG, context.get(BEARER_AUTH_TOKEN_CONFIG));
+        }
+      }
     }
   }
 
@@ -331,9 +353,9 @@ public final class SamplerUtil {
     props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
 
     props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-        propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
-            DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
-            ""));
+              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
+                                DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
+                                ""));
 
     props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
     props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
@@ -365,6 +387,8 @@ public final class SamplerUtil {
         generator = new JsonLoadGenerator();
       } else if (jMeterVariables.get(VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroLoadGenerator();
+      } else if (jMeterVariables.get(VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+        generator = new ProtobufLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");
       }
@@ -373,21 +397,11 @@ public final class SamplerUtil {
     }
 
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-        Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
+              Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
-      originals.put(SCHEMA_REGISTRY_URL_CONFIG, jMeterVariables.get(SCHEMA_REGISTRY_URL));
-
-      if (FLAG_YES.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(jMeterVariables.get(SCHEMA_REGISTRY_AUTH_KEY))) {
-          originals.put(BASIC_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BASIC_AUTH_CREDENTIALS_SOURCE));
-          originals.put(USER_INFO_CONFIG, jMeterVariables.get(USER_INFO_CONFIG));
-        } else {
-          originals.put(BEARER_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(BEARER_AUTH_CREDENTIALS_SOURCE));
-          originals.put(BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(BEARER_AUTH_TOKEN_CONFIG));
-        }
-      }
+      setupSchemaRegistryAuthenticationProperties(jMeterVariables, originals);
 
       props.putAll(originals);
 
@@ -431,6 +445,8 @@ public final class SamplerUtil {
         generator = new JsonLoadGenerator();
       } else if (jMeterVariables.get(KEY_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroLoadGenerator();
+      } else if (jMeterVariables.get(KEY_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+        generator = new ProtobufLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");
       }
@@ -439,7 +455,7 @@ public final class SamplerUtil {
     }
 
     props.put(KEY_SERIALIZER_CLASS_CONFIG,
-        Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
+              Objects.requireNonNullElse(jMeterVariables.get(VALUE_SERIALIZER_CLASS_PROPERTY), KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SCHEMA_REGISTRY_URL))) {
       Map<String, String> originals = new HashMap<>();
@@ -474,15 +490,11 @@ public final class SamplerUtil {
     List<String> headersSB = new ArrayList<>();
     for (HeaderMapping kafkaHeader : kafkaHeaders) {
       String headerValue = statelessGeneratorTool.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
-          10,
-          emptyList()).toString();
+                                                                 10,
+                                                                 emptyList()).toString();
       headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
       producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
     }
     return headersSB;
-  }
-
-  private static String propertyOrDefault(String property, String defaultToken, String valueToSent) {
-    return defaultToken.equals(property) ? valueToSent : property;
   }
 }

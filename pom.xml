@@ -6,34 +6,190 @@
   <groupId>net.coru</groupId>
 
   <artifactId>kloadgen</artifactId>
-  <version>3.7.4</version>
+
+  <version>4.8.0</version>
+  <name>KLoadGen</name>
+  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on Data specification</description>
+  <url>https://corunet.github.io/kloadgen/</url>
+
+  <licenses>
+    <license>
+      <name>Mozilla Public License 2.0</name>
+      <url>https://github.com/corunet/kloadgen/blob/master/LICENSE</url>
+      <distribution>repo</distribution>
+      <comments></comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>jegarcia</id>
+      <name>Jose Enrique Garcia Maciñeiras</name>
+      <email>jegarcia@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Principal Engineer</role>
+        <role>Team Leader</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>cmunozgomez</id>
+      <name>Cesar Munoz Gomez</name>
+      <email>cmunoz@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>vtorres</id>
+      <name>Vanessa Torres Barca</name>
+      <email>vtorres@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>rivarsal</id>
+      <name>Pablo José López Rivadulla</name>
+      <email>plopez@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>fcampostato</id>
+      <name>Fernando Campos Tato</name>
+      <email>fcampos@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>jmejutovazquez</id>
+      <name>Javier Mejuto Vázquez</name>
+      <email>jmejuto@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>mcabezasp</id>
+      <name>Miguel Cabezas Puerto</name>
+      <email>mcabezas@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>irodigl</id>
+      <name>Isabel Rodríguez Iglesias</name>
+      <email>irodriguez@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>IsaUlloa</id>
+      <name>Isabel López Ulloa</name>
+      <email>ilopez@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>pedror19</id>
+      <name>Pedro Rodríguez Iglesias</name>
+      <email>prodriguezi@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>jgbriz</id>
+      <name>Juan García Briz</name>
+      <email>jgarciab@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:corunet/kloadgen.git</connection>
+    <developerConnection>scm:git:git@github.com:corunet/kloadgen.git</developerConnection>
+    <url>scm:git:git@github.com:corunet/kloadgen.git</url>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <properties>
-    <assertj-core.version>3.18.1</assertj-core.version>
+    <assertj-core.version>3.22.0</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
-    <avro.version>1.10.0</avro.version>
+    <avro.version>1.11.0</avro.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <commons-collections4.version>4.4</commons-collections4.version>
-    <commons-lang3.version>3.11</commons-lang3.version>
+    <commons-lang3.version>3.12.0</commons-lang3.version>
     <gson.version>2.8.6</gson.version>
-    <guava.version>30.0-jre</guava.version>
-    <jaxb-api.version>2.3.1</jaxb-api.version>
+    <guava.version>31.0.1-jre</guava.version>
+    <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
     <jdk.version>11</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.4.1</jmeter.version>
-    <json-path.version>2.4.0</json-path.version>
-    <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
-    <kafka-schema-registry-client.version>5.5.1</kafka-schema-registry-client.version>
-    <kafka.version>2.8.0</kafka.version>
-    <lombok.version>1.18.20</lombok.version>
+    <jmeter.version>5.4.3</jmeter.version>
+    <json-path.version>2.6.0</json-path.version>
+    <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
+    <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
+    <kafka.version>3.1.0</kafka.version>
+    <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
-    <mockito-core.version>3.6.0</mockito-core.version>
+    <mockito-core.version>4.2.0</mockito-core.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <rest-assured.version>4.3.2</rest-assured.version>
+    <rest-assured.version>4.5.0</rest-assured.version>
     <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
     <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
-    <wiremock.version>2.27.2</wiremock.version>
+    <wiremock.version>2.32.0</wiremock.version>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.jmeter</groupId>
@@ -85,7 +241,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.10.5</version>
+      <version>2.13.1</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -119,6 +275,27 @@
       <version>${kafka-schema-registry-client.version}</version>
     </dependency>
     <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-protobuf-serializer</artifactId>
+      <version>${kafka-schema-registry-client.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.avro</groupId>
+      <artifactId>avro-protobuf</artifactId>
+      <version>1.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.os72</groupId>
+      <artifactId>protobuf-dynamic</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.wire</groupId>
+      <artifactId>wire-java-generator</artifactId>
+      <version>4.0.1</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j-api.version}</version>
@@ -131,17 +308,17 @@
     <dependency>
       <groupId>commons-cli</groupId>
       <artifactId>commons-cli</artifactId>
-      <version>1.4</version>
+      <version>1.5.0</version>
     </dependency>
     <dependency>
       <groupId>com.github.curious-odd-man</groupId>
       <artifactId>rgxgen</artifactId>
-      <version>1.2</version>
+      <version>1.3</version>
     </dependency>
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.12</version>
+      <version>0.10.2</version>
     </dependency>
     <dependency>
       <groupId>com.github.everit-org.json-schema</groupId>
@@ -161,13 +338,12 @@
       <version>${kafka.version}</version>
       <classifier>test</classifier>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.kafka</groupId>
-      <artifactId>kafka-clients</artifactId>
-      <version>${kafka.version}</version>
-      <classifier>test</classifier>
-      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -213,7 +389,7 @@
     </dependency>
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock</artifactId>
+      <artifactId>wiremock-jre8</artifactId>
       <version>${wiremock.version}</version>
       <scope>test</scope>
     </dependency>
@@ -258,6 +434,7 @@
       <url>https://jitpack.io</url>
     </repository>
   </repositories>
+
   <build>
     <resources>
       <resource>
@@ -373,6 +550,7 @@
           <scope>provided</scope>
         </dependency>
       </dependencies>
+
       <build>
         <plugins>
           <plugin>
@@ -387,8 +565,8 @@
                   </excludes>
                 </filter>
               </filters>
-              <shadedClassifierName>${lane}</shadedClassifierName>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <finalName>${project.artifactId}-${project.version}</finalName>
+              <shadedArtifactAttached>false</shadedArtifactAttached>
             </configuration>
             <executions>
               <execution>
@@ -518,4 +696,5 @@
       </build>
     </profile>
   </profiles>
+
 </project>

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package tutorial;
+
+option java_multiple_files = true;
+option java_package = "com.example.tutorial.protos";
+option java_outer_classname = "Protos";
+
+message Address{
+  oneof testOneOf {
+    Type type = 1;
+  }
+  oneof simpleOneOf {
+    string optionString = 4;
+    int64 optionLong = 5;
+    int32 optionInt = 6;
+  }
+
+  message Type {
+    string street = 1;
+    int32 number = 2;
+    string test = 3;
+  }
+}
