@@ -17,7 +17,6 @@ import lombok.Value;
 
 @Value
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class NumberField extends Field {
 
   String defaultValue;

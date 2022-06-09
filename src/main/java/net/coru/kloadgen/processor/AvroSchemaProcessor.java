@@ -160,7 +160,7 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
         }
       }
     }
-    return new EnrichedRecord(metadata, entity);
+    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(entity).build();
   }
 
   private Map<ConstraintTypeEnum, String> extractConstraints(Schema.Field field) {
