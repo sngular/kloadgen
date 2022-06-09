@@ -43,11 +43,10 @@ class AvroDeserializerTest {
     var SCHEMA = new FileHelper().getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
     var SCHEMA_STR = readSchema(SCHEMA);
     var fieldValueMappings = asList(
-        new FieldValueMapping("subEntity.anotherLevel.subEntityIntArray[2]", "int-array", 0, "[1,2]"),
-        new FieldValueMapping("subEntity.anotherLevel.subEntityRecordArray[2].name", "string", 0, "[1,3]"),
-        new FieldValueMapping("topLevelIntArray[3]", "int-array", 0, "[2,4,5]"),
-        new FieldValueMapping("topLevelRecordArray[3].name", "string", 0, "[7,8,9]")
-    );
+        FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1,2]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityRecordArray[2].name").fieldType("string").valueLength(0).fieldValueList("[1,3]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("topLevelIntArray[3]").fieldType("int-array").valueLength(0).fieldValueList("[2,4,5]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("topLevelRecordArray[3].name").fieldType("string").valueLength(0).fieldValueList("[7,8,9]").required(true).isAncestorRequired(true).build());
     var metadata = new SchemaMetadata(1, 1, SCHEMA_STR);
 
 

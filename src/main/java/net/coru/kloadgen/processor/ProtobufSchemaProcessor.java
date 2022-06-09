@@ -140,7 +140,7 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
       }
     }
-    return new EnrichedRecord(metadata, messageBuilder.build());
+    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(messageBuilder.build()).build();
   }
 
   private boolean isOptionalField(final Builder messageBuilder, final String fieldName) {
