@@ -61,7 +61,7 @@ public class StatelessGeneratorTool {
     return result;
   }
 
-  public Object generateArray(final String fieldName, final String fieldType, final Integer arraySize, final Integer valueLength, final List<String> fieldValuesList) {
+  public final Object generateArray(final String fieldName, final String fieldType, final Integer arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
     Object result;
     if (checkIfNullFieldValueList(fieldValuesList)) {

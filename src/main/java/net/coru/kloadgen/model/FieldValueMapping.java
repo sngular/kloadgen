@@ -6,9 +6,8 @@
 
 package net.coru.kloadgen.model;
 
-import static java.util.Arrays.asList;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
@@ -108,26 +107,26 @@ public class FieldValueMapping extends AbstractTestElement {
     if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
       try {
         inputFieldValueAux = inputFieldValueList;
-          if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
-              inputFieldValueAux = "[" + inputFieldValueAux;
-          }
-          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
-              inputFieldValueAux += "]";
-          }
+        if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
+          inputFieldValueAux = "[" + inputFieldValueAux;
+        }
+        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
+          inputFieldValueAux += "]";
+        }
         final JsonNode nodes = OBJECT_MAPPER.readTree(inputFieldValueAux);
         final Iterator<JsonNode> nodeElements = nodes.elements();
         while (nodeElements.hasNext()) {
           result.add(nodeElements.next().toString());
         }
-      } catch (JsonProcessingException e) {
+      } catch (final JsonProcessingException ex) {
         inputFieldValueAux = inputFieldValueList;
-          if (inputFieldValueAux.charAt(0) == "[".charAt(0)) {
-              inputFieldValueAux = inputFieldValueAux.substring(1);
-          }
-          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
-              inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
-          }
-        result.addAll(asList(inputFieldValueAux.trim().split("\\s*,\\s*", -1)));
+        if (inputFieldValueAux.charAt(0) == "[".charAt(0)) {
+          inputFieldValueAux = inputFieldValueAux.substring(1);
+        }
+        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
+          inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
+        }
+        result.addAll(Arrays.asList(inputFieldValueAux.trim().split("\\s*,\\s*", -1)));
       }
     }
     return result;

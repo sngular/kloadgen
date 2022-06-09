@@ -20,8 +20,10 @@ import lombok.Value;
 @EqualsAndHashCode(callSuper = true)
 public class EnumField extends Field {
 
+  @SuppressWarnings("checkstyle:VisibilityModifier")
   String defaultValue;
 
+  @SuppressWarnings("checkstyle:VisibilityModifier")
   @Singular
   List<String> enumValues;
 

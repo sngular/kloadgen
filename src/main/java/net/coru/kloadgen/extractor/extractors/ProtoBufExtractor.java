@@ -147,7 +147,8 @@ public class ProtoBufExtractor {
   }
 
   private void extractMapType(
-      final List<FieldValueMapping> completeFieldList, final HashMap<String, TypeElement> nestedTypes, final FieldElement subfield, final List<String> imports, final boolean isRequired,
+      final List<FieldValueMapping> completeFieldList, final HashMap<String, TypeElement> nestedTypes, final FieldElement subfield, final List<String> imports,
+    final boolean isRequired,
       final boolean isAncestorRequired) {
     final String subFieldType = extractInternalMapFields(subfield);
     final String dotTypeMap = checkDotType(subFieldType, imports);

@@ -56,7 +56,7 @@ public class JsonSchemaProcessor {
           fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
 
         } else if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
-                   && (generatedProperties == elapsedProperties && generatedProperties == 0)
+                   && generatedProperties == elapsedProperties && generatedProperties == 0
                    && Objects.requireNonNull(fieldValueMapping).getAncestorRequired()
                    && checkIfNestedCollection(Objects.requireNonNull(fieldValueMapping).getFieldType())) {
           fieldValueMapping.setRequired(true);
@@ -152,7 +152,7 @@ public class JsonSchemaProcessor {
     int generatedProperties = 0;
     int elapsedProperties = 0;
 
-    while ((!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName))
+    while (!fieldExpMappingsQueue.isEmpty() && Objects.requireNonNull(fieldValueMapping).getFieldName().contains(fieldName)
            || !fieldExpMappingsQueueCopyCopy.isEmpty()) {
 
       fieldExpMappingsQueueCopyCopy.poll();
@@ -191,10 +191,10 @@ public class JsonSchemaProcessor {
           fieldValueMapping = actualField;
           fieldValueMapping.setRequired(true);
 
-        } else if ((!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
+        } else if (!Objects.requireNonNull(nextField).getFieldName().contains(fieldName)
                     && Objects.requireNonNull(actualField).getAncestorRequired()
                     && fieldExpMappingsQueue.peek() != null
-                    && generatedProperties == elapsedProperties && generatedProperties > 0)) {
+                    && generatedProperties == elapsedProperties && generatedProperties > 0) {
 
           if (fieldValueMapping.getFieldName().contains(".")) {
             final String ancestorName = fieldValueMapping.getFieldName().substring(0, fieldValueMapping.getFieldName().indexOf("."));
@@ -457,8 +457,8 @@ public class JsonSchemaProcessor {
   }
 
   private void operationsCollections(
-      String completeFieldName, ObjectNode entity, FieldValueMapping fieldValueMapping,
-      String fieldName, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+      final String completeFieldName, final ObjectNode entity, final FieldValueMapping fieldValueMapping,
+      final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     var finalFieldName = "";
     if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("array-map")) {
       finalFieldName = completeFieldName.replace("[:][]", "");
@@ -490,24 +490,24 @@ public class JsonSchemaProcessor {
     }
   }
 
-  public String getFirstPartOfFieldValueMappingName(FieldValueMapping fieldValueMapping) {
+  private String getFirstPartOfFieldValueMappingName(final FieldValueMapping fieldValueMapping) {
+    var fieldName = fieldValueMapping.getFieldName();
     if (fieldValueMapping.getFieldName().contains(".")) {
-      return fieldValueMapping.getFieldName().substring(0, fieldValueMapping.getFieldName().indexOf("."));
-    } else {
-      return fieldValueMapping.getFieldName();
+      fieldName = fieldValueMapping.getFieldName().substring(0, fieldValueMapping.getFieldName().indexOf("."));
     }
+    return fieldName;
   }
 
-  public boolean checkIfNestedCollection(String fieldType) {
+  private boolean checkIfNestedCollection(final String fieldType) {
     return fieldType.contains("-array-map") || fieldType.contains("-map-array") || fieldType.contains("-array-array") || fieldType.contains("-map-map");
   }
 
   private boolean checkIfObjectOptional(final FieldValueMapping field, final String fieldName) {
-    if (fieldName != null && !field.getAncestorRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("["))) {
-      return true;
+    var result = true;
+    if (!(fieldName != null && !field.getAncestorRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("[")))) {
+      result = fieldName != null ? checkIfObjectNullNotRequired(field, fieldName) : checkIfObjectNullNotRequired(field, cleanUpPath(field, ""));
     }
-    return fieldName != null ? checkIfObjectNullNotRequired(field, fieldName) : checkIfObjectNullNotRequired(field, cleanUpPath(field, ""));
-
+    return result;
   }
 
   private boolean checkIfObjectNullNotRequired(final FieldValueMapping field, final String nameOfField) {

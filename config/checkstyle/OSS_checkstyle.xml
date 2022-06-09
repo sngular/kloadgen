@@ -383,7 +383,14 @@
     <property name="max" value="180"/>
   </module>
   <module name="SuppressionFilter">
-    <property name="file" value="styles/OSS_checkstyle_suppressions.xml" />
+    <property name="file" value="config/checkstyle/OSS_checkstyle_suppressions.xml" />
     <property name="optional" value="false" />
+  </module>
+  <module name="TreeWalker">
+    <module name="RegexpSinglelineJava">
+      <property name="id" value="systemout"/>
+      <property name="format" value="^.*System\.(out|err).*$"/>
+      <property name="message" value="Don't use System.out/err, use SLF4J instead."/>
+    </module>
   </module>
 </module>

@@ -472,7 +472,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <configLocation>styles/OSS_checkstyle.xml</configLocation>
+          <configLocation>config/checkstyle/OSS_checkstyle.xml</configLocation>
           <encoding>UTF-8</encoding>
           <consoleOutput>true</consoleOutput>
           <failsOnError>true</failsOnError>
@@ -745,7 +745,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <configLocation>styles/OSS_checkstyle.xml</configLocation>
+          <configLocation>config/checkstyle/OSS_checkstyle.xml</configLocation>
         </configuration>
       </plugin>
     </plugins>

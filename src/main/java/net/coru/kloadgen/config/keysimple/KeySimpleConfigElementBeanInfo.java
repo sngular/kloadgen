@@ -25,7 +25,7 @@ public class KeySimpleConfigElementBeanInfo extends BeanInfoSupport {
     super(KeySimpleConfigElement.class);
 
     createPropertyGroup("key_simple_configuration", new String[]{
-        KEY_VALUE, KEY_TYPE, KEY_SERIALIZER_PROPERTY
+      KEY_VALUE, KEY_TYPE, KEY_SERIALIZER_PROPERTY
     });
 
     final PropertyDescriptor keyValueProp = property(KEY_VALUE);

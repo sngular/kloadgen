@@ -13,7 +13,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@SuppressWarnings("checkstyle:AbstractClassName")
 @Getter
 @ToString
 @AllArgsConstructor

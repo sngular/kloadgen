@@ -74,13 +74,13 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
                              new String[]{
-                                 "Field Name",
-                                 "Field Type"
+                               "Field Name",
+                               "Field Type"
                              });
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
                              new String[]{
-                                 FieldValueMapping.FIELD_NAME,
-                                 FieldValueMapping.FIELD_TYPE
+                               FieldValueMapping.FIELD_NAME,
+                               FieldValueMapping.FIELD_TYPE
                              });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);

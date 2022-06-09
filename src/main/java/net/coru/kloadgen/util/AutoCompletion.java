@@ -17,7 +17,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
-
 import net.coru.kloadgen.exception.KLoadGenException;
 
 /* This work is hereby released into the Public Domain.
@@ -126,8 +125,8 @@ public class AutoCompletion extends PlainDocument {
       // remove all text and insert the completed string
       super.remove(0, getLength());
       super.insertString(0, text, null);
-    } catch (BadLocationException e) {
-      throw new KLoadGenException(e.toString());
+    } catch (final BadLocationException ex) {
+      throw new KLoadGenException(ex.toString());
     }
   }
 
