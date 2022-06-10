@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
+import net.coru.kloadgen.randomtool.random.RandomIterator;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.random.RandomSequence;
@@ -35,6 +36,8 @@ public abstract class SchemaProcessorLib {
   private static final RandomArray randomArray = new RandomArray();
 
   private static final RandomSequence randomSequence = new RandomSequence();
+
+  private static final RandomIterator randomIterator = new RandomIterator();
 
   static boolean checkIfIsRecordMapArray(String cleanPath) {
     var indexOfArrayIdentifier = StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]"));
@@ -164,6 +167,14 @@ public abstract class SchemaProcessorLib {
           value.put(generateMapKey(), randomSequence.generateSeq(fieldName, fieldType, parameterList, context));
         }
       }
+    } else if ("it".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
+        value.put(generateMapKey(), randomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, context));
+      } else {
+        for (int i = mapSize; i > 0; i--) {
+          value.put(generateMapKey(), randomIterator.generateIt(fieldName, fieldType, parameterList, context));
+        }
+      }
     } else {
       return randomMap.generateMap(fieldType, mapSize, parameterList, fieldValueLength, arraySize, Collections.emptyMap());
     }
@@ -186,6 +197,14 @@ public abstract class SchemaProcessorLib {
       } else {
         for (int i = arraySize; i > 0; i--) {
           value.add(randomSequence.generateSeq(fieldName, fieldType, parameterList, context));
+        }
+      }
+    } else if ("it".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
+        value.add(randomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, context));
+      } else {
+        for (int i = arraySize; i > 0; i--) {
+          value.add(randomIterator.generateIt(fieldName, fieldType, parameterList, context));
         }
       }
     } else {

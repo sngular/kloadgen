@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.coru.kloadgen.randomtool.random.RandomArray;
+import net.coru.kloadgen.randomtool.random.RandomIterator;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.random.RandomSequence;
@@ -31,6 +32,8 @@ public class StatelessGeneratorTool {
 
   private final RandomSequence randomSequence = new RandomSequence();
 
+  private final RandomIterator randomIterator = new RandomIterator();
+
   public String generateRandomString(Integer valueLength) {
     return (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), Collections.emptyMap());
   }
@@ -45,6 +48,12 @@ public class StatelessGeneratorTool {
         return randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
       } else {
         value = randomSequence.generateSeq(fieldName, fieldType, parameterList, context);
+      }
+    } else if ("it".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
+        return randomIterator.generateIteratorForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+      } else {
+        value = randomIterator.generateIt(fieldName, fieldType, parameterList, context);
       }
     } else {
       value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
@@ -71,6 +80,9 @@ public class StatelessGeneratorTool {
     Object value = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     if ("seq".equals(fieldType)) {
       value = randomSequence.generateSeq(fieldName, fieldType, parameterList, context);
+    }
+    if ("it".equals(fieldType)) {
+      value = randomIterator.generateIt(fieldName, fieldType, parameterList, context);
     }
 
     return value;
