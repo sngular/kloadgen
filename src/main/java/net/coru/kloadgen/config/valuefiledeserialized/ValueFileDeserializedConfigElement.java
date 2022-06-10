@@ -51,7 +51,7 @@ public class ValueFileDeserializedConfigElement extends ConfigTestElement implem
     final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA, valueSchemaDefinition);
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
-    variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, valueSchemaType);
+    variables.putObject(PropsKeysHelper.VALUE_SCHEMA_TYPE, valueSchemaType);
     variables.putObject(PropsKeysHelper.VALUE_SUBJECT_NAME, valueSubjectName);
     variables.putObject(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY, valueDeSerializerConfiguration);
   }

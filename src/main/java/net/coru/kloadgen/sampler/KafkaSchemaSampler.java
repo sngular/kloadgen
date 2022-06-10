@@ -68,7 +68,7 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
   private transient Properties props;
 
   @Override
-  public final void setupTest(final JavaSamplerContext context) {
+  public void setupTest(final JavaSamplerContext context) {
     props = properties(context);
     generator = SamplerUtil.configureValueGenerator(props);
 
