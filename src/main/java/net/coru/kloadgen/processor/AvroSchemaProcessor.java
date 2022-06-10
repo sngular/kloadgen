@@ -55,12 +55,12 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
 
   public void processSchema(Object schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
     this.objectCreator = ProcessorObjectCreatorFactory.getInstance(SchemaTypeEnum.AVRO, schema, metadata);
-    GenericRecord entity = objectCreator.createObject();
     this.fieldExprMappings = fieldExprMappings;
   }
 
   public EnrichedRecord next() {
     GenericRecord entity = new GenericData.Record(schema);
+    entity = this.objectCreator.createObject(null, null, null);
     if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExprMappings);

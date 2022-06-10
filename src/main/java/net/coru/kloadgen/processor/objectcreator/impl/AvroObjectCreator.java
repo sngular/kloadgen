@@ -1,6 +1,11 @@
 package net.coru.kloadgen.processor.objectcreator.impl;
 
+import static org.apache.avro.Schema.Type.ARRAY;
+
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -11,6 +16,7 @@ import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 
 public class AvroObjectCreator implements ProcessorObjectCreator {
 
@@ -23,6 +29,8 @@ public class AvroObjectCreator implements ProcessorObjectCreator {
   private RandomObject randomObject;
 
   private RandomMap randomMap;
+
+  private Map<String, GenericRecord> entity = new HashMap<>();
 
   public AvroObjectCreator(Object schema, SchemaMetadata metadata) {
     if(schema instanceof ParsedSchema) {
@@ -97,7 +105,17 @@ public class AvroObjectCreator implements ProcessorObjectCreator {
   }
 
   public Object createObjectMapArray(Object entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
-
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
+    Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
+    Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
+    var recordArrayMap = new ArrayList<>(arraySize);
+    for (int i = 0; i < arraySize - 1; i++) {
+      ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
+      recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(), fieldName, mapSize, temporalQueue));
+    }
+    recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), ARRAY).getElementType(), fieldName, arraySize, fieldExpMappingsQueue));
+    entity.put(fieldName, recordArrayMap);
+    return getSafeGetElement(fieldExpMappingsQueue);
   }
 
   public Object createObjectArrayMap(Object entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
