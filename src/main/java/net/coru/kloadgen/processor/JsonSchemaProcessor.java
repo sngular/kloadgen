@@ -12,28 +12,27 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.SneakyThrows;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
+import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreator;
+import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreatorFactory;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class JsonSchemaProcessor {
 
-  private static final ObjectMapper mapper = new ObjectMapper();
-
   private List<FieldValueMapping> fieldExprMappings;
 
-  private StatelessGeneratorTool statelessGeneratorTool;
+  private ProcessorObjectCreator objectCreator;
 
   public void processSchema(List<FieldValueMapping> fieldExprMappings) {
+    this.objectCreator = ProcessorObjectCreatorFactory.getInstance(SchemaTypeEnum.JSON, null, null);
     this.fieldExprMappings = fieldExprMappings;
-    statelessGeneratorTool = new StatelessGeneratorTool();
   }
 
   @SneakyThrows

@@ -18,15 +18,13 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.DynamicMessage.Builder;
 import com.google.protobuf.Message;
-import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
-import net.coru.kloadgen.randomtool.random.RandomMap;
-import net.coru.kloadgen.randomtool.random.RandomObject;
+import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreator;
+import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreatorFactory;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 
 @Slf4j
@@ -34,35 +32,14 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
   public static final String STRING_TYPE = "string";
 
-  private Descriptors.Descriptor schema;
-
-  private SchemaMetadata metadata;
-
-  private RandomObject randomObject;
-
-  private RandomMap randomMap;
-
   private List<FieldValueMapping> fieldExprMappings;
 
-  private ProtoBufGeneratorTool generatorTool;
+  private ProcessorObjectCreator objectCreator;
 
-  public void processSchema(ProtoFileElement schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
+  public void processSchema(Object schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
       throws DescriptorValidationException, IOException {
-    this.schema = new ProtoBufProcessorHelper().buildDescriptor(schema);
+    this.objectCreator = new ProcessorObjectCreatorFactory().getInstance(SchemaTypeEnum.PROTOBUF, schema, metadata);
     this.fieldExprMappings = fieldExprMappings;
-    this.metadata = metadata;
-    randomObject = new RandomObject();
-    generatorTool = new ProtoBufGeneratorTool();
-  }
-
-  public void processSchema(ParsedSchema parsedSchema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
-      throws DescriptorValidationException, IOException {
-    this.schema = new ProtoBufProcessorHelper().buildDescriptor((ProtoFileElement) parsedSchema.rawSchema());
-    this.fieldExprMappings = fieldExprMappings;
-    this.metadata = metadata;
-    randomObject = new RandomObject();
-    generatorTool = new ProtoBufGeneratorTool();
-    randomMap = new RandomMap();
   }
 
   public EnrichedRecord next() {

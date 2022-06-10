@@ -28,7 +28,7 @@ public class ProtoBufProcessorHelper {
 
   private static final String OPTIONAL = "optional";
 
-  Descriptors.Descriptor buildDescriptor(ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
+  public Descriptors.Descriptor buildDescriptor(ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
 
     DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
     List<String> imports = schema.getImports();

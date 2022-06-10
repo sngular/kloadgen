@@ -30,14 +30,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
-import net.coru.kloadgen.randomtool.random.RandomMap;
-import net.coru.kloadgen.randomtool.random.RandomObject;
+import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreator;
+import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreatorFactory;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -50,36 +49,14 @@ public class AvroSchemaProcessor extends SchemaProcessorLib {
 
   private final Set<Type> typesSet = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
 
-  private Schema schema;
-
-  private SchemaMetadata metadata;
-
   private List<FieldValueMapping> fieldExprMappings;
 
-  private RandomObject randomObject;
+  private ProcessorObjectCreator objectCreator;
 
-  private RandomMap randomMap;
-
-  private AvroGeneratorTool avroGeneratorTool;
-
-  public void processSchema(ParsedSchema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
-    this.schema = (Schema) schema.rawSchema();
+  public void processSchema(Object schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
+    this.objectCreator = ProcessorObjectCreatorFactory.getInstance(SchemaTypeEnum.AVRO, schema, metadata);
+    GenericRecord entity = objectCreator.createObject();
     this.fieldExprMappings = fieldExprMappings;
-    this.metadata = metadata;
-    randomObject = new RandomObject();
-    randomMap = new RandomMap();
-    avroGeneratorTool = new AvroGeneratorTool();
-
-  }
-
-  public void processSchema(Schema schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings) {
-    this.schema = schema;
-    this.fieldExprMappings = fieldExprMappings;
-    this.metadata = metadata;
-    randomObject = new RandomObject();
-    randomMap = new RandomMap();
-    avroGeneratorTool = new AvroGeneratorTool();
-
   }
 
   public EnrichedRecord next() {
