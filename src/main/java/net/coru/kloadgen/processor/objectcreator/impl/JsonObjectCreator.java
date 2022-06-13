@@ -19,24 +19,24 @@ public class JsonObjectCreator implements ProcessorObjectCreator {
   }
 
   @Override
-  public Object createObject(final ProcessorFieldTypeEnum objectType, Object entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
+  public Object createObjectChain(FieldValueMapping fieldValueMapping) {
     switch(objectType) {
-      case OBJECT_MAP_MAP:
+      case RECORD_MAP_MAP:
 
         return null;
-      case OBJECT_ARRAY_ARRAY:
+      case RECORD_ARRAY_ARRAY:
 
         return null;
-      case OBJECT_MAP_ARRAY:
+      case RECORD_MAP_ARRAY:
 
         return null;
-      case OBJECT_ARRAY_MAP:
+      case RECORD_ARRAY_MAP:
 
         return null;
-      case OBJECT_MAP:
+      case RECORD_MAP:
 
         return null;
-      case OBJECT_ARRAY:
+      case RECORD_ARRAY:
 
         return null;
       case BASIC_MAP_MAP:

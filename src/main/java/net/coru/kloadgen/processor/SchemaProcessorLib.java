@@ -12,9 +12,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.coru.kloadgen.common.ProcessorFieldTypeEnum;
+import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
@@ -72,11 +75,11 @@ public abstract class SchemaProcessorLib {
     return type.endsWith("map-array");
   }
 
-  static FieldValueMapping getSafeGetElement(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  protected static FieldValueMapping getSafeGetElement(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     return !fieldExpMappingsQueue.isEmpty() ? fieldExpMappingsQueue.element() : null;
   }
 
-  static Integer calculateSize(String fieldName, String methodName) {
+  protected static Integer calculateSize(String fieldName, String methodName) {
     int arrayLength = RandomUtils.nextInt(1, 10);
     int start = fieldName.contains(methodName) ? fieldName.indexOf(methodName) : 0;
     String tempString = fieldName.substring(start,
@@ -96,7 +99,7 @@ public abstract class SchemaProcessorLib {
     return arrayLength;
   }
 
-  static Integer calculateMapSize(String fieldName, String methodName) {
+  protected static Integer calculateMapSize(String fieldName, String methodName) {
     int mapSize = RandomUtils.nextInt(1, 10);
     int start = fieldName.contains(methodName) ? fieldName.indexOf(methodName) : 0;
     String tempString = fieldName.substring(start,
@@ -117,7 +120,7 @@ public abstract class SchemaProcessorLib {
 
   }
 
-  static String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName) {
+  protected static String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName) {
     int startPosition = 0;
     String cleanPath;
     if (StringUtils.isNotEmpty(fieldName)) {
@@ -130,7 +133,7 @@ public abstract class SchemaProcessorLib {
     return cleanPath;
   }
 
-  static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
+  protected static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
     return getFullMethodName(fieldValueMapping, fieldName).replaceAll("\\[[0-9]*:?]", "");
   }
 
@@ -140,7 +143,7 @@ public abstract class SchemaProcessorLib {
     return pathToClean.substring(0, endOfField);
   }
 
-  static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
+  protected static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
     int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
@@ -195,20 +198,20 @@ public abstract class SchemaProcessorLib {
     return value;
   }
 
-  static String generateMapKey() {
+  protected static String generateMapKey() {
     return (String) randomObject.generateRandom("string", 2, Collections.emptyList(), Collections.emptyMap());
   }
 
-  static Object createArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  protected static Object createArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
     return generateRandomList(fieldName, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
   }
 
-  static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
+  protected static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
     return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, 0, fieldExpMappings);
   }
 
-  static Map<String, Object> createSimpleTypeArrayMap(
+  protected static Map<String, Object> createSimpleTypeArrayMap(
       String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
     Map<String, Object> result = new HashMap<>(mapSize);
     String type = fieldType;
@@ -222,4 +225,64 @@ public abstract class SchemaProcessorLib {
     return result;
   }
 
+  protected String getNameObjectCollection(String fieldName) {
+    return fieldName.matches("[\\w\\d]*[\\[\\:*\\]]*\\[\\:*\\]\\.[\\w\\d]*.*") ?
+        fieldName.substring(0, fieldName.indexOf(".") + 1) : fieldName;
+  }
+
+  protected ProcessorFieldTypeEnum getFieldType(FieldValueMapping fieldValueMapping, String cleanPath) {
+    //String fieldNameProcessed = getFirstPartOfFieldValueMappingName(fieldValueMapping);
+    if (cleanPath.contains("[")) {
+      String completeFieldName = getNameObjectCollection(cleanPath);
+      if (completeFieldName.contains("].")) {
+        if (completeFieldName.contains("][")) {
+          if (completeFieldName.contains("[:][:].")) {
+            return ProcessorFieldTypeEnum.RECORD_MAP_MAP;
+          }
+          else if (completeFieldName.contains("[][].")) {
+            return ProcessorFieldTypeEnum.RECORD_ARRAY_ARRAY;
+          }
+          else if (completeFieldName.contains("[:][].")) {
+            return ProcessorFieldTypeEnum.RECORD_MAP_ARRAY;
+          }
+          else if (completeFieldName.contains("[][:].")) {
+            return ProcessorFieldTypeEnum.RECORD_ARRAY_MAP;
+          }
+          else {
+            throw new KLoadGenException("Wrong configuration Map - Array");
+          }
+        } else {
+          if (completeFieldName.contains("[:]")) {
+            return ProcessorFieldTypeEnum.RECORD_MAP;
+          }
+          else if (completeFieldName.contains("[]")) {
+            return ProcessorFieldTypeEnum.RECORD_ARRAY;
+          }
+          else {
+            throw new KLoadGenException("Wrong configuration of Map or Array");
+          }
+        }
+      } else {
+        if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("array-map")) {
+          return ProcessorFieldTypeEnum.BASIC_ARRAY_MAP;
+        }
+        else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
+          return ProcessorFieldTypeEnum.BASIC_MAP_ARRAY;
+        }
+        else if (completeFieldName.contains("[:]")) {
+          return ProcessorFieldTypeEnum.BASIC_MAP;
+        }
+        else if (completeFieldName.contains("[]")) {
+          return ProcessorFieldTypeEnum.BASIC_ARRAY;
+        }
+        else {
+          throw new KLoadGenException("Wrong configuration of last element Map or Array");
+        }
+      }
+    } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
+      return ProcessorFieldTypeEnum.BASIC;
+    } else {
+      return ProcessorFieldTypeEnum.FINAL;
+    }
+  }
 }

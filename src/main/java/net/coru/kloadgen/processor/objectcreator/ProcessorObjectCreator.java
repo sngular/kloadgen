@@ -7,5 +7,5 @@ import net.coru.kloadgen.model.FieldValueMapping;
 
 public interface ProcessorObjectCreator {
 
-  Object createObject(ProcessorFieldTypeEnum objectType, Object entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, String fieldName);
+  Object createObjectChain(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue);
 }
