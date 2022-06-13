@@ -29,7 +29,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class KeyFileSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String keySubjectName;

@@ -101,10 +101,25 @@ public class ValidTypeConstants {
 
   public static final String FIXED_DECIMAL = "fixed_decimal";
 
+  public static final String INT_YEAR = "int_year";
+
+  public static final String INT_MONTH = "int_month";
+
+  public static final String INT_DAY = "int_day";
+
+  public static final String INT_HOURS = "int_hours";
+
+  public static final String INT_MINUTES = "int_minutes";
+
+  public static final String INT_SECONDS = "int_seconds";
+
+  public static final String INT_NANOS = "int_nanos";
+
   public static final Set<String> VALID_OBJECT_TYPES = Set.of(
       ARRAY, MAP, ENUM, STRING, INT, LONG, TIMESTAMP, STRING_TIMESTAMP, SHORT, DOUBLE, LONG_TIMESTAMP, UUID, BOOLEAN,
       BYTES, INT_DATE, INT_TIME_MILLIS, LONG_TIME_MICROS, LONG_TIMESTAMP_MILLIS, LONG_TIMESTAMP_MICROS,
-      LONG_LOCAL_TIMESTAMP_MILLIS, LONG_LOCAL_TIMESTAMP_MICROS, STRING_UUID, BYTES_DECIMAL, FIXED_DECIMAL
+      LONG_LOCAL_TIMESTAMP_MILLIS, LONG_LOCAL_TIMESTAMP_MICROS, STRING_UUID, BYTES_DECIMAL, FIXED_DECIMAL,
+      INT_YEAR, INT_MONTH, INT_DAY, INT_HOURS, INT_MINUTES, INT_SECONDS, INT_NANOS
   );
 
   private ValidTypeConstants() {

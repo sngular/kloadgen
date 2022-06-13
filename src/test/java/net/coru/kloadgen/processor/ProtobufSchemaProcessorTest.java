@@ -471,4 +471,47 @@ class ProtobufSchemaProcessorTest {
     assertThat(assertKeys).hasSize(4);
 
   }
+
+  @Test
+  @DisplayName("Be able to process Date and TimeOfDay types")
+  void testDateTimeTypes() throws IOException, DescriptorValidationException {
+    File testFile = fileHelper.getFile("/proto-files/dateTimeTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = List.of(
+        FieldValueMapping.builder().fieldName("incident_date").fieldType(".google.type.Date").fieldValueList("2022-05-30").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("incident_time").fieldType(".google.type.TimeOfDay").fieldValueList("14:20:30-05:00").required(true).isAncestorRequired(true).build());
+    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
+    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = protobufSchemaProcessor.next();
+    DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+    Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+    List<String> assertKeys = new ArrayList<>();
+    List<Object> assertValues = new ArrayList<>();
+    map.forEach((key, value) ->
+                {
+                  assertKeys.add(key.getFullName());
+                  assertValues.add(value);
+                }
+    );
+
+    DynamicMessage firstDynamicMessage = (DynamicMessage) assertValues.get(0);
+    Integer year = (Integer) firstDynamicMessage.getField(firstDynamicMessage.getDescriptorForType().findFieldByName("year"));
+    Integer month = (Integer) firstDynamicMessage.getField(firstDynamicMessage.getDescriptorForType().findFieldByName("month"));
+    Integer day = (Integer) firstDynamicMessage.getField(firstDynamicMessage.getDescriptorForType().findFieldByName("day"));
+
+    DynamicMessage secondDynamicMessage = (DynamicMessage) assertValues.get(1);
+    Integer hours = (Integer) secondDynamicMessage.getField(secondDynamicMessage.getDescriptorForType().findFieldByName("hours"));
+    Integer minutes = (Integer) secondDynamicMessage.getField(secondDynamicMessage.getDescriptorForType().findFieldByName("minutes"));
+    Integer seconds = (Integer) secondDynamicMessage.getField(secondDynamicMessage.getDescriptorForType().findFieldByName("seconds"));
+    Integer nanos = (Integer) secondDynamicMessage.getField(secondDynamicMessage.getDescriptorForType().findFieldByName("nanos"));
+
+    assertThat(year).isEqualTo(2022);
+    assertThat(month).isEqualTo(5);
+    assertThat(day).isEqualTo(30);
+    assertThat(hours).isEqualTo(9);
+    assertThat(minutes).isEqualTo(20);
+    assertThat(seconds).isEqualTo(30);
+    assertThat(nanos).isZero();
+    assertThat(assertKeys).hasSize(2).containsExactlyInAnyOrder("abc.Incident.incident_date",
+                                                                "abc.Incident.incident_time");
+  }
 }

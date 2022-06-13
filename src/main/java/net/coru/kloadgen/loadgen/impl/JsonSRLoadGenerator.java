@@ -35,7 +35,7 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
     jsonSchemaProcessor = new JsonSchemaProcessor();
   }
 
-  public final void setUpGenerator(final Map<String, String> originals, final String avroSchemaName, final List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(final Map<String, String> originals, final String avroSchemaName, final List<FieldValueMapping> fieldExprMappings) {
     try {
       metadata = retrieveSchema(originals, avroSchemaName);
       this.jsonSchemaProcessor.processSchema(fieldExprMappings);
@@ -45,15 +45,14 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
     }
   }
 
-  public final void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
+  public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final var parsedSchema = new JsonSchemaProvider().parseSchema(schema, Collections.emptyList(), true);
     metadata = parsedSchema.map(parsSchema -> Pair.of(new SchemaMetadata(1, 1, "JSON", Collections.emptyList(), schema), parsSchema)).orElse(null);
     this.jsonSchemaProcessor.processSchema(fieldExprMappings);
   }
 
-  public final EnrichedRecord nextMessage() {
-    return new EnrichedRecord(metadata.getLeft(), jsonSchemaProcessor.next());
+  public EnrichedRecord nextMessage() {
+    return EnrichedRecord.builder().schemaMetadata(metadata.getLeft()).genericRecord(jsonSchemaProcessor.next()).build();
   }
 
 }
-

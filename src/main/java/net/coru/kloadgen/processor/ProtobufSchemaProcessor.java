@@ -137,7 +137,7 @@ public class ProtobufSchemaProcessor {
 
       }
     }
-    return new EnrichedRecord(metadata, messageBuilder.build());
+    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(messageBuilder.build()).build();
   }
 
   private boolean isOptionalField(final Builder messageBuilder, final String fieldName) {
@@ -149,13 +149,35 @@ public class ProtobufSchemaProcessor {
     for (var field : descriptor.getFields()) {
       messageBuilder.setField(field,
                               randomObject.generateRandom(
-                                  field.getType().getJavaType().name(),
+                                  getFieldType(field),
                                   fieldValueMapping.getValueLength(),
                                   fieldValueMapping.getFieldValuesList(),
                                   fieldValueMapping.getConstraints()));
     }
 
     return messageBuilder.build();
+  }
+
+  private String getFieldType(final Descriptors.FieldDescriptor field) {
+    final String type;
+    if (field.getFullName().endsWith("Date.year")) {
+      type = "INT_YEAR";
+    } else if (field.getFullName().endsWith("Date.month")) {
+      type = "INT_MONTH";
+    } else if (field.getFullName().endsWith("Date.day")) {
+      type = "INT_DAY";
+    } else if (field.getFullName().endsWith("TimeOfDay.hours")) {
+      type = "INT_HOURS";
+    } else if (field.getFullName().endsWith("TimeOfDay.minutes")) {
+      type = "INT_MINUTES";
+    } else if (field.getFullName().endsWith("TimeOfDay.seconds")) {
+      type = "INT_SECONDS";
+    } else if (field.getFullName().endsWith("TimeOfDay.nanos")) {
+      type = "INT_NANOS";
+    } else {
+      type = field.getType().getJavaType().name();
+    }
+    return type;
   }
 
   private DynamicMessage createObject(final Descriptors.Descriptor subMessageDescriptor, final String parentFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {

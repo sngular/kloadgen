@@ -31,3 +31,15 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.JIRAID }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.JIRAPASS }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Maven version
+        uses: JActions/maven-version@v1.0.0
+        id: get-version
+
+      - name: Create a Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ steps.get-version.outputs.version }}
+          prerelease: false
+          title: "Release ${{ steps.get-version.outputs.version }}"

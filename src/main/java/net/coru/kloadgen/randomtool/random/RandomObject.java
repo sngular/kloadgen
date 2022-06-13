@@ -13,11 +13,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -123,6 +126,17 @@ public final class RandomObject {
       case ValidTypeConstants.BYTES_DECIMAL:
       case ValidTypeConstants.FIXED_DECIMAL:
         value = getDecimalValueOrRandom(fieldValueList, constraints);
+        break;
+      case ValidTypeConstants.INT_YEAR:
+      case ValidTypeConstants.INT_MONTH:
+      case ValidTypeConstants.INT_DAY:
+        value = getDateValueOrRandom(fieldType, fieldValueList);
+        break;
+      case ValidTypeConstants.INT_HOURS:
+      case ValidTypeConstants.INT_MINUTES:
+      case ValidTypeConstants.INT_SECONDS:
+      case ValidTypeConstants.INT_NANOS:
+        value = getTimeOfDayValueOrRandom(fieldType, fieldValueList);
         break;
       default:
         value = fieldType;
@@ -310,7 +324,23 @@ public final class RandomObject {
     return minimum;
   }
 
-  private static LocalDate getDateValueOrRandom(final List<String> fieldValueList) {
+  private Integer getDateValueOrRandom(final String fieldType, final List<String> fieldValueList) {
+    final LocalDate localDate = getDateValueOrRandom(fieldValueList);
+    final int result;
+
+    if ("int_year".equalsIgnoreCase(fieldType)) {
+      result = localDate.getYear();
+    } else if ("int_month".equalsIgnoreCase(fieldType)) {
+      result = localDate.getMonthValue();
+    } else if ("int_day".equalsIgnoreCase(fieldType)) {
+      result = localDate.getDayOfMonth();
+    } else {
+      throw new KLoadGenException("FieldType wrong or not supported");
+    }
+    return result;
+  }
+
+  private static LocalDate getDateValueOrRandom(List<String> fieldValueList) {
     final LocalDate resultDate;
     final long minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
     final long maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();
@@ -323,6 +353,24 @@ public final class RandomObject {
     return resultDate;
   }
 
+  private Integer getTimeOfDayValueOrRandom(final String fieldType, final List<String> fieldValueList) {
+    final LocalTime localTime = getRandomLocalTime(fieldValueList);
+    final int result;
+
+    if ("int_hours".equalsIgnoreCase(fieldType)) {
+      result = localTime.getHour();
+    } else if ("int_minutes".equalsIgnoreCase(fieldType)) {
+      result = localTime.getMinute();
+    } else if ("int_seconds".equalsIgnoreCase(fieldType)) {
+      result = localTime.getSecond();
+    } else if ("int_nanos".equalsIgnoreCase(fieldType)) {
+      result = localTime.getNano();
+    } else {
+      throw new KLoadGenException("FieldType wrong or not supported");
+    }
+    return result;
+  }
+
   private static LocalTime getRandomLocalTime(final List<String> fieldValueList) {
     final long nanoMin = 0;
     final long nanoMax = 24L * 60L * 60L * 1_000_000_000L - 1L;
@@ -330,7 +378,31 @@ public final class RandomObject {
     if (fieldValueList.isEmpty()) {
       result = LocalTime.ofNanoOfDay(RandomUtils.nextLong(nanoMin, nanoMax));
     } else {
-      result = LocalTime.parse(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
+      result = getLocalTime(fieldValueList);
+    }
+    return result;
+  }
+
+  private static LocalTime getLocalTime(final List<String> fieldValueList) {
+    final String fieldValue = fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim();
+    final Pattern pattern = Pattern.compile("([+|-]\\d{2}:\\d{2})");
+    final Matcher matcher = pattern.matcher(fieldValue);
+    final LocalTime result;
+    if (matcher.find()) {
+      final String offSet = matcher.group(1);
+      final DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_TIME;
+      final LocalTime localtime = LocalTime.parse(fieldValue, formatter);
+
+      final int hours = Integer.parseInt(offSet.substring(2, 3));
+      final int minutes = Integer.parseInt(offSet.substring(5, 6));
+
+      if (offSet.startsWith("-")) {
+        result = localtime.minusHours(hours).minusMinutes(minutes);
+      } else {
+        result = localtime.plusHours(hours).plusMinutes(minutes);
+      }
+    } else {
+      result = LocalTime.parse(fieldValue);
     }
     return result;
   }

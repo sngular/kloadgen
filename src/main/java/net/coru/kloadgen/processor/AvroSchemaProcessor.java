@@ -35,6 +35,8 @@ import org.apache.commons.collections4.IteratorUtils;
 
 public final class AvroSchemaProcessor {
 
+  public static final String WRONG_CONFIGURATION_MAP_ARRAY = "Wrong configuration Map - Array";
+
   private final Set<Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT,
                                                 Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
 
@@ -124,7 +126,7 @@ public final class AvroSchemaProcessor {
             } else if (SchemaProcessorLib.checkIfIsRecordArrayMap(cleanPath)) {
               fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, entity, fieldName);
             } else {
-              throw new KLoadGenException("Wrong configuration Map - Array");
+              throw new KLoadGenException(WRONG_CONFIGURATION_MAP_ARRAY);
             }
           } else if (typeFilter.startsWith("[")) {
             if (SchemaProcessorLib.checkIfMap(typeFilter, Objects.requireNonNull(fieldValueMapping).getFieldType())) {
@@ -136,7 +138,7 @@ public final class AvroSchemaProcessor {
             } else if (SchemaProcessorLib.checkIfRecordMap(cleanPath)) {
               fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, entity, fieldName);
             } else {
-              throw new KLoadGenException("Wrong configuration Map - Array");
+              throw new KLoadGenException(WRONG_CONFIGURATION_MAP_ARRAY);
             }
           } else if (typeFilter.startsWith(".")) {
             entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
@@ -155,7 +157,7 @@ public final class AvroSchemaProcessor {
         }
       }
     }
-    return new EnrichedRecord(metadata, entity);
+    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(entity).build();
   }
 
   private Map<ConstraintTypeEnum, String> extractConstraints(final Schema.Field field) {
@@ -372,7 +374,7 @@ public final class AvroSchemaProcessor {
           } else if (SchemaProcessorLib.checkIfRecordArray(cleanPath)) {
             processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
           } else {
-            throw new KLoadGenException("Wrong configuration Map - Array");
+            throw new KLoadGenException(WRONG_CONFIGURATION_MAP_ARRAY);
           }
         } else if (typeFilter.startsWith(".")) {
           subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
