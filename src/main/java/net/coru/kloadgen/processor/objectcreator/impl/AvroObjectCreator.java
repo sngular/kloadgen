@@ -108,46 +108,46 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
         ProcessorFieldTypeEnum objectType = getFieldType(fieldValueMapping, cleanPath);
         switch (objectType) {
           case RECORD_MAP_MAP:
-            createObjectMapMap(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createObjectMapMap(entity, fieldExpMappingsQueue, fieldName);
             break;
           case RECORD_ARRAY_ARRAY:
-            createObjectArrayArray(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createObjectArrayArray(entity, fieldExpMappingsQueue, fieldName);
             break;
           case RECORD_MAP_ARRAY:
-            createObjectMapArray(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createObjectMapArray(entity, fieldExpMappingsQueue, fieldName);
             break;
           case RECORD_ARRAY_MAP:
-            createObjectArrayMap(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createObjectArrayMap(entity, fieldExpMappingsQueue, fieldName);
             break;
           case RECORD_MAP:
-            createObjectMap(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createObjectMap(entity, fieldExpMappingsQueue, fieldName);
             break;
           case RECORD_ARRAY:
-            createObjectArray(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createObjectArray(entity, fieldExpMappingsQueue, fieldName);
             break;
           case BASIC_MAP_MAP:
-            createBasicMapMap(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createBasicMapMap(entity, fieldExpMappingsQueue, fieldName);
             break;
           case BASIC_ARRAY_ARRAY:
-            createBasicArrayArray(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createBasicArrayArray(entity, fieldExpMappingsQueue, fieldName);
             break;
           case BASIC_MAP_ARRAY:
-            createBasicMapArray(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createBasicMapArray(entity, fieldExpMappingsQueue, fieldName);
             break;
           case BASIC_ARRAY_MAP:
-            createBasicArrayMap(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createBasicArrayMap(entity, fieldExpMappingsQueue, fieldName);
             break;
           case BASIC_MAP:
-            createBasicMap(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createBasicMap(entity, fieldExpMappingsQueue, fieldName);
             break;
           case BASIC_ARRAY:
-            createBasicArray(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createBasicArray(entity, fieldExpMappingsQueue, fieldName);
             break;
           case BASIC:
-            createBasic(entity, fieldExpMappingsQueue, fieldName);
+            fieldValueMapping = createBasic(entity, fieldExpMappingsQueue, fieldName);
             break;
           case FINAL:
-            createFinal(entity, fieldExpMappingsQueue, fieldValueMapping, fieldName);
+            fieldValueMapping = createFinal(entity, fieldExpMappingsQueue, fieldValueMapping, fieldName);
             break;
           default:
             throw new KLoadGenException("Unimplemented data type processor " + objectType.name());
@@ -196,7 +196,7 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
-  public Object createObjectMap(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
+  public FieldValueMapping createObjectMap(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), getCleanMethodName(fieldValueMapping, fieldName));
 
@@ -207,7 +207,7 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
-  public Object createObjectArray(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
+  public FieldValueMapping createObjectArray(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), getCleanMethodName(fieldValueMapping, fieldName));
 
@@ -226,7 +226,7 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
     return createBasicArray(entity, fieldExpMappingsQueue, fieldName);
   }
 
-  public Object createBasicMapArray(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
+  public FieldValueMapping createBasicMapArray(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
     Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
     Integer mapSize = calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
@@ -238,7 +238,7 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
     return getSafeGetElement(fieldExpMappingsQueue);
   }
 
-  public Object createBasicArrayMap(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
+  public FieldValueMapping createBasicArrayMap(GenericRecord entity, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final String fieldName) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     fieldExpMappingsQueue.remove();
     Integer arraySize = calculateSize(fieldValueMapping.getFieldName(), fieldName);
