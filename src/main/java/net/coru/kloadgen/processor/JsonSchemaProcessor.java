@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,6 +26,8 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class JsonSchemaProcessor {
+
+  private static final ObjectMapper mapper = new ObjectMapper();
 
   private List<FieldValueMapping> fieldExprMappings;
 
@@ -67,7 +70,7 @@ public class JsonSchemaProcessor {
         }
         generatedProperties++;
 
-        if (checkIfObjectNullNotRequired(Objects.requireNonNull(fieldValueMapping), cleanUpPath(fieldValueMapping, ""))) {
+        if (this.objectCreator.isOptionalField(null, fieldValueMapping.getRequired(), cleanUpPath(fieldValueMapping, ""), fieldValueMapping.getFieldValuesList())) {
           elapsedProperties++;
           fieldExpMappingsQueueCopy = fieldExpMappingsQueue.clone();
           fieldExpMappingsQueue.remove();
@@ -126,10 +129,11 @@ public class JsonSchemaProcessor {
 
             entity.putPOJO(Objects.requireNonNull(fieldValueMapping).getFieldName(),
                            mapper.convertValue(
-                               statelessGeneratorTool.generateObject(fieldName,
-                                                                     fieldValueMapping.getFieldType(),
-                                                                     fieldValueMapping.getValueLength(),
-                                                                     fieldValueMapping.getFieldValuesList()), JsonNode.class));
+                               this.objectCreator.createFinalField(fieldName,
+                                                                   fieldValueMapping.getFieldType(),
+                                                                   fieldValueMapping.getValueLength(),
+                                                                   fieldValueMapping.getFieldValuesList()), JsonNode.class)
+                           );
             fieldExpMappingsQueue.remove();
             fieldValueMapping = fieldExpMappingsQueue.peek();
             fieldExpMappingsQueueCopy.poll();
@@ -245,10 +249,10 @@ public class JsonSchemaProcessor {
           fieldExpMappingsQueue.poll();
           subEntity.putPOJO(cleanFieldName,
                             mapper.convertValue(
-                                statelessGeneratorTool.generateObject(cleanFieldName,
-                                                                      Objects.requireNonNull(fieldValueMapping).getFieldType(),
-                                                                      fieldValueMapping.getValueLength(),
-                                                                      fieldValueMapping.getFieldValuesList()), JsonNode.class));
+                                        this.objectCreator.createFinalField(cleanFieldName,
+                                                                 Objects.requireNonNull(fieldValueMapping).getFieldType(),
+                                                                 fieldValueMapping.getValueLength(),
+                                                                 fieldValueMapping.getFieldValuesList()), JsonNode.class));
         }
         fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       }
@@ -263,9 +267,9 @@ public class JsonSchemaProcessor {
 
     for (int i = 0; i < calculateSize - 1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.set(statelessGeneratorTool.generateRandomString(i), createObject(fieldName, temporalQueue));
+      objectArray.set(this.objectCreator.generateRandomString(i), createObject(fieldName, temporalQueue));
     }
-    objectArray.set(statelessGeneratorTool.generateRandomString(calculateSize), createObject(fieldName, fieldExpMappingsQueue));
+    objectArray.set(this.objectCreator.generateRandomString(calculateSize), createObject(fieldName, fieldExpMappingsQueue));
     return objectArray;
   }
 
@@ -275,9 +279,9 @@ public class JsonSchemaProcessor {
 
     for (int i = 0; i < calculateSize - 1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.set(statelessGeneratorTool.generateRandomString(i), createObjectMap(fieldName, calculateSize, temporalQueue));
+      objectArray.set(this.objectCreator.generateRandomString(i), createObjectMap(fieldName, calculateSize, temporalQueue));
     }
-    objectArray.set(statelessGeneratorTool.generateRandomString(calculateSize), createObjectMap(fieldName, calculateSize, fieldExpMappingsQueue));
+    objectArray.set(this.objectCreator.generateRandomString(calculateSize), createObjectMap(fieldName, calculateSize, fieldExpMappingsQueue));
     return objectArray;
   }
 
@@ -316,9 +320,9 @@ public class JsonSchemaProcessor {
     ObjectNode objectArray = JsonNodeFactory.instance.objectNode();
     for (int i = 0; i < calculateSize - 1; i++) {
       ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.putArray(statelessGeneratorTool.generateRandomString(i)).addAll(createObjectArray(fieldName, 2, temporalQueue));
+      objectArray.putArray(this.objectCreator.generateRandomString(i)).addAll(createObjectArray(fieldName, 2, temporalQueue));
     }
-    objectArray.putArray(statelessGeneratorTool.generateRandomString(calculateSize)).addAll(createObjectArray(fieldName, 2, fieldExpMappingsQueue));
+    objectArray.putArray(this.objectCreator.generateRandomString(calculateSize)).addAll(createObjectArray(fieldName, 2, fieldExpMappingsQueue));
     return objectArray;
   }
 
@@ -339,15 +343,6 @@ public class JsonSchemaProcessor {
     return array;
   }
 
-  private ArrayNode createBasicArray(String fieldName, String fieldType, Integer calculateSize, Integer valueSize, List<String> fieldValuesList) {
-    return mapper.convertValue(
-        statelessGeneratorTool.generateArray(fieldName, fieldType, calculateSize, valueSize, fieldValuesList), ArrayNode.class);
-  }
-
-  private Object createBasicArrayMap(String fieldName, String fieldType, Integer calculateSize, Integer valueSize, List<String> fieldValuesList) {
-    return statelessGeneratorTool.generateArray(fieldName, fieldType, calculateSize, valueSize, fieldValuesList);
-  }
-
   private List<ObjectNode> createObjectArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
       throws KLoadGenException {
     List<ObjectNode> objectArray = new ArrayList<>(arraySize);
@@ -363,16 +358,6 @@ public class JsonSchemaProcessor {
       objectArray.add(objectNode);
     }
     return objectArray;
-  }
-
-  private Object createBasicMap(String fieldType, Integer arraySize, List<String> fieldExpMappings)
-      throws KLoadGenException {
-    return statelessGeneratorTool.generateMap(fieldType, arraySize, fieldExpMappings, arraySize);
-  }
-
-  private ArrayNode createBasicMapArray(String fieldType, Integer arraySize, List<String> fieldExpMappings)
-      throws KLoadGenException {
-    return mapper.convertValue(statelessGeneratorTool.generateMap(fieldType, arraySize, fieldExpMappings, arraySize), ArrayNode.class);
   }
 
   private Integer calculateSize(String fieldName, String methodName) {
@@ -423,34 +408,40 @@ public class JsonSchemaProcessor {
     if (completeFieldName.contains("][")) {
       if (completeFieldName.contains("[:][:].")) {
         finalFieldName = completeFieldName.replace("[:][:].", "");
-        entity.putPOJO(finalFieldName, createObjectMapMap(fieldName,
+        entity.putPOJO(finalFieldName,
+                       createObjectMapMap(fieldName,
                                                           calculateSize(fieldValueMapping.getFieldName(), fieldName),
                                                           fieldExpMappingsQueue));
       } else if (completeFieldName.contains("[][].")) {
         finalFieldName = completeFieldName.replace("[][].", "");
-        entity.putArray(finalFieldName).addAll(createObjectArrayArray(fieldName,
+        entity.putArray(finalFieldName).addAll(
+                      createObjectArrayArray(fieldName,
                                                                       calculateSize(fieldValueMapping.getFieldName(), fieldName),
                                                                       fieldExpMappingsQueue));
       } else if (completeFieldName.contains("[:][].")) {
         finalFieldName = completeFieldName.replace("[:][].", "");
-        entity.putPOJO(finalFieldName, createObjectMapArray(fieldName,
+        entity.putPOJO(finalFieldName,
+                       createObjectMapArray(fieldName,
                                                             calculateSize(fieldValueMapping.getFieldName(), fieldName),
                                                             fieldExpMappingsQueue));
       } else {
         finalFieldName = completeFieldName.replace("[][:].", "");
-        entity.set(finalFieldName, createObjectArrayMap(completeFieldName,
+        entity.set(finalFieldName,
+                   createObjectArrayMap(completeFieldName,
                                                         calculateSize(fieldValueMapping.getFieldName(), finalFieldName),
                                                         fieldExpMappingsQueue));
       }
     } else {
       if (completeFieldName.contains("[:]")) {
         finalFieldName = completeFieldName.replace("[:].", "");
-        entity.putPOJO(finalFieldName, createObjectMap(fieldName,
+        entity.putPOJO(finalFieldName,
+                       createObjectMap(fieldName,
                                                        calculateSize(fieldValueMapping.getFieldName(), fieldName),
                                                        fieldExpMappingsQueue));
       } else {
         finalFieldName = completeFieldName.replace("[].", "");
-        entity.putArray(finalFieldName).addAll(createObjectArray(fieldName,
+        entity.putArray(finalFieldName).addAll(
+                        createObjectArray(fieldName,
                                                                  calculateSize(fieldValueMapping.getFieldName(), fieldName),
                                                                  fieldExpMappingsQueue));
       }
@@ -464,30 +455,38 @@ public class JsonSchemaProcessor {
     if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("array-map")) {
       finalFieldName = completeFieldName.replace("[:][]", "");
       fieldExpMappingsQueue.poll();
-      entity.putPOJO(finalFieldName, createBasicArrayMap(finalFieldName, fieldValueMapping.getFieldType(),
-                                                         calculateSize(fieldValueMapping.getFieldName(), finalFieldName),
-                                                         fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList()));
+      entity.putPOJO(finalFieldName,
+                     this.objectCreator.createBasicArrayMap(finalFieldName, fieldValueMapping.getFieldType(),
+                                                            calculateSize(fieldValueMapping.getFieldName(), finalFieldName),
+                                                            fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList()));
 
     } else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
       finalFieldName = completeFieldName.replace("[][:]", "");
       fieldExpMappingsQueue.poll();
-      entity.putArray(finalFieldName).addAll(createBasicMapArray(fieldValueMapping.getFieldType(),
-                                                                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                                                                 fieldValueMapping.getFieldValuesList()));
+      entity.putArray(finalFieldName).addAll(
+          this.mapper.convertValue(
+              this.objectCreator.createBasicMapArray(fieldValueMapping.getFieldType(),
+                                                 calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                                 fieldValueMapping.getFieldValuesList(), 0, 0, null), ArrayNode.class));
     } else if (completeFieldName.contains("[:]")) {
       finalFieldName = completeFieldName.replace(fieldValueMapping.getFieldType().endsWith("map-map") ? "[:][:]" : "[:]", "");
       fieldExpMappingsQueue.poll();
-      entity.putPOJO(finalFieldName, createBasicMap(fieldValueMapping.getFieldType(),
-                                                    calculateSize(fieldValueMapping.getFieldName(), fieldName),
-                                                    fieldValueMapping.getFieldValuesList()));
+      entity.putPOJO(finalFieldName,
+          this.objectCreator.createBasicMap(fieldValueMapping.getFieldName(),
+                                            fieldValueMapping.getFieldType(),
+                                            calculateSize(fieldValueMapping.getFieldName(), fieldName),
+                                            null,
+                                            fieldValueMapping.getFieldValuesList()));
     } else {
       fieldExpMappingsQueue.poll();
       finalFieldName = completeFieldName.replace(fieldValueMapping.getFieldType().endsWith("array-array") ? "[][]" : "[]", "");
-      entity.putArray(finalFieldName).addAll(createBasicArray(finalFieldName,
-                                                              fieldValueMapping.getFieldType(),
-                                                              calculateSize(fieldValueMapping.getFieldName(), finalFieldName),
-                                                              fieldValueMapping.getValueLength(),
-                                                              fieldValueMapping.getFieldValuesList()));
+      entity.putArray(finalFieldName).addAll(
+          this.mapper.convertValue(
+          this.objectCreator.createBasicArray(finalFieldName,
+                                              fieldValueMapping.getFieldType(),
+                                              calculateSize(fieldValueMapping.getFieldName(), finalFieldName),
+                                              fieldValueMapping.getValueLength(),
+                                              fieldValueMapping.getFieldValuesList()), ArrayNode.class));
     }
   }
 
@@ -507,13 +506,11 @@ public class JsonSchemaProcessor {
     if (fieldName != null && !field.getAncestorRequired() && field.getFieldValuesList().contains("null") && (fieldName.contains("["))) {
       return true;
     }
-    return fieldName != null ? checkIfObjectNullNotRequired(field, fieldName) : checkIfObjectNullNotRequired(field, cleanUpPath(field, ""));
+    return fieldName != null ? this.objectCreator.isOptionalField(null, field.getRequired(), fieldName, field.getFieldValuesList()) : this.objectCreator.isOptionalField(null,
+                                                                                                                                                                         field.getRequired(),
+                                                                                                                                                                        cleanUpPath(field, ""),
+                                                                                                                                                                         field.getFieldValuesList());
 
-  }
-
-  private boolean checkIfObjectNullNotRequired(FieldValueMapping field, String nameOfField) {
-    return !field.getRequired() && field.getFieldValuesList().contains("null")
-           && (!nameOfField.contains(".") || (nameOfField.contains(".") && nameOfField.contains("[")) || nameOfField.contains("["));
   }
 
   private boolean checkIfOptionalCollection(FieldValueMapping field, String nameOfField) {

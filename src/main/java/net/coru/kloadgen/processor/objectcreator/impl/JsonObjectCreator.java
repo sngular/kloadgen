@@ -1,16 +1,13 @@
 package net.coru.kloadgen.processor.objectcreator.impl;
 
-import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.coru.kloadgen.common.ProcessorFieldTypeEnum;
-import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreator;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 
 public class JsonObjectCreator implements ProcessorObjectCreator {
-
-  private static final ObjectMapper mapper = new ObjectMapper();
 
   private StatelessGeneratorTool statelessGeneratorTool;
 
@@ -19,53 +16,41 @@ public class JsonObjectCreator implements ProcessorObjectCreator {
   }
 
   @Override
-  public Object createObjectChain(FieldValueMapping fieldValueMapping) {
-    switch(objectType) {
-      case RECORD_MAP_MAP:
+  public String generateRandomString(final Integer valueLength) {
+    return statelessGeneratorTool.generateRandomString(valueLength);
+  }
 
-        return null;
-      case RECORD_ARRAY_ARRAY:
+  @Override
+  public boolean isOptionalField(final Object field, final boolean isRequired, final String nameOfField, final List<String> fieldValuesList) {
+    return !isRequired && fieldValuesList.contains("null")
+           && (!nameOfField.contains(".") || (nameOfField.contains(".") && nameOfField.contains("[")) || nameOfField.contains("["));
+  }
 
-        return null;
-      case RECORD_MAP_ARRAY:
+  @Override
+  public Object createBasicArrayMap(final String fieldName, final String fieldType, final Integer calculateSize, final Integer valueLength, final List<String> fieldValuesList) {
+    return statelessGeneratorTool.generateArray(fieldName, fieldType, calculateSize, valueLength, fieldValuesList);
+  }
 
-        return null;
-      case RECORD_ARRAY_MAP:
+  @Override
+  public Object createBasicMapArray(final String fieldType, final Integer calculateSize, final List<String> fieldValuesList, Integer valueLength, Integer arraySize, Map<ConstraintTypeEnum, String> constraints) {
+    return statelessGeneratorTool.generateMap(fieldType, calculateSize, fieldValuesList, calculateSize);
+  }
 
-        return null;
-      case RECORD_MAP:
+  @Override
+  public Object createBasicMap(final String fieldName, final String fieldType, final Integer arraySize, Integer fieldValueLength, final List<String> fieldValuesList) {
+    return statelessGeneratorTool.generateMap(fieldType, arraySize, fieldValuesList, arraySize);
+  }
 
-        return null;
-      case RECORD_ARRAY:
+  @Override
+  public Object createBasicArray(final String fieldName, final String fieldType, final Integer calculateSize, final Integer valueSize, final List<String> fieldValuesList) {
+    return statelessGeneratorTool.generateArray(fieldName, fieldType, calculateSize, valueSize, fieldValuesList);
+  }
 
-        return null;
-      case BASIC_MAP_MAP:
-
-        return null;
-      case BASIC_ARRAY_ARRAY:
-
-        return null;
-      case BASIC_MAP_ARRAY:
-
-        return null;
-      case BASIC_ARRAY_MAP:
-
-        return null;
-      case BASIC_MAP:
-
-        return null;
-      case BASIC_ARRAY:
-
-        return null;
-      case BASIC:
-
-        return null;
-      case FINAL:
-
-        return null;
-      default:
-
-        return null;
-    }
+  @Override
+  public Object createFinalField(final String fieldName, final String fieldType, final Integer valueLength, final List<String> fieldValuesList) {
+    return statelessGeneratorTool.generateObject(fieldName,
+                                              fieldType,
+                                              valueLength,
+                                              fieldValuesList);
   }
 }

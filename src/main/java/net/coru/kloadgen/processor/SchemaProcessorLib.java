@@ -29,15 +29,15 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public abstract class SchemaProcessorLib {
 
-  private static final Map<String, Object> context = new HashMap<>();
+  protected static final Map<String, Object> context = new HashMap<>();
 
-  private static final RandomObject randomObject = new RandomObject();
+  /*private static final RandomObject randomObject = new RandomObject();
 
   private static final RandomMap randomMap = new RandomMap();
 
   private static final RandomArray randomArray = new RandomArray();
 
-  private static final RandomSequence randomSequence = new RandomSequence();
+  private static final RandomSequence randomSequence = new RandomSequence();*/
 
   static boolean checkIfIsRecordMapArray(String cleanPath) {
     var indexOfArrayIdentifier = StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]"));
@@ -149,7 +149,7 @@ public abstract class SchemaProcessorLib {
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
   }
 
-  static Object generateRandomMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, Integer arraySize, List<String> fieldValuesList) {
+  /*static Object generateRandomMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, Integer arraySize, List<String> fieldValuesList) {
 
     List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(fieldValue ->
@@ -172,7 +172,7 @@ public abstract class SchemaProcessorLib {
     }
 
     return value;
-  }
+  }*/
 
   static Object generateRandomList(String fieldName, String fieldType, int arraySize, Integer valueLength, List<String> fieldValuesList) {
 
@@ -207,9 +207,9 @@ public abstract class SchemaProcessorLib {
     return generateRandomList(fieldName, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
   }
 
-  protected static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
+  /*protected static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
     return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, 0, fieldExpMappings);
-  }
+  }*/
 
   protected static Map<String, Object> createSimpleTypeArrayMap(
       String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
