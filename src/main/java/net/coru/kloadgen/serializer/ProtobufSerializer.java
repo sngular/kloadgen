@@ -10,7 +10,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.DynamicMessage;
+import io.confluent.kafka.schemaregistry.protobuf.MessageIndexes;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
@@ -35,11 +38,11 @@ public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
         byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).putInt(data.getSchemaMetadata().getId()).array());
-
-        /* MessageIndexes indexes = schema.toMessageIndexes(data.getDescriptorForType().getFullName());
-          byteArrayOutputStream.write(indexes.toByteArray());*/
+        Descriptor descriptor = ((DynamicMessage) data.getGenericRecord()).getDescriptorForType();
+        ProtobufSchema schema = new ProtobufSchema(descriptor);
+        MessageIndexes indexes = schema.toMessageIndexes(descriptor.getFullName());
+        byteArrayOutputStream.write(indexes.toByteArray());
         ((DynamicMessage) data.getGenericRecord()).writeTo(byteArrayOutputStream);
-
         result = byteArrayOutputStream.toByteArray();
         log.debug("serialized data='{}'", DatatypeConverter.printHexBinary(result));
       }

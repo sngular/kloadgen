@@ -46,15 +46,6 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
   private ProtoBufGeneratorTool generatorTool;
 
-  public void processSchema(ProtoFileElement schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
-      throws DescriptorValidationException, IOException {
-    this.schema = new ProtoBufProcessorHelper().buildDescriptor(schema);
-    this.fieldExprMappings = fieldExprMappings;
-    this.metadata = metadata;
-    randomObject = new RandomObject();
-    generatorTool = new ProtoBufGeneratorTool();
-  }
-
   public void processSchema(ParsedSchema parsedSchema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
       throws DescriptorValidationException, IOException {
     this.schema = new ProtoBufProcessorHelper().buildDescriptor((ProtoFileElement) parsedSchema.rawSchema());
@@ -203,10 +194,10 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
       generatedProperties++;
 
-      if ((((MESSAGE.equals(subMessageDescriptor.findFieldByName(fieldName).getType()) ||
+      if (((MESSAGE.equals(subMessageDescriptor.findFieldByName(fieldName).getType()) ||
              subMessageDescriptor.findFieldByName(fieldName).isRepeated() ||
              subMessageDescriptor.findFieldByName(fieldName).isMapField()) &&
-            isOptionalField(messageBuilder, fieldName)))
+            isOptionalField(messageBuilder, fieldName))
           && fieldValueMapping.getFieldValuesList().contains("null")) {
 
         elapsedProperties++;
