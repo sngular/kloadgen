@@ -102,6 +102,16 @@ This screenshot shows an example of how KLoadGen generates sequences:
 
 The field name will be generated as sequences from 1 to 5.
 
+### Iterators
+
+It has also been created a new type of field, `it`, to allow creating a custom iterator of values.
+
+In order to create an iterator, you need to specify `it` as **Field Type**.
+
+| Type | Details                                                                                                                                                         | Returns                                   |
+|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
+| it   | Works like the [sequences](#Sequences); but, if it finds a value in the Field Values List field, it will take that value instead of going on with the sequence. | Returns an iteration of the given values. |
+
 ### Date and Time types
 
 Every kind of schema manage date and time types in a different way when they are passed as constant values from Jmeter, at the moment of random values generation:

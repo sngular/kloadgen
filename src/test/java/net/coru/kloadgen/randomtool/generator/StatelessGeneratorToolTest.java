@@ -45,7 +45,10 @@ class StatelessGeneratorToolTest {
     return Stream.of(
         Arguments.of("name", "seq", 1, Collections.singletonList("0"), "0"),
         Arguments.of("name", "seq", 1, Collections.singletonList("1"), "1"),
-        Arguments.of("name", "seq", 1, Collections.singletonList("2"), "2"));
+        Arguments.of("name", "seq", 1, Collections.singletonList("2"), "2"),
+        Arguments.of("name", "it", 1, Collections.singletonList("0"), "0"),
+        Arguments.of("name", "it", 1, Collections.singletonList("1"), "1"),
+        Arguments.of("name", "it", 1, Collections.singletonList("2"), "2"));
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
