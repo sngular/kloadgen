@@ -6,11 +6,10 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import org.apache.groovy.util.Maps;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,9 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.apache.groovy.util.Maps;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class RandomSequenceTest {
 
@@ -37,7 +38,7 @@ class RandomSequenceTest {
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context,
                                          Object expectedStored) {
-    assertThat(new RandomSequence().generateSeq(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
+    assertThat(RandomSequence.generateSeq(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
     assertThat(context).containsEntry(fieldName, expectedStored);
   }
 
@@ -54,11 +55,11 @@ class RandomSequenceTest {
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value With a List of Values")
   @MethodSource("parametersForGenerateRandomValueWithList")
-  void testGenerateRandomValueWithList(int size, List<String> values, List<String> expected) {
-    var intList = new ArrayList<>();
-    var context = new HashMap<String, Object>();
+  void testGenerateRandomValueWithList(final int size, final List<String> values, final List<String> expected) {
+    final var intList = new ArrayList<>();
+    final var context = new HashMap<String, Object>();
     for (int i=0; i <= size; i++) {
-      intList.add(new RandomSequence().generateSequenceForFieldValueList("ClientCode", "seq", values, context));
+      intList.add(RandomSequence.generateSequenceForFieldValueList("ClientCode", "seq", values, context));
     }
     assertThat(intList).containsExactlyElementsOf(expected);
   }

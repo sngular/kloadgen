@@ -25,13 +25,8 @@ public class ObjectField extends Field {
 
   boolean isFieldRequired;
 
-  @Override
-  public List<Field> getProperties() {
-    return properties;
-  }
-
   @Builder(toBuilder = true)
-  public ObjectField(String name, List<Field> properties, List<String> required, boolean isFieldRequired) {
+  public ObjectField(final String name, final List<Field> properties, final List<String> required, final boolean isFieldRequired) {
     super(name, "object");
     this.properties = properties;
     this.required = required;
@@ -39,7 +34,12 @@ public class ObjectField extends Field {
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final List<Field> getProperties() {
+    return properties;
+  }
+
+  @Override
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
@@ -49,22 +49,22 @@ public class ObjectField extends Field {
 
     private List<String> required = new ArrayList<>();
 
-    public ObjectFieldBuilder properties(List<Field> fieldList) {
+    public final ObjectFieldBuilder properties(final List<Field> fieldList) {
       properties.addAll(fieldList);
       return this;
     }
 
-    public ObjectFieldBuilder property(Field field) {
+    public final ObjectFieldBuilder property(final Field field) {
       properties.add(field);
       return this;
     }
 
-    public ObjectFieldBuilder required(String requiredField) {
+    public final ObjectFieldBuilder required(final String requiredField) {
       required.add(requiredField);
       return this;
     }
 
-    public ObjectFieldBuilder required(List<String> requiredFields) {
+    public final ObjectFieldBuilder required(final List<String> requiredFields) {
       required = requiredFields;
       return this;
     }

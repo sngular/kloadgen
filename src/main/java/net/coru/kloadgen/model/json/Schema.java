@@ -6,9 +6,8 @@
 
 package net.coru.kloadgen.model.json;
 
-import static java.util.Arrays.asList;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,43 +42,43 @@ public class Schema {
 
     List<String> requiredFields = new ArrayList<>();
 
-    public SchemaBuilder property(Field field) {
+    public final SchemaBuilder property(final Field field) {
       properties.add(field);
       return this;
     }
 
-    public SchemaBuilder properties(List<Field> fieldList) {
+    public final SchemaBuilder properties(final List<Field> fieldList) {
       properties.addAll(fieldList);
       return this;
     }
 
-    public SchemaBuilder description(Field field) {
+    public final SchemaBuilder description(final Field field) {
       definitions.add(field);
       return this;
     }
 
-    public SchemaBuilder descriptions(List<Field> fieldList) {
+    public final SchemaBuilder descriptions(final List<Field> fieldList) {
       definitions.addAll(fieldList);
       return this;
     }
 
-    public SchemaBuilder descriptions(Collection<Field> fieldList) {
+    public final SchemaBuilder descriptions(final Collection<Field> fieldList) {
       definitions.addAll(fieldList);
       return this;
     }
 
-    public SchemaBuilder requiredField(String field) {
+    public final SchemaBuilder requiredField(final String field) {
       requiredFields.add(field);
       return this;
     }
 
-    public SchemaBuilder requiredFields(List<String> fields) {
+    public final SchemaBuilder requiredFields(final List<String> fields) {
       requiredFields.addAll(fields);
       return this;
     }
 
-    public SchemaBuilder requiredFields(String[] fields) {
-      requiredFields.addAll(asList(fields));
+    public final SchemaBuilder requiredFields(final String[] fields) {
+      requiredFields.addAll(Arrays.asList(fields));
       return this;
     }
   }

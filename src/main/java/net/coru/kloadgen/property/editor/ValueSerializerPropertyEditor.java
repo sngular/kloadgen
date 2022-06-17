@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.property.editor;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -18,11 +16,13 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
@@ -38,6 +38,17 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
     this.init();
   }
 
+  public ValueSerializerPropertyEditor(final Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public ValueSerializerPropertyEditor(final PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
+
   private void init() {
 
     fillSerializer(new JComboBox<>());
@@ -46,33 +57,22 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
     serializerComboBox.addActionListener(this);
   }
 
-  private void fillSerializer(JComboBox<String> objectJComboBox) {
+  private void fillSerializer(final JComboBox<String> objectJComboBox) {
     serializerComboBox = objectJComboBox;
-    Reflections reflections = new Reflections(
+    final var reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Serializer.class))
             .filterInputsBy(new FilterBuilder()
                                 .includePackage("net.coru.kloadgen.serializer")
                                 .includePackage("io.confluent.kafka.serializers"))
-            .setScanners(SubTypes));
+            .setScanners(Scanners.SubTypes));
 
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
 
   }
 
-  public ValueSerializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public ValueSerializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
-  }
-
   @Override
-  public void actionPerformed(ActionEvent event) {
+  public void actionPerformed(final ActionEvent event) {
     // Not implementation required
   }
 
@@ -82,37 +82,37 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
   }
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
     super.setSource(descriptor);
   }
 
   @Override
-  public String getAsText() {
+  public final String getAsText() {
     return Objects.requireNonNull(this.serializerComboBox.getSelectedItem()).toString();
   }
 
   @Override
-  public Component getCustomEditor() {
+  public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public void setAsText(String text) throws IllegalArgumentException {
+  public final void setAsText(final String text) throws IllegalArgumentException {
     this.serializerComboBox.setSelectedItem(text);
   }
 
   @Override
-  public void setValue(Object value) {
+  public final void setValue(final Object value) {
     this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override
-  public Object getValue() {
+  public final Object getValue() {
     return this.serializerComboBox.getSelectedItem();
   }
 
   @Override
-  public boolean supportsCustomEditor() {
+  public final boolean supportsCustomEditor() {
     return true;
   }
 }

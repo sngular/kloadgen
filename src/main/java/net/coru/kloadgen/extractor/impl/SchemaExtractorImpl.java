@@ -6,10 +6,6 @@
 
 package net.coru.kloadgen.extractor.impl;
 
-import static net.coru.kloadgen.common.SchemaTypeEnum.AVRO;
-import static net.coru.kloadgen.common.SchemaTypeEnum.JSON;
-import static net.coru.kloadgen.common.SchemaTypeEnum.PROTOBUF;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +20,7 @@ import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.extractors.AvroExtractor;
@@ -36,24 +33,34 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaExtractorImpl implements SchemaExtractor {
 
-  private AvroExtractor avroExtractor = new AvroExtractor();
+  private final AvroExtractor avroExtractor;
 
-  private JsonExtractor jsonExtractor = new JsonExtractor();
+  private final JsonExtractor jsonExtractor;
 
-  private ProtoBufExtractor protoBufExtractor = new ProtoBufExtractor();
+  private final ProtoBufExtractor protoBufExtractor;
 
-  private JMeterHelper jMeterHelper = new JMeterHelper();
+  public SchemaExtractorImpl() {
+    this.avroExtractor = new AvroExtractor();
+    this.jsonExtractor = new JsonExtractor();
+    this.protoBufExtractor = new ProtoBufExtractor();
+  }
+
+  public SchemaExtractorImpl(final AvroExtractor avroExtractor, final JsonExtractor jsonExtractor, final ProtoBufExtractor protoBufExtractor) {
+    this.avroExtractor = avroExtractor;
+    this.jsonExtractor = jsonExtractor;
+    this.protoBufExtractor = protoBufExtractor;
+  }
 
   @Override
-  public Pair<String, List<FieldValueMapping>> flatPropertiesList(String subjectName) throws IOException, RestClientException {
-    ParsedSchema schema = jMeterHelper.getParsedSchema(subjectName, JMeterContextService.getContext().getProperties());
-    List<FieldValueMapping> attributeList = new ArrayList<>();
-    if (AVRO.name().equalsIgnoreCase(schema.schemaType())) {
+  public final Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) throws IOException, RestClientException {
+    final var schema = JMeterHelper.getParsedSchema(subjectName, JMeterContextService.getContext().getProperties());
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    if (SchemaTypeEnum.AVRO.name().equalsIgnoreCase(schema.schemaType())) {
       (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> avroExtractor.processField(field, attributeList, true, false));
-    } else if (JSON.name().equalsIgnoreCase(schema.schemaType())) {
+    } else if (SchemaTypeEnum.JSON.name().equalsIgnoreCase(schema.schemaType())) {
       attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
-    } else if (PROTOBUF.name().equalsIgnoreCase(schema.schemaType())) {
-      com.squareup.wire.schema.internal.parser.ProtoFileElement protoFileElement = (((ProtobufSchema) schema).rawSchema());
+    } else if (SchemaTypeEnum.PROTOBUF.name().equalsIgnoreCase(schema.schemaType())) {
+      final var protoFileElement = ((ProtobufSchema) schema).rawSchema();
       protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false));
     } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schema.schemaType()));
@@ -62,13 +69,13 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   }
 
   @Override
-  public List<FieldValueMapping> flatPropertiesList(ParsedSchema parserSchema) {
+  public final List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
     return processSchema(parserSchema);
   }
 
   @Override
-  public ParsedSchema schemaTypesList(File schemaFile, String schemaType) throws IOException {
-    ParsedSchema parsedSchema;
+  public final ParsedSchema schemaTypesList(final File schemaFile, final String schemaType) throws IOException {
+    final ParsedSchema parsedSchema;
     if ("AVRO".equalsIgnoreCase(schemaType)) {
       parsedSchema = avroExtractor.getParsedSchema(readLineByLine(schemaFile.getPath()));
     } else if ("JSON".equalsIgnoreCase(schemaType)) {
@@ -79,8 +86,8 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     return parsedSchema;
   }
 
-  private static String readLineByLine(String filePath) throws IOException {
-    StringBuilder contentBuilder = new StringBuilder();
+  private static String readLineByLine(final String filePath) throws IOException {
+    final StringBuilder contentBuilder = new StringBuilder();
 
     try (Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
       stream.forEach(s -> contentBuilder.append(s).append("\n"));
@@ -89,17 +96,18 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     return contentBuilder.toString();
   }
 
-  private List<FieldValueMapping> processSchema(ParsedSchema schema) {
+  private List<FieldValueMapping> processSchema(final ParsedSchema schema) {
+    final var result = new ArrayList<FieldValueMapping>();
     if ("AVRO".equalsIgnoreCase(schema.schemaType())) {
-      return avroExtractor.processSchema(((AvroSchema) schema).rawSchema());
+      result.addAll(avroExtractor.processSchema(((AvroSchema) schema).rawSchema()));
     } else if ("JSON".equalsIgnoreCase(schema.schemaType())) {
-      return jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode());
+      result.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
     } else if ("PROTOBUF".equalsIgnoreCase(schema.schemaType())) {
-      return protoBufExtractor.processSchema(((ProtobufSchema) schema).rawSchema());
+      result.addAll(protoBufExtractor.processSchema(((ProtobufSchema) schema).rawSchema()));
     } else {
       throw new KLoadGenException("Unsupported Schema Type");
     }
+    return result;
   }
-
 
 }

@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.config.kafkaheaders;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.ProducerKeysHelper;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
@@ -33,12 +32,12 @@ public class KafkaHeadersConfigElement extends ConfigTestElement implements Test
   private List<FieldValueMapping> kafkaHeaders;
 
   @Override
-  public void iterationStart(LoopIterationEvent iterEvent) {
+  public final void iterationStart(final LoopIterationEvent iterEvent) {
 
-    JMeterContext context = getThreadContext();
+    final JMeterContext context = getThreadContext();
 
-    Map<String, Object> threadVars = context.getSamplerContext();
+    final Map<String, Object> threadVars = context.getSamplerContext();
 
-    threadVars.put(KAFKA_HEADERS, kafkaHeaders);
+    threadVars.put(ProducerKeysHelper.KAFKA_HEADERS, kafkaHeaders);
   }
 }

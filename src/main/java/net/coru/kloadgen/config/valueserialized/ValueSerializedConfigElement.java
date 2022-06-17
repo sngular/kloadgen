@@ -45,9 +45,9 @@ public class ValueSerializedConfigElement extends ConfigTestElement implements T
   private String valueNameStrategy;
 
   @Override
-  public void iterationStart(LoopIterationEvent loopIterationEvent) {
+  public final void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
-    JMeterVariables variables = JMeterContextService.getContext().getVariables();
+    final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(VALUE_SUBJECT_NAME, valueSubjectName);
     variables.putObject(VALUE_SCHEMA_PROPERTIES, valueSchemaProperties);
     variables.putObject(VALUE_SCHEMA_TYPE, valueSchemaType);
