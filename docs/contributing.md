@@ -2,15 +2,15 @@
 
 When contributing to this repository, please first discuss the change you wish
 to make via issue, email, or any other method with the owners of this
-repository before making a change.
+repository before making.
 
 Please note we have a code of conduct, please follow it in all your
 interactions with the project.
 
 ## Code Style
 
-To ensure every body can work easily and focus in the code, make easy the review process and keep the same style, we have a couple of files defining our code standards:
-- Intellj editor style at `config/checkstyle/OSS_style_idea.xml`
+To ensure everybody can work easily and focus in the code, make easy the review process and keep the same style, we have a couple of files defining our code standards:
+- Intellij editor style at `config/checkstyle/OSS_style_idea.xml`
 - Checkstyle configuration files at `config/checkstyle/OSS_checkstyle.xml`
   - suppression file at `config/checkstyle/OSS_checkstyle/OSS_checkstyle_suppressions.xml`
 
