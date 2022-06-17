@@ -6,7 +6,6 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -16,14 +15,14 @@ import net.coru.kloadgen.randomtool.util.ValueUtils;
 
 public class RandomIterator {
 
-    private static final Map<String, SequenceType<?>> supportedIteratorTypes = ImmutableMap.<String, SequenceType<?>>builder()
-                                                                                           .put(ValidTypeConstants.INT, SequenceType.of(() -> 1, itObject -> Integer.parseInt(itObject.toString()) + 1))
-                                                                                           .put(ValidTypeConstants.DOUBLE, SequenceType.of(() -> 1.0, itObject -> Double.parseDouble(itObject.toString()) + 1))
-                                                                                           .put(ValidTypeConstants.LONG, SequenceType.of(() -> 1L, itObject -> Long.parseLong(itObject.toString()) + 1))
-                                                                                           .put(ValidTypeConstants.FLOAT, SequenceType.of(() -> 1.0f, itObject -> Float.parseFloat(itObject.toString()) + 1))
-                                                                                           .put(ValidTypeConstants.SHORT, SequenceType.of(() -> (short) 1, itObject -> Integer.parseInt(itObject.toString()) + 1))
-                                                                                           .put(ValidTypeConstants.BYTES_DECIMAL, SequenceType.of(() -> BigDecimal.ONE, itObject -> new BigDecimal(itObject.toString()).add(BigDecimal.ONE)))
-                                                                                           .put(ValidTypeConstants.FIXED_DECIMAL, SequenceType.of(() -> BigDecimal.ONE, itObject -> new BigDecimal(itObject.toString()).add(BigDecimal.ONE)))
+    private static final Map<String, IteratorType<?>> supportedIteratorTypes = ImmutableMap.<String, IteratorType<?>>builder()
+                                                                                           .put(ValidTypeConstants.INT, IteratorType.of(() -> "null"))
+                                                                                           .put(ValidTypeConstants.DOUBLE, IteratorType.of(() -> "null"))
+                                                                                           .put(ValidTypeConstants.LONG, IteratorType.of(() -> "null"))
+                                                                                           .put(ValidTypeConstants.FLOAT, IteratorType.of(() -> "null"))
+                                                                                           .put(ValidTypeConstants.SHORT, IteratorType.of(() -> "null"))
+                                                                                           .put(ValidTypeConstants.BYTES_DECIMAL, IteratorType.of(() -> "null"))
+                                                                                           .put(ValidTypeConstants.FIXED_DECIMAL, IteratorType.of(() -> "null"))
                                                                                            .build();
 
     public static boolean isTypeSupported(String fieldType) {
@@ -33,8 +32,8 @@ public class RandomIterator {
     public Object generateIt(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
         return context.compute(fieldName, (fieldNameMap, itObject) ->
                 itObject == null || !fieldValueList.isEmpty()
-                        ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
-                        : addOneCasted(itObject, fieldType));
+                        ? getValueForType(fieldValueList, fieldType)
+                        : getValueFromContext(itObject, fieldType));
     }
 
     public Object generateIteratorForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
@@ -42,21 +41,20 @@ public class RandomIterator {
         return ValueUtils.castValue(fieldValueList.get(index), fieldType);
     }
 
-    public Object getFirstValueOrDefaultForType(List<String> fieldValueList, String fieldType) {
+    public Object getValueForType(List<String> fieldValueList, String fieldType) {
         if (!isTypeSupported(fieldType)) {
             throw new IllegalArgumentException("Field type is not supported for iterators");
         }
         if (!fieldValueList.isEmpty()) {
             return ValueUtils.castValue(fieldValueList.get(0), fieldType);
         }
-
         return supportedIteratorTypes.get(fieldType).getDefaultForType();
     }
 
-    public Object addOneCasted(Object itObject, String fieldType) {
+    public Object getValueFromContext(Object itObject, String fieldType) {
         if (!isTypeSupported(fieldType)) {
             throw new IllegalArgumentException("Field type is not supported for iterators");
         }
-        return supportedIteratorTypes.get(fieldType).addOneCasted(itObject);
+        return itObject;
     }
 }

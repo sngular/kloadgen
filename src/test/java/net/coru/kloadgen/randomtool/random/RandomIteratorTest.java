@@ -28,11 +28,11 @@ class RandomIteratorTest {
 
   private static Stream<Arguments> parametersForGenerateIteratorValueForField() {
     return Stream.of(
-            Arguments.of("name", "int", emptyList(), new HashMap<>(), 1),
-            Arguments.of("name", "float", emptyList(), new HashMap<>(), 1f),
-            Arguments.of("name", "long", singletonList("0"), new HashMap<>(), 0L),
+            Arguments.of("name", "int", emptyList(), new HashMap<>(), "null"),
+            Arguments.of("name", "float", singletonList("1"), new HashMap<>(), 1f),
+            Arguments.of("name", "long", singletonList("2"), new HashMap<>(), 2L),
             Arguments.of("name", "bytes_decimal", singletonList("1"), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("1")),
-            Arguments.of("name", "bytes_decimal", emptyList(), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("16")));
+            Arguments.of("name", "bytes_decimal", emptyList(), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("15")));
   }
 
   @ParameterizedTest

@@ -108,9 +108,9 @@ It has also been created a new type of field, `it`, to allow creating a custom i
 
 In order to create an iterator, you need to specify `it` as **Field Type**.
 
-| Type | Details                                                                                                                                                         | Returns                                   |
-|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
-| it   | Works like the [sequences](#Sequences); but, if it finds a value in the Field Values List field, it will take that value instead of going on with the sequence. | Returns an iteration of the given values. |
+| Type | Details                                                                                                             | Returns                                   |
+|------|---------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
+| it   | Generates and iteration of values. It will return `null` if it doesn't find a value in the **Field Values List** field. | Returns an iteration of the given values. |
 
 ### Date and Time types
 
