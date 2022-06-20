@@ -13,35 +13,35 @@ import com.google.common.collect.ImmutableMap;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
 import net.coru.kloadgen.randomtool.util.ValueUtils;
 
-public class RandomIterator {
+public final class RandomIterator {
 
-    private static final Map<String, IteratorType<?>> supportedIteratorTypes = ImmutableMap.<String, IteratorType<?>>builder()
-                                                                                           .put(ValidTypeConstants.INT, IteratorType.of(() -> null))
-                                                                                           .put(ValidTypeConstants.DOUBLE, IteratorType.of(() -> null))
-                                                                                           .put(ValidTypeConstants.LONG, IteratorType.of(() -> null))
-                                                                                           .put(ValidTypeConstants.FLOAT, IteratorType.of(() -> null))
-                                                                                           .put(ValidTypeConstants.SHORT, IteratorType.of(() -> null))
-                                                                                           .put(ValidTypeConstants.BYTES_DECIMAL, IteratorType.of(() -> null))
-                                                                                           .put(ValidTypeConstants.FIXED_DECIMAL, IteratorType.of(() -> null))
-                                                                                           .build();
+    private static final Map<String, IteratorType<?>> SUPPORTED_ITERATOR_TYPES = ImmutableMap.<String, IteratorType<?>>builder()
+                                                                                             .put(ValidTypeConstants.INT, IteratorType.of(() -> null))
+                                                                                             .put(ValidTypeConstants.DOUBLE, IteratorType.of(() -> null))
+                                                                                             .put(ValidTypeConstants.LONG, IteratorType.of(() -> null))
+                                                                                             .put(ValidTypeConstants.FLOAT, IteratorType.of(() -> null))
+                                                                                             .put(ValidTypeConstants.SHORT, IteratorType.of(() -> null))
+                                                                                             .put(ValidTypeConstants.BYTES_DECIMAL, IteratorType.of(() -> null))
+                                                                                             .put(ValidTypeConstants.FIXED_DECIMAL, IteratorType.of(() -> null))
+                                                                                             .build();
 
-    public static boolean isTypeSupported(String fieldType) {
-        return supportedIteratorTypes.containsKey(fieldType);
+    public static boolean isTypeSupported(final String fieldType) {
+        return SUPPORTED_ITERATOR_TYPES.containsKey(fieldType);
     }
 
-    public Object generateIt(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
+    public static Object generateIt(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
         return context.compute(fieldName, (fieldNameMap, itObject) ->
             !fieldValueList.isEmpty()
                 ? getValueForType(fieldValueList, fieldType)
                 : null);
     }
 
-    public Object generateIteratorForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-        Integer index = (Integer) context.compute(fieldName, (fieldNameMap, itObject) -> itObject == null ? 0 : (((Integer) itObject) + 1) % fieldValueList.size());
+    public static Object generateIteratorForFieldValueList(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
+        final var index = (Integer) context.compute(fieldName, (fieldNameMap, itObject) -> itObject == null ? 0 : (((Integer) itObject) + 1) % fieldValueList.size());
         return ValueUtils.castValue(fieldValueList.get(index), fieldType);
     }
 
-    public Object getValueForType(List<String> fieldValueList, String fieldType) {
+    private static Object getValueForType(final List<String> fieldValueList, final String fieldType) {
         if (!isTypeSupported(fieldType)) {
             throw new IllegalArgumentException("Field type is not supported for iterators");
         }
