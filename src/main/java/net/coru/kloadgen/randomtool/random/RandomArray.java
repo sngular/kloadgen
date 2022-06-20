@@ -23,9 +23,9 @@ public class RandomArray {
     randomObject = new RandomObject();
   }
 
-  public Object generateArray(
-      String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
-      Map<ConstraintTypeEnum, String> constraints) {
+  public final Object generateArray(
+      final String fieldType, final Integer valueLength, final List<String> fieldValueList, final Integer arraySize,
+      final Map<ConstraintTypeEnum, String> constraints) {
 
     Object value;
 
@@ -71,10 +71,10 @@ public class RandomArray {
   }
 
   private Object generateRandomArrayMap(
-      String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize,
-      Integer innerArraySize, Map<ConstraintTypeEnum, String> constraints) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
-    Map<String, Object> map = new java.util.HashMap<>(arraySize);
+      final String fieldType, final Integer valueLength, final List<String> fieldValueList, final Integer arraySize,
+      final Integer innerArraySize, final Map<ConstraintTypeEnum, String> constraints) {
+    final int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
+    final Map<String, Object> map = new java.util.HashMap<>(arraySize);
 
     for (int i = 0; i < size; i++) {
       map.put(
@@ -86,10 +86,11 @@ public class RandomArray {
   }
 
   private Object generateArrayOfArray(
-      String fieldType, Integer valueLength, List<String> fieldValueList, Integer arraySize, Integer innerArraySize, Map<ConstraintTypeEnum, String> constraints) {
+      final String fieldType, final Integer valueLength, final List<String> fieldValueList, final Integer arraySize, final Integer innerArraySize,
+      final Map<ConstraintTypeEnum, String> constraints) {
 
-    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
-    List<Object> array = new ArrayList<>(size);
+    final int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
+    final List<Object> array = new ArrayList<>(size);
 
     for (int i = 0; i < size; i++) {
       array.add(generateArray(fieldType, valueLength, fieldValueList, innerArraySize, constraints));
@@ -98,10 +99,10 @@ public class RandomArray {
   }
 
   private List<Object> generate(
-      String type, Integer arraySize, Integer valueLength, List<String> fieldValueList,
-      Map<ConstraintTypeEnum, String> constraints) {
-    int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
-    List<Object> array = new ArrayList<>(size);
+      final String type, final Integer arraySize, final Integer valueLength, final List<String> fieldValueList,
+      final Map<ConstraintTypeEnum, String> constraints) {
+    final int size = arraySize == 0 ? RandomUtils.nextInt(1, 5) : arraySize;
+    final List<Object> array = new ArrayList<>(size);
 
     for (int i = 0; i < size; i++) {
       array.add(randomObject.generateRandom(type, valueLength, fieldValueList, constraints));

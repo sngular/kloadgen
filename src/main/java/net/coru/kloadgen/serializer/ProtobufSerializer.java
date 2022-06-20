@@ -9,8 +9,9 @@ package net.coru.kloadgen.serializer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import com.google.protobuf.DynamicMessage;
 import javax.xml.bind.DatatypeConverter;
+
+import com.google.protobuf.DynamicMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
@@ -20,14 +21,14 @@ import org.apache.kafka.common.serialization.Serializer;
 public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String topic, T data) {
+  public final byte[] serialize(final String topic, final T data) {
     try {
       byte[] result = null;
 
       if (data != null) {
         log.debug("data='{}'", data);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final var byteArrayOutputStream = new ByteArrayOutputStream();
 
         ((DynamicMessage) data.getGenericRecord()).writeTo(byteArrayOutputStream);
 
@@ -35,13 +36,13 @@ public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<
         log.debug("serialized data='{}'", DatatypeConverter.printHexBinary(result));
       }
       return result;
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       throw new SerializationException("Can't serialize data='" + data + "' for topic='" + topic + "'", ex);
     }
   }
 
   @Override
-  public byte[] serialize(String topic, Headers headers, T data) {
+  public final byte[] serialize(final String topic, final Headers headers, final T data) {
     return serialize(topic, data);
   }
 

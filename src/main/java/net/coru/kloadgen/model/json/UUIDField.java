@@ -17,6 +17,7 @@ import lombok.Value;
 @Value
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class UUIDField extends Field {
 
   String regex;
@@ -24,19 +25,20 @@ public class UUIDField extends Field {
   String format;
 
   @Builder(toBuilder = true)
-  public UUIDField(String name, String regex, String format) {
+  public UUIDField(final String name, final String regex, final String format) {
     super(name, "uuid");
     this.regex = regex;
     this.format = format;
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
   @Override
-  public List<Field> getProperties() {
+  public final List<Field> getProperties() {
     return Collections.singletonList(this);
   }
 }
+

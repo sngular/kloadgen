@@ -6,11 +6,6 @@
 
 package net.coru.kloadgen.sampler;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_TOPIC_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG;
-
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -23,6 +18,7 @@ import java.util.Properties;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.util.ProducerKeysHelper;
 import org.apache.avro.Conversions;
 import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;
@@ -30,11 +26,9 @@ import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.threads.JMeterThread;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.slf4j.Logger;
 
 @Slf4j
 @NoArgsConstructor
@@ -46,28 +40,28 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   private transient KafkaConsumer<Object, Object> consumer;
 
   @Override
-  public void setupTest(JavaSamplerContext context) {
+  public final void setupTest(final JavaSamplerContext context) {
 
-    Properties props = properties(context);
-    String topic = context.getParameter(KAFKA_TOPIC_CONFIG);
+    final var props = properties(context);
+    final var topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
     consumer = new KafkaConsumer<>(props);
     configGenericData();
 
     consumer.subscribe(Collections.singletonList(topic));
   }
 
-  public Properties properties(JavaSamplerContext context) {
-    Properties props = SamplerUtil.setupCommonConsumerProperties(context);
-    props.put(MAX_POLL_RECORDS_CONFIG, "1");
-    props.put(ENABLE_AUTO_COMMIT_CONFIG, "false");
-    props.put(SESSION_TIMEOUT_MS_CONFIG, "10000");
+  public final Properties properties(final JavaSamplerContext context) {
+    final var props = SamplerUtil.setupCommonConsumerProperties(context);
+    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "10000");
     timeout = Long.parseLong(props.getProperty("timeout.millis"));
     log.debug("Populated properties: {}", props);
     return props;
   }
 
   private void configGenericData() {
-    GenericData genericData = GenericData.get();
+    final var genericData = GenericData.get();
 
     genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
     genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
@@ -81,36 +75,36 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
   }
 
   @Override
-  public void teardownTest(JavaSamplerContext context) {
+  public final void teardownTest(final JavaSamplerContext context) {
     if (Objects.nonNull(consumer)) {
       consumer.close();
     }
   }
 
   @Override
-  public Arguments getDefaultParameters() {
+  public final Arguments getDefaultParameters() {
     return SamplerUtil.getCommonConsumerDefaultParameters();
   }
 
   @Override
-  public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
-    SampleResult sampleResult = new SampleResult();
+  public final SampleResult runTest(final JavaSamplerContext javaSamplerContext) {
+    var sampleResult = new SampleResult();
     sampleResult.sampleStart();
-    JMeterThread thread = javaSamplerContext.getJMeterContext().getThread();
+    final var thread = javaSamplerContext.getJMeterContext().getThread();
     try {
       boolean running = true;
-      Instant startTime = Instant.now();
+      final var startTime = Instant.now();
       while (running) {
-        ConsumerRecords<Object, Object> records = consumer.poll(Duration.of(5, ChronoUnit.SECONDS));
+        final var records = consumer.poll(Duration.of(5, ChronoUnit.SECONDS));
 
         if (!records.isEmpty()) {
           running = false;
-          ConsumerRecord<Object, Object> consumerRecord = records.iterator().next();
+          final var consumerRecord = records.iterator().next();
           fillSampleResult(sampleResult, prettify(consumerRecord), true);
           consumer.commitSync();
         }
 
-        Instant endTime = Instant.now();
+        final var endTime = Instant.now();
         if (Duration.between(startTime, endTime).toMillis() > timeout) {
           running = false;
           sampleResult = null;
@@ -119,15 +113,15 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
           }
         }
       }
-    } catch (Exception e) {
-      logger().error("Failed to receive message", e);
-      fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "",
+    } catch (final IllegalStateException ex) {
+      log.error("Failed to receive message", ex);
+      fillSampleResult(sampleResult, ex.getMessage() != null ? ex.getMessage() : "",
                        false);
     }
     return sampleResult;
   }
 
-  private void fillSampleResult(SampleResult sampleResult, String responseData, boolean successful) {
+  private void fillSampleResult(final SampleResult sampleResult, final String responseData, final boolean successful) {
     if (Objects.nonNull(sampleResult)) {
       sampleResult.setResponseData(responseData, StandardCharsets.UTF_8.name());
       sampleResult.setSuccessful(successful);
@@ -135,13 +129,9 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
     }
   }
 
-  private String prettify(ConsumerRecord<Object, Object> consumerRecord) {
-    return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key() +
-           ", value: " + consumerRecord.value().toString() + " }}";
-  }
-
-  protected Logger logger() {
-    return KafkaConsumerSampler.log;
+  private String prettify(final ConsumerRecord<Object, Object> consumerRecord) {
+    return "{ partition: " + consumerRecord.partition() + ", message: { key: " + consumerRecord.key()
+           + ", value: " + consumerRecord.value().toString() + " }}";
   }
 
 }

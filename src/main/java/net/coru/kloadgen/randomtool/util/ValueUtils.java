@@ -6,9 +6,6 @@
 
 package net.coru.kloadgen.randomtool.util;
 
-import org.apache.avro.Schema;
-import org.apache.jmeter.threads.JMeterContextService;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,24 +15,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.avro.Schema;
+import org.apache.jmeter.threads.JMeterContextService;
+
 public class ValueUtils {
 
   private ValueUtils() {
 
   }
 
-  public static List<String> replaceValuesContext(List<String> fieldValuesList) {
-    List<String> parameterList = new ArrayList<>(fieldValuesList);
+  public static List<String> replaceValuesContext(final List<String> fieldValuesList) {
+    final List<String> parameterList = new ArrayList<>(fieldValuesList);
 
     parameterList.replaceAll(fieldValue ->
-                                 fieldValue.matches("\\$\\{\\w*}") ?
-                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
+                                 fieldValue.matches("\\$\\{\\w*}")
+                                     ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
     return parameterList;
   }
 
-  public static Object castValue(Object valueObject, String type) {
-    Object castValue;
-    String value = valueObject.toString();
+  public static Object castValue(final Object valueObject, final String type) {
+    final Object castValue;
+    final String value = valueObject.toString();
     switch (type) {
       case ValidTypeConstants.INT:
         castValue = Integer.valueOf(value);
@@ -55,9 +55,6 @@ public class ValueUtils {
       case ValidTypeConstants.BOOLEAN:
         castValue = Boolean.valueOf(value);
         break;
-      case ValidTypeConstants.TIMESTAMP:
-        castValue = LocalDateTime.parse(value.trim());
-        break;
       case ValidTypeConstants.LONG_TIMESTAMP:
         castValue = LocalDateTime.parse(value.trim()).toInstant(ZoneOffset.UTC).toEpochMilli();
         break;
@@ -69,13 +66,14 @@ public class ValueUtils {
         break;
       case ValidTypeConstants.INT_TIME_MILLIS:
       case ValidTypeConstants.LONG_TIME_MICROS:
+      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
         castValue = LocalTime.parse(value.trim());
         break;
       case ValidTypeConstants.LONG_TIMESTAMP_MILLIS:
       case ValidTypeConstants.LONG_TIMESTAMP_MICROS:
         castValue = LocalDateTime.parse(value.trim()).toInstant(ZoneOffset.UTC);
         break;
-      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
+      case ValidTypeConstants.TIMESTAMP:
       case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
         castValue = LocalDateTime.parse(value.trim());
         break;
@@ -94,7 +92,7 @@ public class ValueUtils {
     return castValue;
   }
 
-  public static String getValidTypeFromSchema(Schema schema) {
+  public static String getValidTypeFromSchema(final Schema schema) {
     return schema.getLogicalType() == null
         ? schema.getType().getName()
         : String.format("%s_%s", schema.getType().getName(), schema.getLogicalType().getName());

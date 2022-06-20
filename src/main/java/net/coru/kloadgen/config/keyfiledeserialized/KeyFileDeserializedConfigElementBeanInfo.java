@@ -41,46 +41,46 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     super(KeyFileDeserializedConfigElement.class);
 
     createPropertyGroup("key_deserialized_load_generator", new String[]{
-        /*KEY_NAME_STRATEGY, */KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION,
+        KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION,
         KEY_SCHEMA_PROPERTIES
     });
 
-    PropertyDescriptor serializerPropertyProps = property(KEY_DESERIALIZER_PROPERTY);
+    final PropertyDescriptor serializerPropertyProps = property(KEY_DESERIALIZER_PROPERTY);
     serializerPropertyProps.setPropertyEditorClass(KeyDeserializerPropertyEditor.class);
     serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     serializerPropertyProps.setValue(DEFAULT, "");
     serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor subjectNameProps = property(KEY_SUBJECT_NAME);
+    final PropertyDescriptor subjectNameProps = property(KEY_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor schemaType = property(KEY_SCHEMA_TYPE);
+    final PropertyDescriptor schemaType = property(KEY_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
     schemaType.setValue(DEFAULT, "");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor avroSchemaProps = property(KEY_SCHEMA_DEFINITION);
+    final PropertyDescriptor avroSchemaProps = property(KEY_SCHEMA_DEFINITION);
     avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
     avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     avroSchemaProps.setValue(DEFAULT, "");
     avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    TypeEditor tableEditor = TypeEditor.TableEditor;
-    PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
+    final TypeEditor tableEditor = TypeEditor.TableEditor;
+    final PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
                              new String[]{
-                                 "Field Name",
-                                 "Field Type"
+                               "Field Name",
+                               "Field Type"
                              });
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
                              new String[]{
-                                 FieldValueMapping.FIELD_NAME,
-                                 FieldValueMapping.FIELD_TYPE
+                               FieldValueMapping.FIELD_NAME,
+                               FieldValueMapping.FIELD_TYPE
                              });
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);

@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 @WireMockTest
-class AvroLoadGeneratorTest {
+class AvroSRLoadGeneratorTest {
 
   @BeforeEach
   public void setUp() {
@@ -56,7 +56,7 @@ class AvroLoadGeneratorTest {
     originals.put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     originals.put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator();
+    AvroSRLoadGenerator avroLoadGenerator = new AvroSRLoadGenerator();
     avroLoadGenerator.setUpGenerator(originals, "avroSubject", fieldValueMappingList);
     Object message = avroLoadGenerator.nextMessage();
     assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
