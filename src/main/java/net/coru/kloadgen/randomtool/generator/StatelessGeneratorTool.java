@@ -51,7 +51,7 @@ public class StatelessGeneratorTool {
       }
     } else if ("it".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
-        return randomIterator.generateIteratorForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+        value = randomIterator.generateIteratorForFieldValueList(fieldName, fieldType, fieldValuesList, context);
       } else {
         value = randomIterator.generateIt(fieldName, fieldType, parameterList, context);
       }

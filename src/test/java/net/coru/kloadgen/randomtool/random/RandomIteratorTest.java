@@ -7,6 +7,7 @@
 package net.coru.kloadgen.randomtool.random;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.groovy.util.Maps;
@@ -28,11 +30,11 @@ class RandomIteratorTest {
 
   private static Stream<Arguments> parametersForGenerateIteratorValueForField() {
     return Stream.of(
-            Arguments.of("name", "int", emptyList(), new HashMap<>(), "null"),
+            Arguments.of("name", "int", emptyList(), new HashMap<>(), null),
             Arguments.of("name", "float", singletonList("1"), new HashMap<>(), 1f),
             Arguments.of("name", "long", singletonList("2"), new HashMap<>(), 2L),
             Arguments.of("name", "bytes_decimal", singletonList("1"), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("1")),
-            Arguments.of("name", "bytes_decimal", emptyList(), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("15")));
+            Arguments.of("name15", "bytes_decimal", emptyList(), new HashMap<>(Maps.of("name15", new BigDecimal("15"))), null));
   }
 
   @ParameterizedTest
@@ -40,7 +42,11 @@ class RandomIteratorTest {
   void testGenerateIteratorValueForField(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context,
                                          Object expectedStored) {
     assertThat(new RandomIterator().generateIt(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
-    assertThat(context).containsEntry(fieldName, expectedStored);
+    if (Objects.isNull(expectedStored)) {
+      assertThat(context).doesNotContainKey(fieldName);
+    } else {
+      assertThat(context).containsEntry(fieldName, expectedStored);
+    }
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValueWithList() {

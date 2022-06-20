@@ -16,13 +16,13 @@ import net.coru.kloadgen.randomtool.util.ValueUtils;
 public class RandomIterator {
 
     private static final Map<String, IteratorType<?>> supportedIteratorTypes = ImmutableMap.<String, IteratorType<?>>builder()
-                                                                                           .put(ValidTypeConstants.INT, IteratorType.of(() -> "null"))
-                                                                                           .put(ValidTypeConstants.DOUBLE, IteratorType.of(() -> "null"))
-                                                                                           .put(ValidTypeConstants.LONG, IteratorType.of(() -> "null"))
-                                                                                           .put(ValidTypeConstants.FLOAT, IteratorType.of(() -> "null"))
-                                                                                           .put(ValidTypeConstants.SHORT, IteratorType.of(() -> "null"))
-                                                                                           .put(ValidTypeConstants.BYTES_DECIMAL, IteratorType.of(() -> "null"))
-                                                                                           .put(ValidTypeConstants.FIXED_DECIMAL, IteratorType.of(() -> "null"))
+                                                                                           .put(ValidTypeConstants.INT, IteratorType.of(() -> null))
+                                                                                           .put(ValidTypeConstants.DOUBLE, IteratorType.of(() -> null))
+                                                                                           .put(ValidTypeConstants.LONG, IteratorType.of(() -> null))
+                                                                                           .put(ValidTypeConstants.FLOAT, IteratorType.of(() -> null))
+                                                                                           .put(ValidTypeConstants.SHORT, IteratorType.of(() -> null))
+                                                                                           .put(ValidTypeConstants.BYTES_DECIMAL, IteratorType.of(() -> null))
+                                                                                           .put(ValidTypeConstants.FIXED_DECIMAL, IteratorType.of(() -> null))
                                                                                            .build();
 
     public static boolean isTypeSupported(String fieldType) {
@@ -31,9 +31,9 @@ public class RandomIterator {
 
     public Object generateIt(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
         return context.compute(fieldName, (fieldNameMap, itObject) ->
-                itObject == null || !fieldValueList.isEmpty()
-                        ? getValueForType(fieldValueList, fieldType)
-                        : getValueFromContext(itObject, fieldType));
+            !fieldValueList.isEmpty()
+                ? getValueForType(fieldValueList, fieldType)
+                : null);
     }
 
     public Object generateIteratorForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
@@ -45,16 +45,7 @@ public class RandomIterator {
         if (!isTypeSupported(fieldType)) {
             throw new IllegalArgumentException("Field type is not supported for iterators");
         }
-        if (!fieldValueList.isEmpty()) {
-            return ValueUtils.castValue(fieldValueList.get(0), fieldType);
-        }
-        return supportedIteratorTypes.get(fieldType).getDefaultForType();
+        return ValueUtils.castValue(fieldValueList.get(0), fieldType);
     }
 
-    public Object getValueFromContext(Object itObject, String fieldType) {
-        if (!isTypeSupported(fieldType)) {
-            throw new IllegalArgumentException("Field type is not supported for iterators");
-        }
-        return itObject;
-    }
 }
