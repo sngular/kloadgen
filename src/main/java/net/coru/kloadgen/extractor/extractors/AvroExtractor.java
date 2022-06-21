@@ -87,18 +87,14 @@ public class AvroExtractor {
 
   private void processRecordFieldList(final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
       final List<FieldValueMapping> completeFieldList) {
-    if (completeFieldList.isEmpty()) {
-      internalFields.forEach(internalField -> {
-        if (internalField.getFieldName().startsWith(fieldName + ".")) {
-          internalField.setFieldName(fieldName + internalField.getFieldName().replace(fieldName, splitter.replace(".", "")));
-        } else {
-          internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
-        }
-        completeFieldList.add(internalField);
-      });
-    } else {
-      internalFields.forEach(internalField -> internalField.setFieldName(fieldName + splitter + internalField.getFieldName()));
-    }
+    internalFields.forEach(internalField -> {
+      if (internalField.getFieldName().startsWith(fieldName + ".")) {
+        internalField.setFieldName(fieldName + internalField.getFieldName().replace(fieldName, splitter.replace(".", "")));
+      } else {
+        internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
+      }
+      completeFieldList.add(internalField);
+    });
   }
 
   private List<FieldValueMapping> processFieldList(final List<Schema.Field> fieldList, final boolean isAncestorRequired) {

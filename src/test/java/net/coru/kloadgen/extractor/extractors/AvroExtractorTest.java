@@ -130,4 +130,28 @@ class AvroExtractorTest {
         );
   }
 
+  @Test
+  @DisplayName("Should extract Union Record")
+  void testFlatPropertiesUnionRecordAvros() throws Exception {
+
+    String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
+    ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    Schema schema = (Schema) parsedSchema.rawSchema();
+
+    List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+
+    assertThat(fieldValueMappingList)
+      .hasSize(8)
+      .containsExactlyInAnyOrder(
+        FieldValueMapping.builder().fieldName("validateInnerObject.attribute1").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("validateInnerObject.attribute2").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("products[].Price.price").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("products[].Price.priceType").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("products[].Price.currency").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("products[].Price.discount").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("products[].Price.validateInnerObject.attribute1").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("products[].Price.validateInnerObject.attribute2").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build()
+      );
+  }
+
 }
