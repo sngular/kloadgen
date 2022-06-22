@@ -22,18 +22,18 @@ public class DateField extends Field {
   String format;
 
   @Builder(toBuilder = true)
-  public DateField(String name, String format) {
+  public DateField(final String name, final String format) {
     super(name, "timestamp");
     this.format = format;
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
   @Override
-  public List<Field> getProperties() {
+  public final List<Field> getProperties() {
     return Collections.singletonList(this);
   }
 }

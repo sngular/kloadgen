@@ -20,21 +20,21 @@ import org.apache.kafka.common.serialization.Serializer;
 public class GenericJsonRecordSerializer<T extends ObjectNode> implements Serializer<T> {
 
   @Override
-  public byte[] serialize(String topic, T record) {
+  public final byte[] serialize(final String topic, final T data) {
 
-    byte[] data = new byte[0];
+    byte[] dataBytes = new byte[0];
     try {
-      ObjectMapper mapper = new ObjectMapper();
+      final var mapper = new ObjectMapper();
       mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
-      data = mapper.writeValueAsString(record).getBytes(CharSet.ASCII_ALPHA.toString());
-    } catch (IOException e) {
-      log.error("Serialization error:" + e.getMessage());
+      dataBytes = mapper.writeValueAsString(data).getBytes(CharSet.ASCII_ALPHA.toString());
+    } catch (final IOException ex) {
+      log.error("Serialization error:" + ex.getMessage());
     }
-    return data;
+    return dataBytes;
   }
 
   @Override
-  public byte[] serialize(String topic, Headers headers, T data) {
+  public final byte[] serialize(final String topic, final Headers headers, final T data) {
     return new byte[0];
   }
 }

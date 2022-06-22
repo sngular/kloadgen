@@ -20,17 +20,17 @@ import lombok.Value;
 public class BooleanField extends Field {
 
   @Builder(toBuilder = true)
-  public BooleanField(String name) {
+  public BooleanField(final String name) {
     super(name, "boolean");
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
   @Override
-  public List<Field> getProperties() {
+  public final List<Field> getProperties() {
     return Collections.singletonList(this);
   }
 }

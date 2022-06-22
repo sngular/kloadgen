@@ -29,6 +29,11 @@ The following screenshots show the load test process in JMeter:
 
 ![Load test starting](images/load_test_process_1.png)
 
-![Load test in progress](images/load_test_process_2.png)
 
-![Load test results](images/load_test_process_2.png)
+
+ ![Load test in progress](images/load_test_process_2.png)
+ 
+
+
+![Load test results](images/load_test_results.png)
+

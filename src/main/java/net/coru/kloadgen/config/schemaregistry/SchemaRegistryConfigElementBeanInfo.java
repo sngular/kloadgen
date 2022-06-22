@@ -31,14 +31,14 @@ public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
         SCHEMA_REGISTRY_URL, SCHEMA_REGISTRY_PROPERTIES
     });
 
-    PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_URL);
+    final PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_URL);
     schemaRegistryUrl.setPropertyEditorClass(SchemaRegistryConfigPropertyEditor.class);
     schemaRegistryUrl.setValue(NOT_UNDEFINED, Boolean.TRUE);
     schemaRegistryUrl.setValue(DEFAULT, SCHEMA_REGISTRY_URL_DEFAULT);
     schemaRegistryUrl.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    TypeEditor tableEditor = TypeEditor.TableEditor;
-    PropertyDescriptor tableProperties = property(SCHEMA_REGISTRY_PROPERTIES, tableEditor);
+    final TypeEditor tableEditor = TypeEditor.TableEditor;
+    final PropertyDescriptor tableProperties = property(SCHEMA_REGISTRY_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, PropertyMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS, new String[]{"Property Name", "Property Value"});
     tableProperties

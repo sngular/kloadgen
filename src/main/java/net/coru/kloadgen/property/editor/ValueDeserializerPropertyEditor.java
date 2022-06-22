@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
@@ -38,6 +39,17 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
     this.init();
   }
 
+  public ValueDeserializerPropertyEditor(final Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
+
+  public ValueDeserializerPropertyEditor(final PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
+
   private void init() {
 
     fillDeserializer(new JComboBox<>());
@@ -46,9 +58,9 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
     deserializerComboBox.addActionListener(this);
   }
 
-  private void fillDeserializer(JComboBox<String> objectJComboBox) {
+  private void fillDeserializer(final JComboBox<String> objectJComboBox) {
     deserializerComboBox = objectJComboBox;
-    Reflections reflections = new Reflections(
+    final var reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Deserializer.class))
             .filterInputsBy(new FilterBuilder()
@@ -60,19 +72,8 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
 
   }
 
-  public ValueDeserializerPropertyEditor(Object source) {
-    super(source);
-    this.init();
-    this.setValue(source);
-  }
-
-  public ValueDeserializerPropertyEditor(PropertyDescriptor propertyDescriptor) {
-    super(propertyDescriptor);
-    this.init();
-  }
-
   @Override
-  public void actionPerformed(ActionEvent event) {
+  public void actionPerformed(final ActionEvent event) {
     // Not implementation required
   }
 
@@ -82,37 +83,37 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
   }
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
     super.setSource(descriptor);
   }
 
   @Override
-  public String getAsText() {
+  public final String getAsText() {
     return Objects.requireNonNull(this.deserializerComboBox.getSelectedItem()).toString();
   }
 
   @Override
-  public void setAsText(String text) throws IllegalArgumentException {
+  public final void setAsText(final String text) throws IllegalArgumentException {
     this.deserializerComboBox.setSelectedItem(text);
   }
 
   @Override
-  public Component getCustomEditor() {
+  public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public Object getValue() {
+  public final Object getValue() {
     return this.deserializerComboBox.getSelectedItem();
   }
 
   @Override
-  public void setValue(Object value) {
+  public final void setValue(final Object value) {
     this.deserializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override
-  public boolean supportsCustomEditor() {
+  public final boolean supportsCustomEditor() {
     return true;
   }
 }

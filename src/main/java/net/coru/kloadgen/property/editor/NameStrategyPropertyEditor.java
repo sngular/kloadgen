@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.property.editor;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -16,13 +14,15 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
-import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+
+import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -37,13 +37,13 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     this.init();
   }
 
-  public NameStrategyPropertyEditor(Object source) {
+  public NameStrategyPropertyEditor(final Object source) {
     super(source);
     this.init();
     this.setValue(source);
   }
 
-  public NameStrategyPropertyEditor(PropertyDescriptor propertyDescriptor) {
+  public NameStrategyPropertyEditor(final PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
     this.init();
   }
@@ -55,17 +55,17 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     nameStrategyComboBox.addActionListener(this);
   }
 
-  private void fillSerializer(JComboBox<String> objectJComboBox) {
+  private void fillSerializer(final JComboBox<String> objectJComboBox) {
     nameStrategyComboBox = objectJComboBox;
-    Reflections reflections = new Reflections(
+    final Reflections reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
-            .setScanners(SubTypes));
+            .setScanners(Scanners.SubTypes));
     ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
   }
 
   @Override
-  public void actionPerformed(ActionEvent event) {
+  public void actionPerformed(final ActionEvent event) {
     // Not implementation required
   }
 
@@ -75,37 +75,37 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
   }
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
     super.setSource(descriptor);
   }
 
   @Override
-  public String getAsText() {
+  public final String getAsText() {
     return Objects.requireNonNull(this.nameStrategyComboBox.getSelectedItem()).toString();
   }
 
   @Override
-  public Component getCustomEditor() {
+  public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public void setAsText(String text) throws IllegalArgumentException {
+  public final void setAsText(final String text) throws IllegalArgumentException {
     this.nameStrategyComboBox.setSelectedItem(text);
   }
 
   @Override
-  public void setValue(Object value) {
+  public final void setValue(final Object value) {
     this.nameStrategyComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override
-  public Object getValue() {
+  public final Object getValue() {
     return this.nameStrategyComboBox.getSelectedItem();
   }
 
   @Override
-  public boolean supportsCustomEditor() {
+  public final boolean supportsCustomEditor() {
     return true;
   }
 }

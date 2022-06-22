@@ -9,7 +9,7 @@ package net.coru.kloadgen.util;
 import net.coru.kloadgen.serializer.GenericAvroRecordSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-public class ProducerKeysHelper {
+public final class ProducerKeysHelper {
 
   public static final String KAFKA_TOPIC_CONFIG = "kafka.topic.name";
 
@@ -65,8 +65,6 @@ public class ProducerKeysHelper {
 
   public static final String FLAG_YES = "YES";
 
-  public static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
-
   public static final String KAFKA_HEADERS = "kafka.headers";
 
   public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
@@ -77,7 +75,8 @@ public class ProducerKeysHelper {
 
   public static final String KEY_NAME_STRATEGY = "key.subject.name.strategy";
 
-  public static final String RECORD_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.RecordNameStrategy";
-
   public static final String TOPIC_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.TopicRecordNameStrategy";
+
+  private ProducerKeysHelper() {
+  }
 }

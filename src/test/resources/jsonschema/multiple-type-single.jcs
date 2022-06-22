@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Transformed Event",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "title": "Not included"
+        },
+        {
+          "type": "string",
+          "format": "uuid"
+        }
+      ]
+    }
+  }
+}

@@ -7,12 +7,15 @@
 package net.coru.kloadgen.serializer;
 
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import lombok.Builder;
 import lombok.Value;
 
 @Value
+@Builder
 public class EnrichedRecord {
 
   SchemaMetadata schemaMetadata;
 
   Object genericRecord;
 }
+

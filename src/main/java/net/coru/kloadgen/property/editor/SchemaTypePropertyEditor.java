@@ -14,6 +14,7 @@ import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
 import javax.swing.JPanel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.jmeter.gui.ClearGui;
@@ -27,57 +28,57 @@ public class SchemaTypePropertyEditor extends PropertyEditorSupport implements A
   public SchemaTypePropertyEditor() {
   }
 
-  public SchemaTypePropertyEditor(Object source) {
+  public SchemaTypePropertyEditor(final Object source) {
     super(source);
     this.setValue(source);
   }
 
-  public SchemaTypePropertyEditor(PropertyDescriptor propertyDescriptor) {
+  public SchemaTypePropertyEditor(final PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
   }
 
   @Override
-  public void actionPerformed(ActionEvent event) {
+  public final void actionPerformed(final ActionEvent event) {
     throw new NotImplementedException("Not implementation is required");
   }
 
   @Override
-  public void clearGui() {}
+  public final void clearGui() {}
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
     setSource(descriptor);
   }
 
   @Override
-  public Component getCustomEditor() {
+  public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public String getAsText() {
+  public final String getAsText() {
     return super.getAsText();
   }
 
   @Override
-  public void setAsText(String value) throws IllegalArgumentException {
+  public final void setAsText(final String value) throws IllegalArgumentException {
     super.setValue(value);
   }
 
   @Override
-  public void setValue(Object value) {
+  public final void setValue(final Object value) {
     if (Objects.nonNull(value)) {
       super.setValue(value);
     }
   }
 
   @Override
-  public Object getValue() {
+  public final Object getValue() {
     return super.getValue();
   }
 
   @Override
-  public boolean supportsCustomEditor() {
+  public final boolean supportsCustomEditor() {
     return true;
   }
 

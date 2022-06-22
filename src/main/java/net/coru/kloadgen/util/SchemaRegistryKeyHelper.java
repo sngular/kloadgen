@@ -6,7 +6,7 @@
 
 package net.coru.kloadgen.util;
 
-public class SchemaRegistryKeyHelper {
+public final class SchemaRegistryKeyHelper {
 
   public static final String SCHEMA_REGISTRY_USERNAME_KEY = "schema.registry.username";
 
@@ -35,4 +35,7 @@ public class SchemaRegistryKeyHelper {
   public static final String SCHEMA_REGISTRY_AUTH_FLAG = "schema.registry.auth.enabled";
 
   public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
+
+  private SchemaRegistryKeyHelper() {
+  }
 }

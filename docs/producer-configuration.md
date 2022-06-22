@@ -4,7 +4,7 @@ Here you can find the list of the parameters to be configured when defining the 
 
 ## Kafka Producer Sampler configuration
 
-![Kafka Producer Sampler configuration](images/Kafka_Producer_Properties.png)
+![Kafka Producer Sampler configuration](images/kafka-producer-properties.png)
 
 - **bootstrap.servers**: list of Bootstrap servers with format: broker-ip-1:port, broker-ip-2:port, broker-ip-3:port. 
 - **zookeeper.servers**: list of Zookeeper servers with format: zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port.
@@ -46,7 +46,7 @@ These are the configuration elements corresponding to the Kafka producer. See be
 
 ### Schema Registry Config
 
-![Schema Registry Config](images/Schema_Registry_Config.png)
+![Schema Registry Config](images/schema-registry-config.png)
 
 This configuration element establishes the connection to the Schema Registry and retrieves the list of subjects included there.
 
@@ -66,17 +66,19 @@ The **Test Registry** button will test the connection properties and retrieve th
 
 A confirmation message will be shown with the number of subjects retrieved from the Registry.
 
-![Schema Registry Config Success](images/Schema_Registry_Success.png)
+![Schema Registry Config Success](images/schema-registry-success.png)
 
 The subject list will be used when configuring the AVRO schema to download.
 
 ### Serializer configuration elements
 
+KLoadGen includes five serializers, apart from the ones from Kafka. [Make sure to choose the best option for you.](#custom-serializers)
+
 KLoadGen includes four elements to configure the schema that will be used to serialize the data: [Value Schema Serializer Config](#value-schema-serializer-config), [Value Schema File Serializer Config](#value-schema-file-serializer-config), [Key Schema Serializer Config](#key-schema-serializer-config), and [Key Schema File Serializer Config](#key-schema-file-serializer-config).
 
 #### Value Schema Serializer Config
 
-![Value Schema Serializer Config](images/Value_Schema_Load_Generator_Config.png)
+![Value Schema Serializer Config](images/value-schema-load-generator-config.png)
 
 This configuration element allows to choose a subject and download its schema.
 
@@ -84,7 +86,7 @@ You need to provide values for **Name Strategy** and **Serializer** to get the l
 
 #### Value Schema File Serializer Config
 
-![Value Scheme File Serializer Config](images/Value_Schema_File_Load_Generator_Config.png)
+![Value Scheme File Serializer Config](images/value-schema-file-load-generator-config.png)
 
 This configuration element allows to load a schema from a file (.avsc, .json or .proto).
 
@@ -117,11 +119,13 @@ The four previous configuration elements share the same table, which includes th
   - **Field Type**: field type, such as String, Int, Double, Array, etc.  For a complete list of field types, see [Field types](schemas.md#field-types).
   - **Field Length**: field length configuration for the Random Tool. For strings, it indicates the number of characters. For numbers, it indicates the number of digits.
   - **Field Values List**: possible list of values for the field, which will be used by the Random Tool to generate values.
-    **Note**: If the field type is an array or a map, you can define a specific list of values  (*[1,2,3,4,5]* or *[key1:value1, key2:value2, key3:value3]*).
+    **Note**: 
+       - For reading context values by default in Jmeter, they must be in the way: ${name_of_variable}
+       - If the field type is an array or a map, you can define a specific list of values  (*[1,2,3,4,5]* or *[key1:value1, key2:value2, key3:value3]*).
 
 ### Simple Key Config
 
-![Simple Key Config](images/Key_Plain_Load_Generator_Config.png)
+![Simple Key Config](images/key-plain-load-generator-config.png)
 
 This configuration element allows to define a simple key with primitive types.
 
@@ -129,10 +133,22 @@ You need to provide values for **Key Value**, **Key Class Type** and **Serialize
 
 ### Kafka Headers Config
 
-![Kafka Headers Config](images/Kafka-header-config-element.png)
+![Kafka Headers Config](images/kafka-header-config-element.png)
 
 This configuration element allows to specify a list of headers which will be included in the producer. 
 
 The headers specified here will be included in every message after they are serialized.
 
 Values will also be included. They will be considered of type `string`, whether they are supplied in the table or randomly generated.
+
+## Custom Serializers
+
+- **AvroSerializer**: adds a header with the id of the schema, uses GenericDatumWriter to transform the data into an array of bytes and sends it.
+
+- **GenericAvroRecordBinarySerializer**: uses SpecificDatumWriter to transform the data into an array of bytes and sends it.
+
+- **GenericAvroRecordSerializer**: uses SpecificDatumWriter to transform the data into JSON and sends it.
+
+- **GenericJsonRecordSerializer**: maps the data and sends it.
+
+- **ProtobufSerializer**: transforms the data into an array of bytes and sends it.

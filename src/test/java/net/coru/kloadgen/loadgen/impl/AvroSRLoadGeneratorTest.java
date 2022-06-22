@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 @WireMockTest
-class AvroLoadGeneratorTest {
+class AvroSRLoadGeneratorTest {
 
   @BeforeEach
   public void setUp() {
@@ -48,15 +48,15 @@ class AvroLoadGeneratorTest {
   void testAvroLoadGenerator(WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     List<FieldValueMapping> fieldValueMappingList = asList(
-        new FieldValueMapping("Name", "string", 0, "Jose"),
-        new FieldValueMapping("Age", "int", 0, "43"));
+        FieldValueMapping.builder().fieldName("Name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
 
     Map<String, String> originals = new HashMap<>();
     originals.put(SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
     originals.put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     originals.put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroLoadGenerator avroLoadGenerator = new AvroLoadGenerator();
+    AvroSRLoadGenerator avroLoadGenerator = new AvroSRLoadGenerator();
     avroLoadGenerator.setUpGenerator(originals, "avroSubject", fieldValueMappingList);
     Object message = avroLoadGenerator.nextMessage();
     assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);

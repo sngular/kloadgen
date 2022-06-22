@@ -26,7 +26,7 @@ public class IntegerField extends Field {
   int maximum;
 
   @Builder(toBuilder = true)
-  public IntegerField(String name, String defaultValue, int minimum, int maximum) {
+  public IntegerField(final String name, final String defaultValue, final int minimum, final int maximum) {
     super(name, "number");
     this.defaultValue = defaultValue;
     this.maximum = maximum;
@@ -34,7 +34,7 @@ public class IntegerField extends Field {
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
