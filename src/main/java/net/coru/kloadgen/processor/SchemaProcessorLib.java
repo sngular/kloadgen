@@ -118,23 +118,23 @@ public final class SchemaProcessorLib {
 
   }
 
-  static String cleanUpPath(final FieldValueMapping fieldValueMapping, int level) {
-    String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
-    List<String> splitPathAux = Arrays.asList(Arrays.copyOfRange(splitPath, level, splitPath.length));
+  static String cleanUpPath(final FieldValueMapping fieldValueMapping, final int level) {
+    final String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
+    final List<String> splitPathAux = Arrays.asList(Arrays.copyOfRange(splitPath, level, splitPath.length));
     return String.join(".",splitPathAux);
   }
 
-  static String getCleanMethodName(final FieldValueMapping fieldValueMapping, int level) {
+  static String getCleanMethodName(final FieldValueMapping fieldValueMapping, final int level) {
     return getFullMethodName(fieldValueMapping, level).replaceAll("\\[[0-9]*:?]", "");
   }
 
-  static String getFullMethodName(final FieldValueMapping fieldValueMapping, int level) {
+  static String getFullMethodName(final FieldValueMapping fieldValueMapping, final int level) {
     final String pathToClean = cleanUpPath(fieldValueMapping, level);
     final int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
     return pathToClean.substring(0, endOfField);
   }
 
-  static String getMapCleanMethodName(final FieldValueMapping fieldValueMapping, final String fieldName, int level) {
+  static String getMapCleanMethodName(final FieldValueMapping fieldValueMapping, final int level) {
     final String pathToClean = cleanUpPath(fieldValueMapping, level);
     final int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
