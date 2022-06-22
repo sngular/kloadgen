@@ -1,5 +1,9 @@
 # About KLoadGen
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85c9817742944668b5cc75e3fa1cdb23)](https://app.codacy.com/gh/corunet/kloadgen?utm_source=github.com&utm_medium=referral&utm_content=corunet/kloadgen&utm_campaign=Badge_Grade_Dashboard)
+[![Build Status](https://api.travis-ci.org/corunet/kloadgen.svg?branch=master)](https://travis-ci.org/corunet/kloadgen)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.coru/kloadgen/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.coru/kloadgen)
+
 KLoadGen is a plugin for JMeter which acts as a load generator designed to send Kafka messages and that supports AVRO, JSON Schema and PROTOBUF structures.
 
 It can also connect to the Schema Registry server, where it retrieves the subjects to send.

@@ -49,7 +49,7 @@ See the architecture and project structure of KLoadGen in the [Architecture](htt
 
 We’ll be glad to talk and discuss how KLoadGen can help you 😊
 
-Reach us through [GitHub issues](https://github.com/corunet/kloadgen/issues), [email](mailto:info@corunet.com) or [Twitter](https://twitter.com/corunet).
+Reach us through [GitHub issues](https://github.com/corunet/kloadgen/issues), [GitHub discussions](https://github.com/corunet/kloadgen/discussions), [email](mailto:info@corunet.com) or [Twitter](https://twitter.com/corunet).
 
 ## 💜 Special thanks
 
