@@ -28,30 +28,30 @@ public class ProtoBufProcessorHelper {
 
   private static final String OPTIONAL = "optional";
 
-  Descriptors.Descriptor buildDescriptor(ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
+  final Descriptors.Descriptor buildDescriptor(final ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
 
-    DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
-    List<String> imports = schema.getImports();
+    final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
+    final List<String> imports = schema.getImports();
     for (String importedClass : imports) {
-      String schemaToString = new String(getClass().getClassLoader().getResourceAsStream(importedClass).readAllBytes());
-      var lines = new ArrayList<>(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
+      final String schemaToString = new String(getClass().getClassLoader().getResourceAsStream(importedClass).readAllBytes());
+      final var lines = new ArrayList<>(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
       if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
-        var importedSchema = processImported(lines);
+        final var importedSchema = processImported(lines);
         schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
         schemaBuilder.addSchema(importedSchema);
       }
     }
-    MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
-    HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+    final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
+    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     schemaBuilder.setPackage(schema.getPackageName());
     schemaBuilder.addMessageDefinition(buildMessageDefinition(messageElement.getName(), messageElement, nestedTypes));
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
-  private MessageDefinition buildMessageDefinition(String fieldName, TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
+  private MessageDefinition buildMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes) {
     fillNestedTypes(messageElement, nestedTypes);
-    MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
-    var element = (MessageElement) messageElement;
+    final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
+    final var element = (MessageElement) messageElement;
     extracted(nestedTypes, msgDef, element.getFields());
     for (var optionalField : element.getOneOfs()) {
       extracted(nestedTypes, msgDef, optionalField.getFields());
@@ -61,8 +61,8 @@ public class ProtoBufProcessorHelper {
 
   private void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList) {
     for (var elementField : fieldElementList) {
-      var elementFieldType = elementField.getType();
-      var dotType = checkDotType(elementFieldType);
+      final var elementFieldType = elementField.getType();
+      final var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
         addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes);
       }
@@ -72,8 +72,8 @@ public class ProtoBufProcessorHelper {
       }
 
       if (elementField.getType().startsWith("map")) {
-        var realType = StringUtils.chop(elementFieldType.substring(elementFieldType.indexOf(',') + 1).trim());
-        var mapDotType = checkDotType(realType);
+        final var realType = StringUtils.chop(elementFieldType.substring(elementFieldType.indexOf(',') + 1).trim());
+        final var mapDotType = checkDotType(realType);
 
         if (nestedTypes.containsKey(realType)) {
           addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes);
@@ -106,10 +106,10 @@ public class ProtoBufProcessorHelper {
     }
   }
 
-  private void addDefinition(MessageDefinition.Builder msgDef, String typeName, TypeElement typeElement, HashMap<String, TypeElement> nestedTypes) {
+  private void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes) {
     if (typeElement instanceof EnumElement) {
-      var enumElement = (EnumElement) typeElement;
-      EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
+      final var enumElement = (EnumElement) typeElement;
+      final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
       for (var constant : enumElement.getConstants()) {
         builder.addValue(constant.getName(), constant.getTag());
       }
@@ -121,7 +121,7 @@ public class ProtoBufProcessorHelper {
     }
   }
 
-  private void fillNestedTypes(TypeElement messageElement, HashMap<String, TypeElement> nestedTypes) {
+  private void fillNestedTypes(final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes) {
     if (!CollectionUtils.isEmpty(messageElement.getNestedTypes())) {
       messageElement.getNestedTypes().forEach(nestedType ->
                                                   nestedTypes.put(nestedType.getName(), nestedType)
@@ -133,21 +133,21 @@ public class ProtoBufProcessorHelper {
     return line -> !line.contains("//") && !line.isEmpty();
   }
 
-  private DynamicSchema processImported(List<String> importedLines) throws DescriptorValidationException {
+  private DynamicSchema processImported(final List<String> importedLines) throws DescriptorValidationException {
 
-    DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
+    final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
 
     String packageName = "";
-    var linesIterator = importedLines.listIterator();
+    final var linesIterator = importedLines.listIterator();
     while (linesIterator.hasNext()) {
-      var fileLine = linesIterator.next();
+      final var fileLine = linesIterator.next();
 
       if (fileLine.startsWith("package")) {
         packageName = StringUtils.chop(fileLine.substring(7).trim());
         schemaBuilder.setPackage(packageName);
       }
       if (fileLine.startsWith("message")) {
-        var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
+        final var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
         schemaBuilder.setName(packageName + "." + messageName);
         schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
 
@@ -160,12 +160,12 @@ public class ProtoBufProcessorHelper {
     return schemaBuilder.build();
   }
 
-  private MessageDefinition buildMessage(String messageName, ListIterator<String> messageLines) {
+  private MessageDefinition buildMessage(final String messageName, final ListIterator<String> messageLines) {
 
     boolean exit = false;
-    MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
+    final MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
     while (messageLines.hasNext() && !exit) {
-      var field = messageLines.next().trim().split("\\s");
+      final var field = messageLines.next().trim().split("\\s");
       if (ProtobufHelper.isValidType(field[0])) {
         messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
       } else if (ProtobufHelper.LABEL.contains(field[0])) {
@@ -178,7 +178,7 @@ public class ProtoBufProcessorHelper {
     return messageDefinition.build();
   }
 
-  public String checkIfChoppable(String field) {
+  public final String checkIfChoppable(final String field) {
     String choppedField = field;
     if (field.endsWith(";")) {
       choppedField = StringUtils.chop(field);
@@ -186,10 +186,10 @@ public class ProtoBufProcessorHelper {
     return choppedField;
   }
 
-  private String checkDotType(String subfieldType) {
+  private String checkDotType(final String subfieldType) {
     String dotType = "";
     if (subfieldType.startsWith(".") || subfieldType.contains(".")) {
-      String[] typeSplit = subfieldType.split("\\.");
+      final String[] typeSplit = subfieldType.split("\\.");
       dotType = typeSplit[typeSplit.length - 1];
     }
     return dotType;

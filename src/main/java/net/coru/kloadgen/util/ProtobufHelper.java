@@ -5,6 +5,10 @@ import java.util.Set;
 
 public final class ProtobufHelper {
 
+  public static final Set<String> LABEL = Set.of("required", "optional");
+
+  public static final Set<String> NOT_ACCEPTED_IMPORTS = Set.of("google/protobuf/descriptor.proto", "google/protobuf/compiler/plugin.proto");
+
   private static final Map<String, String> PROTOBUF_TYPES =
       Map.ofEntries(
           Map.entry("double", "double"),
@@ -23,17 +27,13 @@ public final class ProtobufHelper {
           Map.entry("string", "string"),
           Map.entry("bytes", "ByteString"));
 
-  public static final Set<String> LABEL = Set.of("required", "optional");
+  private ProtobufHelper() {}
 
-  public static final Set<String> NOT_ACCEPTED_IMPORTS = Set.of("google/protobuf/descriptor.proto", "google/protobuf/compiler/plugin.proto");
-
-  public static String translateType(String type) {
+  public static String translateType(final String type) {
     return PROTOBUF_TYPES.getOrDefault(type, null);
   }
 
-  public static boolean isValidType(String type) {
+  public static boolean isValidType(final String type) {
     return PROTOBUF_TYPES.containsKey(type);
   }
-
-  private ProtobufHelper() {}
 }

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.jmeter.report.dashboard.GenerationException;
 import org.apache.jmeter.report.dashboard.ReportGenerator;
 import org.apache.jmeter.samplers.Remoteable;
 import org.apache.jmeter.testelement.TestStateListener;
@@ -21,12 +22,12 @@ public class ListenToTest implements TestStateListener, Remoteable {
 
   private final ReportGenerator reportGenerator;
 
-  public ListenToTest(ReportGenerator reportGenerator) {
+  public ListenToTest(final ReportGenerator reportGenerator) {
     this.reportGenerator = reportGenerator;
   }
 
   @Override
-  public void testStarted() {
+  public final void testStarted() {
     if (log.isInfoEnabled()) {
       final long now = System.currentTimeMillis();
       log.info("{} ({})", JMeterUtils.getResString("running_test"), now);
@@ -34,24 +35,24 @@ public class ListenToTest implements TestStateListener, Remoteable {
   }
 
   @Override
-  public void testStarted(String host) {
+  public final void testStarted(final String host) {
     final long now = System.currentTimeMillis();
     log.info("Started remote host:  {} ({})", host, now);
   }
 
   @Override
-  public void testEnded() {
+  public final void testEnded() {
     endTest();
   }
 
   @Override
-  public void testEnded(String host) {
+  public final void testEnded(final String host) {
     final long now = System.currentTimeMillis();
     log.info("Finished remote host: {} ({})", host, now);
   }
 
   private void endTest() {
-    long now = System.currentTimeMillis();
+    final long now = System.currentTimeMillis();
     log.info("Tidying up ...    @ " + new Date(now) + " (" + now + ")");
 
     if (reportGenerator != null) {
@@ -59,7 +60,7 @@ public class ListenToTest implements TestStateListener, Remoteable {
         log.info("Generating Dashboard");
         reportGenerator.generate();
         log.info("Dashboard generated");
-      } catch (Exception ex) {
+      } catch (final GenerationException ex) {
         log.error("Error generating the report: {}", ex.getMessage(), ex);
       }
     }
@@ -72,10 +73,10 @@ public class ListenToTest implements TestStateListener, Remoteable {
         JMeterUtils.getPropDefault("jmeter.exit.check.pause", 2000);
 
     if (pauseToCheckForRemainingThreads > 0) {
-      Thread daemon = new Thread(() -> {
+      final Thread daemon = new Thread(() -> {
         try {
           TimeUnit.MILLISECONDS.sleep(pauseToCheckForRemainingThreads);
-        } catch (InterruptedException ignored) {
+        } catch (final InterruptedException ignored) {
           Thread.currentThread().interrupt();
         }
         log.warn("The JVM should have exited but did not.");

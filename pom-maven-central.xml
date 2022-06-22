@@ -7,9 +7,9 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>4.8.2</version>
+  <version>4.10.0</version>
   <name>KLoadGen</name>
-  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on Data specification</description>
+  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial data base on Data specification</description>
   <url>https://corunet.github.io/kloadgen/</url>
 
   <licenses>

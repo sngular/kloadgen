@@ -6,17 +6,18 @@
 
 package net.coru.kloadgen.exception;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class KLoadGenException extends RuntimeException {
 
-  public KLoadGenException(String message) {
+  public KLoadGenException(final String message) {
     super(message);
   }
 
-  public KLoadGenException(Exception exc) {
+  public KLoadGenException(final Exception exc) {
     super(exc);
   }
 
-  public KLoadGenException(String message, Exception exc) {
+  public KLoadGenException(final String message, final Exception exc) {
     super(message, exc);
   }
 }

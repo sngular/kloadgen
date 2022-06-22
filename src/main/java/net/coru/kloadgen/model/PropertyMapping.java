@@ -26,30 +26,30 @@ public class PropertyMapping extends AbstractTestElement {
 
   private String propertyValue;
 
-  public PropertyMapping(String propertyName, String propertyValue) {
+  public PropertyMapping(final String propertyName, final String propertyValue) {
     this.setPropertyName(propertyName);
     this.setPropertyValue(propertyValue);
     init();
   }
 
-  public void init() {
+  public final void init() {
     this.setName("Config properties");
   }
 
-  public String getPropertyName() {
+  public final String getPropertyName() {
     return getPropertyAsString(PROPERTY_NAME);
   }
 
-  public void setPropertyName(String propertyName) {
+  public final void setPropertyName(final String propertyName) {
     this.propertyName = propertyName;
     setProperty(PROPERTY_NAME, propertyName);
   }
 
-  public String getPropertyValue() {
+  public final String getPropertyValue() {
     return getPropertyAsString(PROPERTY_VALUE);
   }
 
-  public void setPropertyValue(String propertyValue) {
+  public final void setPropertyValue(final String propertyValue) {
     this.propertyValue = propertyValue;
     setProperty(PROPERTY_VALUE, propertyValue);
   }

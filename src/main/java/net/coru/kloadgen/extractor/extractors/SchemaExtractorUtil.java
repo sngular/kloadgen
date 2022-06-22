@@ -10,11 +10,14 @@ public final class SchemaExtractorUtil {
 
   public static final String MAP_TYPE_POSTFIX = "-map";
 
-  public static String postFixNameArray(String fieldName) {
+  private SchemaExtractorUtil() {
+  }
+
+  public static String postFixNameArray(final String fieldName) {
     return fieldName + ARRAY_NAME_POSTFIX;
   }
 
-  public static String postFixNameMap(String fieldName) {
+  public static String postFixNameMap(final String fieldName) {
     return fieldName + MAP_NAME_POSTFIX;
   }
 }

@@ -28,7 +28,7 @@ public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<
   private static final int ID_SIZE = 4;
 
   @Override
-  public byte[] serialize(String topic, T data) {
+  public final byte[] serialize(final String topic, final T data) {
     try {
       byte[] result = null;
 
@@ -47,13 +47,13 @@ public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<
         log.debug("serialized data='{}'", DatatypeConverter.printHexBinary(result));
       }
       return result;
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       throw new SerializationException("Can't serialize data='" + data + "' for topic='" + topic + "'", ex);
     }
   }
 
   @Override
-  public byte[] serialize(String topic, Headers headers, T data) {
+  public final byte[] serialize(final String topic, final Headers headers, final T data) {
     return serialize(topic, data);
   }
 

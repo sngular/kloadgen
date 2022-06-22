@@ -7,6 +7,7 @@
 package net.coru.kloadgen.strategy;
 
 import java.util.Map;
+import java.util.Objects;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
@@ -16,40 +17,41 @@ import org.apache.kafka.common.errors.SerializationException;
 
 public class RecordSubjectNameStrategy implements io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy {
 
-  @Deprecated
-  public String getSubjectName(String topic, boolean isKey, Object value) {
+  @Deprecated(forRemoval = true)
+  public final String getSubjectName(final String topic, final boolean isKey, final Object value) {
     return subjectName(topic, isKey, new AvroSchema(AvroSchemaUtils.getSchema(value)));
   }
 
   @Override
-  public String subjectName(String topic, boolean isKey, ParsedSchema parsedSchema) {
-    if (parsedSchema == null) {
-      return null;
+  public final String subjectName(final String topic, final boolean isKey, final ParsedSchema parsedSchema) {
+    String result = null;
+    if (parsedSchema != null) {
+      result = getRecordName(parsedSchema, isKey);
     }
-    return getRecordName(parsedSchema, isKey);
+    return result;
   }
 
-  protected String getRecordName(ParsedSchema schema, boolean isKey) {
-    String name = ((AvroSchema) schema).rawSchema().getObjectProps().get("subject").toString();
-    if (name != null) {
-      return name;
+  private String getRecordName(final ParsedSchema schema, final boolean isKey) {
+    final String name = ((AvroSchema) schema).rawSchema().getObjectProps().get("subject").toString();
+    if (Objects.isNull(name)) {
+      if (isKey) {
+        throwTheException(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, "key");
+      } else {
+        throwTheException(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, "value");
+      }
     }
+    return name;
+  }
 
-    // isKey is only used to produce more helpful error messages
-    if (isKey) {
-      throw new SerializationException("In configuration "
-                                       + AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY + " = "
-                                       + getClass().getName() + ", the message key must only be a record schema");
-    } else {
-      throw new SerializationException("In configuration "
-                                       + AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY + " = "
-                                       + getClass().getName() + ", the message value must only be a record schema");
-    }
+  private void throwTheException(final String configuration, final String type) {
+    throw new SerializationException("In configuration "
+                                     + configuration + " = "
+                                     + getClass().getName() + ", the message " + type + " must only be a record schema");
   }
 
   @Override
-  public void configure(Map<String, ?> configs) {
-
+  public final void configure(final Map<String, ?> configs) {
+    // No configuration required.
   }
 
 }

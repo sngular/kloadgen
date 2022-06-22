@@ -46,32 +46,32 @@ public class ValueFileDeserializedConfigElementBeanInfo extends BeanInfoSupport 
         VALUE_SCHEMA_DEFINITION
     });
 
-    PropertyDescriptor deserializerPropertyProps = property(VALUE_DESERIALIZER_PROPERTY);
+    final PropertyDescriptor deserializerPropertyProps = property(VALUE_DESERIALIZER_PROPERTY);
     deserializerPropertyProps.setPropertyEditorClass(ValueDeserializerPropertyEditor.class);
     deserializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     deserializerPropertyProps.setValue(DEFAULT, "");
     deserializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
+    final PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
     subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     subjectNameProps.setValue(DEFAULT, "");
     subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor schemaType = property(VALUE_SCHEMA_TYPE);
+    final PropertyDescriptor schemaType = property(VALUE_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
     schemaType.setValue(DEFAULT, "");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    PropertyDescriptor avroSchemaProps = property(VALUE_SCHEMA_DEFINITION);
+    final PropertyDescriptor avroSchemaProps = property(VALUE_SCHEMA_DEFINITION);
     avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
     avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     avroSchemaProps.setValue(DEFAULT, "");
     avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
-    TypeEditor tableEditor = TypeEditor.TableEditor;
-    PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
+    final TypeEditor tableEditor = TypeEditor.TableEditor;
+    final PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
     tableProperties.setValue(TableEditor.HEADERS,
                              new String[]{

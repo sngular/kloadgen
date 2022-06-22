@@ -14,6 +14,7 @@ import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
 import javax.swing.JPanel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.jmeter.gui.ClearGui;
@@ -31,59 +32,59 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
   public SchemaConverterPropertyEditor() {
   }
 
-  public SchemaConverterPropertyEditor(Object source) {
+  public SchemaConverterPropertyEditor(final Object source) {
     super(source);
     this.setValue(source);
   }
 
-  public SchemaConverterPropertyEditor(PropertyDescriptor propertyDescriptor) {
+  public SchemaConverterPropertyEditor(final PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
     this.propertyDescriptor = propertyDescriptor;
   }
 
   @Override
-  public void actionPerformed(ActionEvent event) {
+  public final void actionPerformed(final ActionEvent event) {
     throw new NotImplementedException("Not implementation is required");
   }
 
   @Override
-  public void clearGui() {}
+  public final void clearGui() {}
 
   @Override
-  public void setDescriptor(PropertyDescriptor descriptor) {
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
     propertyDescriptor = descriptor;
   }
 
   @Override
-  public Component getCustomEditor() {
+  public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public String getAsText() {
+  public final String getAsText() {
     return schemaAsString;
   }
 
   @Override
-  public void setAsText(String value) throws IllegalArgumentException {
+  public final void setAsText(final String value) throws IllegalArgumentException {
     propertyDescriptor.setValue("schemaAsString", value);
     schemaAsString = value;
   }
 
   @Override
-  public void setValue(Object value) {
+  public final void setValue(final Object value) {
     if (Objects.nonNull(value)) {
       setAsText(value.toString());
     }
   }
 
   @Override
-  public Object getValue() {
+  public final Object getValue() {
     return getAsText();
   }
 
   @Override
-  public boolean supportsCustomEditor() {
+  public final boolean supportsCustomEditor() {
     return true;
   }
 

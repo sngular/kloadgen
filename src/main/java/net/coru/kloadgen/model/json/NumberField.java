@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
 
@@ -33,8 +32,8 @@ public class NumberField extends Field {
 
   @Builder(toBuilder = true)
   public NumberField(
-      String name, String defaultValue, Number minimum, Number maximum, Number exclusiveMinimum,
-      Number exclusiveMaximum, Number multipleOf) {
+      final String name, final String defaultValue, final Number minimum, final Number maximum, final Number exclusiveMinimum,
+      final Number exclusiveMaximum, final Number multipleOf) {
     super(name, "number");
     this.defaultValue = defaultValue;
     this.maximum = maximum;
@@ -45,7 +44,7 @@ public class NumberField extends Field {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) {
       return true;
     }
@@ -55,38 +54,38 @@ public class NumberField extends Field {
     if (!super.equals(o)) {
       return false;
     }
-    NumberField that = (NumberField) o;
-    return Objects.equals(defaultValue, that.defaultValue) &&
-           compare(minimum, that.minimum) &&
-           compare(maximum, that.maximum) &&
-           compare(exclusiveMinimum, that.exclusiveMinimum) &&
-           compare(exclusiveMaximum, that.exclusiveMaximum) &&
-           compare(multipleOf, that.multipleOf) &&
-           Objects.equals(super.getName(), ((NumberField) o).getName()) &&
-           Objects.equals(super.getType(), ((NumberField) o).getType());
+    final NumberField that = (NumberField) o;
+    return Objects.equals(defaultValue, that.defaultValue)
+           && compare(minimum, that.minimum)
+           && compare(maximum, that.maximum)
+           && compare(exclusiveMinimum, that.exclusiveMinimum)
+           && compare(exclusiveMaximum, that.exclusiveMaximum)
+           && compare(multipleOf, that.multipleOf)
+           && Objects.equals(super.getName(), ((NumberField) o).getName())
+           && Objects.equals(super.getType(), ((NumberField) o).getType());
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(super.hashCode(), defaultValue, minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf);
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
   @Override
-  public List<Field> getProperties() {
+  public final List<Field> getProperties() {
     return Collections.singletonList(this);
   }
 
-  public boolean compare(Number a, Number b) {
+  public final boolean compare(final Number number1, final Number number2) {
     boolean equals = false;
-    if (Objects.equals(a, b)) {
+    if (Objects.equals(number1, number2)) {
       equals = true;
-    } else if (Objects.nonNull(a)) {
-      equals = a.toString().equalsIgnoreCase(b.toString());
+    } else if (Objects.nonNull(number1)) {
+      equals = number1.toString().equalsIgnoreCase(number2.toString());
     }
     return equals;
   }

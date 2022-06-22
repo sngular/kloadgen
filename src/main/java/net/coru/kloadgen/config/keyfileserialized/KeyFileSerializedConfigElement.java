@@ -6,22 +6,17 @@
 
 package net.coru.kloadgen.config.keyfileserialized;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.KEY_NAME_STRATEGY;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA_TYPE;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY;
-
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.ProducerKeysHelper;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
@@ -34,6 +29,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class KeyFileSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String keySubjectName;
@@ -49,16 +45,16 @@ public class KeyFileSerializedConfigElement extends ConfigTestElement implements
   private String keyNameStrategy;
 
   @Override
-  public void iterationStart(LoopIterationEvent loopIterationEvent) {
+  public final void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
-    JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(KEY_SCHEMA, keySchemaDefinition);
-    variables.putObject(KEY_SCHEMA_PROPERTIES, keySchemaProperties);
-    variables.putObject(KEY_SUBJECT_NAME, keySubjectName);
-    variables.putObject(KEY_SCHEMA_TYPE, keySchemaType);
-    variables.putObject(KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
-    variables.putObject(KEY_NAME_STRATEGY, keyNameStrategy);
-    variables.putObject(SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
+    final JMeterVariables variables = JMeterContextService.getContext().getVariables();
+    variables.putObject(PropsKeysHelper.KEY_SCHEMA, keySchemaDefinition);
+    variables.putObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES, keySchemaProperties);
+    variables.putObject(PropsKeysHelper.KEY_SUBJECT_NAME, keySubjectName);
+    variables.putObject(PropsKeysHelper.KEY_SCHEMA_TYPE, keySchemaType);
+    variables.putObject(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
+    variables.putObject(ProducerKeysHelper.KEY_NAME_STRATEGY, keyNameStrategy);
+    variables.putObject(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 
 }

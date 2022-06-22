@@ -6,6 +6,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Objects;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
@@ -36,8 +37,6 @@ public class AutoCompletion extends PlainDocument {
 
   private JTextComponent editor;
 
-  // flag to indicate if setSelectedItem has been called
-  // subsequent calls to remove/insertString should be ignored
   private boolean selecting = false;
 
   private boolean hitBackspace = false;
@@ -67,12 +66,10 @@ public class AutoCompletion extends PlainDocument {
         }
         hitBackspace = false;
         switch (e.getKeyCode()) {
-          // determine if the pressed key is backspace (needed by the remove method)
           case KeyEvent.VK_BACK_SPACE:
             hitBackspace = true;
             hitBackspaceOnSelection = editor.getSelectionStart() != editor.getSelectionEnd();
             break;
-          // ignore delete key
           case KeyEvent.VK_DELETE:
             e.consume();
             comboBox.getToolkit().beep();
@@ -82,36 +79,34 @@ public class AutoCompletion extends PlainDocument {
         }
       }
     };
-    // Bug 5100422 on Java 1.5: Editable JComboBox won't hide popup when tabbing out
     hidePopupOnFocusLoss = System.getProperty("java.version").startsWith("1.5");
-    // Highlight whole text when gaining focus
     editorFocusListener = new FocusAdapter() {
-      public void focusGained(FocusEvent e) {
+      @Override
+      public void focusGained(final FocusEvent e) {
         highlightCompletedText(0);
       }
 
-      public void focusLost(FocusEvent e) {
-        // Workaround for Bug 5100422 - Hide Popup on focus loss
+      @Override
+      public void focusLost(final FocusEvent e) {
         if (hidePopupOnFocusLoss) {
           comboBox.setPopupVisible(false);
         }
       }
     };
     configureEditor(comboBox.getEditor());
-    // Handle initially selected object
-    Object selected = comboBox.getSelectedItem();
+    final Object selected = comboBox.getSelectedItem();
     if (selected != null) {
       setText(selected.toString());
     }
     highlightCompletedText(0);
   }
 
-  private void highlightCompletedText(int start) {
+  private void highlightCompletedText(final int start) {
     editor.setCaretPosition(getLength());
     editor.moveCaretPosition(start);
   }
 
-  private void configureEditor(ComboBoxEditor newEditor) {
+  private void configureEditor(final ComboBoxEditor newEditor) {
     if (editor != null) {
       editor.removeKeyListener(editorKeyListener);
       editor.removeFocusListener(editorFocusListener);
@@ -125,26 +120,24 @@ public class AutoCompletion extends PlainDocument {
     }
   }
 
-  private void setText(String text) {
+  private void setText(final String text) {
     try {
       // remove all text and insert the completed string
       super.remove(0, getLength());
       super.insertString(0, text, null);
-    } catch (BadLocationException e) {
-      throw new KLoadGenException(e.toString());
+    } catch (final BadLocationException ex) {
+      throw new KLoadGenException(ex.toString());
     }
   }
 
-  public static void main(String[] args) {
-    javax.swing.SwingUtilities.invokeLater(() -> createAndShowGUI());
+  public static void main(final String[] args) {
+    javax.swing.SwingUtilities.invokeLater(AutoCompletion::createAndShowGUI);
   }
 
   private static void createAndShowGUI() {
-    // the combo box (add/modify items if you like to)
     final JComboBox<String> comboBox = new JComboBox<>(new String[]{"Ester", "Jordi", "Jordina", "Jorge", "Sergi"});
     enable(comboBox);
 
-    // create and show a window containing the combo box
     final JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.getContentPane().add(comboBox);
@@ -152,29 +145,25 @@ public class AutoCompletion extends PlainDocument {
     frame.setVisible(true);
   }
 
-  public static void enable(JComboBox<String> comboBox) {
-    // has to be editable
+  public static void enable(final JComboBox<String> comboBox) {
     comboBox.setEditable(true);
-    // change the editor's document
     new AutoCompletion(comboBox);
   }
 
-  public void remove(int offs, int len) throws BadLocationException {
-    // return immediately when selecting an item
+  @Override
+  public final void remove(final int offs, final int len) throws BadLocationException {
     int editOffs = offs;
     if (selecting) {
       return;
     }
     if (hitBackspace) {
-      // user hit backspace => move the selection backwards
-      // old item keeps being selected
+
       if (editOffs > 0) {
         if (hitBackspaceOnSelection) {
           editOffs--;
         }
       } else {
-        // User hit backspace with the cursor positioned on the start => beep
-        comboBox.getToolkit().beep(); // when available use: UIManager.getLookAndFeel().provideErrorFeedback(comboBox);
+        comboBox.getToolkit().beep();
       }
       highlightCompletedText(editOffs);
     } else {
@@ -182,58 +171,53 @@ public class AutoCompletion extends PlainDocument {
     }
   }
 
-  public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-    // return immediately when selecting an item
+  @Override
+  public final void insertString(final int offs, final String str, final AttributeSet a) throws BadLocationException {
     int editOffs = offs;
     if (selecting) {
       return;
     }
-    // insert the string into the document
     super.insertString(editOffs, str, a);
-    // lookup and select a matching item
     Object item = lookupItem(getText(0, getLength()));
     if (item != null) {
       setSelectedItem(item);
     } else {
-      // keep old item selected if there is no match
       item = comboBox.getSelectedItem();
-      // imitate no insert (later on offs will be incremented by str.length(): selection won't move forward)
       editOffs = editOffs - str.length();
-      // provide feedback to the user that his input has been received but can not be accepted
-      comboBox.getToolkit().beep(); // when available use: UIManager.getLookAndFeel().provideErrorFeedback(comboBox);
+      comboBox.getToolkit().beep();
     }
-    setText(item.toString());
-    // select the completed part
+    setText(Objects.requireNonNull(item).toString());
     highlightCompletedText(editOffs + str.length());
   }
 
-  private Object lookupItem(String pattern) {
-    Object selectedItem = model.getSelectedItem();
-    // only search for a different item if the currently selected does not match
+  private Object lookupItem(final String pattern) {
+    final Object selectedItem = model.getSelectedItem();
+    Object returnObject = null;
     if (selectedItem != null && startsWithIgnoreCase(selectedItem.toString(), pattern)) {
-      return selectedItem;
+      returnObject = selectedItem;
     } else {
-      // iterate over all items
-      for (int i = 0, n = model.getSize(); i < n; i++) {
-        Object currentItem = model.getElementAt(i);
-        // current item starts with the pattern?
+      int i = 0;
+      boolean notFound = true;
+      while (i < model.getSize() && notFound) {
+        final Object currentItem = model.getElementAt(i);
         if (currentItem != null && startsWithIgnoreCase(currentItem.toString(), pattern)) {
-          return currentItem;
+          returnObject = currentItem;
+          notFound = false;
+        } else {
+          i++;
         }
       }
     }
-    // no item starts with the pattern => return null
-    return null;
+    return returnObject;
   }
 
-  private void setSelectedItem(Object item) {
+  private void setSelectedItem(final Object item) {
     selecting = true;
     model.setSelectedItem(item);
     selecting = false;
   }
 
-  // checks if str1 starts with str2 - ignores case
-  private boolean startsWithIgnoreCase(String str1, String str2) {
+  private boolean startsWithIgnoreCase(final String str1, final String str2) {
     return str1.toUpperCase().startsWith(str2.toUpperCase());
   }
 }
