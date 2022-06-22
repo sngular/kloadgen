@@ -75,13 +75,12 @@ public final class AvroSchemaProcessor {
 
       int generatedProperties = 0;
       int elapsedProperties = 0;
-      int level = 0;
 
       while (!fieldExpMappingsQueue.isEmpty()) {
-        final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, "", level);
-        final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, "", level);
+        int level = 0;
+        final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, level);
+        final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
         final String typeFilter = cleanPath.replaceAll(fieldName, "");
-        level = 0;
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek()
                                                                                    .getFieldName().contains(fieldName))
@@ -171,7 +170,7 @@ public final class AvroSchemaProcessor {
       final GenericRecord entity, final String fieldName, int level) {
     final FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     final Integer arraySize = SchemaProcessorLib.calculateSize(fieldValueMapping.getFieldName(),
-                                                               SchemaProcessorLib.getCleanMethodName(fieldValueMapping, fieldName, level));
+                                                               SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level));
 
     entity.put(fieldName, createObjectArray(extractType(entity.getSchema().getField(fieldName),
                                                         Type.ARRAY).getElementType(),
@@ -184,7 +183,7 @@ public final class AvroSchemaProcessor {
   private FieldValueMapping processFieldValueMappingAsRecordMap(final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue,
       final GenericRecord entity, final String fieldName, int level) {
     final FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    final Integer mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), SchemaProcessorLib.getCleanMethodName(fieldValueMapping, fieldName, level));
+    final Integer mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level));
 
     entity.put(fieldName, createObjectMap(extractType(entity.getSchema().getField(fieldName), Type.MAP).getValueType(),
                                           fieldName,
@@ -287,7 +286,7 @@ public final class AvroSchemaProcessor {
     return result;
   }
 
-  private GenericRecord createObject(final Schema subSchema, final String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, int level) {
+  private GenericRecord createObject(final Schema subSchema, final String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final int rootLevel) {
     Schema innerSchema = subSchema;
     if (subSchema.getType().equals(Type.MAP)) {
       innerSchema = subSchema.getValueType();
@@ -305,15 +304,15 @@ public final class AvroSchemaProcessor {
     int generatedProperties = 0;
     int elapsedProperties = 0;
 
-    level++;
+    int level = rootLevel + 1;
 
     while (!fieldExpMappingsQueue.isEmpty()
            && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + rootFieldName + "$")
                || fieldValueMapping.getFieldName().matches(rootFieldName + "\\..*")
                || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\[.*")
                || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\..*"))) {
-      final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, rootFieldName, level);
-      final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, rootFieldName, level);
+      final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, level);
+      final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
       final String typeFilter = cleanPath.replaceAll(fieldNameSubEntity, "");
 
       generatedProperties++;

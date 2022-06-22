@@ -118,34 +118,24 @@ public final class SchemaProcessorLib {
 
   }
 
-  static String cleanUpPath(final FieldValueMapping fieldValueMapping, final String fieldName, int level) {
-    StringBuilder cleanPathBuilder = new StringBuilder();
-
+  static String cleanUpPath(final FieldValueMapping fieldValueMapping, int level) {
     String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
-    int levelCount = level;
-    while (levelCount < splitPath.length) {
-      cleanPathBuilder.append(splitPath[levelCount]);
-      if (levelCount != splitPath.length - 1) {
-        cleanPathBuilder.append(".");
-      }
-      levelCount++;
-    }
-
-    return cleanPathBuilder.toString();
+    List<String> splitPathAux = Arrays.asList(Arrays.copyOfRange(splitPath, level, splitPath.length));
+    return String.join(".",splitPathAux);
   }
 
-  static String getCleanMethodName(final FieldValueMapping fieldValueMapping, final String fieldName, int level) {
-    return getFullMethodName(fieldValueMapping, fieldName, level).replaceAll("\\[[0-9]*:?]", "");
+  static String getCleanMethodName(final FieldValueMapping fieldValueMapping, int level) {
+    return getFullMethodName(fieldValueMapping, level).replaceAll("\\[[0-9]*:?]", "");
   }
 
-  static String getFullMethodName(final FieldValueMapping fieldValueMapping, final String fieldName, int level) {
-    final String pathToClean = cleanUpPath(fieldValueMapping, fieldName, level);
+  static String getFullMethodName(final FieldValueMapping fieldValueMapping, int level) {
+    final String pathToClean = cleanUpPath(fieldValueMapping, level);
     final int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
     return pathToClean.substring(0, endOfField);
   }
 
   static String getMapCleanMethodName(final FieldValueMapping fieldValueMapping, final String fieldName, int level) {
-    final String pathToClean = cleanUpPath(fieldValueMapping, fieldName, level);
+    final String pathToClean = cleanUpPath(fieldValueMapping, level);
     final int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
   }

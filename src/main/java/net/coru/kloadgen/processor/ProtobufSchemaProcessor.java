@@ -71,8 +71,8 @@ public class ProtobufSchemaProcessor {
       int level = 0;
 
       while (!fieldExpMappingsQueue.isEmpty()) {
-        final String methodName = SchemaProcessorLib.cleanUpPath(fieldValueMapping, "", level);
-        final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, "", level);
+        final String methodName = SchemaProcessorLib.cleanUpPath(fieldValueMapping, level);
+        final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
         final String typeFilter = methodName.replaceAll(fieldName, "");
         final String fieldType = fieldValueMapping.getFieldType();
         level = 0;
@@ -121,7 +121,7 @@ public class ProtobufSchemaProcessor {
               throw new KLoadGenException("Wrong configuration Map - Array");
             }
           } else if (typeFilter.startsWith(".")) {
-            final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, "", level);
+            final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
             messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName),
                                     createObject(getDescriptorForField(messageBuilder, fieldNameSubEntity), fieldNameSubEntity, fieldExpMappingsQueue, level));
           } else {
@@ -190,8 +190,8 @@ public class ProtobufSchemaProcessor {
                || fieldValueMapping.getFieldName().matches(parentFieldName + "\\..*")
                || fieldValueMapping.getFieldName().matches(".*" + parentFieldName + "\\[.*")
                || fieldValueMapping.getFieldName().matches(".*" + parentFieldName + "\\..*"))) {
-      final String methodName = SchemaProcessorLib.cleanUpPath(fieldValueMapping, parentFieldName, level);
-      final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, parentFieldName, level);
+      final String methodName = SchemaProcessorLib.cleanUpPath(fieldValueMapping, level);
+      final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
       final String collectionTail = methodName.replaceAll(fieldName, "");
       final String fieldType = fieldValueMapping.getFieldType();
 
@@ -246,7 +246,7 @@ public class ProtobufSchemaProcessor {
             processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, messageBuilder, parentFieldName, fieldName, level);
           }
         } else if (collectionTail.startsWith(".")) {
-          final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, parentFieldName, level);
+          final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
           messageBuilder.setField(messageBuilder.getDescriptorForType().findFieldByName(fieldName),
                                   createObject(getDescriptorForField(messageBuilder, fieldNameSubEntity),
                                                fieldNameSubEntity,
@@ -322,7 +322,7 @@ public class ProtobufSchemaProcessor {
 
   private void processFieldValueMappingAsSimpleMap(final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final DynamicMessage.Builder messageBuilder, final String fieldName, int level) {
     final var fieldValueMapping = fieldExpMappingsQueue.element();
-    final var mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), SchemaProcessorLib.getCleanMethodName(fieldValueMapping, fieldName, level));
+    final var mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level));
     messageBuilder.setField(getFieldDescriptorForField(messageBuilder, fieldName),
                             createSimpleObjectMap(messageBuilder, fieldName, mapSize, fieldExpMappingsQueue)
     );
