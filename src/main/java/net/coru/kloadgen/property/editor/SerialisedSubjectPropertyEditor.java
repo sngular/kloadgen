@@ -96,7 +96,7 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
           final var tableEditor = (TableEditor) propertyEditor;
-          if (tableEditor.getValue() instanceof List && ((List<?>) tableEditor.getValue()).get(0) instanceof FieldValueMapping) {
+          if (tableEditor.getValue() instanceof List) {
             propertyEditor.setValue(mergeValue((List<FieldValueMapping>) tableEditor.getValue(), attributeList.getRight()));
           }
         } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
