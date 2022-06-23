@@ -303,7 +303,6 @@ public final class AvroSchemaProcessor {
 
     int generatedProperties = 0;
     int elapsedProperties = 0;
-
     int level = rootLevel + 1;
 
     while (!fieldExpMappingsQueue.isEmpty()
@@ -342,9 +341,7 @@ public final class AvroSchemaProcessor {
         } else {
           fieldValueMapping = nextField;
         }
-
       } else {
-
         if (typeFilter.matches("\\[?..]\\[.*") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")
             && !typeFilter.startsWith(".")) {
           if (SchemaProcessorLib.checkIfMapArray(fieldValueMapping.getFieldType())) {
