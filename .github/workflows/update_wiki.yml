@@ -24,7 +24,7 @@ jobs:
       run: |
         cp -rf kloadgen/docs/* wiki/
         cd wiki
-        grep -lr "link:[a-zA-Z0-9_.-]*.asciidoc.*" .| xargs -r sed -i '/^.*link:/ s/.asciidoc//g'
+        grep -lr "(.*\.md)" *|xargs  -r sed -i 's/\.md//g'
         echo ">"
         git diff-index --quiet HEAD & git status -s
         echo "<"
