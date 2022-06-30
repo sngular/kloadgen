@@ -43,27 +43,27 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
 
   private final Set<Type> typesSet = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
 
-  private Schema schema;
+  private final Schema schema;
 
-  private SchemaMetadata metadata;
+  private final SchemaMetadata metadata;
 
-  private AvroGeneratorTool avroGeneratorTool;
+  private final AvroGeneratorTool avroGeneratorTool;
 
-  private RandomObject randomObject;
+  private final RandomObject randomObject;
 
-  private RandomMap randomMap;
+  private final RandomMap randomMap;
 
-  private RandomArray randomArray;
+  private final RandomArray randomArray;
 
   private static final RandomSequence randomSequence = new RandomSequence();
 
-  private Map<String, GenericRecord> entity = new HashMap<>();
+  private final Map<String, GenericRecord> entity = new HashMap<>();
 
   public AvroObjectCreator(Object schema, SchemaMetadata metadata) {
     if(schema instanceof ParsedSchema) {
       this.schema = (Schema) ((ParsedSchema)schema).rawSchema();
     }
-    else if(schema instanceof Schema) {
+    else {
       this.schema = (Schema) schema;
     }
     this.metadata = metadata;
@@ -95,7 +95,7 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
 
   @Override
   public Object createBasicMap(final String fieldName, final String fieldType, final Integer mapSize, final Integer fieldValueLength, final List<String> fieldValuesList) {
-    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    /*List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(fieldValue ->
                                  fieldValue.matches("\\$\\{\\w*}") ?
                                      JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
@@ -115,12 +115,32 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
       return randomMap.generateMap(fieldType, mapSize, parameterList, fieldValueLength, 0, Collections.emptyMap());
     }
 
-    return value;
+    return value;*/
+    return null;
   }
 
   @Override
-  public Object createBasicArray(final String fieldName, final String fieldType, final Integer calculateSize, final Integer valueSize, final List<String> fieldValuesList) {
-    return null;
+  public Object createBasicArray(final String fieldName, final String fieldType, final Integer arraySize, final Integer valueLength, final List<String> fieldValuesList) {
+    List<String> parameterList = new ArrayList<>(fieldValuesList);
+    parameterList.replaceAll(fieldValue ->
+                                 fieldValue.matches("\\$\\{\\w*}") ?
+                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
+                                     fieldValue
+    );
+    List value = new ArrayList<>(arraySize);
+    if ("seq".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(fieldType))) {
+        value.add(randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
+      } else {
+        for (int i = arraySize; i > 0; i--) {
+          value.add(randomSequence.generateSeq(fieldName, fieldType, parameterList, context));
+        }
+      }
+    } else {
+      value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
+    }
+
+    return value;
   }
 
   @Override
@@ -137,11 +157,12 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
     } else {
       subEntity.getSchema();
     }
-    return avroGeneratorTool.generateObject(
+    /*return avroGeneratorTool.generateObject(
         subEntity.getSchema().getField(fieldName),
         fieldName, fieldType, valueLength, fieldValuesList,
         extractConstraints(subEntity.getSchema().getField(fieldName))
-    );
+    );*/
+    return null;
   }
 
   private GenericRecord createRecord(Schema schema) {
@@ -166,19 +187,5 @@ public class AvroObjectCreator extends SchemaProcessorLib implements ProcessorOb
       }
     }
     return isRecord;
-  }
-
-  private Map<ConstraintTypeEnum, String> extractConstraints(Schema.Field field) {
-    Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-
-    if (Objects.nonNull(field.schema().getObjectProp("precision"))) {
-      constraints.put(ConstraintTypeEnum.PRECISION, field.schema().getObjectProp("precision").toString());
-    }
-
-    if (Objects.nonNull(field.schema().getObjectProp("scale"))) {
-      constraints.put(ConstraintTypeEnum.SCALE, field.schema().getObjectProp("scale").toString());
-    }
-
-    return constraints;
   }
 }

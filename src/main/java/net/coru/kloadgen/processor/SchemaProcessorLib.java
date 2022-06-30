@@ -8,6 +8,7 @@ package net.coru.kloadgen.processor;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -31,13 +32,13 @@ public abstract class SchemaProcessorLib {
 
   protected static final Map<String, Object> context = new HashMap<>();
 
-  /*private static final RandomObject randomObject = new RandomObject();
+  private static final RandomObject randomObject = new RandomObject();
 
   private static final RandomMap randomMap = new RandomMap();
 
   private static final RandomArray randomArray = new RandomArray();
 
-  private static final RandomSequence randomSequence = new RandomSequence();*/
+  private static final RandomSequence randomSequence = new RandomSequence();
 
   static boolean checkIfIsRecordMapArray(String cleanPath) {
     var indexOfArrayIdentifier = StringUtils.substring(cleanPath, cleanPath.indexOf("["), cleanPath.indexOf(":]"));
@@ -120,31 +121,32 @@ public abstract class SchemaProcessorLib {
 
   }
 
-  protected static String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName) {
-    int startPosition = 0;
-    String cleanPath;
-    if (StringUtils.isNotEmpty(fieldName)) {
-      startPosition = fieldValueMapping.getFieldName().indexOf(fieldName) + fieldName.length() + 1;
-    }
-    cleanPath = fieldValueMapping.getFieldName().substring(startPosition);
-    if (cleanPath.matches("^(\\d*:*]).*$")) {
-      cleanPath = cleanPath.substring(cleanPath.indexOf(".") + 1);
-    }
-    return cleanPath;
+  protected static String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
+    String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
+    return String.join(".", Arrays.copyOfRange(splitPath, level, splitPath.length));
   }
 
-  protected static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
-    return getFullMethodName(fieldValueMapping, fieldName).replaceAll("\\[[0-9]*:?]", "");
+  protected static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
+    return getFullMethodName(fieldValueMapping, fieldName, level).replaceAll("\\[[0-9]*:?]", "");
   }
 
-  static String getFullMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
-    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
+  protected static String getCompleteSubfieldName(String cleanPath) {
+    return cleanPath.substring(0, cleanPath.indexOf(".")>0?cleanPath.indexOf(".")+1:cleanPath.length());
+  }
+
+  static String getTypeFilter(String fieldName, String cleanPath) {
+    String tmpCleanPath = cleanPath.replaceAll(fieldName, "");
+    return tmpCleanPath.substring(0, tmpCleanPath.indexOf(".")>0?tmpCleanPath.indexOf(".")+1:tmpCleanPath.length());
+  }
+
+  static String getFullMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
+    String pathToClean = cleanUpPath(fieldValueMapping, fieldName, level);
     int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
     return pathToClean.substring(0, endOfField);
   }
 
-  protected static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName) {
-    String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
+  protected static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
+    String pathToClean = cleanUpPath(fieldValueMapping, fieldName, level);
     int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
   }
@@ -174,7 +176,7 @@ public abstract class SchemaProcessorLib {
     return value;
   }*/
 
-  static Object generateRandomList(String fieldName, String fieldType, int arraySize, Integer valueLength, List<String> fieldValuesList) {
+  /*static Object generateRandomList(String fieldName, String fieldType, int arraySize, Integer valueLength, List<String> fieldValuesList) {
 
     List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(fieldValue ->
@@ -205,13 +207,13 @@ public abstract class SchemaProcessorLib {
   protected static Object createArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
     return generateRandomList(fieldName, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
-  }
+  }*/
 
   /*protected static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
     return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, 0, fieldExpMappings);
   }*/
 
-  protected static Map<String, Object> createSimpleTypeArrayMap(
+  /*protected static Map<String, Object> createSimpleTypeArrayMap(
       String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
     Map<String, Object> result = new HashMap<>(mapSize);
     String type = fieldType;
@@ -284,5 +286,5 @@ public abstract class SchemaProcessorLib {
     } else {
       return ProcessorFieldTypeEnum.FINAL;
     }
-  }
+  }*/
 }

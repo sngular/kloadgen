@@ -17,7 +17,7 @@ import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 
 
-public class ProtobufObjectCreator extends ProtoBufProcessorHelper implements ProcessorObjectCreator {
+public class ProtobufObjectCreator extends ProtoBufProcessorHelper  {
 
   private Descriptors.Descriptor schema;
 
@@ -42,54 +42,4 @@ public class ProtobufObjectCreator extends ProtoBufProcessorHelper implements Pr
     this.generatorTool = new ProtoBufGeneratorTool();
   }
 
-  @Override
-  public Object createObjectChain(FieldValueMapping fieldValueMapping) {
-    switch(objectType) {
-      case RECORD_MAP_MAP:
-
-        return null;
-      case RECORD_ARRAY_ARRAY:
-
-        return null;
-      case RECORD_MAP_ARRAY:
-
-        return null;
-      case RECORD_ARRAY_MAP:
-
-        return null;
-      case RECORD_MAP:
-
-        return null;
-      case RECORD_ARRAY:
-
-        return null;
-      case BASIC_MAP_MAP:
-
-        return null;
-      case BASIC_ARRAY_ARRAY:
-
-        return null;
-      case BASIC_MAP_ARRAY:
-
-        return null;
-      case BASIC_ARRAY_MAP:
-
-        return null;
-      case BASIC_MAP:
-
-        return null;
-      case BASIC_ARRAY:
-
-        return null;
-      case BASIC:
-
-        return null;
-      case FINAL:
-
-        return null;
-      default:
-
-        return null;
-    }
-  }
 }

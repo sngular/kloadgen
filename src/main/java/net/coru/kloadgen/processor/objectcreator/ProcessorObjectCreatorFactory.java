@@ -25,12 +25,12 @@ public class ProcessorObjectCreatorFactory {
           objectCreator = new AvroObjectCreator(schema, metadata);
           break;
         case PROTOBUF:
-          objectCreator = new ProtobufObjectCreator(schema, metadata);
+          //objectCreator = new ProtobufObjectCreator(schema, metadata);
           break;
         default:
           throw new KLoadGenException("Unsupported schema type");
       }
-    } catch(DescriptorValidationException | IOException | KLoadGenException e) {
+    } catch(KLoadGenException e) {
       log.error("Please, make sure that the schema sources fed are correct", e);
     }
     return objectCreator;
