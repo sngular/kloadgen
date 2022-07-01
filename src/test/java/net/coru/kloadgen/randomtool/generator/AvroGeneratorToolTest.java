@@ -208,26 +208,6 @@ class AvroGeneratorToolTest {
     assertThat(intList).containsExactlyElementsOf(expected);
   }
 
-  @ParameterizedTest
-  @DisplayName("Testing generate an iteration of a list of values")
-  @MethodSource("parametersForGenerateFieldValuesListSequence")
-  void testGenerateFieldValuesListIterator(int size, List<String> fieldValuesList, String fieldType, List<Object> expected) {
-    var intList = new ArrayList<>();
-    Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
-    Field field = new Field("name", schema);
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType("it")
-                                                           .valueLength(0)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .build();
-    AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
-    for (int i = 0; i <= size; i++) {
-      intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
-    }
-    assertThat(intList).containsExactlyElementsOf(expected);
-  }
-
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
     return Stream.of(
         Arguments.of("enum", 1, Collections.singletonList("RED"),

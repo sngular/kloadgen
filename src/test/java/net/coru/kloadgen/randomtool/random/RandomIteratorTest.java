@@ -40,7 +40,7 @@ class RandomIteratorTest {
   @MethodSource("parametersForGenerateIteratorValueForField")
   void testGenerateIteratorValueForField(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context,
                                          Object expectedStored) {
-    assertThat(new RandomIterator().generateIt(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
+    assertThat(RandomIterator.generateIt(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
     if (Objects.isNull(expectedStored)) {
       assertThat(context).doesNotContainKey(fieldName);
     } else {
@@ -48,24 +48,24 @@ class RandomIteratorTest {
     }
   }
 
-  private static Stream<Arguments> parametersForGenerateRandomValueWithList() {
+  private static Stream<Arguments> parametersForGenerateValueWithList() {
     return Stream.of(
-            Arguments.of(18,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")),
-            Arguments.of(20,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20", "1", "2")));
+            Arguments.of(10,
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10"),
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10")),
+            Arguments.of(12,
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10"),
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "1", "2")));
   }
 
   @ParameterizedTest
-  @DisplayName("Testing Generate a Random Value With a List of Values")
-  @MethodSource("parametersForGenerateRandomValueWithList")
+  @DisplayName("Testing Generate an Iterator With a List of Values")
+  @MethodSource("parametersForGenerateValueWithList")
   void testGenerateRandomValueWithList(int size, List<String> values, List<String> expected) {
     var intList = new ArrayList<>();
     var context = new HashMap<String, Object>();
     for (int i=0; i <= size; i++) {
-      intList.add(new RandomIterator().generateIteratorForFieldValueList("ClientCode", "it", values, context));
+      intList.add(RandomIterator.generateIteratorForFieldValueList("ClientCode", "it", values, context));
     }
     assertThat(intList).containsExactlyElementsOf(expected);
   }
