@@ -145,146 +145,54 @@ public abstract class SchemaProcessorLib {
     return pathToClean.substring(0, endOfField);
   }
 
-  protected static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
+  static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
     String pathToClean = cleanUpPath(fieldValueMapping, fieldName, level);
     int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
   }
 
-  /*static Object generateRandomMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, Integer arraySize, List<String> fieldValuesList) {
+  static boolean isTypeFilterMap(String singleTypeFilter) {
+    return singleTypeFilter.matches("^\\[[1-9]*:]");
+  }
 
-    List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(fieldValue ->
-                                 fieldValue.matches("\\$\\{\\w*}") ?
-                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-                                     fieldValue
-    );
+  static boolean isTypeFilterArray(String singleTypeFilter) {
+    return singleTypeFilter.matches("^\\[\\d*]");
+  }
 
-    var value = new HashMap<>(mapSize);
-    if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(fieldType))) {
-        value.put(generateMapKey(), randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
-      } else {
-        for (int i = mapSize; i > 0; i--) {
-          value.put(generateMapKey(), randomSequence.generateSeq(fieldName, fieldType, parameterList, context));
-        }
+  static Integer calculateSizeFromTypeFilter(String singleTypeFilter) {
+    int arrayLength = RandomUtils.nextInt(1, 10);
+    String arrayStringSize = "";
+    Pattern pattern = Pattern.compile("\\d*");
+    Matcher matcher = pattern.matcher(singleTypeFilter);
+    while (matcher.find()) {
+      if (StringUtils.isNumeric(matcher.group(0))) {
+        arrayStringSize = matcher.group(0);
       }
-    } else {
-      return randomMap.generateMap(fieldType, mapSize, parameterList, fieldValueLength, arraySize, Collections.emptyMap());
     }
+    if (StringUtils.isNotEmpty(arrayStringSize) && StringUtils.isNumeric(arrayStringSize)) {
+      arrayLength = Integer.parseInt(arrayStringSize);
+    }
+    return arrayLength;
+  }
 
-    return value;
-  }*/
+  static boolean hasMapOrArrayTypeFilter(String typeFilter) {
+    return typeFilter.matches("\\[.*].*");
+  }
 
-  /*static Object generateRandomList(String fieldName, String fieldType, int arraySize, Integer valueLength, List<String> fieldValuesList) {
-
-    List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(fieldValue ->
-                                 fieldValue.matches("\\$\\{\\w*}") ?
-                                     JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-                                     fieldValue
-    );
-    List value = new ArrayList<>(arraySize);
-    if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(fieldType))) {
-        value.add(randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
-      } else {
-        for (int i = arraySize; i > 0; i--) {
-          value.add(randomSequence.generateSeq(fieldName, fieldType, parameterList, context));
-        }
+  static String getFirstComplexType(String completeTypeFilterChain) {
+    String firstElementTypeFilterChain = completeTypeFilterChain;
+    if (StringUtils.isNotEmpty(firstElementTypeFilterChain)) {
+      String[] splitElements = firstElementTypeFilterChain.split("\\.");
+      if (splitElements.length > 0) {
+        firstElementTypeFilterChain = splitElements[0] + ".";
       }
-    } else {
-      value = (ArrayList) randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     }
-
-    return value;
+    Pattern pattern = Pattern.compile("\\[.*?]");
+    Matcher matcher = pattern.matcher(firstElementTypeFilterChain);
+    return matcher.find() ? matcher.group() : firstElementTypeFilterChain;
   }
 
-  protected static String generateMapKey() {
-    return (String) randomObject.generateRandom("string", 2, Collections.emptyList(), Collections.emptyMap());
+  static boolean isTypeFilterRecord(String singleTypeFilter) {
+    return singleTypeFilter.startsWith(".");
   }
-
-  protected static Object createArray(String fieldName, Integer arraySize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
-    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.poll();
-    return generateRandomList(fieldName, fieldValueMapping.getFieldType(), arraySize, fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList());
-  }*/
-
-  /*protected static Object createSimpleTypeMap(String fieldName, String fieldType, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
-    return generateRandomMap(fieldName, fieldType, mapSize, fieldValueLength, 0, fieldExpMappings);
-  }*/
-
-  /*protected static Map<String, Object> createSimpleTypeArrayMap(
-      String fieldName, String fieldType, Integer arraySize, Integer mapSize, Integer fieldValueLength, List<String> fieldExpMappings) {
-    Map<String, Object> result = new HashMap<>(mapSize);
-    String type = fieldType;
-    if (type.endsWith("array-map")) {
-      type = fieldType.replace("-map", "");
-    }
-    for (int i = 0; i < mapSize; i++) {
-      var list = generateRandomList(fieldName, type, arraySize, fieldValueLength, fieldExpMappings);
-      result.put(generateMapKey(), list);
-    }
-    return result;
-  }
-
-  protected String getNameObjectCollection(String fieldName) {
-    return fieldName.matches("[\\w\\d]*[\\[\\:*\\]]*\\[\\:*\\]\\.[\\w\\d]*.*") ?
-        fieldName.substring(0, fieldName.indexOf(".") + 1) : fieldName;
-  }
-
-  protected ProcessorFieldTypeEnum getFieldType(FieldValueMapping fieldValueMapping, String cleanPath) {
-    //String fieldNameProcessed = getFirstPartOfFieldValueMappingName(fieldValueMapping);
-    if (cleanPath.contains("[")) {
-      String completeFieldName = getNameObjectCollection(cleanPath);
-      if (completeFieldName.contains("].")) {
-        if (completeFieldName.contains("][")) {
-          if (completeFieldName.contains("[:][:].")) {
-            return ProcessorFieldTypeEnum.RECORD_MAP_MAP;
-          }
-          else if (completeFieldName.contains("[][].")) {
-            return ProcessorFieldTypeEnum.RECORD_ARRAY_ARRAY;
-          }
-          else if (completeFieldName.contains("[:][].")) {
-            return ProcessorFieldTypeEnum.RECORD_MAP_ARRAY;
-          }
-          else if (completeFieldName.contains("[][:].")) {
-            return ProcessorFieldTypeEnum.RECORD_ARRAY_MAP;
-          }
-          else {
-            throw new KLoadGenException("Wrong configuration Map - Array");
-          }
-        } else {
-          if (completeFieldName.contains("[:]")) {
-            return ProcessorFieldTypeEnum.RECORD_MAP;
-          }
-          else if (completeFieldName.contains("[]")) {
-            return ProcessorFieldTypeEnum.RECORD_ARRAY;
-          }
-          else {
-            throw new KLoadGenException("Wrong configuration of Map or Array");
-          }
-        }
-      } else {
-        if (Objects.requireNonNull(fieldValueMapping).getFieldType().endsWith("array-map")) {
-          return ProcessorFieldTypeEnum.BASIC_ARRAY_MAP;
-        }
-        else if (fieldValueMapping.getFieldType().endsWith("map-array")) {
-          return ProcessorFieldTypeEnum.BASIC_MAP_ARRAY;
-        }
-        else if (completeFieldName.contains("[:]")) {
-          return ProcessorFieldTypeEnum.BASIC_MAP;
-        }
-        else if (completeFieldName.contains("[]")) {
-          return ProcessorFieldTypeEnum.BASIC_ARRAY;
-        }
-        else {
-          throw new KLoadGenException("Wrong configuration of last element Map or Array");
-        }
-      }
-    } else if (cleanUpPath(fieldValueMapping, "").contains(".")) {
-      return ProcessorFieldTypeEnum.BASIC;
-    } else {
-      return ProcessorFieldTypeEnum.FINAL;
-    }
-  }*/
 }

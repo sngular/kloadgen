@@ -38,22 +38,23 @@ public class AvroGeneratorTool {
 
   private final RandomSequence randomSequence = new RandomSequence();
 
-  public Object generateObject(Field field, String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints) {
+  public Object generateObject(Schema schema, String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
+      Map<ConstraintTypeEnum, String> constraints) {
 
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-    boolean logicalType = Objects.nonNull(field.schema().getLogicalType());
+    boolean logicalType = Objects.nonNull(schema.getLogicalType());
 
     Object value;
-    if (ENUM == field.schema().getType() && !"seq".equalsIgnoreCase(fieldType)) {
-      value = getEnumOrGenerate(fieldName, fieldType, field.schema(), parameterList, field.schema().getType().getName());
-    } else if (UNION == field.schema().getType() && !"seq".equalsIgnoreCase(fieldType)) {
-      Schema safeSchema = getRecordUnion(field.schema().getTypes());
+    if (ENUM == schema.getType() && !"seq".equalsIgnoreCase(fieldType)) {
+      value = getEnumOrGenerate(fieldName, fieldType, schema, parameterList, schema.getType().getName());
+    } else if (UNION == schema.getType() && !"seq".equalsIgnoreCase(fieldType)) {
+      Schema safeSchema = getRecordUnion(schema.getTypes());
       if (differentTypesNeedCast(fieldType, safeSchema.getType())) {
 
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
-        value = ValueUtils.castValue(value, field.schema().getType().getName());
+        value = ValueUtils.castValue(value, schema.getType().getName());
       } else if (ENUM == safeSchema.getType()) {
-        value = getEnumOrGenerate(fieldName, fieldType, safeSchema, parameterList, field.schema().getType().getName());
+        value = getEnumOrGenerate(fieldName, fieldType, safeSchema, parameterList, schema.getType().getName());
       } else {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
         if ("null".equalsIgnoreCase(value.toString())) {
@@ -61,27 +62,27 @@ public class AvroGeneratorTool {
         }
       }
     } else if ("seq".equalsIgnoreCase(fieldType)) {
-      String type = UNION.getName().equals(getValidTypeFromSchema(field.schema())) ? getRecordUnion(field.schema().getTypes()).getName()
-          : getValidTypeFromSchema(field.schema());
+      String type = UNION.getName().equals(getValidTypeFromSchema(schema)) ? getRecordUnion(schema.getTypes()).getName()
+          : getValidTypeFromSchema(schema);
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(type))) {
         return randomSequence.generateSequenceForFieldValueList(fieldName, type, fieldValuesList, context);
       } else {
-        value = randomSequence.generateSeq(field.name(), type, parameterList, context);
+        value = randomSequence.generateSeq(fieldName, type, parameterList, context);
       }
-    } else if (differentTypesNeedCast(fieldType, field.schema().getType())) {
+    } else if (differentTypesNeedCast(fieldType, schema.getType())) {
 
       value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
-      value = ValueUtils.castValue(value, field.schema().getType().getName());
-    } else if (!logicalType && FIXED == field.schema().getType()) {
-      value = getFixedOrGenerate(field.schema());
+      value = ValueUtils.castValue(value, schema.getType().getName());
+    } else if (!logicalType && FIXED == schema.getType()) {
+      value = getFixedOrGenerate(schema);
     } else {
       value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
     }
     return value;
   }
 
-  public Object generateObject(Field field, FieldValueMapping fieldValueMapping, Map<ConstraintTypeEnum, String> constraints) {
-    return generateObject(field, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
+  public Object generateObject(Schema schema, FieldValueMapping fieldValueMapping, Map<ConstraintTypeEnum, String> constraints) {
+    return generateObject(schema, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
                           constraints);
   }
 

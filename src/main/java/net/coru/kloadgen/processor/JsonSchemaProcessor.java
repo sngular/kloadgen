@@ -20,8 +20,7 @@ import lombok.SneakyThrows;
 import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreatorFactory;
+import net.coru.kloadgen.processor.objectcreator.ObjectCreatorFactory;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,16 +30,16 @@ public class JsonSchemaProcessor {
 
   private List<FieldValueMapping> fieldExprMappings;
 
-  private ProcessorObjectCreator objectCreator;
+  //private ProcessorObjectCreator objectCreator;
 
   public void processSchema(List<FieldValueMapping> fieldExprMappings) {
-    this.objectCreator = ProcessorObjectCreatorFactory.getInstance(SchemaTypeEnum.JSON, null, null);
-    this.fieldExprMappings = fieldExprMappings;
+    /*this.objectCreator = ObjectCreatorFactory.getInstance(SchemaTypeEnum.JSON, null, null);
+    this.fieldExprMappings = fieldExprMappings;*/
   }
 
   @SneakyThrows
   public ObjectNode next() {
-    ObjectNode entity = JsonNodeFactory.instance.objectNode();
+    /*ObjectNode entity = JsonNodeFactory.instance.objectNode();
     if (!fieldExprMappings.isEmpty()) {
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
       ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExprMappings);
@@ -140,13 +139,13 @@ public class JsonSchemaProcessor {
           }
         }
       }
-    }
-    return entity;
+    }*/
+    return null;
   }
 
   private ObjectNode createObject(final String fieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue)
       throws KLoadGenException {
-    ObjectNode subEntity = JsonNodeFactory.instance.objectNode();
+    /*ObjectNode subEntity = JsonNodeFactory.instance.objectNode();
     if (null == subEntity) {
       throw new KLoadGenException("Something Odd just happened");
     }
@@ -256,11 +255,11 @@ public class JsonSchemaProcessor {
         }
         fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       }
-    }
+    }*/
 
-    return subEntity;
+    return null;
   }
-
+/*
   private ObjectNode createObjectMap(String fieldName, Integer calculateSize, ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
 
     ObjectNode objectArray = JsonNodeFactory.instance.objectNode();
@@ -516,6 +515,6 @@ public class JsonSchemaProcessor {
   private boolean checkIfOptionalCollection(FieldValueMapping field, String nameOfField) {
     return !field.getRequired() && field.getFieldValuesList().contains("null") && (nameOfField.contains("[]") || nameOfField.contains("[:]"));
   }
-
+*/
 
 }

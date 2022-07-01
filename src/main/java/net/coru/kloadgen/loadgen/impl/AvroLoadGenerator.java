@@ -14,17 +14,17 @@ import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.processor.AvroSchemaProcessor;
+import net.coru.kloadgen.processor.SchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
 
 @Slf4j
 public class AvroLoadGenerator extends AbstractLoadGenerator implements BaseLoadGenerator {
 
-  private final AvroSchemaProcessor avroSchemaProcessor;
+  private final SchemaProcessor avroSchemaProcessor;
 
   public AvroLoadGenerator() {
-    avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor = new SchemaProcessor();
   }
 
   public void setUpGenerator(Map<String, String> originals, String avroSchemaName, List<FieldValueMapping> fieldExprMappings) {
@@ -48,7 +48,7 @@ public class AvroLoadGenerator extends AbstractLoadGenerator implements BaseLoad
   }
 
   public EnrichedRecord nextMessage() {
-    return avroSchemaProcessor.next();
+    return (EnrichedRecord) avroSchemaProcessor.next();
   }
 
 

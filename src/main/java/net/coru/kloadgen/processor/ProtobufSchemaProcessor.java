@@ -1,30 +1,14 @@
 package net.coru.kloadgen.processor;
 
-import static com.google.protobuf.Descriptors.FieldDescriptor.Type.ENUM;
-import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
-
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
-import com.google.protobuf.Descriptors.FieldDescriptor;
-import com.google.protobuf.DynamicMessage;
-import com.google.protobuf.DynamicMessage.Builder;
-import com.google.protobuf.Message;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.common.SchemaTypeEnum;
-import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.ProcessorObjectCreatorFactory;
+import net.coru.kloadgen.processor.objectcreator.ObjectCreatorFactory;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 
 @Slf4j
@@ -34,12 +18,12 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
   private List<FieldValueMapping> fieldExprMappings;
 
-  private ProcessorObjectCreator objectCreator;
+  //private ProcessorObjectCreator objectCreator;
 
   public void processSchema(Object schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
       throws DescriptorValidationException, IOException {
-    this.objectCreator = new ProcessorObjectCreatorFactory().getInstance(SchemaTypeEnum.PROTOBUF, schema, metadata);
-    this.fieldExprMappings = fieldExprMappings;
+    /*this.objectCreator = new ObjectCreatorFactory().getInstance(SchemaTypeEnum.PROTOBUF, schema, metadata);
+    this.fieldExprMappings = fieldExprMappings;*/
   }
 
   public EnrichedRecord next() {
