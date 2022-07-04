@@ -6,15 +6,6 @@
 
 package net.coru.kloadgen.processor;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
@@ -23,6 +14,10 @@ import net.coru.kloadgen.randomtool.random.RandomSequence;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class SchemaProcessorLib {
 
@@ -123,31 +118,24 @@ public final class SchemaProcessorLib {
 
   }
 
-  static String cleanUpPath(final FieldValueMapping fieldValueMapping, final String fieldName) {
-    int startPosition = 0;
-    String cleanPath;
-    if (StringUtils.isNotEmpty(fieldName)) {
-      startPosition = fieldValueMapping.getFieldName().indexOf(fieldName) + fieldName.length() + 1;
-    }
-    cleanPath = fieldValueMapping.getFieldName().substring(startPosition);
-    if (cleanPath.matches("^(\\d*:*]).*$")) {
-      cleanPath = cleanPath.substring(cleanPath.indexOf(".") + 1);
-    }
-    return cleanPath;
+  static String cleanUpPath(final FieldValueMapping fieldValueMapping, final int level) {
+    final String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
+    final List<String> splitPathAux = Arrays.asList(Arrays.copyOfRange(splitPath, level, splitPath.length));
+    return String.join(".",splitPathAux);
   }
 
-  static String getCleanMethodName(final FieldValueMapping fieldValueMapping, final String fieldName) {
-    return getFullMethodName(fieldValueMapping, fieldName).replaceAll("\\[[0-9]*:?]", "");
+  static String getCleanMethodName(final FieldValueMapping fieldValueMapping, final int level) {
+    return getFullMethodName(fieldValueMapping, level).replaceAll("\\[[0-9]*:?]", "");
   }
 
-  static String getFullMethodName(final FieldValueMapping fieldValueMapping, final String fieldName) {
-    final String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
+  static String getFullMethodName(final FieldValueMapping fieldValueMapping, final int level) {
+    final String pathToClean = cleanUpPath(fieldValueMapping, level);
     final int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
     return pathToClean.substring(0, endOfField);
   }
 
-  static String getMapCleanMethodName(final FieldValueMapping fieldValueMapping, final String fieldName) {
-    final String pathToClean = cleanUpPath(fieldValueMapping, fieldName);
+  static String getMapCleanMethodName(final FieldValueMapping fieldValueMapping, final int level) {
+    final String pathToClean = cleanUpPath(fieldValueMapping, level);
     final int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
   }

@@ -6,17 +6,6 @@
 
 package net.coru.kloadgen.processor;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -32,6 +21,8 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
+
+import java.util.*;
 
 public final class AvroSchemaProcessor {
 
@@ -86,8 +77,9 @@ public final class AvroSchemaProcessor {
       int elapsedProperties = 0;
 
       while (!fieldExpMappingsQueue.isEmpty()) {
-        final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, "");
-        final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, "");
+        int level = 0;
+        final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, level);
+        final String fieldName = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
         final String typeFilter = cleanPath.replaceAll(fieldName, "");
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek()
@@ -122,9 +114,9 @@ public final class AvroSchemaProcessor {
             } else if (SchemaProcessorLib.checkIfMapArray(fieldValueMapping.getFieldType())) {
               fieldValueMapping = processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, entity, fieldName);
             } else if (SchemaProcessorLib.checkIfIsRecordMapArray(cleanPath)) {
-              fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, entity, fieldName);
+              fieldValueMapping = processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, entity, fieldName, level);
             } else if (SchemaProcessorLib.checkIfIsRecordArrayMap(cleanPath)) {
-              fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, entity, fieldName);
+              fieldValueMapping = processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, entity, fieldName, level);
             } else {
               throw new KLoadGenException(WRONG_CONFIGURATION_MAP_ARRAY);
             }
@@ -134,14 +126,14 @@ public final class AvroSchemaProcessor {
             } else if (SchemaProcessorLib.checkIfArray(typeFilter, fieldValueMapping.getFieldType())) {
               fieldValueMapping = processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, entity, fieldName);
             } else if (SchemaProcessorLib.checkIfRecordArray(cleanPath)) {
-              fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, entity, fieldName);
+              fieldValueMapping = processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, entity, fieldName, level);
             } else if (SchemaProcessorLib.checkIfRecordMap(cleanPath)) {
-              fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, entity, fieldName);
+              fieldValueMapping = processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, entity, fieldName, level);
             } else {
               throw new KLoadGenException(WRONG_CONFIGURATION_MAP_ARRAY);
             }
           } else if (typeFilter.startsWith(".")) {
-            entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue));
+            entity.put(fieldName, createObject(entity.getSchema().getField(fieldName).schema(), fieldName, fieldExpMappingsQueue, level));
             fieldValueMapping = SchemaProcessorLib.getSafeGetElement(fieldExpMappingsQueue);
           } else {
             entity.put(Objects.requireNonNull(fieldValueMapping).getFieldName(),
@@ -175,28 +167,28 @@ public final class AvroSchemaProcessor {
   }
 
   private FieldValueMapping processFieldValueMappingAsRecordArray(final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue,
-      final GenericRecord entity, final String fieldName) {
+      final GenericRecord entity, final String fieldName, final int level) {
     final FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     final Integer arraySize = SchemaProcessorLib.calculateSize(fieldValueMapping.getFieldName(),
-                                                               SchemaProcessorLib.getCleanMethodName(fieldValueMapping, fieldName));
+                                                               SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level));
 
     entity.put(fieldName, createObjectArray(extractType(entity.getSchema().getField(fieldName),
                                                         Type.ARRAY).getElementType(),
                                             fieldName,
                                             arraySize,
-                                            fieldExpMappingsQueue));
+                                            fieldExpMappingsQueue, level));
     return SchemaProcessorLib.getSafeGetElement(fieldExpMappingsQueue);
   }
 
   private FieldValueMapping processFieldValueMappingAsRecordMap(final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue,
-      final GenericRecord entity, final String fieldName) {
+      final GenericRecord entity, final String fieldName, final int level) {
     final FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
-    final Integer mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), SchemaProcessorLib.getCleanMethodName(fieldValueMapping, fieldName));
+    final Integer mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level));
 
     entity.put(fieldName, createObjectMap(extractType(entity.getSchema().getField(fieldName), Type.MAP).getValueType(),
                                           fieldName,
                                           mapSize,
-                                          fieldExpMappingsQueue));
+                                          fieldExpMappingsQueue, level));
     return SchemaProcessorLib.getSafeGetElement(fieldExpMappingsQueue);
   }
 
@@ -245,7 +237,7 @@ public final class AvroSchemaProcessor {
   }
 
   private FieldValueMapping processFieldValueMappingAsRecordArrayMap(final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final GenericRecord entity,
-      final String fieldName) {
+      final String fieldName, final int level) {
     final FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     final Integer arraySize = SchemaProcessorLib.calculateSize(fieldValueMapping.getFieldName(), fieldName);
     final Integer mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
@@ -254,26 +246,26 @@ public final class AvroSchemaProcessor {
     for (int i = 0; i < mapSize - 1; i++) {
       final ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
       recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
-                         createObjectArray(extractType(entity.getSchema().getField(fieldName), Type.MAP).getValueType().getElementType(), fieldName, arraySize, temporalQueue));
+                         createObjectArray(extractType(entity.getSchema().getField(fieldName), Type.MAP).getValueType().getElementType(), fieldName, arraySize, temporalQueue, level));
     }
     recordMapArray.put((String) randomObject.generateRandom("string", fieldValueMapping.getValueLength(), Collections.emptyList(), Collections.emptyMap()),
                        createObjectArray(extractType(entity.getSchema().getField(fieldName), Type.MAP).getValueType().getElementType(), fieldName, arraySize,
-                                         fieldExpMappingsQueue));
+                                         fieldExpMappingsQueue, level));
     entity.put(fieldName, recordMapArray);
     return SchemaProcessorLib.getSafeGetElement(fieldExpMappingsQueue);
   }
 
   private FieldValueMapping processFieldValueMappingAsRecordMapArray(final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final GenericRecord entity,
-      final String fieldName) {
+      final String fieldName, final int level) {
     final FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     final Integer arraySize = SchemaProcessorLib.calculateSize(fieldValueMapping.getFieldName(), fieldName);
     final Integer mapSize = SchemaProcessorLib.calculateMapSize(fieldValueMapping.getFieldName(), fieldName);
     final var recordArrayMap = new ArrayList<>(arraySize);
     for (int i = 0; i < arraySize - 1; i++) {
       final ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), Type.ARRAY).getElementType(), fieldName, mapSize, temporalQueue));
+      recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), Type.ARRAY).getElementType(), fieldName, mapSize, temporalQueue, level));
     }
-    recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), Type.ARRAY).getElementType(), fieldName, arraySize, fieldExpMappingsQueue));
+    recordArrayMap.add(createObjectMap(extractType(entity.getSchema().getField(fieldName), Type.ARRAY).getElementType(), fieldName, arraySize, fieldExpMappingsQueue, level));
     entity.put(fieldName, recordArrayMap);
     return SchemaProcessorLib.getSafeGetElement(fieldExpMappingsQueue);
   }
@@ -294,7 +286,7 @@ public final class AvroSchemaProcessor {
     return result;
   }
 
-  private GenericRecord createObject(final Schema subSchema, final String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  private GenericRecord createObject(final Schema subSchema, final String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final int rootLevel) {
     Schema innerSchema = subSchema;
     if (subSchema.getType().equals(Type.MAP)) {
       innerSchema = subSchema.getValueType();
@@ -311,14 +303,15 @@ public final class AvroSchemaProcessor {
 
     int generatedProperties = 0;
     int elapsedProperties = 0;
+    int level = rootLevel + 1;
 
     while (!fieldExpMappingsQueue.isEmpty()
            && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + rootFieldName + "$")
                || fieldValueMapping.getFieldName().matches(rootFieldName + "\\..*")
                || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\[.*")
                || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\..*"))) {
-      final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, rootFieldName);
-      final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, rootFieldName);
+      final String cleanPath = SchemaProcessorLib.cleanUpPath(fieldValueMapping, level);
+      final String fieldNameSubEntity = SchemaProcessorLib.getCleanMethodName(fieldValueMapping, level);
       final String typeFilter = cleanPath.replaceAll(fieldNameSubEntity, "");
 
       generatedProperties++;
@@ -348,38 +341,36 @@ public final class AvroSchemaProcessor {
         } else {
           fieldValueMapping = nextField;
         }
-
       } else {
-
         if (typeFilter.matches("\\[?..]\\[.*") && !fieldValueMapping.getFieldType().endsWith("map-map") && !fieldValueMapping.getFieldType().endsWith("array-array")
             && !typeFilter.startsWith(".")) {
           if (SchemaProcessorLib.checkIfMapArray(fieldValueMapping.getFieldType())) {
             processFieldValueMappingAsSimpleMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
           } else if (SchemaProcessorLib.checkIfArrayMap(fieldValueMapping.getFieldType())) {
-            final String mapFieldNameSubEntity = SchemaProcessorLib.getMapCleanMethodName(fieldValueMapping, rootFieldName);
+            final String mapFieldNameSubEntity = SchemaProcessorLib.getMapCleanMethodName(fieldValueMapping, level);
             processFieldValueMappingAsSimpleArrayMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
           } else if (SchemaProcessorLib.checkIfIsRecordMapArray(cleanPath)) {
-            processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+            processFieldValueMappingAsRecordMapArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity, level);
           } else if (SchemaProcessorLib.checkIfIsRecordArrayMap(cleanPath)) {
-            processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+            processFieldValueMappingAsRecordArrayMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity, level);
           }
         } else if (typeFilter.startsWith("[")) {
           if (SchemaProcessorLib.checkIfMap(typeFilter, fieldValueMapping.getFieldType())) {
-            final String mapFieldNameSubEntity = SchemaProcessorLib.getMapCleanMethodName(fieldValueMapping, rootFieldName);
+            final String mapFieldNameSubEntity = SchemaProcessorLib.getMapCleanMethodName(fieldValueMapping, level);
             processFieldValueMappingAsSimpleMap(fieldExpMappingsQueue, subEntity, mapFieldNameSubEntity);
           } else if (SchemaProcessorLib.checkIfArray(typeFilter, fieldValueMapping.getFieldType())) {
             processFieldValueMappingAsSimpleArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
           } else if (SchemaProcessorLib.checkIfRecordMap(cleanPath)) {
-            processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+            processFieldValueMappingAsRecordMap(fieldExpMappingsQueue, subEntity, fieldNameSubEntity, level);
           } else if (SchemaProcessorLib.checkIfRecordArray(cleanPath)) {
-            processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity);
+            processFieldValueMappingAsRecordArray(fieldExpMappingsQueue, subEntity, fieldNameSubEntity, level);
           } else {
             throw new KLoadGenException(WRONG_CONFIGURATION_MAP_ARRAY);
           }
         } else if (typeFilter.startsWith(".")) {
           subEntity.put(fieldNameSubEntity, createObject(subEntity.getSchema().getField(fieldNameSubEntity).schema(),
                                                          fieldNameSubEntity,
-                                                         fieldExpMappingsQueue));
+                                                         fieldExpMappingsQueue, level));
         } else {
           fieldExpMappingsQueue.poll();
           subEntity.put(fieldNameSubEntity, avroGeneratorTool.generateObject(
@@ -421,24 +412,24 @@ public final class AvroSchemaProcessor {
   }
 
   private List<GenericRecord> createObjectArray(final Schema subSchema, final String fieldName, final Integer arraySize,
-      final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+      final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final int level) {
     final List<GenericRecord> objectArray = new ArrayList<>(arraySize);
     for (int i = 0; i < arraySize - 1; i++) {
       final ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectArray.add(createObject(subSchema, fieldName, temporalQueue));
+      objectArray.add(createObject(subSchema, fieldName, temporalQueue, level));
     }
-    objectArray.add(createObject(subSchema, fieldName, fieldExpMappingsQueue));
+    objectArray.add(createObject(subSchema, fieldName, fieldExpMappingsQueue, level));
     return objectArray;
   }
 
   private Map<String, GenericRecord> createObjectMap(final Schema subSchema, final String fieldName, final Integer mapSize,
-      final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+      final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final int level) {
     final Map<String, GenericRecord> objectMap = new HashMap<>(mapSize);
     for (int i = 0; i < mapSize - 1; i++) {
       final ArrayDeque<FieldValueMapping> temporalQueue = fieldExpMappingsQueue.clone();
-      objectMap.put(SchemaProcessorLib.generateMapKey(), createObject(subSchema, fieldName, temporalQueue));
+      objectMap.put(SchemaProcessorLib.generateMapKey(), createObject(subSchema, fieldName, temporalQueue, level));
     }
-    objectMap.put(SchemaProcessorLib.generateMapKey(), createObject(subSchema, fieldName, fieldExpMappingsQueue));
+    objectMap.put(SchemaProcessorLib.generateMapKey(), createObject(subSchema, fieldName, fieldExpMappingsQueue, level));
     return objectMap;
   }
 
