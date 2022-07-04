@@ -11,7 +11,7 @@ interactions with the project.
 
 To ensure everybody can work easily and focus in the code, make easy the review process and keep the same style, we have a couple of files defining our code standards:
 - Intellij editor style at `config/checkstyle/OSS_style_idea.xml`
-- Checkstyle configuration files at `config/checkstyle/checkstyle.xml`
+- Checkstyle configuration files at `checkstyle.xml`
   - suppression file at `config/checkstyle/OSS_checkstyle/OSS_checkstyle_suppressions.xml`
 
 ## Pull Request Process

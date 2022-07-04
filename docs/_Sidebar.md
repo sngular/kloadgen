@@ -1,5 +1,5 @@
 # Overview
-  - [About KLoadGen](about.md)
+  - [About KLoadGen](home.md)
   - [KLoadGen architecture](architecture.md)
 
 # Getting started
