@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.model.GenerationFunctionPOJO;
+import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 
 public class JsonObjectCreatorFactory implements ObjectCreator {
@@ -19,38 +19,20 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public String generateString(final Integer valueLength) {
-    return null;
-  }
-
-  @Override
   public Object createMap(
-      final String objectName, final ArrayDeque<?> fieldExpMappingsQueue, final String fieldName, final String completeFieldName, final Integer mapSize,
-      final String completeTypeFilterChain, final String valueType,
-      final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints, final int level, final BiFunction<ArrayDeque<?>,
-                                                                                                                                                             GenerationFunctionPOJO, Object> generateFunction,
-      final boolean returnCompleteEntry) {
+      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean returnCompleteEntry) {
     return null;
   }
 
   @Override
   public Object createArray(
-      final String objectName, final ArrayDeque<?> fieldExpMappingsQueue, final String fieldName, final String completeFieldName, final Integer arraySize,
-      final String completeTypeFilterChain, final String valueType,
-      final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints, final int level, final BiFunction<ArrayDeque<?>,
-                                                                                                                                                             GenerationFunctionPOJO, Object> generateFunction,
-      final boolean returnCompleteEntry) {
+      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean returnCompleteEntry) {
     return null;
   }
 
   @Override
-  public Object createRepeatedObject(
-      final String fieldName, final String completeFieldName, final String valueType, final Integer valueLength, final List<String> fieldValuesList,
-      Map<ConstraintTypeEnum, String> constraints) {
-    return null;
-  }
+  public Object createValueObject(final SchemaProcessorPOJO pojo) { return null; }
 
-  @Override
   public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
     return null;
   }
@@ -61,8 +43,7 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public Object createRecord(final String objectName) {
-    return null;
+  public void createRecord(final String objectName) {
   }
 
   @Override
@@ -73,5 +54,9 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   @Override
   public boolean isOptional(final String rootFieldName, final String fieldName) {
     return false;
+  }
+
+  private String generateString(final Integer valueLength) {
+    return null;
   }
 }

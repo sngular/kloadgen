@@ -54,8 +54,6 @@ public class JsonLoadGenerator extends AbstractLoadGenerator implements BaseLoad
   }
 
   public EnrichedRecord nextMessage() {
-    //return new EnrichedRecord(metadata.getLeft(), jsonSchemaProcessor.next());
-    return null;
+    return EnrichedRecord.builder().schemaMetadata(metadata.getLeft()).genericRecord(jsonSchemaProcessor.next()).build();
   }
-
 }

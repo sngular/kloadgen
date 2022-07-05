@@ -35,29 +35,29 @@ public class RandomMap {
     Object value;
 
     switch (fieldType) {
-      case ValidTypeConstants.INT_MAP:
+      case ValidTypeConstants.INT:
         value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, mapSize, constraints);
         break;
-      case ValidTypeConstants.LONG_MAP:
+      case ValidTypeConstants.LONG:
         value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, mapSize, constraints);
         break;
-      case ValidTypeConstants.DOUBLE_MAP:
+      case ValidTypeConstants.DOUBLE:
         value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, mapSize, constraints);
         break;
-      case ValidTypeConstants.SHORT_MAP:
+      case ValidTypeConstants.SHORT:
         value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, mapSize, constraints);
         break;
-      case ValidTypeConstants.NUMBER_MAP:
-      case ValidTypeConstants.FLOAT_MAP:
+      case ValidTypeConstants.NUMBER:
+      case ValidTypeConstants.FLOAT:
         value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, mapSize, constraints);
         break;
-      case ValidTypeConstants.STRING_MAP:
+      case ValidTypeConstants.STRING:
         value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, mapSize, constraints);
         break;
-      case ValidTypeConstants.UUID_MAP:
+      case ValidTypeConstants.UUID:
         value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, mapSize, Collections.emptyMap());
         break;
-      case ValidTypeConstants.BOOLEAN_MAP:
+      case ValidTypeConstants.BOOLEAN:
         value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
         break;
       default:
@@ -80,28 +80,28 @@ public class RandomMap {
     Object value;
 
     switch (fieldType) {
-      case ValidTypeConstants.INT_MAP:
+      case ValidTypeConstants.INT:
         value = generate(ValidTypeConstants.INT, mapSize, fieldValueList, valueLength, constraints);
         break;
-      case ValidTypeConstants.LONG_MAP:
+      case ValidTypeConstants.LONG:
         value = generate(ValidTypeConstants.LONG, mapSize, fieldValueList, valueLength, constraints);
         break;
-      case ValidTypeConstants.DOUBLE_MAP:
+      case ValidTypeConstants.DOUBLE:
         value = generate(ValidTypeConstants.DOUBLE, mapSize, fieldValueList, valueLength, constraints);
         break;
-      case ValidTypeConstants.SHORT_MAP:
+      case ValidTypeConstants.SHORT:
         value = generate(ValidTypeConstants.SHORT, mapSize, fieldValueList, valueLength, constraints);
         break;
-      case ValidTypeConstants.FLOAT_MAP:
+      case ValidTypeConstants.FLOAT:
         value = generate(ValidTypeConstants.FLOAT, mapSize, fieldValueList, valueLength, constraints);
         break;
-      case ValidTypeConstants.STRING_MAP:
+      case ValidTypeConstants.STRING:
         value = generate(ValidTypeConstants.STRING, mapSize, fieldValueList, valueLength, constraints);
         break;
-      case ValidTypeConstants.UUID_MAP:
+      case ValidTypeConstants.UUID:
         value = generate(ValidTypeConstants.UUID, mapSize, fieldValueList, valueLength, Collections.emptyMap());
         break;
-      case ValidTypeConstants.BOOLEAN_MAP:
+      case ValidTypeConstants.BOOLEAN:
         value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, valueLength, Collections.emptyMap());
         break;
       default:

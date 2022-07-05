@@ -1,59 +1,28 @@
 package net.coru.kloadgen.processor.objectcreator;
 
-import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.processor.objectcreator.model.GenerationFunctionPOJO;
+import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 
 import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 public interface ObjectCreator {
 
-  String generateString(Integer valueLength);
-
   Object createMap(
-    String objectName,
-    ArrayDeque<?> fieldExpMappingsQueue,
-    String fieldName,
-    String completeFieldName,
-    Integer mapSize,
-    String completeTypeFilterChain,
-    String valueType,
-    Integer valueLength,
-    List<String> fieldValuesList,
-    Map<ConstraintTypeEnum, String> constraints,
-    int level,
-    BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
+    SchemaProcessorPOJO pojo,
+    BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
     boolean returnCompleteEntry);
 
   Object createArray(
-    String objectName,
-    ArrayDeque<?> fieldExpMappingsQueue,
-    String fieldName,
-    String completeFieldName,
-    Integer arraySize,
-    String completeTypeFilterChain,
-    String valueType,
-    Integer valueLength,
-    List<String> fieldValuesList,
-    Map<ConstraintTypeEnum, String> constraints,
-    int level,
-    BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
+    SchemaProcessorPOJO pojo,
+    BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
     boolean returnCompleteEntry);
 
-  Object createRepeatedObject(
-          String fieldName,
-          String completeFieldName,
-          String valueType,
-          Integer valueLength,
-          List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints);
-
-  Object assignObject(String targetObjectName, String fieldName, Object objectToAssign);
+  Object createValueObject(
+      SchemaProcessorPOJO pojo);
 
   Object assignRecord(String targetObjectName, String fieldName, String recordToAssign);
 
-  Object createRecord(String objectName);
+  void createRecord(String objectName);
 
   Object generateRecord();
 

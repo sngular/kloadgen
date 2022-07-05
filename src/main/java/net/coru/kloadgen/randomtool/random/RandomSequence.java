@@ -6,57 +6,64 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import com.google.common.collect.ImmutableMap;
-import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
-import net.coru.kloadgen.randomtool.util.ValueUtils;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-public class RandomSequence {
+import com.google.common.collect.ImmutableMap;
+import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
+import net.coru.kloadgen.randomtool.util.ValueUtils;
 
-    private static final Map<String, SequenceType<?>> supportedSequenceTypes = ImmutableMap.<String, SequenceType<?>>builder()
-            .put(ValidTypeConstants.INT, SequenceType.of(() -> 1, seqObject -> Integer.parseInt(seqObject.toString()) + 1))
-            .put(ValidTypeConstants.DOUBLE, SequenceType.of(() -> 1.0, seqObject -> Double.parseDouble(seqObject.toString()) + 1))
-            .put(ValidTypeConstants.LONG, SequenceType.of(() -> 1L, seqObject -> Long.parseLong(seqObject.toString()) + 1))
-            .put(ValidTypeConstants.FLOAT, SequenceType.of(() -> 1.0f, seqObject -> Float.parseFloat(seqObject.toString()) + 1))
-            .put(ValidTypeConstants.SHORT, SequenceType.of(() -> (short) 1, seqObject -> Integer.parseInt(seqObject.toString()) + 1))
-            .put(ValidTypeConstants.BYTES_DECIMAL, SequenceType.of(() -> BigDecimal.ONE, seqObject -> new BigDecimal(seqObject.toString()).add(BigDecimal.ONE)))
-            .put(ValidTypeConstants.FIXED_DECIMAL, SequenceType.of(() -> BigDecimal.ONE, seqObject -> new BigDecimal(seqObject.toString()).add(BigDecimal.ONE)))
-            .build();
+public final class RandomSequence {
 
-    public static boolean isTypeSupported(String fieldType) {
-        return supportedSequenceTypes.containsKey(fieldType);
+  private static final Map<String, SequenceType<?>> SUPPORTED_SEQUENCE_TYPES =
+      ImmutableMap.<String, SequenceType<?>>builder()
+                  .put(ValidTypeConstants.INT, SequenceType.of(() -> 1, seqObject -> Integer.parseInt(seqObject.toString()) + 1))
+                  .put(ValidTypeConstants.DOUBLE, SequenceType.of(() -> 1.0, seqObject -> Double.parseDouble(seqObject.toString()) + 1))
+                  .put(ValidTypeConstants.LONG, SequenceType.of(() -> 1L, seqObject -> Long.parseLong(seqObject.toString()) + 1))
+                  .put(ValidTypeConstants.FLOAT, SequenceType.of(() -> 1.0f, seqObject -> Float.parseFloat(seqObject.toString()) + 1))
+                  .put(ValidTypeConstants.SHORT, SequenceType.of(() -> (short) 1, seqObject -> Integer.parseInt(seqObject.toString()) + 1))
+                  .put(ValidTypeConstants.BYTES_DECIMAL, SequenceType.of(() -> BigDecimal.ONE, seqObject -> new BigDecimal(seqObject.toString()).add(BigDecimal.ONE)))
+                  .put(ValidTypeConstants.FIXED_DECIMAL, SequenceType.of(() -> BigDecimal.ONE, seqObject -> new BigDecimal(seqObject.toString()).add(BigDecimal.ONE)))
+                  .build();
+
+  private RandomSequence() {
+  }
+
+  public static Object generateSeq(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
+    return context.compute(fieldName, (fieldNameMap, seqObject) ->
+                                          seqObject == null
+                                              ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
+                                              : addOneCasted(seqObject, fieldType));
+  }
+
+  private static Object getFirstValueOrDefaultForType(final List<String> fieldValueList, final String fieldType) {
+    Object result = null;
+    if (isTypeNotSupported(fieldType)) {
+      throw new IllegalArgumentException("Field type is not supported for sequences");
+    }
+    if (!fieldValueList.isEmpty()) {
+      result = ValueUtils.castValue(fieldValueList.get(0), fieldType);
+    } else {
+      result = SUPPORTED_SEQUENCE_TYPES.get(fieldType).getDefaultForType();
     }
 
-    public Object generateSeq(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-        return context.compute(fieldName, (fieldNameMap, seqObject) ->
-                seqObject == null
-                        ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
-                        : addOneCasted(seqObject, fieldType));
-    }
+    return result;
+  }
 
-    public Object generateSequenceForFieldValueList(String fieldName, String fieldType, List<String> fieldValueList, Map<String, Object> context) {
-        Integer index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
-        return ValueUtils.castValue(fieldValueList.get(index), fieldType);
+  private static Object addOneCasted(final Object seqObject, final String fieldType) {
+    if (isTypeNotSupported(fieldType)) {
+      throw new IllegalArgumentException("Field type is not supported for sequences");
     }
+    return SUPPORTED_SEQUENCE_TYPES.get(fieldType).addOneCasted(seqObject);
+  }
 
-    public Object getFirstValueOrDefaultForType(List<String> fieldValueList, String fieldType) {
-        if (!isTypeSupported(fieldType)) {
-            throw new IllegalArgumentException("Field type is not supported for sequences");
-        }
-        if (!fieldValueList.isEmpty()) {
-            return ValueUtils.castValue(fieldValueList.get(0), fieldType);
-        }
+  public static boolean isTypeNotSupported(final String fieldType) {
+    return !SUPPORTED_SEQUENCE_TYPES.containsKey(fieldType);
+  }
 
-        return supportedSequenceTypes.get(fieldType).getDefaultForType();
-    }
-
-    public Object addOneCasted(Object seqObject, String fieldType) {
-        if (!isTypeSupported(fieldType)) {
-            throw new IllegalArgumentException("Field type is not supported for sequences");
-        }
-        return supportedSequenceTypes.get(fieldType).addOneCasted(seqObject);
-    }
+  public static Object generateSequenceForFieldValueList(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
+    final var index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
+    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
+  }
 }

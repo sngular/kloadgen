@@ -1,18 +1,16 @@
 package net.coru.kloadgen.processor.objectcreator.model;
 
-import net.coru.kloadgen.model.ConstraintTypeEnum;
-
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 
-public class GenerationFunctionPOJO {
+import net.coru.kloadgen.model.ConstraintTypeEnum;
+
+public class SchemaProcessorPOJO {
 
   private String rootFieldName;
 
   private ArrayDeque<?> fieldExpMappingsQueue;
-
-  private String objectName;
 
   private String fieldNameSubEntity;
 
@@ -26,25 +24,30 @@ public class GenerationFunctionPOJO {
 
   private List<String> fieldValuesList;
 
+  private boolean lastFilterTypeOfLastElement;
+
   private Map<ConstraintTypeEnum, String> constraints;
 
   private int level;
 
-  public GenerationFunctionPOJO(
-      String rootFieldName, ArrayDeque<?> fieldExpMappingsQueue, String objectName, String fieldNameSubEntity, String completeFieldName,
-      String completeTypeFilterChain, String valueType,
-      Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints, int level) {
+  private int fieldSize;
+
+  public SchemaProcessorPOJO(
+      String rootFieldName, ArrayDeque<?> fieldExpMappingsQueue, String fieldNameSubEntity, String completeFieldName,
+      String completeTypeFilterChain, int fieldSize, String valueType,
+      Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints, int level, boolean isLastElementType) {
     this.rootFieldName = rootFieldName;
     this.fieldExpMappingsQueue = fieldExpMappingsQueue;
-    this.objectName = objectName;
     this.fieldNameSubEntity = fieldNameSubEntity;
     this.completeFieldName = completeFieldName;
     this.completeTypeFilterChain = completeTypeFilterChain;
+    this.fieldSize = fieldSize;
     this.valueType = valueType;
     this.valueLength = valueLength;
     this.fieldValuesList = fieldValuesList;
     this.constraints = constraints;
     this.level = level;
+    this.lastFilterTypeOfLastElement = isLastElementType;
   }
 
   public String getRootFieldName() {
@@ -53,10 +56,6 @@ public class GenerationFunctionPOJO {
 
   public ArrayDeque<?> getFieldExpMappingsQueue() {
     return fieldExpMappingsQueue;
-  }
-
-  public String getObjectName() {
-    return objectName;
   }
 
   public String getFieldNameSubEntity() {
@@ -83,15 +82,19 @@ public class GenerationFunctionPOJO {
     return valueType;
   }
 
-  public Map<ConstraintTypeEnum, String> getConstraints() {
-    return constraints;
-  }
-
-  public void setConstraints(Map<ConstraintTypeEnum, String> constraints) {
-    this.constraints = constraints;
-  }
-
   public int getLevel() {
     return level;
+  }
+
+  public boolean isLastFilterTypeOfLastElement() {
+    return lastFilterTypeOfLastElement;
+  }
+
+  public int getFieldSize() {
+    return fieldSize;
+  }
+
+  public Map<ConstraintTypeEnum, String> getConstraints() {
+    return constraints;
   }
 }

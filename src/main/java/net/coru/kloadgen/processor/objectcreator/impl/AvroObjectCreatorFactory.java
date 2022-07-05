@@ -14,7 +14,15 @@ import static org.apache.avro.Schema.Type.RECORD;
 import static org.apache.avro.Schema.Type.STRING;
 import static org.apache.avro.Schema.Type.UNION;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
@@ -22,12 +30,9 @@ import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.model.GenerationFunctionPOJO;
+import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
-import net.coru.kloadgen.randomtool.random.RandomArray;
-import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
-import net.coru.kloadgen.randomtool.random.RandomSequence;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -38,15 +43,15 @@ import org.apache.commons.collections4.IteratorUtils;
 
 public class AvroObjectCreatorFactory implements ObjectCreator {
 
-  private final Set<Type> typesSet = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
+  private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
+
+  private static final RandomObject RANDOM_OBJECT = new RandomObject();
+
+  private static final Set<Type> TYPES_SET = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
 
   private final Schema schema;
 
   private final SchemaMetadata metadata;
-
-  private final AvroGeneratorTool avroGeneratorTool;
-
-  private final RandomObject randomObject;
 
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
@@ -57,78 +62,88 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       this.schema = (Schema) schema;
     }
     this.metadata = (SchemaMetadata) metadata;
-    this.randomObject = new RandomObject();
-    this.avroGeneratorTool = new AvroGeneratorTool();
-  }
-
-  @Override
-  public String generateString(final Integer valueLength) {
-    return String.valueOf(randomObject.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
   }
 
   @Override
   public Object createMap(
-      final String objectName,
-      final ArrayDeque<?> fieldExpMappingsQueue,
-      final String fieldName,
-      final String completeFieldName,
-      final Integer mapSize,
-      final String completeTypeFilterChain,
-      final String valueType,
-      final Integer valueLength,
-      final List<String> fieldValuesList,
-      final Map<ConstraintTypeEnum, String> constraints,
-      final int level,
-      final BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
+      final SchemaProcessorPOJO pojo,
+      final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
 
-    final Map<String, Object> map = new HashMap<>();
-
-    for (int i = 0; i < mapSize; i++) {
-      GenerationFunctionPOJO pojo = new GenerationFunctionPOJO(objectName, fieldExpMappingsQueue, objectName, fieldName, completeFieldName,
-                                                               completeTypeFilterChain, valueType, valueLength, fieldValuesList, null, level);
-      if (i == mapSize - 1) {
-        map.put(generateString(valueLength), generateFunction.apply(fieldExpMappingsQueue, pojo));
-      } else {
-        map.put(generateString(valueLength), generateFunction.apply(fieldExpMappingsQueue.clone(), pojo));
+    Map<Object, Object> map = new HashMap<>();
+    if (pojo.isLastFilterTypeOfLastElement()) {
+      map = createFinalMap(pojo);
+    } else {
+      for (int i = 0; i < pojo.getFieldSize(); i++) {
+        String key = generateString(pojo.getValueLength());
+        if (i == pojo.getFieldSize() - 1) {
+          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
+        } else {
+          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
+        }
       }
     }
-    entity.get(objectName).put(fieldName, map);
-    return returnCompleteEntry ? entity.get(objectName) : map;
+    entity.get(pojo.getRootFieldName()).put(pojo.getFieldNameSubEntity(), map);
+    return returnCompleteEntry ? entity.get(pojo.getRootFieldName()) : map;
+  }
+
+  private Map<Object, Object> createFinalMap(SchemaProcessorPOJO pojo) {
+    return (Map<Object, Object>) AVRO_GENERATOR_TOOL.generateMap(pojo.getFieldNameSubEntity(), getSimpleValueType(pojo.getValueType()), pojo.getValueLength(),
+                                                                 pojo.getFieldValuesList(),
+                                                                 pojo.getFieldSize(),
+                                                                 Collections.emptyMap());
+  }
+
+  private String generateString(final Integer valueLength) {
+    return String.valueOf(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
+  }
+
+  private String getSimpleValueType(String completeValueType) {
+    return completeValueType.substring(0, completeValueType.indexOf("-") > 0 ? completeValueType.indexOf("-") : completeValueType.length());
   }
 
   @Override
   public Object createArray(
-      final String objectName,
-      final ArrayDeque<?> fieldExpMappingsQueue,
-      final String fieldName,
-      final String completeFieldName,
-      final Integer arraySize,
-      final String completeTypeFilterChain,
-      final String valueType,
-      final Integer valueLength,
-      final List<String> fieldValuesList,
-      final Map<ConstraintTypeEnum, String> constraints,
-      final int level,
-      final BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
+      final SchemaProcessorPOJO pojo,
+      final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
 
-    final List<Object> list = new ArrayList<>();
-
-    for (int i = 0; i < arraySize; i++) {
-      GenerationFunctionPOJO pojo = new GenerationFunctionPOJO(objectName, fieldExpMappingsQueue, objectName, fieldName, completeFieldName,
-                                                               completeTypeFilterChain, valueType, valueLength, fieldValuesList, null, level);
-      if (i == arraySize - 1) {
-        list.add(generateFunction.apply(fieldExpMappingsQueue, pojo));
-      } else {
-        list.add(generateFunction.apply(fieldExpMappingsQueue.clone(), pojo));
+    List<Object> list = new ArrayList<>();
+    if (pojo.isLastFilterTypeOfLastElement()) {
+      list = createFinalArray(pojo);
+    } else {
+      for (int i = 0; i < pojo.getFieldSize(); i++) {
+        if (i == pojo.getFieldSize() - 1) {
+          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
+        } else {
+          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
+        }
       }
     }
-    entity.get(objectName).put(fieldName, list);
-    return returnCompleteEntry ? entity.get(objectName) : list;
+    entity.get(pojo.getRootFieldName()).put(pojo.getFieldNameSubEntity(), list);
+    return returnCompleteEntry ? entity.get(pojo.getRootFieldName()) : list;
   }
 
-  @Override
+  private List<Object> createFinalArray(SchemaProcessorPOJO pojo) {
+    return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), getSimpleValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+                                                         pojo.getFieldSize(),
+                                                         Collections.emptyMap());
+  }
+
+  public Object createValueObject(
+      final SchemaProcessorPOJO pojo) {
+    Schema fieldSchema = findSchema(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+
+
+    Object valueObject =  AVRO_GENERATOR_TOOL.generateObject(
+        Objects.requireNonNull(fieldSchema),
+        pojo.getCompleteFieldName(), getSimpleValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+        extractConstraints(fieldSchema)
+    );
+
+    return assignObject(pojo.getRootFieldName(),pojo.getFieldNameSubEntity(), valueObject);
+  }
+
   public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
     GenericRecord entityObject = entity.get(targetObjectName);
     entityObject.put(fieldName, objectToAssign);
@@ -142,19 +157,8 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
     return entity.get(targetObjectName);
   }
 
-  public Object createRepeatedObject(
-      final String fieldName, final String completeFieldName, final String fieldType, final Integer valueLength,
-      List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
-    Schema fieldSchema = findSchema(fieldName, this.schema, new AtomicBoolean(false));
-    return avroGeneratorTool.generateObject(
-        Objects.requireNonNull(fieldSchema),
-        completeFieldName, fieldType.substring(0, fieldType.indexOf("-") > 0 ? fieldType.indexOf("-") : fieldType.length()), valueLength, fieldValuesList,
-        extractConstraints(fieldSchema)
-    );
-  }
-
   @Override
-  public Object createRecord(final String objectName) {
+  public void createRecord(final String objectName) {
     if ("root".equalsIgnoreCase(objectName)) {
       entity.put("root", new GenericData.Record(this.schema));
     } else {
@@ -168,17 +172,6 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       }
       entity.put(objectName, new GenericData.Record(innerSchema));
     }
-    return entity.get(objectName);
-  }
-
-  private Schema getRecordUnion(List<Schema> types) {
-    Schema isRecord = null;
-    for (Schema innerSchema : types) {
-      if (RECORD == innerSchema.getType() || ARRAY == innerSchema.getType() || MAP == innerSchema.getType() || typesSet.contains(innerSchema.getType())) {
-        isRecord = innerSchema;
-      }
-    }
-    return isRecord;
   }
 
   @Override
@@ -188,22 +181,28 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
 
   @Override
   public boolean isOptional(final String rootFieldName, final String fieldName) {
-    var schema = findSchema(rootFieldName, this.schema, new AtomicBoolean(false));
+    var schema = findSchema(fieldName, this.schema, new AtomicBoolean(false));
     if (schema.getType().equals(Type.MAP)) {
       schema = findRecursiveSchemaForRecord(schema.getValueType());
     } else if (schema.getType().equals(Type.ARRAY)) {
       schema = findRecursiveSchemaForRecord(schema.getElementType());
     }
-
-    return ((schema.getType().equals(RECORD) && isOptionalField(schema.getField(fieldName))) ||
-            (schema.getType().equals(ARRAY) && isOptionalField(schema.getField(fieldName))) ||
-            (schema.getType().equals(MAP) && isOptionalField(schema.getValueType().getField(fieldName))));
-
+    return isOptionalField(schema);
   }
 
-  private Boolean isOptionalField(Field field) {
-    if (UNION.equals(field.schema().getType())) {
-      return IteratorUtils.matchesAny(field.schema().getTypes().iterator(), type -> type.getType() == NULL);
+  private Schema getRecordUnion(List<Schema> types) {
+    Schema isRecord = null;
+    for (Schema innerSchema : types) {
+      if (RECORD == innerSchema.getType() || ARRAY == innerSchema.getType() || MAP == innerSchema.getType() || TYPES_SET.contains(innerSchema.getType())) {
+        isRecord = innerSchema;
+      }
+    }
+    return isRecord;
+  }
+
+  private Boolean isOptionalField(Schema schema) {
+    if (UNION.equals(schema.getType())) {
+      return IteratorUtils.matchesAny(schema.getTypes().iterator(), type -> type.getType() == NULL);
     }
     return false;
   }
@@ -250,15 +249,12 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
 
   private Map<ConstraintTypeEnum, String> extractConstraints(Schema schema) {
     Map<ConstraintTypeEnum, String> constraints = new HashMap<>();
-
     if (Objects.nonNull(schema.getObjectProp("precision"))) {
       constraints.put(ConstraintTypeEnum.PRECISION, schema.getObjectProp("precision").toString());
     }
-
     if (Objects.nonNull(schema.getObjectProp("scale"))) {
       constraints.put(ConstraintTypeEnum.SCALE, schema.getObjectProp("scale").toString());
     }
-
     return constraints;
   }
 }

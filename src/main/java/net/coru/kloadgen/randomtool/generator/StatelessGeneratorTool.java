@@ -16,8 +16,8 @@ import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.random.RandomSequence;
-import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.randomtool.util.ValidTypeConstants;
+import net.coru.kloadgen.randomtool.util.ValueUtils;
 
 public class StatelessGeneratorTool {
 
@@ -29,8 +29,6 @@ public class StatelessGeneratorTool {
 
   private final RandomObject randomObject = new RandomObject();
 
-  private final RandomSequence randomSequence = new RandomSequence();
-
   public String generateRandomString(Integer valueLength) {
     return (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), Collections.emptyMap());
   }
@@ -41,10 +39,10 @@ public class StatelessGeneratorTool {
     Object value;
 
     if ("seq".equals(fieldType)) {
-      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomSequence.isTypeSupported(fieldType))) {
-        return randomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
+        return RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
       } else {
-        value = randomSequence.generateSeq(fieldName, fieldType, parameterList, context);
+        value = RandomSequence.generateSeq(fieldName, fieldType, parameterList, context);
       }
     } else {
       value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
@@ -61,6 +59,10 @@ public class StatelessGeneratorTool {
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
+  public boolean checkIfNullFieldValueList(List<String> fieldValueList) {
+    return fieldValueList == null || (fieldValueList.size() == 1 && fieldValueList.contains("null"));
+  }
+
   public Object generateArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
 
     if (checkIfNullFieldValueList(fieldValuesList)) {
@@ -70,13 +72,9 @@ public class StatelessGeneratorTool {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     Object value = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
     if ("seq".equals(fieldType)) {
-      value = randomSequence.generateSeq(fieldName, fieldType, parameterList, context);
+      value = RandomSequence.generateSeq(fieldName, fieldType, parameterList, context);
     }
 
     return value;
-  }
-
-  public boolean checkIfNullFieldValueList(List<String> fieldValueList) {
-    return fieldValueList == null || (fieldValueList.size() == 1 && fieldValueList.contains("null"));
   }
 }
