@@ -77,6 +77,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       final String valueType,
       final Integer valueLength,
       final List<String> fieldValuesList,
+      final Map<ConstraintTypeEnum, String> constraints,
       final int level,
       final BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
@@ -85,7 +86,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
 
     for (int i = 0; i < mapSize; i++) {
       GenerationFunctionPOJO pojo = new GenerationFunctionPOJO(objectName, fieldExpMappingsQueue, objectName, fieldName, completeFieldName,
-                                                               completeTypeFilterChain, valueType, valueLength, fieldValuesList, level);
+                                                               completeTypeFilterChain, valueType, valueLength, fieldValuesList, null, level);
       if (i == mapSize - 1) {
         map.put(generateString(valueLength), generateFunction.apply(fieldExpMappingsQueue, pojo));
       } else {
@@ -107,6 +108,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       final String valueType,
       final Integer valueLength,
       final List<String> fieldValuesList,
+      final Map<ConstraintTypeEnum, String> constraints,
       final int level,
       final BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
@@ -115,7 +117,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
 
     for (int i = 0; i < arraySize; i++) {
       GenerationFunctionPOJO pojo = new GenerationFunctionPOJO(objectName, fieldExpMappingsQueue, objectName, fieldName, completeFieldName,
-                                                               completeTypeFilterChain, valueType, valueLength, fieldValuesList, level);
+                                                               completeTypeFilterChain, valueType, valueLength, fieldValuesList, null, level);
       if (i == arraySize - 1) {
         list.add(generateFunction.apply(fieldExpMappingsQueue, pojo));
       } else {
@@ -142,7 +144,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
 
   public Object createRepeatedObject(
       final String fieldName, final String completeFieldName, final String fieldType, final Integer valueLength,
-      List<String> fieldValuesList) {
+      List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
     Schema fieldSchema = findSchema(fieldName, this.schema, new AtomicBoolean(false));
     return avroGeneratorTool.generateObject(
         Objects.requireNonNull(fieldSchema),
@@ -181,7 +183,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
 
   @Override
   public Object generateRecord() {
-    return new EnrichedRecord(this.metadata, this.entity.get("root"));
+    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(this.entity.get("root")).build();
   }
 
   @Override

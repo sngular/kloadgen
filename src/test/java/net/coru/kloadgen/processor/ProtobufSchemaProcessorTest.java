@@ -15,6 +15,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.extractor.SchemaExtractor;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
@@ -46,15 +47,51 @@ class ProtobufSchemaProcessorTest {
   }
 
   @Test
+  @DisplayName("Be able to process simple schema")
+  void testProtoBufFactory() throws IOException, DescriptorValidationException {
+    File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        FieldValueMapping.builder().fieldName("name").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("age").fieldType("int").required(true).isAncestorRequired(true).build());
+
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
+    DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+    List<String> assertKeys = new ArrayList<>();
+    List<Object> assertValues = new ArrayList<>();
+    Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+    map.forEach((key, value) ->
+                {
+                  assertKeys.add(key.getFullName());
+                  assertValues.add(value);
+                }
+    );
+
+    assertThat(message).isNotNull()
+                       .isInstanceOf(EnrichedRecord.class)
+                       .extracting(EnrichedRecord::getGenericRecord)
+                       .isNotNull();
+    assertThat(assertKeys).hasSize(9)
+                          .containsExactlyInAnyOrder("tutorial.Test.name",
+                                                     "tutorial.Test.age");
+    assertThat(assertValues).hasSize(9).isNotNull();
+    assertThat(assertValues.get(2)).isInstanceOf(Integer.class);
+    assertThat(assertValues.get(7)).isInstanceOf(String.class);
+  }
+
+
+
+  @Test
   @DisplayName("Be able to process embedded schema")
   void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
     List<FieldValueMapping> fieldValueMappingList = List.of(
         FieldValueMapping.builder().fieldName("phones.addressesPhone[1:].id[1]").fieldType("string-array").fieldValueList("Pablo").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("phones.phoneType").fieldType("enum").fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build());
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
     List<String> assertKeys = new ArrayList<>();
@@ -80,9 +117,9 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("id").fieldType("Int32Value").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("occurrence_id").fieldType("StringValue").fieldValueList("Isabel").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("load_number").fieldType("Int32Value").required(true).isAncestorRequired(true).build());
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
     List<String> assertKeys = new ArrayList<>();
@@ -116,9 +153,9 @@ class ProtobufSchemaProcessorTest {
     File testFile = fileHelper.getFile("/proto-files/enumTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
     fieldValueMappingList.get(0).setFieldValuesList("HOME, WORK");
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
     List<String> assertKeys = new ArrayList<>();
@@ -155,9 +192,9 @@ class ProtobufSchemaProcessorTest {
   void testProtoBufEasyTestProcessor() throws IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     List<String> assertKeys = new ArrayList<>();
     List<Object> assertValues = new ArrayList<>();
@@ -186,9 +223,9 @@ class ProtobufSchemaProcessorTest {
   void testProtoBufOneOfProcessor() throws IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/oneOfTest.proto");
     List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(schemaExtractor.schemaTypesList(testFile, "PROTOBUF"));
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     List<String> assertKeys = new ArrayList<>();
     List<Object> assertValues = new ArrayList<>();
@@ -224,9 +261,9 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("addressesNoDot[:].street").fieldType("string").fieldValueList("Sor Joaquina").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("addressesNoDot[:].number").fieldType("int").fieldValueList("6").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("addressesNoDot[:].zipcode").fieldType("int").fieldValueList("15011").required(true).isAncestorRequired(true).build());
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     List<String> assertKeys = new ArrayList<>();
     List<Object> assertValues = new ArrayList<>();
@@ -287,9 +324,9 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("dates[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("response").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("presents[:].options[]").fieldType("string-array").required(true).isAncestorRequired(true).build());
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     List<String> assertKeys = new ArrayList<>();
     List<Object> assertValues = new ArrayList<>();
@@ -357,9 +394,9 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("preventable_indicator").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("report_by_name").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("create_user_id").fieldType("string").required(true).isAncestorRequired(true).build());
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     List<String> assertKeys = new ArrayList<>();
     List<Object> assertValues = new ArrayList<>();
@@ -408,10 +445,13 @@ class ProtobufSchemaProcessorTest {
     File testFile = fileHelper.getFile("/proto-files/deveTest.proto");
     List<FieldValueMapping> fieldValueMappingList = asList(
         FieldValueMapping.builder().fieldName("load_type").fieldType("string").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("shipment.carrier_identifier.type").fieldType("enum").fieldValueList("[CARRIER_IDENTIFIER_TYPE_UNSPECIFIED, CARRIER_IDENTIFIER_TYPE_DOT_NUMBER]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("shipment.carrier_identifier.type").fieldType("enum")
+                         .fieldValueList("[CARRIER_IDENTIFIER_TYPE_UNSPECIFIED, CARRIER_IDENTIFIER_TYPE_DOT_NUMBER]").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("shipment.carrier_identifier.value").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("shipment.shipment_identifiers[].type").fieldType("enum").fieldValueList("[SHIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
-                                                                                                                       "SHIPMENT_IDENTIFIER_TYPE_BILL_OF_LADING, SHIPMENT_IDENTIFIER_TYPE_ORDER]").required(true).isAncestorRequired(true).build(),
+                                                                                                                       "SHIPMENT_IDENTIFIER_TYPE_BILL_OF_LADING, " +
+                                                                                                                       "SHIPMENT_IDENTIFIER_TYPE_ORDER]")
+                         .required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("shipment.shipment_identifiers[].value").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("shipment.equipment_identifiers[].type").fieldType("enum").fieldValueList("[EQUIPMENT_IDENTIFIER_TYPE_UNSPECIFIED, " +
                                                                                                                         "EQUIPMENT_IDENTIFIER_TYPE_MOBILE_PHONE_NUMBER, " +
@@ -420,17 +460,24 @@ class ProtobufSchemaProcessorTest {
                                                                                                                         "EQUIPMENT_IDENTIFIER_TYPE_SENSITECH_DEVICE_ID, " +
                                                                                                                         "EQUIPMENT_IDENTIFIER_TYPE_EMERSON_DEVICE_ID, " +
                                                                                                                         "EQUIPMENT_IDENTIFIER_TYPE_TIVE_DEVICE_ID, " +
-                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_CONTAINER_ID]").required(true).isAncestorRequired(true).build(),
+                                                                                                                        "EQUIPMENT_IDENTIFIER_TYPE_CONTAINER_ID]").required(true)
+                         .isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("shipment.equipment_identifiers[].value").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("shipment.attributes[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("latest_status_update.timestamp").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("latest_status_update.stop_number").fieldType("int").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.status_code").fieldType("enum").fieldValueList("[STATUS_UPDATE_CODE_UNSPECIFIED, STATUS_UPDATE_CODE_DISPATCHED, STATUS_UPDATE_CODE_IN_TRANSIT, " +
-                                                                                                                   "STATUS_UPDATE_CODE_AT_STOP, STATUS_UPDATE_CODE_COMPLETED, STATUS_UPDATE_CODE_TRACKING_FAILED, " +
-                                                                                                                   "STATUS_UPDATE_CODE_INFO, STATUS_UPDATE_CODE_DELETED]").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_status_update.status_reason").fieldType("enum").fieldValueList("[STATUS_UPDATE_REASON_UNSPECIFIED, STATUS_UPDATE_REASON_PENDING_TRACKING_METHOD, " +
-                                                                                                                     "STATUS_UPDATE_REASON_SCHEDULED, STATUS_UPDATE_REASON_PENDING_APPROVAL, " +
-                                                                                                                     "STATUS_UPDATE_REASON_ACQUIRING_LOCATION, STATUS_UPDATE_REASON_PENDING_CARRIER, STATUS_UPDATE_REASON_IN_MOTION, STATUS_UPDATE_REASON_IDLE, STATUS_UPDATE_REASON_APPROVAL_DENIED, STATUS_UPDATE_REASON_TIMED_OUT, STATUS_UPDATE_REASON_CANCELED, STATUS_UPDATE_REASON_DEPARTED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FAILED_TO_ACQUIRE_LOCATION, STATUS_UPDATE_REASON_INFO]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.status_code").fieldType("enum")
+                         .fieldValueList("[STATUS_UPDATE_CODE_UNSPECIFIED, STATUS_UPDATE_CODE_DISPATCHED, STATUS_UPDATE_CODE_IN_TRANSIT, " +
+                                         "STATUS_UPDATE_CODE_AT_STOP, STATUS_UPDATE_CODE_COMPLETED, STATUS_UPDATE_CODE_TRACKING_FAILED, " +
+                                         "STATUS_UPDATE_CODE_INFO, STATUS_UPDATE_CODE_DELETED]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_status_update.status_reason").fieldType("enum")
+                         .fieldValueList("[STATUS_UPDATE_REASON_UNSPECIFIED, STATUS_UPDATE_REASON_PENDING_TRACKING_METHOD, " +
+                                         "STATUS_UPDATE_REASON_SCHEDULED, STATUS_UPDATE_REASON_PENDING_APPROVAL, " +
+                                         "STATUS_UPDATE_REASON_ACQUIRING_LOCATION, STATUS_UPDATE_REASON_PENDING_CARRIER, STATUS_UPDATE_REASON_IN_MOTION, " +
+                                         "STATUS_UPDATE_REASON_IDLE, STATUS_UPDATE_REASON_APPROVAL_DENIED, STATUS_UPDATE_REASON_TIMED_OUT, STATUS_UPDATE_REASON_CANCELED, " +
+                                         "STATUS_UPDATE_REASON_DEPARTED_FINAL_STOP, STATUS_UPDATE_REASON_ARRIVED_FINAL_STOP, " +
+                                         "STATUS_UPDATE_REASON_ARRIVED_FAILED_TO_ACQUIRE_LOCATION, STATUS_UPDATE_REASON_INFO]")
+                         .required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("latest_status_update.geo_coordinates.latitude").fieldType("double").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("latest_status_update.geo_coordinates.longitude").fieldType("double").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("latest_status_update.address.postal_code").fieldType("string").required(true).isAncestorRequired(true).build(),
@@ -439,19 +486,25 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("latest_status_update.address.state").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("latest_status_update.address.country").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("latest_stop_statuses[].stop_number").fieldType("int").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].status_code").fieldType("enum").fieldValueList("[STOP_STATUS_CODE_UNSPECIFIED, STOP_STATUS_CODE_UNKNOWN, STOP_STATUS_CODE_EN_ROUTE, " +
-                                                                                                                     "STOP_STATUS_CODE_ARRIVED, STOP_STATUS_CODE_DEPARTED]").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.start_date_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.end_date_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.last_calculated_date_time").fieldType(".google.protobuf.Timestamp").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_code").fieldType("enum").fieldValueList("[ARRIVAL_CODE_UNSPECIFIED, ARRIVAL_CODE_UNKNOWN, ARRIVAL_CODE_EARLY, ARRIVAL_CODE_ON_TIME, " +
-                                                                                                                      "ARRIVAL_CODE_LATE]").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("latest_stop_statuses[].additional_appointment_window_statuses[]").fieldType("string-array").required(true).isAncestorRequired(true).build()
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].status_code").fieldType("enum")
+                         .fieldValueList("[STOP_STATUS_CODE_UNSPECIFIED, STOP_STATUS_CODE_UNKNOWN, STOP_STATUS_CODE_EN_ROUTE, " +
+                                         "STOP_STATUS_CODE_ARRIVED, STOP_STATUS_CODE_DEPARTED]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.start_date_time").fieldType(".google.protobuf.Timestamp")
+                         .required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.estimated_arrival_window.end_date_time").fieldType(".google.protobuf.Timestamp")
+                         .required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_estimate.last_calculated_date_time").fieldType(".google.protobuf.Timestamp").required(true)
+                         .isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].arrival_code").fieldType("enum")
+                         .fieldValueList("[ARRIVAL_CODE_UNSPECIFIED, ARRIVAL_CODE_UNKNOWN, ARRIVAL_CODE_EARLY, ARRIVAL_CODE_ON_TIME, " +
+                                         "ARRIVAL_CODE_LATE]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("latest_stop_statuses[].additional_appointment_window_statuses[]").fieldType("string-array").required(true).isAncestorRequired(true)
+                         .build()
     );
 
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     List<String> assertKeys = new ArrayList<>();
     List<Object> assertValues = new ArrayList<>();
@@ -478,10 +531,11 @@ class ProtobufSchemaProcessorTest {
     File testFile = fileHelper.getFile("/proto-files/dateTimeTest.proto");
     List<FieldValueMapping> fieldValueMappingList = List.of(
         FieldValueMapping.builder().fieldName("incident_date").fieldType(".google.type.Date").fieldValueList("2022-05-30").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("incident_time").fieldType(".google.type.TimeOfDay").fieldValueList("14:20:30-05:00").required(true).isAncestorRequired(true).build());
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = protobufSchemaProcessor.next();
+        FieldValueMapping.builder().fieldName("incident_time").fieldType(".google.type.TimeOfDay").fieldValueList("14:20:30-05:00").required(true).isAncestorRequired(true)
+                         .build());
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
     List<String> assertKeys = new ArrayList<>();

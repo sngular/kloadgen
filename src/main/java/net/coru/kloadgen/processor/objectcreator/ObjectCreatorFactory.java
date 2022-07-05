@@ -14,7 +14,7 @@ import net.coru.kloadgen.processor.objectcreator.impl.ProtobufObjectCreatorFacto
 @Slf4j
 public class ObjectCreatorFactory {
 
-  public static ObjectCreator getInstance(SchemaTypeEnum schemaType, Object schema, SchemaMetadata metadata) {
+  public static ObjectCreator getInstance(SchemaTypeEnum schemaType, Object schema, Object metadata) {
     ObjectCreator objectCreator = null;
     try {
       switch (schemaType) {

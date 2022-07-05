@@ -8,12 +8,15 @@ package net.coru.kloadgen.processor;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
+import net.coru.kloadgen.common.SchemaTypeEnum;
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.impl.AvroObjectCreatorFactory;
+import net.coru.kloadgen.processor.objectcreator.ObjectCreatorFactory;
 import net.coru.kloadgen.processor.objectcreator.model.GenerationFunctionPOJO;
 
 public class SchemaProcessor extends SchemaProcessorLib {
@@ -22,8 +25,8 @@ public class SchemaProcessor extends SchemaProcessorLib {
 
   private ObjectCreator objectCreator;
 
-  public void processSchema(Object schema, Object metadata, List<FieldValueMapping> fieldExprMappings) {
-    this.objectCreator = new AvroObjectCreatorFactory(schema, metadata);
+  public void processSchema(SchemaTypeEnum schemaType, Object schema, Object metadata, List<FieldValueMapping> fieldExprMappings) {
+    this.objectCreator = ObjectCreatorFactory.getInstance(schemaType, schema, metadata);
     this.fieldExprMappings = fieldExprMappings;
   }
 
@@ -63,27 +66,29 @@ public class SchemaProcessor extends SchemaProcessorLib {
           fieldExpMappingsQueue.remove();
           fieldValueMapping = fieldExpMappingsQueue.peek();
         } else {*/
-          String singleTypeFilter = getFirstComplexType(completeTypeFilterChain);
-          if (isTypeFilterMap(singleTypeFilter)) {
-            this.objectCreator.createMap("root", fieldExpMappingsQueue, fieldName, completeFieldName, calculateSizeFromTypeFilter(singleTypeFilter),
-                                         completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll(
-                                             "\\[", "\\\\["), ""), fieldValueMapping.getFieldType(),
-                                         fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(), level, getMapAndArrayGenerationFunction(), true);
-          } else if (isTypeFilterArray(singleTypeFilter)) {
-            this.objectCreator.createArray("root", fieldExpMappingsQueue, fieldName, completeFieldName, calculateSizeFromTypeFilter(singleTypeFilter),
-                                           completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""), fieldValueMapping.getFieldType(),
-                                           fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(), level, getMapAndArrayGenerationFunction(), true);
-          } else if (isTypeFilterRecord(singleTypeFilter)) {
-            createObject(fieldName, fieldExpMappingsQueue, level);
-            this.objectCreator.assignRecord("root", fieldName, fieldName);
-          } else {
-            fieldExpMappingsQueue.remove();
-            Object objectResult = this.objectCreator.createRepeatedObject(fieldName, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(),
-                                                                          fieldValueMapping.getValueLength(),
-                                                                          fieldValueMapping.getFieldValuesList());
-            this.objectCreator.assignObject("root", fieldName, objectResult);
-          }
-          fieldValueMapping = fieldExpMappingsQueue.peek();
+        String singleTypeFilter = getFirstComplexType(completeTypeFilterChain);
+        if (isTypeFilterMap(singleTypeFilter)) {
+          this.objectCreator.createMap("root", fieldExpMappingsQueue, fieldName, completeFieldName, calculateSizeFromTypeFilter(singleTypeFilter),
+                                       completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll(
+                                           "\\[", "\\\\["), ""), fieldValueMapping.getFieldType(),
+                                       fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), level,
+                                       getMapAndArrayGenerationFunction(), true);
+        } else if (isTypeFilterArray(singleTypeFilter)) {
+          this.objectCreator.createArray("root", fieldExpMappingsQueue, fieldName, completeFieldName, calculateSizeFromTypeFilter(singleTypeFilter),
+                                         completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""), fieldValueMapping.getFieldType(),
+                                         fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), level,
+                                         getMapAndArrayGenerationFunction(), true);
+        } else if (isTypeFilterRecord(singleTypeFilter)) {
+          createObject(fieldName, fieldExpMappingsQueue, level);
+          this.objectCreator.assignRecord("root", fieldName, fieldName);
+        } else {
+          fieldExpMappingsQueue.remove();
+          Object objectResult = this.objectCreator.createRepeatedObject(fieldName, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(),
+                                                                        fieldValueMapping.getValueLength(),
+                                                                        fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints());
+          this.objectCreator.assignObject("root", fieldName, objectResult);
+        }
+        fieldValueMapping = fieldExpMappingsQueue.peek();
         //}
       }
     }
@@ -138,32 +143,34 @@ public class SchemaProcessor extends SchemaProcessorLib {
         }
 
       } else {*/
-        String singleTypeFilter = getFirstComplexType(completeTypeFilterChain);
+      String singleTypeFilter = getFirstComplexType(completeTypeFilterChain);
 
-        if (isTypeFilterMap(singleTypeFilter)) {
-          objectRecord = this.objectCreator.createMap(rootFieldName, fieldExpMappingsQueue, fieldNameSubEntity, completeFieldName,
+      if (isTypeFilterMap(singleTypeFilter)) {
+        objectRecord = this.objectCreator.createMap(rootFieldName, fieldExpMappingsQueue, fieldNameSubEntity, completeFieldName,
+                                                    calculateSizeFromTypeFilter(singleTypeFilter),
+                                                    completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""), fieldValueMapping.getFieldType(),
+                                                    fieldValueMapping.getValueLength(),
+                                                    fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), levelCount, getMapAndArrayGenerationFunction(),
+                                                    true);
+
+      } else if (isTypeFilterArray(singleTypeFilter)) {
+        objectRecord = this.objectCreator.createArray(rootFieldName, fieldExpMappingsQueue, fieldNameSubEntity, completeFieldName,
                                                       calculateSizeFromTypeFilter(singleTypeFilter),
                                                       completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""), fieldValueMapping.getFieldType(),
                                                       fieldValueMapping.getValueLength(),
-                                                      fieldValueMapping.getFieldValuesList(), levelCount, getMapAndArrayGenerationFunction(), true);
-
-        } else if (isTypeFilterArray(singleTypeFilter)) {
-          objectRecord = this.objectCreator.createArray(rootFieldName, fieldExpMappingsQueue, fieldNameSubEntity, completeFieldName,
-                                                        calculateSizeFromTypeFilter(singleTypeFilter),
-                                                        completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""), fieldValueMapping.getFieldType(),
-                                                        fieldValueMapping.getValueLength(),
-                                                        fieldValueMapping.getFieldValuesList(), levelCount, getMapAndArrayGenerationFunction(), true);
-        } else if (isTypeFilterRecord(singleTypeFilter)) {
-          objectRecord = createObject(fieldNameSubEntity, fieldExpMappingsQueue, levelCount);
-          this.objectCreator.assignRecord(rootFieldName, fieldNameSubEntity, fieldNameSubEntity);
-        } else {
-          fieldExpMappingsQueue.remove();
-          objectRecord = this.objectCreator.createRepeatedObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(),
-                                                                 fieldValueMapping.getValueLength(),
-                                                                 fieldValueMapping.getFieldValuesList());
-          objectRecord = this.objectCreator.assignObject(rootFieldName, fieldNameSubEntity, objectRecord);
-        }
-        fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
+                                                      fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), levelCount, getMapAndArrayGenerationFunction(),
+                                                      true);
+      } else if (isTypeFilterRecord(singleTypeFilter)) {
+        objectRecord = createObject(fieldNameSubEntity, fieldExpMappingsQueue, levelCount);
+        this.objectCreator.assignRecord(rootFieldName, fieldNameSubEntity, fieldNameSubEntity);
+      } else {
+        fieldExpMappingsQueue.remove();
+        objectRecord = this.objectCreator.createRepeatedObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(),
+                                                               fieldValueMapping.getValueLength(),
+                                                               fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints());
+        objectRecord = this.objectCreator.assignObject(rootFieldName, fieldNameSubEntity, objectRecord);
+      }
+      fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       //}
     }
     return objectRecord;
@@ -182,15 +189,17 @@ public class SchemaProcessor extends SchemaProcessorLib {
                                            generationFunctionPOJO.getValueType(),
                                            generationFunctionPOJO.getValueLength(),
                                            generationFunctionPOJO.getFieldValuesList(),
+                                           generationFunctionPOJO.getConstraints(),
                                            generationFunctionPOJO.getLevel());
       } else if (isTypeFilterRecord(singleTypeFilter)) {
-          returnObject = createObject(generationFunctionPOJO.getFieldNameSubEntity(), (ArrayDeque<FieldValueMapping>)fieldExpMappingsQueue,
-                                      generationFunctionPOJO.getLevel());
+        returnObject = createObject(generationFunctionPOJO.getFieldNameSubEntity(), (ArrayDeque<FieldValueMapping>) fieldExpMappingsQueue,
+                                    generationFunctionPOJO.getLevel());
       } else {
         fieldExpMappingsQueue.remove();
         returnObject = this.objectCreator.createRepeatedObject(generationFunctionPOJO.getFieldNameSubEntity(), generationFunctionPOJO.getCompleteFieldName(),
-                                                               generationFunctionPOJO.getValueType()
-            , generationFunctionPOJO.getValueLength(), generationFunctionPOJO.getFieldValuesList());
+                                                               generationFunctionPOJO.getValueType(),
+                                                               generationFunctionPOJO.getValueLength(), generationFunctionPOJO.getFieldValuesList(),
+                                                               generationFunctionPOJO.getConstraints());
       }
 
       return returnObject;
@@ -201,7 +210,7 @@ public class SchemaProcessor extends SchemaProcessorLib {
 
   private Object processComplexTypes(
       String objectName, ArrayDeque<?> fieldExpMappingsQueue, String fieldNameSubEntity, String completeFieldName, String completeTypeFilterChain,
-      String valueType, Integer valueLength, List<String> fieldValuesList, final int level) {
+      String valueType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints, final int level) {
     Object returnObject;
     String subfieldCleanName = fieldNameSubEntity;
     String singleTypeFilter = getFirstComplexType(completeTypeFilterChain);
@@ -209,12 +218,11 @@ public class SchemaProcessor extends SchemaProcessorLib {
     if (isTypeFilterMap(singleTypeFilter)) {
       returnObject = this.objectCreator.createMap(objectName, fieldExpMappingsQueue, subfieldCleanName, completeFieldName, calculateSizeFromTypeFilter(singleTypeFilter),
                                                   completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""), valueType, valueLength, fieldValuesList,
-                                                  level,
-                                                  getMapAndArrayGenerationFunction(), false);
+                                                  constraints, level, getMapAndArrayGenerationFunction(), false);
     } else {
       returnObject = this.objectCreator.createArray(objectName, fieldExpMappingsQueue, subfieldCleanName, completeFieldName, calculateSizeFromTypeFilter(singleTypeFilter),
                                                     completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""), valueType, valueLength,
-                                                    fieldValuesList, level,
+                                                    fieldValuesList, constraints, level,
                                                     getMapAndArrayGenerationFunction(), false);
     }
     return returnObject;

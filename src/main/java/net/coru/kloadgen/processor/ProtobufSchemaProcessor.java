@@ -20,11 +20,6 @@ public class ProtobufSchemaProcessor extends SchemaProcessorLib {
 
   //private ProcessorObjectCreator objectCreator;
 
-  public void processSchema(Object schema, SchemaMetadata metadata, List<FieldValueMapping> fieldExprMappings)
-      throws DescriptorValidationException, IOException {
-    /*this.objectCreator = new ObjectCreatorFactory().getInstance(SchemaTypeEnum.PROTOBUF, schema, metadata);
-    this.fieldExprMappings = fieldExprMappings;*/
-  }
 
   public EnrichedRecord next() {
     /*DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(schema);

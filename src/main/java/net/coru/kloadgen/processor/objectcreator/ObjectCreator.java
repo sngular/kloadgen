@@ -1,9 +1,11 @@
 package net.coru.kloadgen.processor.objectcreator;
 
+import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.processor.objectcreator.model.GenerationFunctionPOJO;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 public interface ObjectCreator {
@@ -20,6 +22,7 @@ public interface ObjectCreator {
     String valueType,
     Integer valueLength,
     List<String> fieldValuesList,
+    Map<ConstraintTypeEnum, String> constraints,
     int level,
     BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
     boolean returnCompleteEntry);
@@ -34,16 +37,17 @@ public interface ObjectCreator {
     String valueType,
     Integer valueLength,
     List<String> fieldValuesList,
+    Map<ConstraintTypeEnum, String> constraints,
     int level,
     BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
     boolean returnCompleteEntry);
 
   Object createRepeatedObject(
-      String fieldName,
-      String completeFieldName,
-      String valueType,
-      Integer valueLength,
-      List<String> fieldValuesList);
+          String fieldName,
+          String completeFieldName,
+          String valueType,
+          Integer valueLength,
+          List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints);
 
   Object assignObject(String targetObjectName, String fieldName, Object objectToAssign);
 
