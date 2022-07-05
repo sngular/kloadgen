@@ -13,7 +13,7 @@ import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.processor.ProtoBufProcessorHelper;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.model.GenerationFunctionPOJO;
+import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
@@ -45,30 +45,23 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public String generateString(final Integer valueLength) {
-    return String.valueOf(randomObject.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
-  }
-
-  @Override
   public Object createMap(
-      final String objectName, final ArrayDeque<?> fieldExpMappingsQueue, final String fieldName, final String completeFieldName, final Integer mapSize,
-      final String completeTypeFilterChain, final String valueType,
-      final Integer valueLength, final List<String> fieldValuesList, final int level, final BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
+      final SchemaProcessorPOJO pojo,
+      final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
     return null;
   }
 
   @Override
   public Object createArray(
-      final String objectName, final ArrayDeque<?> fieldExpMappingsQueue, final String fieldName, final String completeFieldName, final Integer arraySize,
-      final String completeTypeFilterChain, final String valueType,
-      final Integer valueLength, final List<String> fieldValuesList, final int level, final BiFunction<ArrayDeque<?>, GenerationFunctionPOJO, Object> generateFunction,
+      final SchemaProcessorPOJO pojo,
+      final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
     return null;
   }
 
   @Override
-  public Object createRepeatedObject(
+  public Object createValueObject(
       final String fieldName, final String completeFieldName, final String valueType, final Integer valueLength, final List<String> fieldValuesList) {
     return null;
   }
@@ -96,5 +89,9 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   @Override
   public boolean isOptional(final String rootFieldName, final String fieldName) {
     return false;
+  }
+
+  private String generateString(final Integer valueLength) {
+    return String.valueOf(randomObject.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
   }
 }
