@@ -77,6 +77,9 @@ public class SchemaProcessor extends SchemaProcessorLib {
                                                                fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), level,
                                                                lastTypeFilterOfLastElement);
             this.objectCreator.createMap(pojo, getMapAndArrayGenerationFunction(), true);
+            if (lastTypeFilterOfLastElement) {
+              fieldExpMappingsQueue.remove();
+            }
           } else if (isTypeFilterArray(singleTypeFilter)) {
 
             SchemaProcessorPOJO pojo = new SchemaProcessorPOJO("root", fieldExpMappingsQueue, fieldName, completeFieldName, remainingFilterChain,
@@ -85,6 +88,9 @@ public class SchemaProcessor extends SchemaProcessorLib {
                                                                fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), level,
                                                                lastTypeFilterOfLastElement);
             this.objectCreator.createArray(pojo, getMapAndArrayGenerationFunction(), true);
+            if (lastTypeFilterOfLastElement) {
+              fieldExpMappingsQueue.remove();
+            }
           } else if (isTypeFilterRecord(singleTypeFilter)) {
             createObject(fieldName, fieldExpMappingsQueue, level);
             this.objectCreator.assignRecord("root", fieldName, fieldName);
@@ -163,6 +169,9 @@ public class SchemaProcessor extends SchemaProcessorLib {
                                                              fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), levelCount,
                                                              lastTypeFilterOfLastElement);
           objectRecord = this.objectCreator.createMap(pojo, getMapAndArrayGenerationFunction(), true);
+          if (lastTypeFilterOfLastElement) {
+            fieldExpMappingsQueue.remove();
+          }
         } else if (isTypeFilterArray(singleTypeFilter)) {
 
           SchemaProcessorPOJO pojo = new SchemaProcessorPOJO(rootFieldName, fieldExpMappingsQueue, fieldNameSubEntity, completeFieldName,
@@ -173,15 +182,18 @@ public class SchemaProcessor extends SchemaProcessorLib {
                                                              fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), levelCount,
                                                              lastTypeFilterOfLastElement);
           objectRecord = this.objectCreator.createArray(pojo, getMapAndArrayGenerationFunction(), true);
+          if (lastTypeFilterOfLastElement) {
+            fieldExpMappingsQueue.remove();
+          }
         } else if (isTypeFilterRecord(singleTypeFilter)) {
           objectRecord = createObject(fieldNameSubEntity, fieldExpMappingsQueue, levelCount);
           this.objectCreator.assignRecord(rootFieldName, fieldNameSubEntity, fieldNameSubEntity);
         } else {
           fieldExpMappingsQueue.remove();
-          objectRecord = this.objectCreator.createValueObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(),
-                                                              fieldValueMapping.getValueLength(),
-                                                              fieldValueMapping.getFieldValuesList());
-          objectRecord = this.objectCreator.assignObject(rootFieldName, fieldNameSubEntity, objectRecord);
+          Object objectResult = this.objectCreator.createValueObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(),
+                                                                     fieldValueMapping.getValueLength(),
+                                                                     fieldValueMapping.getFieldValuesList());
+          objectRecord = this.objectCreator.assignObject(rootFieldName, fieldNameSubEntity, objectResult);
         }
         fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       }
@@ -230,7 +242,9 @@ public class SchemaProcessor extends SchemaProcessorLib {
     String remainingFilterChain = completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), "");
     boolean lastTypeFilterOfLastElement = isLastTypeFilterOfLastElement(remainingFilterChain);
     int size = calculateSizeFromTypeFilter(singleTypeFilter);
-
+    if (lastTypeFilterOfLastElement) {
+      fieldExpMappingsQueue.remove();
+    }
     SchemaProcessorPOJO pojo = new SchemaProcessorPOJO(objectName, fieldExpMappingsQueue, subfieldCleanName, completeFieldName,
                                                        completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), ""),
                                                        size, valueType, valueLength,

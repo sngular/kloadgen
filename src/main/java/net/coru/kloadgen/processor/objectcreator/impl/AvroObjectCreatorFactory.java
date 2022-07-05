@@ -32,8 +32,6 @@ import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
 import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
-import net.coru.kloadgen.randomtool.random.RandomArray;
-import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
@@ -48,10 +46,6 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
 
   private static final RandomObject RANDOM_OBJECT = new RandomObject();
-
-  private static final RandomMap RANDOM_MAP = new RandomMap();
-
-  private static final RandomArray RANDOM_ARRAY = new RandomArray();
 
   private static final Set<Type> TYPES_SET = EnumSet.of(INT, DOUBLE, FLOAT, BOOLEAN, STRING, LONG, BYTES, FIXED);
 
@@ -77,20 +71,15 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       final boolean returnCompleteEntry) {
 
     Map<Object, Object> map = new HashMap<>();
-    SchemaProcessorPOJO innerPojo = new SchemaProcessorPOJO(pojo.getRootFieldName(), pojo.getFieldExpMappingsQueue(), pojo.getFieldNameSubEntity(), pojo.getCompleteFieldName(),
-                                                            pojo.getCompleteTypeFilterChain(), pojo.getFieldSize(), pojo.getValueType(), pojo.getValueLength(),
-                                                            pojo.getFieldValuesList(), pojo.getConstraints(), pojo.getLevel(), pojo.isLastFilterTypeOfLastElement());
-
     if (pojo.isLastFilterTypeOfLastElement()) {
-      pojo.getFieldExpMappingsQueue().remove();
       map = createFinalMap(pojo);
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         String key = generateString(pojo.getValueLength());
         if (i == pojo.getFieldSize() - 1) {
-          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue(), innerPojo));
+          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
         } else {
-          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), innerPojo));
+          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
         }
       }
     }
@@ -120,20 +109,14 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       final boolean returnCompleteEntry) {
 
     List<Object> list = new ArrayList<>();
-    SchemaProcessorPOJO innerPojo = new SchemaProcessorPOJO(pojo.getRootFieldName(), pojo.getFieldExpMappingsQueue(), pojo.getFieldNameSubEntity(),
-                                                            pojo.getCompleteFieldName(),
-                                                            pojo.getCompleteTypeFilterChain(), pojo.getFieldSize(), pojo.getValueType(), pojo.getValueLength(),
-                                                            pojo.getFieldValuesList(), pojo.getConstraints(),
-                                                            pojo.getLevel(), pojo.isLastFilterTypeOfLastElement());
     if (pojo.isLastFilterTypeOfLastElement()) {
-      pojo.getFieldExpMappingsQueue().remove();
       list = createFinalArray(pojo);
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         if (i == pojo.getFieldSize() - 1) {
-          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue(), innerPojo));
+          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
         } else {
-          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), innerPojo));
+          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
         }
       }
     }
