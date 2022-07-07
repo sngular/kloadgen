@@ -54,12 +54,20 @@ public class SchemaProcessorPOJO {
     return rootFieldName;
   }
 
+  public void setRootFieldName(final String rootFieldName) {
+    this.rootFieldName = rootFieldName;
+  }
+
   public ArrayDeque<?> getFieldExpMappingsQueue() {
     return fieldExpMappingsQueue;
   }
 
   public String getFieldNameSubEntity() {
     return fieldNameSubEntity;
+  }
+
+  public void setFieldNameSubEntity(final String fieldNameSubEntity) {
+    this.fieldNameSubEntity = fieldNameSubEntity;
   }
 
   public String getCompleteTypeFilterChain() {
