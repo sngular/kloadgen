@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class SchemaProcessorLib {
 
-  protected static final Map<String, Object> context = new HashMap<>();
+  protected static final Map<String, Object> CONTEXT = new HashMap<>();
 
   private static final RandomObject randomObject = new RandomObject();
 
@@ -111,45 +111,35 @@ public abstract class SchemaProcessorLib {
 
   }
 
-  protected static String getCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
-    return getFullMethodName(fieldValueMapping, fieldName, level).replaceAll("\\[[0-9]*:?]", "");
-  }
-
-  static String getFullMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
-    String pathToClean = cleanUpPath(fieldValueMapping, fieldName, level);
-    int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
-    return pathToClean.substring(0, endOfField);
-  }
-
-  protected static String cleanUpPath(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
-    String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
-    return String.join(".", Arrays.copyOfRange(splitPath, level, splitPath.length));
-  }
-
-  protected static String getCompleteSubfieldName(String cleanPath) {
+  protected static String getCompleteSubfieldName(final String cleanPath) {
     return cleanPath.substring(0, cleanPath.indexOf(".") > 0 ? cleanPath.indexOf(".") + 1 : cleanPath.length());
   }
 
-  static String getTypeFilter(String fieldName, String cleanPath) {
+  static String getTypeFilter(final String fieldName, final String cleanPath) {
     String tmpCleanPath = cleanPath.replaceAll(fieldName, "");
     return tmpCleanPath.substring(0, tmpCleanPath.indexOf(".") > 0 ? tmpCleanPath.indexOf(".") + 1 : tmpCleanPath.length());
   }
 
-  static String getMapCleanMethodName(FieldValueMapping fieldValueMapping, String fieldName, final int level) {
-    String pathToClean = cleanUpPath(fieldValueMapping, fieldName, level);
+  static String getMapCleanMethodName(final FieldValueMapping fieldValueMapping, final String fieldName, final int level) {
+    String pathToClean = cleanUpPath(fieldValueMapping, level);
     int endOfField = pathToClean.contains("[") ? pathToClean.indexOf("[") : 0;
     return pathToClean.substring(0, endOfField).replaceAll("\\[\\d*:?]", "");
   }
 
-  static boolean isTypeFilterMap(String singleTypeFilter) {
+  protected static String cleanUpPath(final FieldValueMapping fieldValueMapping, final int level) {
+    String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
+    return String.join(".", Arrays.copyOfRange(splitPath, level, splitPath.length));
+  }
+
+  static boolean isTypeFilterMap(final String singleTypeFilter) {
     return singleTypeFilter.matches("^\\[[1-9]*:]");
   }
 
-  static boolean isTypeFilterArray(String singleTypeFilter) {
+  static boolean isTypeFilterArray(final String singleTypeFilter) {
     return singleTypeFilter.matches("^\\[\\d*]");
   }
 
-  static Integer calculateSizeFromTypeFilter(String singleTypeFilter) {
+  static Integer calculateSizeFromTypeFilter(final String singleTypeFilter) {
     int arrayLength = RandomUtils.nextInt(1, 10);
     String arrayStringSize = "";
     Pattern pattern = Pattern.compile("\\d*");
@@ -165,11 +155,11 @@ public abstract class SchemaProcessorLib {
     return arrayLength;
   }
 
-  static boolean hasMapOrArrayTypeFilter(String typeFilter) {
+  static boolean hasMapOrArrayTypeFilter(final String typeFilter) {
     return typeFilter.matches("\\[.*].*");
   }
 
-  static String getFirstComplexType(String completeTypeFilterChain) {
+  static String getFirstComplexType(final String completeTypeFilterChain) {
     String firstElementTypeFilterChain = completeTypeFilterChain;
     if (StringUtils.isNotEmpty(firstElementTypeFilterChain)) {
       String[] splitElements = firstElementTypeFilterChain.split("\\.");
@@ -182,11 +172,25 @@ public abstract class SchemaProcessorLib {
     return matcher.find() ? matcher.group() : firstElementTypeFilterChain;
   }
 
-  static boolean isTypeFilterRecord(String singleTypeFilter) {
+  static boolean isTypeFilterRecord(final String singleTypeFilter) {
     return singleTypeFilter.startsWith(".");
   }
 
   static boolean isLastTypeFilterOfLastElement(final String completeTypeFilterChain) {
     return !completeTypeFilterChain.matches("\\[.*].*") && !completeTypeFilterChain.matches("\\.");
+  }
+
+  static boolean isNewFieldSharingRootFieldName(final int level, final FieldValueMapping fieldValueMapping, final String rootFieldName) {
+    return getCleanMethodName(fieldValueMapping, level).equalsIgnoreCase(rootFieldName);
+  }
+
+  protected static String getCleanMethodName(final FieldValueMapping fieldValueMapping, final int level) {
+    return getFullMethodName(fieldValueMapping, level).replaceAll("\\[[0-9]*:?]", "");
+  }
+
+  static String getFullMethodName(final FieldValueMapping fieldValueMapping, final int level) {
+    String pathToClean = cleanUpPath(fieldValueMapping, level);
+    int endOfField = pathToClean.contains(".") ? pathToClean.indexOf(".") : pathToClean.length();
+    return pathToClean.substring(0, endOfField);
   }
 }

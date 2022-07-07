@@ -21,6 +21,7 @@ import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.DynamicMessage.Builder;
 import com.google.protobuf.Message;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -70,7 +71,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
         final Descriptors.FieldDescriptor keyFieldDescriptor = fieldDescriptor.getMessageType().findFieldByName("key");
         builder.setField(keyFieldDescriptor, generateString(pojo.getValueLength()));
         final Descriptors.FieldDescriptor valueFieldDescriptor = fieldDescriptor.getMessageType().findFieldByName("value");
-        pojo.setFieldNameSubEntity(valueFieldDescriptor.getFullName());
+        //pojo.setFieldNameSubEntity(valueFieldDescriptor.getFullName());
         if (i == pojo.getFieldSize() - 1) {
           builder.setField(valueFieldDescriptor, generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
         } else {
@@ -144,7 +145,12 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
     if ("root".equalsIgnoreCase(objectName)) {
       entity.put("root", DynamicMessage.newBuilder(schema));
     } else {
-      entity.put(objectName, DynamicMessage.newBuilder(findDescriptor(objectName, schema, new AtomicBoolean(false))));
+      FieldDescriptor fieldDescriptor = findFieldDescriptor(objectName, schema, new AtomicBoolean(false));
+      Descriptor descriptor = fieldDescriptor.getMessageType();
+      if (isDescriptorOfMap(descriptor)) {
+        descriptor = descriptor.getFields().get(1).getMessageType();
+      }
+      entity.put(objectName, DynamicMessage.newBuilder(descriptor));
     }
   }
 
@@ -154,8 +160,20 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
+  public Object generateSubentityRecord(Object objectRecord) {
+    if (objectRecord instanceof Builder) {
+      objectRecord = ((Builder) objectRecord).build();
+    }
+    return objectRecord;
+  }
+
+  @Override
   public boolean isOptional(final String rootFieldName, final String fieldName) {
     return false;
+  }
+
+  private boolean isDescriptorOfMap(Descriptor descriptor) {
+    return descriptor.getName().startsWith("typemap");
   }
 
   public Object assignObject(final String targetObjectName, final Object objectToAssign, final Descriptors.FieldDescriptor descriptor) {
@@ -224,6 +242,21 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
         found.set(true);
       } else if (Type.MESSAGE.equals(field.getType())) {
         field = findFieldDescriptor(objectName, field.getMessageType(), found);
+      }
+    }
+    return field;
+  }
+
+  private Descriptors.FieldDescriptor findFieldDescriptorFromFullName(final String fullObjectName, final Descriptor descriptor, AtomicBoolean found) {
+    FieldDescriptor field = null;
+    List<FieldDescriptor> alFieldDescriptor = descriptor.getFields();
+    Iterator<FieldDescriptor> fieldsIterator = alFieldDescriptor.iterator();
+    while (fieldsIterator.hasNext() && !found.get()) {
+      field = fieldsIterator.next();
+      if (fullObjectName.equalsIgnoreCase(field.getFullName())) {
+        found.set(true);
+      } else if (Type.MESSAGE.equals(field.getType())) {
+        field = findFieldDescriptorFromFullName(fullObjectName, field.getMessageType(), found);
       }
     }
     return field;
