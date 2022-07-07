@@ -30,29 +30,29 @@ public class RandomArray {
     Object value;
 
     switch (fieldType) {
-      case ValidTypeConstants.INT:
-      case ValidTypeConstants.NUMBER:
+      case ValidTypeConstants.INT_ARRAY:
+      case ValidTypeConstants.NUMBER_ARRAY:
         value = generate(ValidTypeConstants.INT, arraySize, valueLength, fieldValueList, constraints);
         break;
-      case ValidTypeConstants.LONG:
+      case ValidTypeConstants.LONG_ARRAY:
         value = generate(ValidTypeConstants.LONG, arraySize, valueLength, fieldValueList, constraints);
         break;
-      case ValidTypeConstants.DOUBLE:
+      case ValidTypeConstants.DOUBLE_ARRAY:
         value = generate(ValidTypeConstants.DOUBLE, arraySize, valueLength, fieldValueList, constraints);
         break;
-      case ValidTypeConstants.SHORT:
+      case ValidTypeConstants.SHORT_ARRAY:
         value = generate(ValidTypeConstants.SHORT, arraySize, valueLength, fieldValueList, constraints);
         break;
-      case ValidTypeConstants.FLOAT:
+      case ValidTypeConstants.FLOAT_ARRAY:
         value = generate(ValidTypeConstants.FLOAT, arraySize, valueLength, fieldValueList, constraints);
         break;
-      case ValidTypeConstants.STRING:
+      case ValidTypeConstants.STRING_ARRAY:
         value = generate(ValidTypeConstants.STRING, arraySize, valueLength, fieldValueList, constraints);
         break;
-      case ValidTypeConstants.UUID:
+      case ValidTypeConstants.UUID_ARRAY:
         value = generate(ValidTypeConstants.UUID, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
-      case ValidTypeConstants.BOOLEAN:
+      case ValidTypeConstants.BOOLEAN_ARRAY:
         value = generate(ValidTypeConstants.BOOLEAN, arraySize, 0, fieldValueList, Collections.emptyMap());
         break;
       default:

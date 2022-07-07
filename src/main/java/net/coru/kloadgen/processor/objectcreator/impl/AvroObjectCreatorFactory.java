@@ -40,6 +40,7 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class AvroObjectCreatorFactory implements ObjectCreator {
 
@@ -88,7 +89,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
   }
 
   private Map<Object, Object> createFinalMap(SchemaProcessorPOJO pojo) {
-    return (Map<Object, Object>) AVRO_GENERATOR_TOOL.generateMap(pojo.getFieldNameSubEntity(), getSimpleValueType(pojo.getValueType()), pojo.getValueLength(),
+    return (Map<Object, Object>) AVRO_GENERATOR_TOOL.generateMap(pojo.getFieldNameSubEntity(), getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
                                                                  pojo.getFieldValuesList(),
                                                                  pojo.getFieldSize(),
                                                                  Collections.emptyMap());
@@ -98,8 +99,9 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
     return String.valueOf(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
   }
 
-  private String getSimpleValueType(String completeValueType) {
-    return completeValueType.substring(0, completeValueType.indexOf("-") > 0 ? completeValueType.indexOf("-") : completeValueType.length());
+  private String getOneDimensionValueType(String completeValueType) {
+    int numberOfHyphens = StringUtils.countMatches(completeValueType, "-");
+    return numberOfHyphens > 1 ? completeValueType.substring(0, completeValueType.lastIndexOf("-")) : completeValueType;
   }
 
   @Override
@@ -125,7 +127,8 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
   }
 
   private List<Object> createFinalArray(SchemaProcessorPOJO pojo) {
-    return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), getSimpleValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+    return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
+                                                         pojo.getFieldValuesList(),
                                                          pojo.getFieldSize(),
                                                          Collections.emptyMap());
   }
@@ -134,20 +137,13 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       final SchemaProcessorPOJO pojo) {
     Schema fieldSchema = findSchema(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
 
-
-    Object valueObject =  AVRO_GENERATOR_TOOL.generateObject(
+    Object valueObject = AVRO_GENERATOR_TOOL.generateObject(
         Objects.requireNonNull(fieldSchema),
-        pojo.getCompleteFieldName(), getSimpleValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+        pojo.getCompleteFieldName(), getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
         extractConstraints(fieldSchema)
     );
 
-    return assignObject(pojo.getRootFieldName(),pojo.getFieldNameSubEntity(), valueObject);
-  }
-
-  public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
-    GenericRecord entityObject = entity.get(targetObjectName);
-    entityObject.put(fieldName, objectToAssign);
-    return entityObject;
+    return assignObject(pojo.getRootFieldName(), pojo.getFieldNameSubEntity(), valueObject);
   }
 
   @Override
@@ -188,6 +184,12 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       schema = findRecursiveSchemaForRecord(schema.getElementType());
     }
     return isOptionalField(schema);
+  }
+
+  public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
+    GenericRecord entityObject = entity.get(targetObjectName);
+    entityObject.put(fieldName, objectToAssign);
+    return entityObject;
   }
 
   private Schema getRecordUnion(List<Schema> types) {
