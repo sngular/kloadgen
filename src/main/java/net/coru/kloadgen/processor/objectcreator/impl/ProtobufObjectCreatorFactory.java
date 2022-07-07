@@ -113,12 +113,16 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   @Override
   public void createRecord(final String objectName) {
 
+    entityBuilder = DynamicMessage.newBuilder(schema);
+
     if ("root".equalsIgnoreCase(objectName)) {
-      entityBuilder = DynamicMessage.newBuilder(schema);
-    } else{
 
+      entityBuilder.setField(schema.getFile(), new Object());// .getDescriptorForType().findFieldByName(objectName), new Object() );
+      structure.put("root", entityBuilder);
+    } else {
+      entityBuilder.setField(entityBuilder.getDescriptorForType().findFieldByName(objectName), new Object() );
+      structure.put(objectName, entityBuilder);
     }
-
   }
 
   @Override
