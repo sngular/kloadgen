@@ -176,6 +176,11 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
+  public Object generateSubentityRecord(Object objectRecord) {
+    return objectRecord;
+  }
+
+  @Override
   public boolean isOptional(final String rootFieldName, final String fieldName) {
     var schema = findSchema(fieldName, this.schema, new AtomicBoolean(false));
     if (schema.getType().equals(Type.MAP)) {

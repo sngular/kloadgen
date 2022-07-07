@@ -1,11 +1,8 @@
 package net.coru.kloadgen.processor.objectcreator.impl;
 
 import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 
-import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
 import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
@@ -31,11 +28,7 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public Object createValueObject(final SchemaProcessorPOJO pojo) { return null; }
-
-  public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
-    return null;
-  }
+  public Object createValueObject(final SchemaProcessorPOJO pojo) {return null;}
 
   @Override
   public Object assignRecord(final String targetObjectName, final String fieldName, final String recordToAssign) {
@@ -52,8 +45,17 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
+  public Object generateSubentityRecord(Object objectRecord) {
+    return objectRecord;
+  }
+
+  @Override
   public boolean isOptional(final String rootFieldName, final String fieldName) {
     return false;
+  }
+
+  public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
+    return null;
   }
 
   private String generateString(final Integer valueLength) {

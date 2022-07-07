@@ -42,9 +42,8 @@ public class SchemaProcessor extends SchemaProcessorLib {
       objectCreator.createRecord("root");
       while (!fieldExpMappingsQueue.isEmpty()) {
         int level = 0;
-        String cleanPath = cleanUpPath(fieldValueMapping, "", level);
-        String fieldName = getCleanMethodName(fieldValueMapping, "", level);
-        String completeFieldName = getFullMethodName(fieldValueMapping, "", level);
+        String cleanPath = cleanUpPath(fieldValueMapping, level);
+        String fieldName = getCleanMethodName(fieldValueMapping, level);
         String completeTypeFilterChain = getTypeFilter(fieldName, cleanPath);
 
         if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName))
@@ -70,7 +69,7 @@ public class SchemaProcessor extends SchemaProcessorLib {
           String singleTypeFilter = getFirstComplexType(completeTypeFilterChain);
           String remainingFilterChain = completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), "");
           boolean lastTypeFilterOfLastElement = isLastTypeFilterOfLastElement(remainingFilterChain);
-          SchemaProcessorPOJO pojo = new SchemaProcessorPOJO("root", fieldExpMappingsQueue, fieldName,fieldValueMapping.getFieldName(), remainingFilterChain,
+          SchemaProcessorPOJO pojo = new SchemaProcessorPOJO("root", fieldExpMappingsQueue, fieldName, fieldValueMapping.getFieldName(), remainingFilterChain,
                                                              calculateSizeFromTypeFilter(singleTypeFilter), fieldValueMapping.getFieldType(),
                                                              fieldValueMapping.getValueLength(),
                                                              fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), level,
@@ -100,25 +99,20 @@ public class SchemaProcessor extends SchemaProcessorLib {
     return this.objectCreator.generateRecord();
   }
 
-  private Object createObject(String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final int level) {
+  private Object createObject(String rootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final int levelCount) {
     objectCreator.createRecord(rootFieldName);
 
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
 
     int generatedProperties = 0;
     int elapsedProperties = 0;
-    int levelCount = level + 1;
+    int level = levelCount + 1;
 
     Object objectRecord = new Object();
 
-    while (!fieldExpMappingsQueue.isEmpty()
-           && (Objects.requireNonNull(fieldValueMapping).getFieldName().matches(".*" + rootFieldName + "$")
-               || fieldValueMapping.getFieldName().matches(rootFieldName + "\\..*")
-               || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\[.*")
-               || fieldValueMapping.getFieldName().matches(".*" + rootFieldName + "\\..*"))) {
-      String cleanPath = cleanUpPath(fieldValueMapping, rootFieldName, levelCount);
-      String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, rootFieldName, levelCount);
-      String completeFieldName = getFullMethodName(fieldValueMapping, rootFieldName, levelCount);
+    while (!fieldExpMappingsQueue.isEmpty() && isNewFieldSharingRootFieldName(level - 1, fieldValueMapping, rootFieldName)) {
+      String cleanPath = cleanUpPath(fieldValueMapping, level);
+      String fieldNameSubEntity = getCleanMethodName(fieldValueMapping, level);
       String completeTypeFilterChain = getTypeFilter(fieldNameSubEntity, cleanPath);
 
       generatedProperties++;
@@ -157,7 +151,7 @@ public class SchemaProcessor extends SchemaProcessorLib {
                                                            calculateSizeFromTypeFilter(singleTypeFilter),
                                                            fieldValueMapping.getFieldType(),
                                                            fieldValueMapping.getValueLength(),
-                                                           fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), levelCount,
+                                                           fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), level,
                                                            lastTypeFilterOfLastElement);
         if (isTypeFilterMap(singleTypeFilter)) {
           objectRecord = this.objectCreator.createMap(pojo, getMapAndArrayGenerationFunction(), true);
@@ -170,7 +164,7 @@ public class SchemaProcessor extends SchemaProcessorLib {
             fieldExpMappingsQueue.remove();
           }
         } else if (isTypeFilterRecord(singleTypeFilter)) {
-          objectRecord = createObject(fieldNameSubEntity, fieldExpMappingsQueue, levelCount);
+          objectRecord = createObject(fieldNameSubEntity, fieldExpMappingsQueue, level);
           this.objectCreator.assignRecord(rootFieldName, fieldNameSubEntity, fieldNameSubEntity);
         } else {
           fieldExpMappingsQueue.remove();
@@ -179,7 +173,7 @@ public class SchemaProcessor extends SchemaProcessorLib {
         fieldValueMapping = getSafeGetElement(fieldExpMappingsQueue);
       }
     }
-    return objectRecord;
+    return this.objectCreator.generateSubentityRecord(objectRecord);
   }
 
   private BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> getMapAndArrayGenerationFunction() {
