@@ -1,14 +1,11 @@
 package net.coru.kloadgen.processor.objectcreator.impl;
 
-import static com.google.protobuf.Descriptors.FieldDescriptor.Type.ENUM;
-import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,7 +23,8 @@ import com.google.protobuf.Message;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import net.coru.kloadgen.processor.ProtoBufProcessorHelper;
+import net.coru.kloadgen.exception.KLoadGenException;
+import net.coru.kloadgen.processor.SchemaProcessorUtils;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
 import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
@@ -38,30 +36,31 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
 
   private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
-  private static final ProtoBufGeneratorTool GENERATOR_TOOL = new ProtoBufGeneratorTool();
+  private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
 
-  private Descriptors.Descriptor schema;
+  private final Descriptors.Descriptor schema;
 
-  private SchemaMetadata metadata;
+  private final SchemaMetadata metadata;
 
-  private Map<String, DynamicMessage.Builder> entity = new HashMap<>();
+  private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
-  public ProtobufObjectCreatorFactory(Object schema, Object metadata) throws DescriptorValidationException, IOException {
+  public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
     if (schema instanceof ParsedSchema) {
-      this.schema = new ProtoBufProcessorHelper().buildDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema());
+      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema());
     } else if (schema instanceof ProtoFileElement) {
-      this.schema = new ProtoBufProcessorHelper().buildDescriptor((ProtoFileElement) schema);
+      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schema);
+    } else {
+      throw new KLoadGenException("Unsupported schema type");
     }
     this.metadata = (SchemaMetadata) metadata;
   }
 
   @Override
   public Object createMap(
-      final SchemaProcessorPOJO pojo,
-      final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
-      final boolean returnCompleteEntry) {
-    DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
-    FieldDescriptor fieldDescriptor = findFieldDescriptor(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+    final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
+    final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
+    final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
       messageBuilder.setField(fieldDescriptor, createFinalMap(fieldDescriptor, pojo));
     } else {
@@ -86,11 +85,10 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
 
   @Override
   public Object createArray(
-      final SchemaProcessorPOJO pojo,
-      final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
-      final boolean returnCompleteEntry) {
-    DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
-    FieldDescriptor fieldDescriptor = findFieldDescriptor(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+    final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
+    final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
+    final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
       messageBuilder.setField(fieldDescriptor, createFinalArray(fieldDescriptor, pojo));
     } else {
@@ -109,24 +107,15 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   public Object createValueObject(
       final SchemaProcessorPOJO pojo) {
 
-    var descriptor = findFieldDescriptor(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+    final var descriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(pojo.getCompleteFieldName()), this.schema, new AtomicBoolean(false));
     Object object;
 
-    if (MESSAGE.equals(descriptor.getType())) {
+    if (Type.MESSAGE.equals(descriptor.getType())) {
       object = createFieldObject(descriptor.getMessageType(), pojo);
-    } else if (ENUM.equals(descriptor.getType())) {
-      object = GENERATOR_TOOL.generateObject(descriptor.getEnumType(),
-                                             pojo.getValueType(),
-                                             pojo.getValueLength(),
-                                             pojo.getFieldValuesList()
-      );
+    } else if (Type.ENUM.equals(descriptor.getType())) {
+      object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor.getEnumType(), pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList());
     } else {
-      object = GENERATOR_TOOL.generateObject(descriptor,
-                                             pojo.getValueType(),
-                                             pojo.getValueLength(),
-                                             pojo.getFieldValuesList(),
-                                             pojo.getConstraints()
-      );
+      object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor, pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints());
     }
 
     object = assignObject(pojo.getRootFieldName(), object, descriptor);
@@ -134,18 +123,20 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public Object assignRecord(final String targetObjectName, final String fieldName, final String recordToAssign) {
-    DynamicMessage.Builder builder = entity.get(targetObjectName);
-    builder.setField(findFieldDescriptor(fieldName, this.schema, new AtomicBoolean(false)), entity.get(recordToAssign).build());
+  public Object assignRecord(final SchemaProcessorPOJO pojo) {
+    final DynamicMessage.Builder builder = entity.get(pojo.getRootFieldName());
+    final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
+    builder.setField(findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false)),
+                     entity.get(pojo.getFieldNameSubEntity()).build());
     return builder;
   }
 
   @Override
-  public void createRecord(final String objectName) {
+  public void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
       entity.put("root", DynamicMessage.newBuilder(schema));
     } else {
-      FieldDescriptor fieldDescriptor = findFieldDescriptor(objectName, schema, new AtomicBoolean(false));
+      final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(completeFieldName), schema, new AtomicBoolean(false));
       Descriptor descriptor = fieldDescriptor.getMessageType();
       if (isDescriptorOfMap(descriptor)) {
         descriptor = descriptor.getFields().get(1).getMessageType();
@@ -160,40 +151,38 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public Object generateSubentityRecord(Object objectRecord) {
+  public Object generateSubEntityRecord(final Object objectRecord) {
+    Object returnObject = objectRecord;
     if (objectRecord instanceof Builder) {
-      objectRecord = ((Builder) objectRecord).build();
+      returnObject = ((Builder) objectRecord).build();
     }
-    return objectRecord;
+    return returnObject;
   }
 
   @Override
-  public boolean isOptional(final String rootFieldName, final String fieldName) {
-    return false;
+  public boolean isOptional(final SchemaProcessorPOJO pojo) {
+    final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
+    final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
+    return Type.MESSAGE.equals(fieldDescriptor.getType()) || fieldDescriptor.isRepeated() || fieldDescriptor.isMapField() && fieldDescriptor.isOptional();
   }
 
-  private boolean isDescriptorOfMap(Descriptor descriptor) {
+  private boolean isDescriptorOfMap(final Descriptor descriptor) {
     return descriptor.getName().startsWith("typemap");
   }
 
-  public Object assignObject(final String targetObjectName, final Object objectToAssign, final Descriptors.FieldDescriptor descriptor) {
-    DynamicMessage.Builder builder = entity.get(targetObjectName);
-    builder.setField(descriptor, objectToAssign);
-    return builder;
-  }
-
-  private Object createFieldObject(Descriptors.Descriptor descriptor, SchemaProcessorPOJO pojo) {
-    DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(descriptor);
+  private Object createFieldObject(final Descriptors.Descriptor descriptor, final SchemaProcessorPOJO pojo) {
+    final DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(descriptor);
     for (var field : descriptor.getFields()) {
-      messageBuilder.setField(field,
-                              RANDOM_OBJECT.generateRandom(
-                                  getFieldType(field),
-                                  pojo.getValueLength(),
-                                  pojo.getFieldValuesList(),
-                                  pojo.getConstraints()));
+      messageBuilder.setField(field, RANDOM_OBJECT.generateRandom(getFieldType(field), pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));
     }
 
     return messageBuilder.build();
+  }
+
+  public Object assignObject(final String targetObjectName, final Object objectToAssign, final Descriptors.FieldDescriptor descriptor) {
+    final DynamicMessage.Builder builder = entity.get(targetObjectName);
+    builder.setField(descriptor, objectToAssign);
+    return builder;
   }
 
   private String getFieldType(final Descriptors.FieldDescriptor field) {
@@ -219,72 +208,39 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   }
 
   private Object createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
-    Object objectReturn;
+    final Object objectReturn;
     if (Objects.nonNull(fieldDescriptor) && FieldDescriptor.Type.ENUM.equals(fieldDescriptor.getType())) {
       final var enumDescriptor = fieldDescriptor.getEnumType();
-      objectReturn = GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(), pojo.getFieldValuesList());
+      objectReturn = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(), pojo.getFieldValuesList());
     } else {
       objectReturn = ProtoBufGeneratorTool.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(), pojo.getFieldValuesList());
     }
     return objectReturn;
   }
 
-  private Descriptors.FieldDescriptor findFieldDescriptor(final String objectName, final Descriptor descriptor, AtomicBoolean found) {
-    FieldDescriptor field = null;
-    List<FieldDescriptor> alFieldDescriptor = descriptor.getFields();
-    Iterator<FieldDescriptor> fieldsIterator = alFieldDescriptor.iterator();
-    while (fieldsIterator.hasNext() && !found.get()) {
-      field = fieldsIterator.next();
-      /*int firstIndexSubstring = field.getFullName().indexOf(".") > 0 ? field.getFullName().lastIndexOf(".") + 1 : 0;
-      int lastIndexSubstring = field.getFullName().length();
-      String cleanFieldName = field.getFullName().substring(firstIndexSubstring, lastIndexSubstring);*/
-      if (objectName.equalsIgnoreCase(field.getName())) {
-        found.set(true);
-      } else if (Type.MESSAGE.equals(field.getType())) {
-        field = findFieldDescriptor(objectName, field.getMessageType(), found);
+  private String getOneDimensionValueType(final String completeValueType) {
+    final int numberOfHyphens = StringUtils.countMatches(completeValueType, "-");
+    return numberOfHyphens > 1 ? completeValueType.substring(0, completeValueType.lastIndexOf("-")) : completeValueType;
+  }
+
+  private Descriptors.FieldDescriptor findFieldDescriptor(final String[] objectNameFields, final Descriptor descriptor, final AtomicBoolean found) {
+    FieldDescriptor fieldDescriptor = null;
+
+    if (null != objectNameFields && objectNameFields.length > 0) {
+      final boolean isLastElement = objectNameFields.length == 1;
+      if (isDescriptorOfMap(descriptor)) {
+        fieldDescriptor = descriptor.getFields().get(1).getMessageType().findFieldByName(objectNameFields[0]);
+      } else {
+        fieldDescriptor = descriptor.findFieldByName(objectNameFields[0]);
+      }
+      found.set(fieldDescriptor.getName().equalsIgnoreCase(objectNameFields[0]) && isLastElement);
+      if (!found.get()) {
+        final Descriptor newDescriptor = fieldDescriptor.getMessageType();
+        fieldDescriptor = findFieldDescriptor(Arrays.copyOfRange(objectNameFields, 1, objectNameFields.length), newDescriptor, found);
       }
     }
-    return field;
-  }
 
-  private Descriptors.FieldDescriptor findFieldDescriptorFromFullName(final String fullObjectName, final Descriptor descriptor, AtomicBoolean found) {
-    FieldDescriptor field = null;
-    List<FieldDescriptor> alFieldDescriptor = descriptor.getFields();
-    Iterator<FieldDescriptor> fieldsIterator = alFieldDescriptor.iterator();
-    while (fieldsIterator.hasNext() && !found.get()) {
-      field = fieldsIterator.next();
-      if (fullObjectName.equalsIgnoreCase(field.getFullName())) {
-        found.set(true);
-      } else if (Type.MESSAGE.equals(field.getType())) {
-        field = findFieldDescriptorFromFullName(fullObjectName, field.getMessageType(), found);
-      }
-    }
-    return field;
-  }
-
-  private Descriptors.Descriptor findDescriptor(final String fullObjectName, final Descriptor descriptor, AtomicBoolean found) {
-    Descriptor foundDescriptor = null;
-    if (fullObjectName.equalsIgnoreCase(descriptor.getFullName())) {
-      found.set(true);
-      foundDescriptor = descriptor;
-    }
-    List<FieldDescriptor> alFieldDescriptor = descriptor.getFields();
-    Iterator<FieldDescriptor> fieldsIterator = alFieldDescriptor.iterator();
-    while (fieldsIterator.hasNext() && !found.get()) {
-      FieldDescriptor field = fieldsIterator.next();
-      if (Type.MESSAGE.equals(field.getType()) && null != field.getMessageType()) {
-        foundDescriptor = findDescriptor(fullObjectName, field.getMessageType(), found);
-      }
-    }
-    return foundDescriptor;
-  }
-
-  private Descriptors.Descriptor getDescriptorForField(final DynamicMessage.Builder messageBuilder, final String typeName) {
-    return messageBuilder.getDescriptorForType().findFieldByName(typeName).getMessageType();
-  }
-
-  private Descriptors.FieldDescriptor getFieldDescriptorForField(final DynamicMessage.Builder messageBuilder, final String typeName) {
-    return messageBuilder.getDescriptorForType().findFieldByName(typeName);
+    return fieldDescriptor;
   }
 
   private Object createFinalMap(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
@@ -293,6 +249,10 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
       messageMap.add(buildSimpleMapEntry(fieldDescriptor, pojo));
     }
     return messageMap;
+  }
+
+  private String generateString(final Integer valueLength) {
+    return String.valueOf(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
   }
 
   private Message buildSimpleMapEntry(final Descriptors.FieldDescriptor descriptor, final SchemaProcessorPOJO pojo) {
@@ -306,30 +266,16 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
       for (Descriptors.EnumValueDescriptor value : valueFieldDescriptor.getEnumType().getValues()) {
         fieldValueMappings.add(value.getName());
       }
-      builder.setField(valueFieldDescriptor, GENERATOR_TOOL.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(),
-                                                                           0, fieldValueMappings));
-    } else {
       builder.setField(valueFieldDescriptor,
-                       RANDOM_OBJECT.generateRandom(
-                           fieldValueMappingCleanType,
-                           pojo.getValueLength(),
-                           pojo.getFieldValuesList(),
-                           pojo.getConstraints()));
+                       PROTOBUF_GENERATOR_TOOL.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
+    } else {
+      builder.setField(valueFieldDescriptor, RANDOM_OBJECT.generateRandom(fieldValueMappingCleanType, pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));
     }
 
     return builder.build();
   }
 
-  private String getOneDimensionValueType(String completeValueType) {
-    int numberOfHyphens = StringUtils.countMatches(completeValueType, "-");
-    return numberOfHyphens > 1 ? completeValueType.substring(0, completeValueType.lastIndexOf("-")) : completeValueType;
-  }
-
-  private String getSimpleValueType(String completeValueType) {
+  private String getSimpleValueType(final String completeValueType) {
     return completeValueType.substring(0, completeValueType.indexOf("-") > 0 ? completeValueType.indexOf("-") : completeValueType.length());
-  }
-
-  private String generateString(final Integer valueLength) {
-    return String.valueOf(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
   }
 }

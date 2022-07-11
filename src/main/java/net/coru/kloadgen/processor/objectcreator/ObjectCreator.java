@@ -8,25 +8,21 @@ import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 public interface ObjectCreator {
 
   Object createMap(
-      SchemaProcessorPOJO pojo,
-      BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
-      boolean returnCompleteEntry);
+      SchemaProcessorPOJO pojo, BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, boolean isInnerMap);
 
   Object createArray(
-      SchemaProcessorPOJO pojo,
-      BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
-      boolean returnCompleteEntry);
+      SchemaProcessorPOJO pojo, BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, boolean isInnerArray);
 
   Object createValueObject(
       SchemaProcessorPOJO pojo);
 
-  Object assignRecord(String targetObjectName, String fieldName, String recordToAssign);
+  Object assignRecord(SchemaProcessorPOJO pojo);
 
-  void createRecord(String objectName);
+  void createRecord(String objectName, String completeFieldName);
 
   Object generateRecord();
 
-  Object generateSubentityRecord(Object objectRecord);
+  Object generateSubEntityRecord(Object objectRecord);
 
-  boolean isOptional(String rootFieldName, String fieldName);
+  boolean isOptional(SchemaProcessorPOJO pojo);
 }
