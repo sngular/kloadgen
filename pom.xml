@@ -9,7 +9,9 @@
 
   <version>4.8.0</version>
   <name>KLoadGen</name>
-  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on Data specification</description>
+  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema schema types. Generate Artificial data base on
+    Data specification
+  </description>
   <url>https://corunet.github.io/kloadgen/</url>
 
   <licenses>
@@ -141,6 +143,28 @@
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
         <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+    <id>Mike Ortiz</id>
+    <name>Miguel Ángel Ortiz Amores</name>
+    <email>mortiz@corunet.com</email>
+    <organization>Corunet</organization>
+    <organizationUrl>https://corunet.github.io/</organizationUrl>
+    <roles>
+      <role>Senior Developer</role>
+    </roles>
+    <timezone>Europe/Madrid</timezone>
+  </developer>
+    <developer>
+      <id>dianaGomezGar</id>
+      <name>Diana Gómez García</name>
+      <email>dgomez@corunet.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
@@ -355,6 +379,12 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <version>${assertj-core.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.skyscreamer</groupId>
+      <artifactId>jsonassert</artifactId>
+      <version>1.5.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>

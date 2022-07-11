@@ -687,5 +687,41 @@ public class JsonSchemaFixturesConstants {
                        .build()
   ));
 
+  public static final List<FieldValueMapping> SIMPLE_SCHEMA_REQUIRED = new ArrayList<FieldValueMapping>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("firstName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("Diana")
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {{
+                         put(MINIMUM_VALUE, "0");
+                         put(MAXIMUM_VALUE, "0");
+                       }})
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("lastName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("García")
+                       .required(true)
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {{
+                         put(MINIMUM_VALUE, "0");
+                         put(MAXIMUM_VALUE, "0");
+                       }})
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("age")
+                       .fieldType("int")
+                       .valueLength(0)
+                       .fieldValueList("2")
+                       .required(true)
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build()
+  ));
+
+  public static final String SIMPLE_SCHEMA_REQUIRED_EXPECTED = "{\"firstName\": \"Diana\",\"lastName\":\"García\"  ,\"age\":2}";
 
 }
