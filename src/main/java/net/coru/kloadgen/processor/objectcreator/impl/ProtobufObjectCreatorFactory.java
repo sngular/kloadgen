@@ -2,6 +2,8 @@ package net.coru.kloadgen.processor.objectcreator.impl;
 
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.ENUM;
 import static com.google.protobuf.Descriptors.FieldDescriptor.Type.MESSAGE;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.normalizeFieldName;
+import static net.coru.kloadgen.processor.SchemaProcessorLib.truncateFullObjectName;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -61,7 +63,8 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
       final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
     DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
-    FieldDescriptor fieldDescriptor = findFieldDescriptor(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+    FieldDescriptor fieldDescriptor = findFieldDescriptor( truncateFullObjectName(pojo.getCompleteFieldName(), pojo.getLevel()), this.schema,
+                                                           new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
       messageBuilder.setField(fieldDescriptor, createFinalMap(fieldDescriptor, pojo));
     } else {
@@ -90,7 +93,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
       final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction,
       final boolean returnCompleteEntry) {
     DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
-    FieldDescriptor fieldDescriptor = findFieldDescriptor(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+    FieldDescriptor fieldDescriptor = findFieldDescriptor(truncateFullObjectName(pojo.getCompleteFieldName(), pojo.getLevel()), this.schema, new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
       messageBuilder.setField(fieldDescriptor, createFinalArray(fieldDescriptor, pojo));
     } else {
@@ -109,7 +112,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   public Object createValueObject(
       final SchemaProcessorPOJO pojo) {
 
-    var descriptor = findFieldDescriptor(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+    var descriptor = findFieldDescriptor(truncateFullObjectName(pojo.getCompleteFieldName(), pojo.getLevel()), this.schema, new AtomicBoolean(false));
     Object object;
 
     if (MESSAGE.equals(descriptor.getType())) {
@@ -147,6 +150,9 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
     } else {
       FieldDescriptor fieldDescriptor = findFieldDescriptor(objectName, schema, new AtomicBoolean(false));
       Descriptor descriptor = fieldDescriptor.getMessageType();
+      //if(fieldDescriptor.isMapField())
+      System.out.println("FieldDescriptorMap -> "+fieldDescriptor.isMapField());
+      System.out.println("IsDescriptorofMap -> "+ isDescriptorOfMap(descriptor));
       if (isDescriptorOfMap(descriptor)) {
         descriptor = descriptor.getFields().get(1).getMessageType();
       }
@@ -238,7 +244,8 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
       /*int firstIndexSubstring = field.getFullName().indexOf(".") > 0 ? field.getFullName().lastIndexOf(".") + 1 : 0;
       int lastIndexSubstring = field.getFullName().length();
       String cleanFieldName = field.getFullName().substring(firstIndexSubstring, lastIndexSubstring);*/
-      if (objectName.equalsIgnoreCase(field.getName())) {
+
+      if (objectName.equalsIgnoreCase(normalizeFieldName(field.getFullName()))) {
         found.set(true);
       } else if (Type.MESSAGE.equals(field.getType())) {
         field = findFieldDescriptor(objectName, field.getMessageType(), found);

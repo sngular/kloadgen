@@ -7,12 +7,15 @@
 package net.coru.kloadgen.processor;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import com.google.common.base.CaseFormat;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
 import net.coru.kloadgen.randomtool.random.RandomMap;
@@ -129,7 +132,20 @@ public abstract class SchemaProcessorLib {
   protected static String cleanUpPath(final FieldValueMapping fieldValueMapping, final int level) {
     String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
     return String.join(".", Arrays.copyOfRange(splitPath, level, splitPath.length));
+
   }
+
+  public static String truncateFullObjectName(final String fullObjectName, final int level) {
+    String[] splitPath = fullObjectName.split("\\.");
+    var list = new ArrayList();
+    Arrays.stream(splitPath).forEach(fieldName -> list.add(normalizeFieldName(fieldName)));
+    return String.join(".",list);
+  }
+
+  public static String normalizeFieldName(final String fieldName) {
+    return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, fieldName).replaceAll("\\[.*]","");
+  }
+
 
   static boolean isTypeFilterMap(final String singleTypeFilter) {
     return singleTypeFilter.matches("^\\[[1-9]*:]");
