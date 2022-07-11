@@ -200,30 +200,6 @@ class AvroGeneratorToolTest {
                                                            .fieldType("seq")
                                                            .valueLength(0)
                                                            .fieldValueList(String.join(",", fieldValuesList))
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
-    AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
-    for (int i = 0; i <= size; i++) {
-      intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
-    }
-    assertThat(intList).containsExactlyElementsOf(expected);
-  }
-
-  @ParameterizedTest
-  @DisplayName("Testing generate an optional sequence of a list of values")
-  @MethodSource("parametersForGenerateFieldValuesListSequence")
-  void testGenerateFieldValuesListOptionalSequence(int size, List<String> fieldValuesList, String fieldType, List<Integer> expected){
-    var intList = new ArrayList<>();
-    Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().nullable().intType() : SchemaBuilder.builder().nullable().stringType();
-    Field field = new Field("name", schema);
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType("seq")
-                                                           .valueLength(0)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .required(false)
-                                                           .isAncestorRequired(true)
                                                            .build();
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
@@ -258,7 +234,10 @@ class AvroGeneratorToolTest {
     return Stream.of(
         Arguments.of("seq", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), "0"),
         Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
-        Arguments.of("seq", 1, Collections.singletonList("2"), new Field("name", SchemaBuilder.builder().intType()), 2));
+        Arguments.of("seq", 1, Collections.singletonList("2"), new Field("name", SchemaBuilder.builder().intType()), 2),
+        Arguments.of("it", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), "0"),
+        Arguments.of("it", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
+        Arguments.of("it", 1, Collections.singletonList("2"), new Field("name", SchemaBuilder.builder().intType()), 2));
   }
 
   @ParameterizedTest

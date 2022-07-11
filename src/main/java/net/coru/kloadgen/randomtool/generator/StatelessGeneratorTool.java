@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.coru.kloadgen.randomtool.random.RandomArray;
+import net.coru.kloadgen.randomtool.random.RandomIterator;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.random.RandomSequence;
@@ -44,6 +45,12 @@ public class StatelessGeneratorTool {
       } else {
         value = RandomSequence.generateSeq(fieldName, fieldType, parameterList, context);
       }
+    } else if ("it".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
+        value = RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+      } else {
+        value = RandomIterator.generateIt(fieldName, fieldType, parameterList, context);
+      }
     } else {
       value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
     }
@@ -72,6 +79,8 @@ public class StatelessGeneratorTool {
       result = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
       if ("seq".equals(fieldType)) {
         result = RandomSequence.generateSeq(fieldName, fieldType, parameterList, context);
+      } else if ("it".equals(fieldType)) {
+        result = RandomIterator.generateIt(fieldName, fieldType, parameterList, context);
       }
     }
     return result;

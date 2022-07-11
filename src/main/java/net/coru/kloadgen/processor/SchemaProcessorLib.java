@@ -8,6 +8,7 @@ package net.coru.kloadgen.processor;
 
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.randomtool.random.RandomArray;
+import net.coru.kloadgen.randomtool.random.RandomIterator;
 import net.coru.kloadgen.randomtool.random.RandomMap;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.randomtool.random.RandomSequence;
@@ -159,6 +160,14 @@ public final class SchemaProcessorLib {
           value.put(generateMapKey(), RandomSequence.generateSeq(fieldName, fieldType, parameterList, CONTEXT));
         }
       }
+    } else if ("it".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
+        value.put(generateMapKey(), RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, CONTEXT));
+      } else {
+        for (int i = mapSize; i > 0; i--) {
+          value.put(generateMapKey(), RandomIterator.generateIt(fieldName, fieldType, parameterList, CONTEXT));
+        }
+      }
     } else {
       return RANDOM_MAP.generateMap(fieldType, mapSize, parameterList, fieldValueLength, arraySize, Collections.emptyMap());
     }
@@ -182,6 +191,14 @@ public final class SchemaProcessorLib {
       } else {
         for (int i = arraySize; i > 0; i--) {
           value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, CONTEXT));
+        }
+      }
+    } else if ("it".equals(fieldType)) {
+      if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
+        value.add(RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, CONTEXT));
+      } else {
+        for (int i = arraySize; i > 0; i--) {
+          value.add(RandomIterator.generateIt(fieldName, fieldType, parameterList, CONTEXT));
         }
       }
     } else {
