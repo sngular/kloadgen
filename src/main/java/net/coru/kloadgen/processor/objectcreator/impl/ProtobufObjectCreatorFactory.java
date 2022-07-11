@@ -138,9 +138,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
     } else {
       final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(completeFieldName), schema, new AtomicBoolean(false));
       Descriptor descriptor = fieldDescriptor.getMessageType();
-      //if(fieldDescriptor.isMapField())
-      System.out.println("FieldDescriptorMap -> "+fieldDescriptor.isMapField());
-      System.out.println("IsDescriptorofMap -> "+ isDescriptorOfMap(descriptor));
+
       if (isDescriptorOfMap(descriptor)) {
         descriptor = descriptor.getFields().get(1).getMessageType();
       }

@@ -47,42 +47,6 @@ class ProtobufSchemaProcessorTest {
   }
 
   @Test
-  @DisplayName("Be able to process simple schema")
-  void testProtoBufFactory() throws IOException, DescriptorValidationException {
-    File testFile = fileHelper.getFile("/proto-files/complexTest.proto");
-    List<FieldValueMapping> fieldValueMappingList = asList(
-        FieldValueMapping.builder().fieldName("name").fieldType("string").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("age").fieldType("int").required(true).isAncestorRequired(true).build());
-
-    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-    EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
-    DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
-    List<String> assertKeys = new ArrayList<>();
-    List<Object> assertValues = new ArrayList<>();
-    Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
-    map.forEach((key, value) ->
-                {
-                  assertKeys.add(key.getFullName());
-                  assertValues.add(value);
-                }
-    );
-
-    assertThat(message).isNotNull()
-                       .isInstanceOf(EnrichedRecord.class)
-                       .extracting(EnrichedRecord::getGenericRecord)
-                       .isNotNull();
-    assertThat(assertKeys).hasSize(9)
-                          .containsExactlyInAnyOrder("tutorial.Test.name",
-                                                     "tutorial.Test.age");
-    assertThat(assertValues).hasSize(9).isNotNull();
-    assertThat(assertValues.get(2)).isInstanceOf(Integer.class);
-    assertThat(assertValues.get(7)).isInstanceOf(String.class);
-  }
-
-
-
-  @Test
   @DisplayName("Be able to process embedded schema")
   void textEmbeddedTypeTestSchemaProcessor() throws KLoadGenException, IOException, DescriptorValidationException {
     File testFile = fileHelper.getFile("/proto-files/embeddedTypeTest.proto");
