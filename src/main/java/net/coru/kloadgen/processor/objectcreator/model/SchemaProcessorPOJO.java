@@ -6,7 +6,7 @@ import java.util.Map;
 
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 
-public class SchemaProcessorPOJO {
+public class SchemaProcessorPOJO implements Cloneable {
 
   private String rootFieldName;
 
@@ -33,9 +33,8 @@ public class SchemaProcessorPOJO {
   private int fieldSize;
 
   public SchemaProcessorPOJO(
-      String rootFieldName, ArrayDeque<?> fieldExpMappingsQueue, String fieldNameSubEntity, String completeFieldName,
-      String completeTypeFilterChain, int fieldSize, String valueType,
-      Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints, int level, boolean isLastElementType) {
+      String rootFieldName, ArrayDeque<?> fieldExpMappingsQueue, String fieldNameSubEntity, String completeFieldName, String completeTypeFilterChain, int fieldSize,
+      String valueType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints, int level, boolean isLastElementType) {
     this.rootFieldName = rootFieldName;
     this.fieldExpMappingsQueue = fieldExpMappingsQueue;
     this.fieldNameSubEntity = fieldNameSubEntity;
@@ -62,6 +61,10 @@ public class SchemaProcessorPOJO {
     return fieldExpMappingsQueue;
   }
 
+  public void setFieldExpMappingsQueue(final ArrayDeque<?> fieldExpMappingsQueue) {
+    this.fieldExpMappingsQueue = fieldExpMappingsQueue;
+  }
+
   public String getFieldNameSubEntity() {
     return fieldNameSubEntity;
   }
@@ -72,6 +75,10 @@ public class SchemaProcessorPOJO {
 
   public String getCompleteTypeFilterChain() {
     return completeTypeFilterChain;
+  }
+
+  public void setCompleteTypeFilterChain(final String completeTypeFilterChain) {
+    this.completeTypeFilterChain = completeTypeFilterChain;
   }
 
   public Integer getValueLength() {
@@ -98,11 +105,24 @@ public class SchemaProcessorPOJO {
     return lastFilterTypeOfLastElement;
   }
 
+  public void setLastFilterTypeOfLastElement(final boolean lastFilterTypeOfLastElement) {
+    this.lastFilterTypeOfLastElement = lastFilterTypeOfLastElement;
+  }
+
   public int getFieldSize() {
     return fieldSize;
   }
 
+  public void setFieldSize(final int fieldSize) {
+    this.fieldSize = fieldSize;
+  }
+
   public Map<ConstraintTypeEnum, String> getConstraints() {
     return constraints;
+  }
+
+  @Override
+  public Object clone() throws CloneNotSupportedException {
+    return super.clone();
   }
 }
