@@ -16,6 +16,7 @@ import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.processor.SchemaProcessorUtils;
 import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
 import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
@@ -76,17 +77,12 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
   }
 
   private Map<Object, Object> createFinalMap(final SchemaProcessorPOJO pojo) {
-    return (Map<Object, Object>) AVRO_GENERATOR_TOOL.generateMap(pojo.getFieldNameSubEntity(), getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
-                                                                 pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
+    return (Map<Object, Object>) AVRO_GENERATOR_TOOL.generateMap(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()),
+                                                                 pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
   }
 
   private String generateString(final Integer valueLength) {
     return String.valueOf(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
-  }
-
-  private String getOneDimensionValueType(final String completeValueType) {
-    final int numberOfHyphens = StringUtils.countMatches(completeValueType, "-");
-    return numberOfHyphens > 1 ? completeValueType.substring(0, completeValueType.lastIndexOf("-")) : completeValueType;
   }
 
   @Override
@@ -110,7 +106,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
   }
 
   private List<Object> createFinalArray(final SchemaProcessorPOJO pojo) {
-    return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
+    return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
                                                          pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
   }
 
@@ -118,8 +114,9 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
       final SchemaProcessorPOJO pojo) {
     final Schema fieldSchema = findSchema(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
 
-    final Object valueObject = AVRO_GENERATOR_TOOL.generateObject(Objects.requireNonNull(fieldSchema), pojo.getCompleteFieldName(), getOneDimensionValueType(pojo.getValueType()),
-                                                                  pojo.getValueLength(), pojo.getFieldValuesList(), extractConstraints(fieldSchema));
+    final Object valueObject = AVRO_GENERATOR_TOOL.generateObject(Objects.requireNonNull(fieldSchema), pojo.getCompleteFieldName(),
+                                                                  SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
+                                                                  pojo.getFieldValuesList(), extractConstraints(fieldSchema));
 
     return assignObject(pojo.getRootFieldName(), pojo.getFieldNameSubEntity(), valueObject);
   }

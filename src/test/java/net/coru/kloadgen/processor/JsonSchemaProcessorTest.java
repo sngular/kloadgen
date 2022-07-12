@@ -51,10 +51,10 @@ public class JsonSchemaProcessorTest {
   @MethodSource("parametersForTestNullOnOptionalField")
   void testNullOnOptionalField(List<FieldValueMapping> schemaAsJson, String expected) {
 
-    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
 
-    jsonSchemaProcessor.processSchema(schemaAsJson);
-    ObjectNode message = jsonSchemaProcessor.next();
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
   }
@@ -91,7 +91,7 @@ public class JsonSchemaProcessorTest {
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null,null, SCHEMA_COMPLEX_COLLECTIONS);
 
     ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
-
+    System.out.println(message);
     assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
                                   .contains("\"birds\":[[{\"nameBird\":")
                                   .contains("\"animals\":{").contains("nameAnimal\":");

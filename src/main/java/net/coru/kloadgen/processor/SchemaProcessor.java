@@ -100,6 +100,8 @@ public class SchemaProcessor extends SchemaProcessorUtils {
     final int level = levelCount + 1;
     objectCreator.createRecord(rootFieldName, getPathUpToFieldName(completeRootFieldName, level));
 
+    ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>();
+    ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopyCopy = new ArrayDeque<>();
     FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
 
     int generatedProperties = 0;
@@ -120,7 +122,7 @@ public class SchemaProcessor extends SchemaProcessorUtils {
                                                                calculateSizeFromTypeFilter(singleTypeFilter), fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(),
                                                                fieldValueMapping.getFieldValuesList(), fieldValueMapping.getConstraints(), level, lastTypeFilterOfLastElement);
 
-      if (objectCreator.isOptional(pojo) && fieldValueMapping.getFieldValuesList().contains("null")) {
+      /*if (objectCreator.isOptional(pojo) && fieldValueMapping.getFieldValuesList().contains("null")) {
 
         elapsedProperties++;
         final FieldValueMapping actualField = fieldExpMappingsQueue.peek();
@@ -142,6 +144,58 @@ public class SchemaProcessor extends SchemaProcessorUtils {
           fieldValueMapping = nextField;
         }
 
+      }*/
+
+      if (this.objectCreator.isOptional(pojo)) {
+
+        elapsedProperties++;
+        final FieldValueMapping actualField = fieldExpMappingsQueue.peek();
+        fieldExpMappingsQueueCopy = new ArrayDeque<>(fieldExpMappingsQueue);
+        fieldExpMappingsQueue.remove();
+        final FieldValueMapping nextField = fieldExpMappingsQueue.peek();
+
+        if (nextField == null && Objects.requireNonNull(actualField).getAncestorRequired()
+            && generatedProperties == elapsedProperties && generatedProperties > 0) {
+
+          if (hasTypeFilterInnerRecord(pojo.getCompleteTypeFilterChain())) {
+            fieldValueMapping = null;
+          } else {
+            fieldValueMapping = makeFieldValueMappingRequired(actualField);
+            fieldExpMappingsQueueCopyCopy = new ArrayDeque<>(fieldExpMappingsQueueCopy);
+          }
+
+        } else if (nextField == null
+                   && (!actualField.getRequired()
+                       || !actualField.getRequired() && !actualField.getAncestorRequired())) {
+          fieldValueMapping = null;
+
+        } else if (checkIfOptionalCollection(fieldValueMapping, cleanPath)) {
+          fieldValueMapping = actualField;
+          fieldValueMapping.setRequired(true);
+
+        } else if (!Objects.requireNonNull(nextField).getFieldName().contains(fieldNameSubEntity)
+                   && Objects.requireNonNull(actualField).getAncestorRequired()
+                   && fieldExpMappingsQueue.peek() != null
+                   && generatedProperties == elapsedProperties && generatedProperties > 0) {
+
+          if (fieldValueMapping.getFieldName().contains(".")) {
+            final String ancestorName = fieldValueMapping.getFieldName().substring(0, fieldValueMapping.getFieldName().indexOf("."));
+            if (Objects.requireNonNull(nextField).getFieldName().contains(ancestorName)) {
+              fieldValueMapping = nextField;
+            } else {
+              if (hasTypeFilterInnerRecord(pojo.getCompleteTypeFilterChain())) {
+                fieldValueMapping = nextField;
+              } else {
+                fieldValueMapping = makeFieldValueMappingRequired(actualField);
+              }
+            }
+          } else {
+            fieldValueMapping = makeFieldValueMappingRequired(actualField);
+          }
+        } else {
+          fieldValueMapping = nextField;
+
+        }
       } else {
         if (isTypeFilterMap(singleTypeFilter)) {
           objectRecord = this.objectCreator.createMap(pojo, getMapAndArrayGenerationFunction(), false);
@@ -202,6 +256,13 @@ public class SchemaProcessor extends SchemaProcessorUtils {
       returnObject = this.objectCreator.createArray(newPojo, getMapAndArrayGenerationFunction(), true);
     }
     return returnObject;
+  }
+  private FieldValueMapping makeFieldValueMappingRequired(FieldValueMapping fieldValueMapping) {
+    fieldValueMapping.setRequired(true);
+    final List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
+    temporalFieldValueList.remove("null");
+    fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
+    return fieldValueMapping;
   }
 
 }

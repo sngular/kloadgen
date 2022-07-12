@@ -280,4 +280,18 @@ public class SchemaProcessorUtils {
     }
     return dotType;
   }
+
+  public static String getOneDimensionValueType(final String completeValueType) {
+    final int numberOfHyphens = StringUtils.countMatches(completeValueType, "-");
+    return numberOfHyphens > 1 ? completeValueType.substring(0, completeValueType.lastIndexOf("-")) : completeValueType;
+  }
+
+  public static boolean checkIfOptionalCollection(FieldValueMapping field, String fieldName) {
+    return !field.getRequired() && field.getFieldValuesList().contains("null") && hasMapOrArrayTypeFilter(fieldName);
+  }
+
+  protected static boolean hasTypeFilterInnerRecord(String completeTypeFilterChain) {
+    return completeTypeFilterChain.matches("\\[.*]\\.");
+  }
+
 }
