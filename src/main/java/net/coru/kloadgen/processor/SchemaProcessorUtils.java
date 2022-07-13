@@ -40,7 +40,7 @@ public class SchemaProcessorUtils {
 
   private static final String OPTIONAL = "optional";
 
-  protected static FieldValueMapping getSafeGetElement(ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
+  protected static FieldValueMapping getSafeGetElement(final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue) {
     return !fieldExpMappingsQueue.isEmpty() ? fieldExpMappingsQueue.element() : null;
   }
 
@@ -236,7 +236,6 @@ public class SchemaProcessorUtils {
         var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
         schemaBuilder.setName(packageName + "." + messageName);
         schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
-
       }
       if (fileLine.startsWith("import")) {
         schemaBuilder.addDependency(fileLine.substring(6));
@@ -246,7 +245,7 @@ public class SchemaProcessorUtils {
     return schemaBuilder.build();
   }
 
-  private static MessageDefinition buildMessage(String messageName, ListIterator<String> messageLines) {
+  private static MessageDefinition buildMessage(final String messageName, final ListIterator<String> messageLines) {
 
     boolean exit = false;
     MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
@@ -264,7 +263,7 @@ public class SchemaProcessorUtils {
     return messageDefinition.build();
   }
 
-  private static String checkIfChoppable(String field) {
+  private static String checkIfChoppable(final String field) {
     String choppedField = field;
     if (field.endsWith(";")) {
       choppedField = StringUtils.chop(field);
@@ -272,7 +271,7 @@ public class SchemaProcessorUtils {
     return choppedField;
   }
 
-  private static String checkDotType(String subfieldType) {
+  private static String checkDotType(final String subfieldType) {
     String dotType = "";
     if (subfieldType.startsWith(".") || subfieldType.contains(".")) {
       String[] typeSplit = subfieldType.split("\\.");
@@ -281,16 +280,17 @@ public class SchemaProcessorUtils {
     return dotType;
   }
 
-  public static String getOneDimensionValueType(final String completeValueType) {
+  public static String getOneDimensionValueType( String completeValueType) {
     final int numberOfHyphens = StringUtils.countMatches(completeValueType, "-");
-    return numberOfHyphens > 1 ? completeValueType.substring(0, completeValueType.lastIndexOf("-")) : completeValueType;
+    String [] types = completeValueType.split("-");
+    return numberOfHyphens > 1 ? String.join("-", Arrays.copyOfRange(types, 0, 2)): completeValueType;
   }
 
-  public static boolean checkIfOptionalCollection(FieldValueMapping field, String fieldName) {
+  public static boolean checkIfOptionalCollection(final FieldValueMapping field, final String fieldName) {
     return !field.getRequired() && field.getFieldValuesList().contains("null") && hasMapOrArrayTypeFilter(fieldName);
   }
 
-  protected static boolean hasTypeFilterInnerRecord(String completeTypeFilterChain) {
+  protected static boolean hasTypeFilterInnerRecord(final String completeTypeFilterChain) {
     return completeTypeFilterChain.matches("\\[.*]\\.");
   }
 
