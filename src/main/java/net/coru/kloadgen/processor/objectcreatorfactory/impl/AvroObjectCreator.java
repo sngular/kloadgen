@@ -1,4 +1,4 @@
-package net.coru.kloadgen.processor.objectcreator.impl;
+package net.coru.kloadgen.processor.objectcreatorfactory.impl;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -16,9 +16,9 @@ import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
-import net.coru.kloadgen.processor.SchemaProcessorUtils;
-import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
+import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
+import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
+import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -28,9 +28,8 @@ import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.commons.lang3.StringUtils;
 
-public class AvroObjectCreatorFactory implements ObjectCreator {
+public class AvroObjectCreator implements ObjectCreator {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
 
@@ -44,7 +43,7 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
 
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
-  public AvroObjectCreatorFactory(final Object schema, final Object metadata) {
+  public AvroObjectCreator(final Object schema, final Object metadata) {
     if (schema instanceof ParsedSchema) {
       this.schema = (Schema) ((ParsedSchema) schema).rawSchema();
     } else if (schema instanceof Schema) {
@@ -156,8 +155,8 @@ public class AvroObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public boolean isOptional(final SchemaProcessorPOJO pojo) {
-    var subSchema = findSchema(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+  public boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
+    var subSchema = findSchema(fieldName, this.schema, new AtomicBoolean(false));
     if (subSchema.getType().equals(Type.MAP)) {
       subSchema = findRecursiveSchemaForRecord(subSchema.getValueType());
     } else if (subSchema.getType().equals(Type.ARRAY)) {
