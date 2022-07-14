@@ -29,18 +29,18 @@ public class StatelessGeneratorTool {
 
   private final RandomObject randomObject = new RandomObject();
 
-  public String generateRandomString(Integer valueLength) {
+  public String generateRandomString(final Integer valueLength) {
     return (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), Collections.emptyMap());
   }
 
-  public Object generateObject(String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList) {
+  public Object generateObject(final String fieldName, final String fieldType, final Integer valueLength, final List<String> fieldValuesList) {
     List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
 
-    Object value;
+    final Object value;
 
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
-        return RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+        value = RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
       } else {
         value = RandomSequence.generateSeq(fieldName, fieldType, parameterList, context);
       }
@@ -50,7 +50,7 @@ public class StatelessGeneratorTool {
     return value;
   }
 
-  public Object generateMap(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
+  public Object generateMap(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Integer size) {
 
     if (checkIfNullFieldValueList(fieldValuesList) && (fieldType.endsWith("-array") || fieldType.endsWith("-map"))) {
       return fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();
@@ -59,11 +59,11 @@ public class StatelessGeneratorTool {
     return randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
   }
 
-  public boolean checkIfNullFieldValueList(List<String> fieldValueList) {
+  public boolean checkIfNullFieldValueList(final List<String> fieldValueList) {
     return fieldValueList == null || (fieldValueList.size() == 1 && fieldValueList.contains("null"));
   }
 
-  public Object generateArray(String fieldName, String fieldType, Integer arraySize, Integer valueLength, List<String> fieldValuesList) {
+  public Object generateArray(final String fieldName, final String fieldType, final Integer arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
     if (checkIfNullFieldValueList(fieldValuesList)) {
       return fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();

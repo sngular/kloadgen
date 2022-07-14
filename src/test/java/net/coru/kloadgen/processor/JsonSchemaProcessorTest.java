@@ -2,6 +2,8 @@ package net.coru.kloadgen.processor;
 
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_COMPLEX_COLLECTIONS;
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_NESTED_COLLECTIONS;
+import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_NESTED_ITERATION;
+import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_NESTED_ITERATION_EXPECTED;
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA;
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_EXPECTED;
 import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_MAP;
@@ -113,6 +115,26 @@ public class JsonSchemaProcessorTest {
     ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
+  }
+
+  private static Stream<Object> parametersForTestNestedLevels() {
+    return Stream.of(
+        Arguments.of(SCHEMA_NESTED_ITERATION , SCHEMA_NESTED_ITERATION_EXPECTED)
+    );
+  }
+  @ParameterizedTest
+  @MethodSource("parametersForTestNestedLevels")
+  void testNestedComplexLevels(List<FieldValueMapping> schemaAsJson, String expected) {
+
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null,null, schemaAsJson);
+
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+    System.out.println(message);
+    /*assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
+                                  .contains("\"birds\":[[{\"nameBird\":")
+                                  .contains("\"animals\":{").contains("nameAnimal\":");*/
+    JSONAssert.assertEquals(message.toString(),expected, JSONCompareMode.LENIENT);
   }
 
 }

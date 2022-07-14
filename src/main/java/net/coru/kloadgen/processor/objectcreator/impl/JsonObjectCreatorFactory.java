@@ -1,15 +1,10 @@
 package net.coru.kloadgen.processor.objectcreator.impl;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -32,7 +27,7 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   public Object createMap(
       final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
 
-    Object map;
+    final Object map;
     if (pojo.isLastFilterTypeOfLastElement()) {
       map = createFinalMap(pojo);
     } else {
@@ -61,7 +56,7 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
       nodeArray = createFinalArray(pojo);
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
-        JsonNode object;
+        final JsonNode object;
         if (i == pojo.getFieldSize() - 1) {
           object = (JsonNode) generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo);
         } else {
@@ -83,7 +78,7 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   @Override
   public Object createValueObject(final SchemaProcessorPOJO pojo) {
 
-    ObjectNode object = entity.get(pojo.getRootFieldName());
+    final ObjectNode object = entity.get(pojo.getRootFieldName());
     object.putPOJO(pojo.getCompleteFieldName(), OBJECT_MAPPER.convertValue(
         STATELESS_GENERATOR_TOOL.generateObject(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList()), JsonNode.class));
     return object;
@@ -92,7 +87,7 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   @Override
   public Object assignRecord(final SchemaProcessorPOJO pojo) {
 
-    ObjectNode parentNode = entity.get(pojo.getRootFieldName());
+    final ObjectNode parentNode = entity.get(pojo.getRootFieldName());
     parentNode.set(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
     return parentNode;
   }
@@ -103,10 +98,12 @@ public class JsonObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public Object generateRecord() {return entity.get("root");}
+  public Object generateRecord() {
+    return entity.get("root");
+  }
 
   @Override
-  public Object generateSubEntityRecord(Object objectRecord) {
+  public Object generateSubEntityRecord(final Object objectRecord) {
     return objectRecord;
   }
 

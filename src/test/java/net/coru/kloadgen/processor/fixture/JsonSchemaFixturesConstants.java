@@ -724,4 +724,52 @@ public class JsonSchemaFixturesConstants {
 
   public static final String SIMPLE_SCHEMA_REQUIRED_EXPECTED = "{\"firstName\": \"Diana\",\"lastName\":\"García\"  ,\"age\":2}";
 
+
+
+  public static final List<FieldValueMapping> SCHEMA_NESTED_ITERATION = new ArrayList<FieldValueMapping>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("flowers[:]")
+                       .fieldType("string-map")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("null")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("flowers.name[]")
+                       .fieldType("string-array")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("null")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("bush.maxHeight[][:]")
+                       .fieldType("int-map-array")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(false)
+                       .fieldValueList("0.5")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("bush.leafs[:3][][:]")
+                       .fieldType("string-map-array-map")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(false)
+                       .fieldValueList("null")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build()
+  ));
+
+  public static final String SCHEMA_NESTED_ITERATION_EXPECTED = "{\"bush.maxHeight\": \"0.5\"}";
+
+
 }

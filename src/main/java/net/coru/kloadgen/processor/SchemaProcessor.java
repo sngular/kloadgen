@@ -38,7 +38,7 @@ public class SchemaProcessor extends SchemaProcessorUtils {
 
       int generatedProperties = 0;
       int elapsedProperties = 0;
-      objectCreator.createRecord("root", "");
+      this.objectCreator.createRecord("root", "");
       while (!fieldExpMappingsQueue.isEmpty()) {
         final int level = 0;
         final String cleanPath = cleanUpPath(fieldValueMapping, level);
@@ -48,8 +48,8 @@ public class SchemaProcessor extends SchemaProcessorUtils {
         final String remainingFilterChain = completeTypeFilterChain.replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), "");
         final boolean lastTypeFilterOfLastElement = isLastTypeFilterOfLastElement(remainingFilterChain);
 
-        if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName)) && generatedProperties == elapsedProperties &&
-            generatedProperties > 0 && fieldValueMapping.getAncestorRequired()) {
+        if ((fieldExpMappingsQueueCopy.peek() == null || !fieldExpMappingsQueueCopy.peek().getFieldName().contains(fieldName)) && generatedProperties == elapsedProperties
+            && generatedProperties > 0 && fieldValueMapping.getAncestorRequired()) {
           fieldValueMapping.setRequired(true);
           final List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
           temporalFieldValueList.remove("null");
@@ -98,7 +98,7 @@ public class SchemaProcessor extends SchemaProcessorUtils {
 
   private Object createObject(final String rootFieldName, final String completeRootFieldName, final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final int levelCount) {
     final int level = levelCount + 1;
-    objectCreator.createRecord(rootFieldName, getPathUpToFieldName(completeRootFieldName, level));
+    this.objectCreator.createRecord(rootFieldName, getPathUpToFieldName(completeRootFieldName, level));
 
     ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopy = new ArrayDeque<>();
     ArrayDeque<FieldValueMapping> fieldExpMappingsQueueCopyCopy = new ArrayDeque<>();
@@ -154,8 +154,7 @@ public class SchemaProcessor extends SchemaProcessorUtils {
         fieldExpMappingsQueue.remove();
         final FieldValueMapping nextField = fieldExpMappingsQueue.peek();
 
-        if (nextField == null && Objects.requireNonNull(actualField).getAncestorRequired()
-            && generatedProperties == elapsedProperties && generatedProperties > 0) {
+        if (nextField == null && Objects.requireNonNull(actualField).getAncestorRequired() && generatedProperties == elapsedProperties && generatedProperties > 0) {
 
           if (hasTypeFilterInnerRecord(pojo.getCompleteTypeFilterChain())) {
             fieldValueMapping = null;
@@ -164,19 +163,15 @@ public class SchemaProcessor extends SchemaProcessorUtils {
             fieldExpMappingsQueueCopyCopy = new ArrayDeque<>(fieldExpMappingsQueueCopy);
           }
 
-        } else if (nextField == null
-                   && (!actualField.getRequired()
-                       || !actualField.getRequired() && !actualField.getAncestorRequired())) {
+        } else if (nextField == null && (!actualField.getRequired() || !actualField.getRequired() && !actualField.getAncestorRequired())) {
           fieldValueMapping = null;
 
         } else if (checkIfOptionalCollection(fieldValueMapping, cleanPath)) {
           fieldValueMapping = actualField;
           fieldValueMapping.setRequired(true);
 
-        } else if (!Objects.requireNonNull(nextField).getFieldName().contains(fieldNameSubEntity)
-                   && Objects.requireNonNull(actualField).getAncestorRequired()
-                   && fieldExpMappingsQueue.peek() != null
-                   && generatedProperties == elapsedProperties && generatedProperties > 0) {
+        } else if (!Objects.requireNonNull(nextField).getFieldName().contains(fieldNameSubEntity) && Objects.requireNonNull(actualField).getAncestorRequired()
+                   && fieldExpMappingsQueue.peek() != null && generatedProperties == elapsedProperties && generatedProperties > 0) {
 
           if (fieldValueMapping.getFieldName().contains(".")) {
             final String ancestorName = fieldValueMapping.getFieldName().substring(0, fieldValueMapping.getFieldName().indexOf("."));
@@ -240,9 +235,9 @@ public class SchemaProcessor extends SchemaProcessorUtils {
 
   @SneakyThrows
   private Object processComplexTypes(final SchemaProcessorPOJO pojo, final String singleTypeFilter, final ArrayDeque<?> fieldExpMappingsQueue) {
-    Object returnObject;
-    String remainingFilterChain = pojo.getCompleteTypeFilterChain().replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), "");
-    boolean lastTypeFilterOfLastElement = isLastTypeFilterOfLastElement(remainingFilterChain);
+    final Object returnObject;
+    final String remainingFilterChain = pojo.getCompleteTypeFilterChain().replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), "");
+    final boolean lastTypeFilterOfLastElement = isLastTypeFilterOfLastElement(remainingFilterChain);
     if (lastTypeFilterOfLastElement) {
       fieldExpMappingsQueue.remove();
     }
@@ -257,10 +252,12 @@ public class SchemaProcessor extends SchemaProcessorUtils {
     }
     return returnObject;
   }
-  private FieldValueMapping makeFieldValueMappingRequired(FieldValueMapping fieldValueMapping) {
+
+  private FieldValueMapping makeFieldValueMappingRequired(final FieldValueMapping fieldValueMapping) {
     fieldValueMapping.setRequired(true);
     final List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
     temporalFieldValueList.remove("null");
+
     fieldValueMapping.setFieldValuesList(temporalFieldValueList.toString());
     return fieldValueMapping;
   }
