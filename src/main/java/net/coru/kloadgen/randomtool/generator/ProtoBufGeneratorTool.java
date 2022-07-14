@@ -28,11 +28,8 @@ public class ProtoBufGeneratorTool {
   public static Object generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
     final List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(fieldValue ->
-                                 fieldValue.matches("\\$\\{\\w*}")
-                                     ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-                                                                                                                                                  fieldValue
-    );
+    parameterList.replaceAll(
+        fieldValue -> fieldValue.matches("\\$\\{\\w*}") ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
 
     final List value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
@@ -88,12 +85,16 @@ public class ProtoBufGeneratorTool {
   }
 
   public Object generateObject(
-      FieldDescriptor descriptor, String fieldType, Integer valueLength, List<String> fieldValuesList,
-      Map<ConstraintTypeEnum, String> constraints) {
+      FieldDescriptor descriptor, String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints) {
     Object result = null;
     if (Objects.nonNull(descriptor.getJavaType())) {
-      result = RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
+      result = generateRawObject(fieldType, valueLength, fieldValuesList, constraints);
     }
     return result;
+  }
+
+  public Object generateRawObject(
+      String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints) {
+    return RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
   }
 }

@@ -28,13 +28,10 @@ import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
 import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
-import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProtobufObjectCreator implements ObjectCreator {
-
-  private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
   private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
 
@@ -123,12 +120,11 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object assignRecord(final SchemaProcessorPOJO pojo) {
+  public void assignRecord(final SchemaProcessorPOJO pojo) {
     final DynamicMessage.Builder builder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     builder.setField(findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false)),
                      entity.get(pojo.getFieldNameSubEntity()).build());
-    return builder;
   }
 
   @Override
@@ -174,7 +170,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   private Object createFieldObject(final Descriptors.Descriptor descriptor, final SchemaProcessorPOJO pojo) {
     final DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(descriptor);
     for (var field : descriptor.getFields()) {
-      messageBuilder.setField(field, RANDOM_OBJECT.generateRandom(getFieldType(field), pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));
+      messageBuilder.setField(field, PROTOBUF_GENERATOR_TOOL.generateRawObject(getFieldType(field), pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));
     }
 
     return messageBuilder.build();
@@ -253,7 +249,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   private String generateString(final Integer valueLength) {
-    return String.valueOf(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
+    return String.valueOf(PROTOBUF_GENERATOR_TOOL.generateRawObject("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
   }
 
   private Message buildSimpleMapEntry(final Descriptors.FieldDescriptor descriptor, final SchemaProcessorPOJO pojo) {
@@ -270,7 +266,8 @@ public class ProtobufObjectCreator implements ObjectCreator {
       builder.setField(valueFieldDescriptor,
                        PROTOBUF_GENERATOR_TOOL.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
     } else {
-      builder.setField(valueFieldDescriptor, RANDOM_OBJECT.generateRandom(fieldValueMappingCleanType, pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));
+      builder.setField(valueFieldDescriptor,
+                       PROTOBUF_GENERATOR_TOOL.generateRawObject(fieldValueMappingCleanType, pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));
     }
 
     return builder.build();

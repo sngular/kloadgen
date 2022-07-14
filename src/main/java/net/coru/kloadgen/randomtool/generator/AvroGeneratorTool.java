@@ -165,9 +165,13 @@ public class AvroGeneratorTool {
     }
   }
 
+  public Object generateRawObject(
+      String fieldType, Integer valueLength, List<String> fieldValuesList, Map<ConstraintTypeEnum, String> constraints) {
+    return RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
+  }
+
   public Object generateArray(
-      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList, Integer arraySize,
-      Map<ConstraintTypeEnum, String> constraints) {
+      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList, Integer arraySize, Map<ConstraintTypeEnum, String> constraints) {
     final List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(
         fieldValue -> fieldValue.matches("\\$\\{\\w*}") ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
@@ -189,14 +193,10 @@ public class AvroGeneratorTool {
   }
 
   public Object generateMap(
-      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList, Integer mapSize,
-      Map<ConstraintTypeEnum, String> constraints) {
+      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList, Integer mapSize, Map<ConstraintTypeEnum, String> constraints) {
     final List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(fieldValue ->
-                                 fieldValue.matches("\\$\\{\\w*}")
-                                     ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) :
-                                                                                                                                                  fieldValue
-    );
+    parameterList.replaceAll(
+        fieldValue -> fieldValue.matches("\\$\\{\\w*}") ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
 
     final var value = new HashMap<>(mapSize);
     if ("seq".equals(fieldType)) {

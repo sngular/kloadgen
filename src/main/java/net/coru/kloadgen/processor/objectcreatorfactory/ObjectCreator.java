@@ -16,7 +16,7 @@ public interface ObjectCreator {
   Object createValueObject(
       SchemaProcessorPOJO pojo);
 
-  Object assignRecord(SchemaProcessorPOJO pojo);
+  void assignRecord(SchemaProcessorPOJO pojo);
 
   void createRecord(String objectName, String completeFieldName);
 

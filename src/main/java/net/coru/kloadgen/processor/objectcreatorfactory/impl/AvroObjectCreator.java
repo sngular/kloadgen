@@ -20,7 +20,6 @@ import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
 import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
-import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
@@ -32,8 +31,6 @@ import org.apache.commons.collections4.IteratorUtils;
 public class AvroObjectCreator implements ObjectCreator {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
-
-  private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
   private static final Set<Type> TYPES_SET = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
 
@@ -81,7 +78,7 @@ public class AvroObjectCreator implements ObjectCreator {
   }
 
   private String generateString(final Integer valueLength) {
-    return String.valueOf(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
+    return String.valueOf(AVRO_GENERATOR_TOOL.generateRawObject("string", valueLength, Collections.emptyList(), Collections.emptyMap()));
   }
 
   @Override
@@ -121,10 +118,10 @@ public class AvroObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object assignRecord(final SchemaProcessorPOJO pojo) {
+  public void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
-    return entity.get(pojo.getRootFieldName());
+    entity.get(pojo.getRootFieldName());
   }
 
   @Override

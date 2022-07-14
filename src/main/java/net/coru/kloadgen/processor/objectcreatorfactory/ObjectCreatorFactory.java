@@ -13,8 +13,10 @@ import net.coru.kloadgen.processor.objectcreatorfactory.impl.ProtobufObjectCreat
 @Slf4j
 public class ObjectCreatorFactory {
 
-  public static ObjectCreator getInstance(SchemaTypeEnum schemaType, Object schema, Object metadata) {
-    ObjectCreator objectCreator = null;
+  private ObjectCreatorFactory() {}
+
+  public static ObjectCreator getInstance(final SchemaTypeEnum schemaType, final Object schema, final Object metadata) {
+    final ObjectCreator objectCreator;
     try {
       switch (schemaType) {
         case JSON:
@@ -30,7 +32,9 @@ public class ObjectCreatorFactory {
           throw new KLoadGenException("Unsupported schema type");
       }
     } catch (KLoadGenException | DescriptorValidationException | IOException e) {
-      log.error("Please, make sure that the schema sources fed are correct", e);
+      final String logMsg = "Please, make sure that the schema sources fed are correct";
+      log.error(logMsg, e);
+      throw new KLoadGenException("Error obtaining object creator factory. " + logMsg);
     }
     return objectCreator;
   }

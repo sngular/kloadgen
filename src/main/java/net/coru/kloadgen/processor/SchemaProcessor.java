@@ -10,7 +10,6 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
@@ -64,7 +63,7 @@ public class SchemaProcessor {
     final int level = levelCount + 1;
     objectCreator.createRecord(rootFieldName, SchemaProcessorUtils.getPathUpToFieldName(completeRootFieldName, level));
 
-    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.peek();
+    FieldValueMapping fieldValueMapping = fieldExpMappingsQueue.element();
     Object objectRecord;
     do {
       final String cleanPath = SchemaProcessorUtils.cleanUpPath(fieldValueMapping, level);
@@ -90,10 +89,10 @@ public class SchemaProcessor {
       final String singleTypeFilter, final boolean lastTypeFilterOfLastElement, final SchemaProcessorPOJO pojo) {
     final Object objectRecord;
     if (SchemaProcessorUtils.isTypeFilterMap(singleTypeFilter)) {
-      objectRecord = this.objectCreator.createMap(pojo, getMapAndArrayGenerationFunction(), false);
+      objectRecord = this.objectCreator.createMap(pojo, this::processTypeFilterAfterComplexType, false);
       removeFieldFromListIfNeededAfterProcessComplexType(fieldExpMappingsQueue, fieldValueMapping, lastTypeFilterOfLastElement);
     } else if (SchemaProcessorUtils.isTypeFilterArray(singleTypeFilter)) {
-      objectRecord = this.objectCreator.createArray(pojo, getMapAndArrayGenerationFunction(), false);
+      objectRecord = this.objectCreator.createArray(pojo, this::processTypeFilterAfterComplexType, false);
       removeFieldFromListIfNeededAfterProcessComplexType(fieldExpMappingsQueue, fieldValueMapping, lastTypeFilterOfLastElement);
     } else if (SchemaProcessorUtils.isTypeFilterRecord(singleTypeFilter)) {
       objectRecord = createObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldExpMappingsQueue, pojo.getLevel());
@@ -112,18 +111,12 @@ public class SchemaProcessor {
     }
   }
 
-  private BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> getMapAndArrayGenerationFunction() {
-    final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generationFunction = (fieldExpMappingsQueue, schemaProcessorPOJO) -> processTypeFilterAfterComplexType(
-        fieldExpMappingsQueue, schemaProcessorPOJO);
-    return generationFunction;
-  }
-
   private Object processTypeFilterAfterComplexType(final ArrayDeque<?> fieldExpMappingsQueue, final SchemaProcessorPOJO schemaProcessorPOJO) {
     final Object returnObject;
     final String singleTypeFilter = SchemaProcessorUtils.getFirstComplexType(schemaProcessorPOJO.getCompleteTypeFilterChain());
     if (SchemaProcessorUtils.hasMapOrArrayTypeFilter(schemaProcessorPOJO.getCompleteTypeFilterChain())
         && (SchemaProcessorUtils.isTypeFilterMap(singleTypeFilter) || SchemaProcessorUtils.isTypeFilterArray(singleTypeFilter))) {
-      returnObject = processComplexTypes(schemaProcessorPOJO, singleTypeFilter, fieldExpMappingsQueue);
+      returnObject = processNestedComplexTypes(schemaProcessorPOJO, singleTypeFilter, fieldExpMappingsQueue);
     } else if (SchemaProcessorUtils.isTypeFilterRecord(singleTypeFilter)) {
       returnObject = createObject(schemaProcessorPOJO.getFieldNameSubEntity(), schemaProcessorPOJO.getCompleteFieldName(), (ArrayDeque<FieldValueMapping>) fieldExpMappingsQueue,
                                   schemaProcessorPOJO.getLevel());
@@ -135,7 +128,7 @@ public class SchemaProcessor {
   }
 
   @SneakyThrows
-  private Object processComplexTypes(final SchemaProcessorPOJO pojo, final String singleTypeFilter, final ArrayDeque<?> fieldExpMappingsQueue) {
+  private Object processNestedComplexTypes(final SchemaProcessorPOJO pojo, final String singleTypeFilter, final ArrayDeque<?> fieldExpMappingsQueue) {
     final Object returnObject;
     final String remainingFilterChain = pojo.getCompleteTypeFilterChain().replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), "");
     final boolean lastTypeFilterOfLastElement = SchemaProcessorUtils.isLastTypeFilterOfLastElement(remainingFilterChain);
@@ -147,9 +140,9 @@ public class SchemaProcessor {
     newPojo.setLastFilterTypeOfLastElement(lastTypeFilterOfLastElement);
     newPojo.setCompleteTypeFilterChain(remainingFilterChain);
     if (SchemaProcessorUtils.isTypeFilterMap(singleTypeFilter)) {
-      returnObject = this.objectCreator.createMap(newPojo, getMapAndArrayGenerationFunction(), true);
+      returnObject = this.objectCreator.createMap(newPojo, this::processTypeFilterAfterComplexType, true);
     } else {
-      returnObject = this.objectCreator.createArray(newPojo, getMapAndArrayGenerationFunction(), true);
+      returnObject = this.objectCreator.createArray(newPojo, this::processTypeFilterAfterComplexType, true);
     }
     return returnObject;
   }
@@ -167,15 +160,8 @@ public class SchemaProcessor {
 
   private ArrayDeque<FieldValueMapping> calculateFieldsToProcess() {
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-    final ArrayDeque<FieldValueMapping> finalFieldExpMappingsQueue = new ArrayDeque<>();
-    final Iterator<FieldValueMapping> itFields = initialFieldExpMappingsQueue.iterator();
-    while (itFields.hasNext()) {
-      final FieldValueMapping fieldValueMapping = itFields.next();
-      if (shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)) {
-        finalFieldExpMappingsQueue.add(fieldValueMapping);
-      }
-    }
-    return finalFieldExpMappingsQueue;
+    return initialFieldExpMappingsQueue.stream().filter(fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue))
+                                       .collect(Collectors.toCollection(ArrayDeque::new));
   }
 
   private boolean shouldProcessField(final FieldValueMapping fieldValueMapping, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue) {

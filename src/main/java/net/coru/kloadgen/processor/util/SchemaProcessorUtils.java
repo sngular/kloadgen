@@ -7,6 +7,7 @@
 package net.coru.kloadgen.processor.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +16,6 @@ import java.util.ListIterator;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.github.os72.protobuf.dynamic.DynamicSchema;
 import com.github.os72.protobuf.dynamic.EnumDefinition;
@@ -117,8 +117,7 @@ public class SchemaProcessorUtils {
 
   public static String[] splitAndNormalizeFullFieldName(final String fullFieldName) {
     final String[] fields = fullFieldName.split("\\.");
-    final List<String> alFields = Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).collect(Collectors.toList());
-    return alFields.toArray(new String[0]);
+    return Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).toArray(String[]::new);
   }
 
   public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
@@ -126,12 +125,16 @@ public class SchemaProcessorUtils {
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
     final List<String> imports = schema.getImports();
     for (String importedClass : imports) {
-      final String schemaToString = new String(SchemaProcessorUtils.class.getClassLoader().getResourceAsStream(importedClass).readAllBytes());
-      final var lines = new ArrayList<>(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
-      if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
-        final var importedSchema = processImported(lines);
-        schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
-        schemaBuilder.addSchema(importedSchema);
+      try (final InputStream resourceStream = SchemaProcessorUtils.class.getClassLoader().getResourceAsStream(importedClass)) {
+        if (null != resourceStream) {
+          final String schemaToString = new String(resourceStream.readAllBytes());
+          final var lines = new ArrayList<>(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
+          if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
+            final var importedSchema = processImported(lines);
+            schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
+            schemaBuilder.addSchema(importedSchema);
+          }
+        }
       }
     }
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
