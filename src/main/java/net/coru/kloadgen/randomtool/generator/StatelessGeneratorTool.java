@@ -22,16 +22,16 @@ import net.coru.kloadgen.randomtool.util.ValueUtils;
 
 public class StatelessGeneratorTool {
 
-  private final Map<String, Object> context = new HashMap<>();
+  private static final Map<String, Object> CONTEXT = new HashMap<>();
 
-  private final RandomMap randomMap = new RandomMap();
+  private static final RandomMap RANDOM_MAP = new RandomMap();
 
-  private final RandomArray randomArray = new RandomArray();
+  private static final RandomArray RANDOM_ARRAY = new RandomArray();
 
-  private final RandomObject randomObject = new RandomObject();
+  private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
   public final String generateRandomString(final Integer valueLength) {
-    return (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), Collections.emptyMap());
+    return (String) RANDOM_OBJECT.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), Collections.emptyMap());
   }
 
   public final Object generateObject(final String fieldName, final String fieldType, final Integer valueLength, final List<String> fieldValuesList) {
@@ -41,18 +41,18 @@ public class StatelessGeneratorTool {
 
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
-        value = RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+        value = RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, fieldValuesList, CONTEXT);
       } else {
-        value = RandomSequence.generateSeq(fieldName, fieldType, parameterList, context);
+        value = RandomSequence.generateSeq(fieldName, fieldType, parameterList, CONTEXT);
       }
     } else if ("it".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
-        value = RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, fieldValuesList, context);
+        value = RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, fieldValuesList, CONTEXT);
       } else {
-        value = RandomIterator.generateIt(fieldName, fieldType, parameterList, context);
+        value = RandomIterator.generateIt(fieldName, fieldType, parameterList, CONTEXT);
       }
     } else {
-      value = randomObject.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
+      value = RANDOM_OBJECT.generateRandom(fieldType, valueLength, parameterList, Collections.emptyMap());
     }
     return value;
   }
@@ -63,9 +63,13 @@ public class StatelessGeneratorTool {
       result = fieldType.endsWith("-array") ? new ArrayList<>() : new HashMap<>();
     } else {
       final List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-      result = randomMap.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
+      result = RANDOM_MAP.generateMap(fieldType, valueLength, parameterList, size, Collections.emptyMap());
     }
     return result;
+  }
+
+  public final boolean checkIfNullFieldValueList(final List<String> fieldValueList) {
+    return fieldValueList == null || fieldValueList.size() == 1 && fieldValueList.contains("null");
   }
 
   public final Object generateArray(final String fieldName, final String fieldType, final Integer arraySize, final Integer valueLength, final List<String> fieldValuesList) {
@@ -76,17 +80,13 @@ public class StatelessGeneratorTool {
     } else {
 
       final List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-      result = randomArray.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
+      result = RANDOM_ARRAY.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap());
       if ("seq".equals(fieldType)) {
-        result = RandomSequence.generateSeq(fieldName, fieldType, parameterList, context);
+        result = RandomSequence.generateSeq(fieldName, fieldType, parameterList, CONTEXT);
       } else if ("it".equals(fieldType)) {
-        result = RandomIterator.generateIt(fieldName, fieldType, parameterList, context);
+        result = RandomIterator.generateIt(fieldName, fieldType, parameterList, CONTEXT);
       }
     }
     return result;
-  }
-
-  public final boolean checkIfNullFieldValueList(final List<String> fieldValueList) {
-    return fieldValueList == null || fieldValueList.size() == 1 && fieldValueList.contains("null");
   }
 }

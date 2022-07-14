@@ -11,11 +11,11 @@ import com.google.protobuf.Descriptors.DescriptorValidationException;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.processor.ProtobufSchemaProcessor;
+import net.coru.kloadgen.processor.SchemaProcessor;
 import net.coru.kloadgen.testutil.FileHelper;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,20 +33,20 @@ class ProtobufSerializerTest {
   void serialize() throws IOException, DescriptorValidationException {
     File testFile = new FileHelper().getFile("/proto-files/easyTest.proto");
     var fieldValueMappings = asList(
-      FieldValueMapping.builder().fieldName("street").fieldType("string").required(true).isAncestorRequired(true).build(),
-      FieldValueMapping.builder().fieldName("number[]").fieldType("int-array").required(true).isAncestorRequired(true).build(),
-      FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(true).build());
+        FieldValueMapping.builder().fieldName("street").fieldType("string").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("number[]").fieldType("int-array").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(true).build());
 
     ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(testFile, "Protobuf");
-    ProtobufSchemaProcessor protobufSchemaProcessor = new ProtobufSchemaProcessor();
-    protobufSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
 
     var record = protobufSchemaProcessor.next();
 
-    var message = protobufSerializer.serialize( "the-topic", EnrichedRecord.builder()
-                                      .genericRecord(record.getGenericRecord())
-                                      .schemaMetadata(record.getSchemaMetadata())
-                                      .build());
+    var message = protobufSerializer.serialize("the-topic", EnrichedRecord.builder()
+                                                                          .genericRecord(((EnrichedRecord) record).getGenericRecord())
+                                                                          .schemaMetadata(((EnrichedRecord) record).getSchemaMetadata())
+                                                                          .build());
     assertThat(message).isNotNull();
   }
 }

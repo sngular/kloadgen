@@ -35,7 +35,7 @@ public final class AvroSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
     try {
       final var schema = retrieveSchema(originals, avroSchemaName);
       this.avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, schema.getRight(), schema.getLeft(), fieldExprMappings);
-    } catch (final IOException | RestClientException exc {
+    } catch (final IOException | RestClientException exc) {
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
     }

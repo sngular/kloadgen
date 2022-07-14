@@ -16,10 +16,11 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.processor.JsonSchemaProcessor;
+import net.coru.kloadgen.processor.SchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.commons.lang3.tuple.Pair;
 

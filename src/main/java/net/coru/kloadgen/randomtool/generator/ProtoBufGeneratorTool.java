@@ -19,11 +19,11 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class ProtoBufGeneratorTool {
 
+  private static final Map<String, Object> CONTEXT = new HashMap<>();
+
   private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
   private static final RandomArray RANDOM_ARRAY = new RandomArray();
-
-  private static final Map<String, Object> CONTEXT = new HashMap<>();
 
   public static Object generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
@@ -49,9 +49,6 @@ public class ProtoBufGeneratorTool {
 
   public final Object generateObject(final Descriptors.EnumDescriptor descriptor, final String fieldType, final int arraySize, final List<String> fieldValuesList) {
     final List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-
-  public Object generateObject(Descriptors.EnumDescriptor descriptor, String fieldType, int arraySize, List<String> fieldValuesList) {
-    List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
     Object value = new Object();
     if ("enum".equalsIgnoreCase(fieldType)) {
       value = getEnumOrGenerate(descriptor, fieldType, parameterList);
@@ -59,16 +56,6 @@ public class ProtoBufGeneratorTool {
       value = getArrayEnumOrGenerate(descriptor, fieldType, arraySize, parameterList);
     }
     return value;
-  }
-
-  public final Object generateObject(
-      final FieldDescriptor descriptor, final String fieldType, final Integer valueLength, final List<String> fieldValuesList,
-      final Map<ConstraintTypeEnum, String> constraints) {
-    Object result = null;
-    if (Objects.nonNull(descriptor.getJavaType())) {
-      result = RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
-    }
-    return result;
   }
 
   private Object getEnumOrGenerate(final Descriptors.EnumDescriptor descriptor, final String fieldType, final List<String> parameterList) {
@@ -99,7 +86,7 @@ public class ProtoBufGeneratorTool {
 
   public Object generateObject(
       final FieldDescriptor descriptor, final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
-      final Object result = null;
+    Object result = null;
     if (Objects.nonNull(descriptor.getJavaType())) {
       result = generateRawObject(fieldType, valueLength, fieldValuesList, constraints);
     }
@@ -107,7 +94,7 @@ public class ProtoBufGeneratorTool {
   }
 
   public Object generateRawObject(
-    final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
+      final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
     return RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
   }
 }

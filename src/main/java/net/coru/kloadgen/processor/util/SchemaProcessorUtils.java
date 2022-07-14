@@ -144,6 +144,63 @@ public class SchemaProcessorUtils {
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
+  private static Predicate<String> isValid() {
+    return line -> !line.contains("//") && !line.isEmpty();
+  }
+
+  private static DynamicSchema processImported(final List<String> importedLines) throws DescriptorValidationException {
+    
+    final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
+
+    String packageName = "";
+    final var linesIterator = importedLines.listIterator();
+    while (linesIterator.hasNext()) {
+      final var fileLine = linesIterator.next();
+
+      if (fileLine.startsWith("package")) {
+        packageName = StringUtils.chop(fileLine.substring(7).trim());
+        schemaBuilder.setPackage(packageName);
+      }
+      if (fileLine.startsWith("message")) {
+        final var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
+        schemaBuilder.setName(packageName + "." + messageName);
+        schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
+
+      }
+      if (fileLine.startsWith("import")) {
+        schemaBuilder.addDependency(fileLine.substring(6));
+      }
+    }
+
+    return schemaBuilder.build();
+  }
+
+  private static MessageDefinition buildMessage(final String messageName, final ListIterator<String> messageLines) {
+
+    boolean exit = false;
+    final MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
+    while (messageLines.hasNext() && !exit) {
+      final var field = messageLines.next().trim().split("\\s");
+      if (ProtobufHelper.isValidType(field[0])) {
+        messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
+      } else if (ProtobufHelper.LABEL.contains(field[0])) {
+        messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
+      } else if ("}".equalsIgnoreCase(field[0])) {
+        exit = true;
+      }
+    }
+
+    return messageDefinition.build();
+  }
+
+  private static String checkIfChoppable(final String field) {
+    String choppedField = field;
+    if (field.endsWith(";")) {
+      choppedField = StringUtils.chop(field);
+    }
+    return choppedField;
+  }
+
   private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes) {
     fillNestedTypes(messageElement, nestedTypes);
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
@@ -209,62 +266,6 @@ public class SchemaProcessorUtils {
     if (!CollectionUtils.isEmpty(messageElement.getNestedTypes())) {
       messageElement.getNestedTypes().forEach(nestedType -> nestedTypes.put(nestedType.getName(), nestedType));
     }
-  }
-
-  private static Predicate<String> isValid() {
-    return line -> !line.contains("//") && !line.isEmpty();
-  }
-
-  private static DynamicSchema processImported(final List<String> importedLines) throws DescriptorValidationException {
-
-    final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
-
-    String packageName = "";
-    final var linesIterator = importedLines.listIterator();
-    while (linesIterator.hasNext()) {
-      final var fileLine = linesIterator.next();
-
-      if (fileLine.startsWith("package")) {
-        packageName = StringUtils.chop(fileLine.substring(7).trim());
-        schemaBuilder.setPackage(packageName);
-      }
-      if (fileLine.startsWith("message")) {
-        final var messageName = StringUtils.chop(fileLine.substring(7).trim()).trim();
-        schemaBuilder.setName(packageName + "." + messageName);
-        schemaBuilder.addMessageDefinition(buildMessage(messageName, linesIterator));
-      }
-      if (fileLine.startsWith("import")) {
-        schemaBuilder.addDependency(fileLine.substring(6));
-      }
-    }
-
-    return schemaBuilder.build();
-  }
-
-  private static MessageDefinition buildMessage(final String messageName, final ListIterator<String> messageLines) {
-
-    boolean exit = false;
-    final MessageDefinition.Builder messageDefinition = MessageDefinition.newBuilder(messageName);
-    while (messageLines.hasNext() && !exit) {
-      final var field = messageLines.next().trim().split("\\s");
-      if (ProtobufHelper.isValidType(field[0])) {
-        messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
-      } else if (ProtobufHelper.LABEL.contains(field[0])) {
-        messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
-      } else if ("}".equalsIgnoreCase(field[0])) {
-        exit = true;
-      }
-    }
-
-    return messageDefinition.build();
-  }
-
-  private static String checkIfChoppable(final String field) {
-    String choppedField = field;
-    if (field.endsWith(";")) {
-      choppedField = StringUtils.chop(field);
-    }
-    return choppedField;
   }
 
   private static String checkDotType(final String subfieldType) {

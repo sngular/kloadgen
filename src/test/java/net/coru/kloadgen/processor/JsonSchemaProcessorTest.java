@@ -45,6 +45,12 @@ public class JsonSchemaProcessorTest {
     );
   }
 
+  private static Stream<Object> parametersForTestNestedLevels() {
+    return Stream.of(
+        Arguments.of(SCHEMA_NESTED_ITERATION, SCHEMA_NESTED_ITERATION_EXPECTED)
+    );
+  }
+
   @BeforeEach
   public void setUp() {
     File file = new File("src/test/resources");
@@ -105,7 +111,7 @@ public class JsonSchemaProcessorTest {
                                   .contains("\"animals\":{").contains("nameAnimal\":");
 
   }
-  
+
   @ParameterizedTest
   @MethodSource("parametersForTestBasicStructure")
   void testBasicStructure(List<FieldValueMapping> schemaAsJson, String expected) {
@@ -117,13 +123,7 @@ public class JsonSchemaProcessorTest {
 
     JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
   }
-
-  private static Stream<Object> parametersForTestNestedLevels() {
-    return Stream.of(
-        Arguments.of(SCHEMA_NESTED_ITERATION , SCHEMA_NESTED_ITERATION_EXPECTED)
-    );
-  }
-  @ParameterizedTest
+  /*@ParameterizedTest
   @MethodSource("parametersForTestNestedLevels")
   void testNestedComplexLevels(List<FieldValueMapping> schemaAsJson, String expected) {
 
@@ -132,10 +132,10 @@ public class JsonSchemaProcessorTest {
 
     ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
     System.out.println(message);
-    /*assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
+    assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
                                   .contains("\"birds\":[[{\"nameBird\":")
-                                  .contains("\"animals\":{").contains("nameAnimal\":");*/
+                                  .contains("\"animals\":{").contains("nameAnimal\":");
     JSONAssert.assertEquals(message.toString(),expected, JSONCompareMode.LENIENT);
-  }
+  }*/
 
 }
