@@ -14,16 +14,17 @@ Here you will see how to create and run a test plan that includes both the produ
 8. In the value and key schema (file) configuration elements, complete the table with the corresponding information regarding **Field Name**, **Field Type**, **Field Length**, and **Field Value List**.
   **Note:** The values you include in **Field Values List** will be used by the random tool. Instead of creating random values, it will choose the values randomly between the ones included here. 
 9. (Optional) You can assign sizes to any map or array field ([10] for arrays, [10:] for maps).
-10. If you want to assign a sequence to any field, see [Sequences](producer-configuration.md#sequences).
-11. Under **Thread Group**, add a new **Java Request sampler**.
-12. In **Name**, assign a descriptive name for  this sampler.
-13. (Optional) You may add any description for the sampler under **Comments**.
-14. In the dropdown box, choose **net.coru.kloadgen.sampler.KafkaConsumerSampler**.
-15. Provide the corresponding values for this sampler, as explained in [Kafka Consumer Sampler configuration](producer-configuration.md#kafka-consumer-sampler-configuration).
-16. Under **Thread Group**, add the configuration elements for this sampler, as seen in [Kafka consumer configuration elements](producer-configuration.md#kafka-consumer-configuration-elements).
-17. Save the test plan.
-18. Run the test plan.
-19. Check your results.
+10. If you want to assign a sequence to any field, see [Sequences](schemas.md#sequences).
+11. If you want to assign an iterator to any field, see [Iterators](schemas.md#iterators).
+12. Under **Thread Group**, add a new **Java Request sampler**.
+13. In **Name**, assign a descriptive name for  this sampler.
+14. (Optional) You may add any description for the sampler under **Comments**.
+15. In the dropdown box, choose **net.coru.kloadgen.sampler.KafkaConsumerSampler**.
+16. Provide the corresponding values for this sampler, as explained in [Kafka Consumer Sampler configuration](producer-configuration.md#kafka-consumer-sampler-configuration).
+17. Under **Thread Group**, add the configuration elements for this sampler, as seen in [Kafka consumer configuration elements](producer-configuration.md#kafka-consumer-configuration-elements).
+18. Save the test plan.
+19. Run the test plan.
+20. Check your results.
 
 The following screenshots show the load test process in JMeter:
 

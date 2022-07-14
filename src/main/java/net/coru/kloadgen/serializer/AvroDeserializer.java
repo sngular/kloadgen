@@ -6,19 +6,15 @@
 
 package net.coru.kloadgen.serializer;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.KEY_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.kafka.common.errors.SerializationException;
@@ -32,39 +28,39 @@ public class AvroDeserializer implements Deserializer<Object> {
 
   private static final int ID_SIZE = 4;
 
-  private static final Map<String, Object> configs = new HashMap<>();
+  private static final Map<String, Object> CONFIGS = new HashMap<>();
 
   private boolean isKey;
 
   @Override
-  public void configure(Map<String, ?> configs, boolean isKey) {
-    AvroDeserializer.configs.putAll(configs);
+  public final void configure(final Map<String, ?> configs, final boolean isKey) {
+    AvroDeserializer.CONFIGS.putAll(configs);
     this.isKey = isKey;
   }
 
   @Override
-  public Object deserialize(String topic, byte[] data) {
+  public final Object deserialize(final String topic, final byte[] data) {
 
-    Object result;
-    String schemaString;
-    Decoder decoder;
+    final Object result;
+    final String schemaString;
+    final Decoder decoder;
 
-    schemaString = (String) (isKey ? configs.get(KEY_SCHEMA) : configs.get(VALUE_SCHEMA));
+    schemaString = (String) (isKey ? CONFIGS.get(PropsKeysHelper.KEY_SCHEMA) : CONFIGS.get(PropsKeysHelper.VALUE_SCHEMA));
 
     if (!schemaString.isEmpty()) {
-      Schema.Parser parser = new Schema.Parser();
-      Schema avroSchema = parser.parse(schemaString);
+      final var parser = new Schema.Parser();
+      final var avroSchema = parser.parse(schemaString);
 
-      ByteBuffer buffer = getByteBuffer(data);
-      DatumReader<GenericRecord> reader = new GenericDatumReader<>(avroSchema);
+      final var buffer = getByteBuffer(data);
+      final var reader = new GenericDatumReader<>(avroSchema);
 
-      int length = buffer.limit() - 1 - 4;
-      int start = buffer.position() + buffer.arrayOffset();
+      final int length = buffer.limit() - 1 - 4;
+      final int start = buffer.position() + buffer.arrayOffset();
 
       try {
         decoder = DecoderFactory.get().binaryDecoder(buffer.array(), start, length, null);
         result = reader.read(null, decoder);
-      } catch (RuntimeException | IOException ex) {
+      } catch (final IOException ex) {
         throw new SerializationException("Error deserializing Avro message");
       }
 
@@ -76,12 +72,12 @@ public class AvroDeserializer implements Deserializer<Object> {
   }
 
   @Override
-  public Object deserialize(String topic, Headers headers, byte[] data) {
+  public final Object deserialize(final String topic, final Headers headers, final byte[] data) {
     return deserialize(topic, data);
   }
 
-  private ByteBuffer getByteBuffer(byte[] payload) {
-    ByteBuffer buffer = ByteBuffer.wrap(payload);
+  private ByteBuffer getByteBuffer(final byte[] payload) {
+    final var buffer = ByteBuffer.wrap(payload);
     if (buffer.get() != MAGIC_BYTE) {
       throw new SerializationException("Unknown magic byte!");
     } else {

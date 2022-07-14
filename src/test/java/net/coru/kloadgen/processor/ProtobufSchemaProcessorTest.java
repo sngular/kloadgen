@@ -528,7 +528,7 @@ class ProtobufSchemaProcessorTest {
     assertThat(hours).isEqualTo(9);
     assertThat(minutes).isEqualTo(20);
     assertThat(seconds).isEqualTo(30);
-    assertThat(nanos).isEqualTo(0);
+    assertThat(nanos).isZero();
     assertThat(assertKeys).hasSize(2).containsExactlyInAnyOrder("abc.Incident.incident_date",
                                                                 "abc.Incident.incident_time");
   }

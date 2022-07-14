@@ -28,7 +28,7 @@ public class ArrayField extends Field {
   boolean isFieldRequired;
 
   @Builder(toBuilder = true)
-  public ArrayField(String name, List<Field> values, int minItems, boolean uniqueItems, boolean isFieldRequired) {
+  public ArrayField(final String name, final List<Field> values, final int minItems, final boolean uniqueItems, final boolean isFieldRequired) {
     super(name, "array");
     this.values = values;
     this.minItems = minItems;
@@ -37,12 +37,12 @@ public class ArrayField extends Field {
   }
 
   @Override
-  public Field cloneField(String fieldName) {
+  public final Field cloneField(final String fieldName) {
     return this.toBuilder().name(fieldName).build();
   }
 
   @Override
-  public List<Field> getProperties() {
+  public final List<Field> getProperties() {
     return values;
   }
 
@@ -50,12 +50,12 @@ public class ArrayField extends Field {
 
     private final List<Field> values = new ArrayList<>();
 
-    public ArrayFieldBuilder values(List<Field> values) {
+    public final ArrayFieldBuilder values(final List<Field> values) {
       this.values.addAll(values);
       return this;
     }
 
-    public ArrayFieldBuilder value(Field value) {
+    public final ArrayFieldBuilder value(final Field value) {
       this.values.add(value);
       return this;
     }

@@ -1,10 +1,11 @@
 # Overview
-  - [About KLoadGen](about.md)
+  - [About KLoadGen](home.md)
   - [KLoadGen architecture](architecture.md)
 
 # Getting started
   - [Prerequisites](getting-started.md#prerequisites)
   - [Quickstart](getting-started.md#quickstart)
+  - [How to contribute](contributing.md)
 
 # Installation
  - [Install as a JMeter library](installation.md#install-as-a-jmeter-library)

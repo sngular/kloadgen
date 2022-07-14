@@ -30,11 +30,20 @@ public final class RandomSequence {
   private RandomSequence() {
   }
 
+  public static boolean isTypeNotSupported(final String fieldType) {
+    return !SUPPORTED_SEQUENCE_TYPES.containsKey(fieldType);
+  }
+
   public static Object generateSeq(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
     return context.compute(fieldName, (fieldNameMap, seqObject) ->
-                                          seqObject == null
-                                              ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
-                                              : addOneCasted(seqObject, fieldType));
+        seqObject == null
+            ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
+            : addOneCasted(seqObject, fieldType));
+  }
+
+  public static Object generateSequenceForFieldValueList(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
+    final var index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
+    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
   }
 
   private static Object getFirstValueOrDefaultForType(final List<String> fieldValueList, final String fieldType) {
@@ -56,14 +65,5 @@ public final class RandomSequence {
       throw new IllegalArgumentException("Field type is not supported for sequences");
     }
     return SUPPORTED_SEQUENCE_TYPES.get(fieldType).addOneCasted(seqObject);
-  }
-
-  public static boolean isTypeNotSupported(final String fieldType) {
-    return !SUPPORTED_SEQUENCE_TYPES.containsKey(fieldType);
-  }
-
-  public static Object generateSequenceForFieldValueList(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
-    final var index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
-    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
   }
 }
