@@ -33,6 +33,18 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class JsonSchemaProcessorTest {
 
+  private static Stream<Object> parametersForTestNullOnOptionalField() {
+    return Stream.of(
+        Arguments.of(SIMPLE_SCHEMA, SIMPLE_SCHEMA_EXPECTED)
+    );
+  }
+
+  private static Stream<Object> parametersForTestBasicStructure() {
+    return Stream.of(
+        Arguments.of(SIMPLE_SCHEMA_REQUIRED, SIMPLE_SCHEMA_REQUIRED_EXPECTED)
+    );
+  }
+
   @BeforeEach
   public void setUp() {
     File file = new File("src/test/resources");
@@ -41,12 +53,6 @@ public class JsonSchemaProcessorTest {
     JMeterContext jmcx = JMeterContextService.getContext();
     jmcx.setVariables(new JMeterVariables());
     JMeterUtils.setLocale(Locale.ENGLISH);
-  }
-
-  private static Stream<Object> parametersForTestNullOnOptionalField() {
-    return Stream.of(
-        Arguments.of(SIMPLE_SCHEMA , SIMPLE_SCHEMA_EXPECTED)
-    );
   }
 
   @ParameterizedTest
@@ -65,7 +71,7 @@ public class JsonSchemaProcessorTest {
   void testNullOnMapWithChildren() {
 
     SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
-    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null,null, SIMPLE_SCHEMA_MAP);
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, SIMPLE_SCHEMA_MAP);
 
     ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
@@ -77,7 +83,7 @@ public class JsonSchemaProcessorTest {
   void testNullOnNestedCollections() {
 
     SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
-    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null,null, SCHEMA_NESTED_COLLECTIONS);
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, SCHEMA_NESTED_COLLECTIONS);
 
     ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
@@ -90,28 +96,23 @@ public class JsonSchemaProcessorTest {
   void testNullOnComplexCollections() {
 
     SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
-    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null,null, SCHEMA_COMPLEX_COLLECTIONS);
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, SCHEMA_COMPLEX_COLLECTIONS);
 
     ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
-    System.out.println(message);
+
     assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
                                   .contains("\"birds\":[[{\"nameBird\":")
                                   .contains("\"animals\":{").contains("nameAnimal\":");
 
   }
-  private static Stream<Object> parametersForTestBasicStructure() {
-    return Stream.of(
-        Arguments.of(SIMPLE_SCHEMA_REQUIRED , SIMPLE_SCHEMA_REQUIRED_EXPECTED)
-    );
-  }
-
+  
   @ParameterizedTest
   @MethodSource("parametersForTestBasicStructure")
   void testBasicStructure(List<FieldValueMapping> schemaAsJson, String expected) {
 
     SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
 
-    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null,null, schemaAsJson);
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
     ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);

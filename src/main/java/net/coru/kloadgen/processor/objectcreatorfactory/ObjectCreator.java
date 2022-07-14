@@ -1,9 +1,9 @@
-package net.coru.kloadgen.processor.objectcreator;
+package net.coru.kloadgen.processor.objectcreatorfactory;
 
 import java.util.ArrayDeque;
 import java.util.function.BiFunction;
 
-import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
+import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
 
 public interface ObjectCreator {
 
@@ -24,5 +24,5 @@ public interface ObjectCreator {
 
   Object generateSubEntityRecord(Object objectRecord);
 
-  boolean isOptional(SchemaProcessorPOJO pojo);
+  boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level);
 }

@@ -1,4 +1,4 @@
-package net.coru.kloadgen.processor.objectcreator.impl;
+package net.coru.kloadgen.processor.objectcreatorfactory.impl;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -24,15 +24,15 @@ import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
-import net.coru.kloadgen.processor.SchemaProcessorUtils;
-import net.coru.kloadgen.processor.objectcreator.ObjectCreator;
-import net.coru.kloadgen.processor.objectcreator.model.SchemaProcessorPOJO;
+import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
+import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
+import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.randomtool.random.RandomObject;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.commons.lang3.StringUtils;
 
-public class ProtobufObjectCreatorFactory implements ObjectCreator {
+public class ProtobufObjectCreator implements ObjectCreator {
 
   private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
@@ -44,7 +44,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
 
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
-  public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
+  public ProtobufObjectCreator(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
     if (schema instanceof ParsedSchema) {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema());
     } else if (schema instanceof ProtoFileElement) {
@@ -161,8 +161,8 @@ public class ProtobufObjectCreatorFactory implements ObjectCreator {
   }
 
   @Override
-  public boolean isOptional(final SchemaProcessorPOJO pojo) {
-    final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
+  public boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
+    final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(completeFieldName, level + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     return Type.MESSAGE.equals(fieldDescriptor.getType()) || fieldDescriptor.isRepeated() || fieldDescriptor.isMapField() && fieldDescriptor.isOptional();
   }

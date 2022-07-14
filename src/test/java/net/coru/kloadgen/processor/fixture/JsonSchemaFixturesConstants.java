@@ -669,8 +669,8 @@ public class JsonSchemaFixturesConstants {
                        .fieldName("birds[][].nameBird")
                        .fieldType("string")
                        .valueLength(0)
-                       .required(true)
-                       .isAncestorRequired(false)
+                       .required(false)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constraints(new HashMap<ConstraintTypeEnum, String>() {
                        })
@@ -679,8 +679,8 @@ public class JsonSchemaFixturesConstants {
                        .fieldName("animals[:][:].nameAnimal")
                        .fieldType("string")
                        .valueLength(0)
-                       .required(true)
-                       .isAncestorRequired(false)
+                       .required(false)
+                       .isAncestorRequired(true)
                        .fieldValueList("null")
                        .constraints(new HashMap<ConstraintTypeEnum, String>() {
                        })
