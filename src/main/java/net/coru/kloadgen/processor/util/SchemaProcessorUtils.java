@@ -296,7 +296,7 @@ public class SchemaProcessorUtils {
     return fieldParts.length - 1 == level;
   }
 
-  public static boolean isFieldValueListNotAcceptingNullValues(List<String> fieldValueList) {
+  public static boolean isFieldValueListNotAcceptingNullValues(final List<String> fieldValueList) {
     return !fieldValueList.contains("null");
   }
 }

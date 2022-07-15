@@ -33,9 +33,7 @@ public class KeyDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(KeyDeserializedConfigElement.class);
 
-    createPropertyGroup("key_deserialized_load_generator", new String[] {
-        KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE
-    });
+    createPropertyGroup("key_deserialized_load_generator", new String[]{KEY_NAME_STRATEGY, KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_PROPERTIES, KEY_SCHEMA_TYPE});
 
     final PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
     nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);

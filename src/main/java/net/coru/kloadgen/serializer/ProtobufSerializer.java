@@ -35,12 +35,12 @@ public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<
       if (data != null) {
         log.debug("data='{}'", data);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
         byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).putInt(data.getSchemaMetadata().getId()).array());
-        Descriptor descriptor = ((DynamicMessage) data.getGenericRecord()).getDescriptorForType();
-        ProtobufSchema schema = new ProtobufSchema(descriptor);
-        MessageIndexes indexes = schema.toMessageIndexes(descriptor.getFullName());
+        final Descriptor descriptor = ((DynamicMessage) data.getGenericRecord()).getDescriptorForType();
+        final ProtobufSchema schema = new ProtobufSchema(descriptor);
+        final MessageIndexes indexes = schema.toMessageIndexes(descriptor.getFullName());
         byteArrayOutputStream.write(indexes.toByteArray());
         ((DynamicMessage) data.getGenericRecord()).writeTo(byteArrayOutputStream);
         result = byteArrayOutputStream.toByteArray();

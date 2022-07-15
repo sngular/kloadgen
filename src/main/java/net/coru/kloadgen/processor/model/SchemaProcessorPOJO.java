@@ -85,7 +85,7 @@ public class SchemaProcessorPOJO implements Cloneable {
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    Object cloned = super.clone();
+    final Object cloned = super.clone();
     ((SchemaProcessorPOJO) cloned).fieldExpMappingsQueue = this.fieldExpMappingsQueue.clone();
     return cloned;
   }

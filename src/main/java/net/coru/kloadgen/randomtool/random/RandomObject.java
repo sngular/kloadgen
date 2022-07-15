@@ -340,7 +340,7 @@ public final class RandomObject {
     return result;
   }
 
-  private static LocalDate getDateValueOrRandom(List<String> fieldValueList) {
+  private static LocalDate getDateValueOrRandom(final List<String> fieldValueList) {
     final LocalDate resultDate;
     final long minDay = (int) LocalDate.of(1900, 1, 1).toEpochDay();
     final long maxDay = (int) LocalDate.of(2100, 1, 1).toEpochDay();

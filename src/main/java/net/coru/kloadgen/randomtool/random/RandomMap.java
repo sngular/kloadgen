@@ -29,7 +29,7 @@ public class RandomMap {
     return fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim().split(":");
   }
 
-  public Object generateMap(
+  public final Object generateMap(
       final String fieldType, final Integer mapSize, final List<String> fieldValueList, final Integer arraySize,
       final Map<ConstraintTypeEnum, String> constraints) {
     Object value;
@@ -74,7 +74,7 @@ public class RandomMap {
     return value;
   }
 
-  public Object generateMap(
+  public final Object generateMap(
       final String fieldType, final Integer mapSize, final List<String> fieldValueList, final Integer valueLength, final Integer arraySize,
       final Map<ConstraintTypeEnum, String> constraints) {
     Object value;

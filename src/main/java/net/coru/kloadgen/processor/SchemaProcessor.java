@@ -27,12 +27,12 @@ public class SchemaProcessor {
 
   private ObjectCreator objectCreator;
 
-  public void processSchema(final SchemaTypeEnum schemaType, final Object schema, final Object metadata, final List<FieldValueMapping> fieldExprMappings) {
+  public final void processSchema(final SchemaTypeEnum schemaType, final Object schema, final Object metadata, final List<FieldValueMapping> fieldExprMappings) {
     this.objectCreator = ObjectCreatorFactory.getInstance(schemaType, schema, metadata);
     this.fieldExprMappings = fieldExprMappings;
   }
 
-  public Object next() {
+  public final Object next() {
     if (Objects.nonNull(fieldExprMappings) && !fieldExprMappings.isEmpty()) {
       final String rootFieldName = "root";
       final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue = calculateFieldsToProcess();

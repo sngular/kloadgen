@@ -70,15 +70,7 @@ public class ProtoBufExtractor {
     } else if (field instanceof EnumElement) {
       final var values = extractEnums((EnumElement) field);
       if (StringUtils.isNotEmpty(values)) {
-        completeFieldList.add(
-            FieldValueMapping.builder()
-                             .fieldName("")
-                             .fieldType("enum")
-                             .valueLength(0)
-                             .fieldValueList(values)
-                             .required(true)
-                             .isAncestorRequired(true)
-                             .build());
+        completeFieldList.add(FieldValueMapping.builder().fieldName("").fieldType("enum").valueLength(0).fieldValueList(values).required(true).isAncestorRequired(true).build());
       }
     } else {
       throw new KLoadGenException(UNSUPPORTED_TYPE_OF_VALUE);
@@ -91,33 +83,22 @@ public class ProtoBufExtractor {
     return completeFieldList;
   }
 
-  private void extractOneOfs(final MessageElement field, final List<FieldValueMapping> completeFieldList, final HashMap<String, TypeElement> nestedTypes,
-      final boolean isAncestorRequired) {
+  private void extractOneOfs(
+      final MessageElement field, final List<FieldValueMapping> completeFieldList, final HashMap<String, TypeElement> nestedTypes, final boolean isAncestorRequired) {
     final List<OneOfElement> oneOfs = new ArrayList<>(field.getOneOfs());
     for (OneOfElement oneOfElement : oneOfs) {
       if (!oneOfElement.getFields().isEmpty()) {
         final FieldElement subField = oneOfElement.getFields().get(RandomUtils.nextInt(0, oneOfElement.getFields().size()));
         if (ProtobufHelper.isValidType(subField.getType())) {
-          completeFieldList.add(
-              FieldValueMapping.builder()
-                               .fieldName(subField.getName())
-                               .fieldType(ProtobufHelper.translateType(subField.getType()))
-                               .required(true)
-                               .isAncestorRequired(isAncestorRequired)
-                               .build());
+          completeFieldList.add(FieldValueMapping.builder().fieldName(subField.getName()).fieldType(ProtobufHelper.translateType(subField.getType())).required(true)
+                                                 .isAncestorRequired(isAncestorRequired).build());
         } else if (nestedTypes.containsKey(subField.getType())) {
-          final MessageElement clonedField = new MessageElement(field.getLocation(), field.getName(), field.getDocumentation(),
-                                                          field.getNestedTypes(), field.getOptions(), field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(),
-                                                          field.getExtensions(), field.getGroups());
+          final MessageElement clonedField = new MessageElement(field.getLocation(), field.getName(), field.getDocumentation(), field.getNestedTypes(), field.getOptions(),
+                                                                field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(), field.getExtensions(), field.getGroups());
           processField(clonedField, completeFieldList, Collections.emptyList(), isAncestorRequired);
         } else {
           completeFieldList.add(
-              FieldValueMapping.builder()
-                               .fieldName(subField.getName())
-                               .fieldType(subField.getType())
-                               .required(true)
-                               .isAncestorRequired(isAncestorRequired)
-                               .build());
+              FieldValueMapping.builder().fieldName(subField.getName()).fieldType(subField.getType()).required(true).isAncestorRequired(isAncestorRequired).build());
         }
 
       }
@@ -129,49 +110,28 @@ public class ProtoBufExtractor {
       final boolean isAncestorRequired) {
     if (isArray) {
       completeFieldList.add(
-          FieldValueMapping.builder()
-                           .fieldName(subfield.getName() + "[]")
-                           .fieldType(dotType + ARRAY_POSTFIX)
-                           .required(isRequired)
-                           .isAncestorRequired(isAncestorRequired)
-                           .build());
+          FieldValueMapping.builder().fieldName(subfield.getName() + "[]").fieldType(dotType + ARRAY_POSTFIX).required(isRequired).isAncestorRequired(isAncestorRequired).build());
     } else {
-      completeFieldList.add(
-          FieldValueMapping.builder()
-                           .fieldName(subfield.getName())
-                           .fieldType(dotType)
-                           .required(isRequired)
-                           .isAncestorRequired(isAncestorRequired)
-                           .build());
+      completeFieldList.add(FieldValueMapping.builder().fieldName(subfield.getName()).fieldType(dotType).required(isRequired).isAncestorRequired(isAncestorRequired).build());
     }
   }
 
   private void extractMapType(
       final List<FieldValueMapping> completeFieldList, final HashMap<String, TypeElement> nestedTypes, final FieldElement subfield, final List<String> imports,
-    final boolean isRequired,
-      final boolean isAncestorRequired) {
+      final boolean isRequired, final boolean isAncestorRequired) {
     final String subFieldType = extractInternalMapFields(subfield);
     final String dotTypeMap = checkDotType(subFieldType, imports);
     if (ProtobufHelper.isValidType(subFieldType)) {
       completeFieldList.add(
-          FieldValueMapping.builder()
-                           .fieldName(subfield.getName() + "[:]")
-                           .fieldType(subFieldType.replace(subFieldType, ProtobufHelper.translateType(subFieldType)) + MAP_POSTFIX)
-                           .required(isRequired)
-                           .isAncestorRequired(isAncestorRequired)
-                           .build());
+          FieldValueMapping.builder().fieldName(subfield.getName() + "[:]").fieldType(subFieldType.replace(subFieldType, ProtobufHelper.translateType(subFieldType)) + MAP_POSTFIX)
+                           .required(isRequired).isAncestorRequired(isAncestorRequired).build());
     } else if (nestedTypes.containsKey(subFieldType)) {
       extractNestedTypesMap(completeFieldList, nestedTypes, subfield, imports, isRequired, isAncestorRequired);
     } else if (nestedTypes.containsKey(dotTypeMap)) {
       extractDotTypesMap(completeFieldList, nestedTypes, subfield, dotTypeMap, imports, isRequired, isAncestorRequired);
     } else if (!imports.isEmpty() && isExternalType(imports, dotTypeMap)) {
-      completeFieldList.add(
-          FieldValueMapping.builder()
-                           .fieldName(subfield.getName() + "[:]")
-                           .fieldType(ProtobufHelper.translateType("string") + MAP_POSTFIX)
-                           .required(isRequired)
-                           .isAncestorRequired(isAncestorRequired)
-                           .build());
+      completeFieldList.add(FieldValueMapping.builder().fieldName(subfield.getName() + "[:]").fieldType(ProtobufHelper.translateType("string") + MAP_POSTFIX).required(isRequired)
+                                             .isAncestorRequired(isAncestorRequired).build());
     } else {
       throw new KLoadGenException(UNSUPPORTED_TYPE_OF_VALUE);
     }
@@ -182,24 +142,16 @@ public class ProtoBufExtractor {
     return mapSplit[1].replace(">", "").trim();
   }
 
-  private void extractPrimitiveTypes(final List<FieldValueMapping> completeFieldList, final FieldElement subfield, final boolean isArray, final boolean isRequired,
-      final boolean isAncestorRequired) {
+  private void extractPrimitiveTypes(
+      final List<FieldValueMapping> completeFieldList, final FieldElement subfield, final boolean isArray, final boolean isRequired, final boolean isAncestorRequired) {
     if (isArray) {
-      completeFieldList.add(
-          FieldValueMapping.builder()
-                           .fieldName(subfield.getName() + "[]")
-                           .fieldType(subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())) + ARRAY_POSTFIX)
-                           .required(isRequired)
-                           .isAncestorRequired(isAncestorRequired)
-                           .build());
+      completeFieldList.add(FieldValueMapping.builder().fieldName(subfield.getName() + "[]")
+                                             .fieldType(subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())) + ARRAY_POSTFIX)
+                                             .required(isRequired).isAncestorRequired(isAncestorRequired).build());
     } else {
       completeFieldList.add(
-          FieldValueMapping.builder()
-                           .fieldName(subfield.getName())
-                           .fieldType(subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())))
-                           .required(isRequired)
-                           .isAncestorRequired(isAncestorRequired)
-                           .build());
+          FieldValueMapping.builder().fieldName(subfield.getName()).fieldType(subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())))
+                           .required(isRequired).isAncestorRequired(isAncestorRequired).build());
     }
   }
 
@@ -210,73 +162,39 @@ public class ProtoBufExtractor {
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if (isArray) {
         completeFieldList.add(
-            FieldValueMapping.builder()
-                             .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."))
-                             .fieldType(fieldValueMapping.getFieldType())
-                             .valueLength(0)
-                             .fieldValueList(getValueList(fieldValueMapping))
-                             .required(isRequired)
-                             .isAncestorRequired(isAncestorRequired)
-                             .build());
+            FieldValueMapping.builder().fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[].")).fieldType(fieldValueMapping.getFieldType())
+                             .valueLength(0).fieldValueList(getValueList(fieldValueMapping)).required(isRequired).isAncestorRequired(isAncestorRequired).build());
       } else {
         completeFieldList.add(
-            FieldValueMapping.builder()
-                             .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."))
-                             .fieldType(fieldValueMapping.getFieldType())
-                             .valueLength(0)
-                             .fieldValueList(getValueList(fieldValueMapping))
-                             .required(isRequired)
-                             .isAncestorRequired(isAncestorRequired)
-                             .build());
+            FieldValueMapping.builder().fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), ".")).fieldType(fieldValueMapping.getFieldType())
+                             .valueLength(0).fieldValueList(getValueList(fieldValueMapping)).required(isRequired).isAncestorRequired(isAncestorRequired).build());
       }
     }
   }
 
   private void extractNestedTypes(
       final List<FieldValueMapping> completeFieldList, final HashMap<String, TypeElement> nestedTypes, final FieldElement subfield, final boolean isArray,
-      final List<String> imports, final boolean isRequired,
-      final boolean isAncestorRequired) {
+      final List<String> imports, final boolean isRequired, final boolean isAncestorRequired) {
     final List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(subfield.getType()), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if ("enum".equals(fieldValueMapping.getFieldType())) {
         if (isArray) {
-          completeFieldList.add(
-              FieldValueMapping.builder()
-                               .fieldName(subfield.getName() + "[]")
-                               .fieldType(fieldValueMapping.getFieldType() + ARRAY_POSTFIX)
-                               .valueLength(0)
-                               .fieldValueList(getValueList(fieldValueMapping))
-                               .required(isRequired)
-                               .isAncestorRequired(isAncestorRequired)
-                               .build());
+          completeFieldList.add(FieldValueMapping.builder().fieldName(subfield.getName() + "[]").fieldType(fieldValueMapping.getFieldType() + ARRAY_POSTFIX).valueLength(0)
+                                                 .fieldValueList(getValueList(fieldValueMapping)).required(isRequired).isAncestorRequired(isAncestorRequired).build());
         } else {
           completeFieldList.add(
-              FieldValueMapping.builder()
-                               .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."))
-                               .fieldType(fieldValueMapping.getFieldType())
-                               .valueLength(0)
-                               .fieldValueList(getValueList(fieldValueMapping))
-                               .required(isRequired)
-                               .isAncestorRequired(isAncestorRequired)
-                               .build());
+              FieldValueMapping.builder().fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), ".")).fieldType(fieldValueMapping.getFieldType())
+                               .valueLength(0).fieldValueList(getValueList(fieldValueMapping)).required(isRequired).isAncestorRequired(isAncestorRequired).build());
         }
       } else {
         if (isArray) {
           completeFieldList.add(
-              FieldValueMapping.builder()
-                               .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[]."))
-                               .fieldType(fieldValueMapping.getFieldType())
-                               .required(isRequired)
-                               .isAncestorRequired(isAncestorRequired)
-                               .build());
+              FieldValueMapping.builder().fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[].")).fieldType(fieldValueMapping.getFieldType())
+                               .required(isRequired).isAncestorRequired(isAncestorRequired).build());
         } else {
           completeFieldList.add(
-              FieldValueMapping.builder()
-                               .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "."))
-                               .fieldType(fieldValueMapping.getFieldType())
-                               .required(isRequired)
-                               .isAncestorRequired(isAncestorRequired)
-                               .build());
+              FieldValueMapping.builder().fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), ".")).fieldType(fieldValueMapping.getFieldType())
+                               .required(isRequired).isAncestorRequired(isAncestorRequired).build());
         }
       }
     }
@@ -288,28 +206,16 @@ public class ProtoBufExtractor {
 
   private void extractNestedTypesMap(
       final List<FieldValueMapping> completeFieldList, final HashMap<String, TypeElement> nestedTypes, final FieldElement subfield, final List<String> imports,
-      final boolean isRequired,
-      final boolean isAncestorRequired) {
+      final boolean isRequired, final boolean isAncestorRequired) {
     final List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(extractInternalMapFields(subfield)), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if ("enum".equals(fieldValueMapping.getFieldType())) {
-        completeFieldList.add(
-            FieldValueMapping.builder()
-                             .fieldName(subfield.getName() + "[:]")
-                             .fieldType(fieldValueMapping.getFieldType() + MAP_POSTFIX)
-                             .valueLength(0)
-                             .fieldValueList(getValueList(fieldValueMapping))
-                             .required(isRequired)
-                             .isAncestorRequired(isAncestorRequired)
-                             .build());
+        completeFieldList.add(FieldValueMapping.builder().fieldName(subfield.getName() + "[:]").fieldType(fieldValueMapping.getFieldType() + MAP_POSTFIX).valueLength(0)
+                                               .fieldValueList(getValueList(fieldValueMapping)).required(isRequired).isAncestorRequired(isAncestorRequired).build());
       } else {
         completeFieldList.add(
-            FieldValueMapping.builder()
-                             .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."))
-                             .fieldType(fieldValueMapping.getFieldType())
-                             .required(isRequired)
-                             .isAncestorRequired(isAncestorRequired)
-                             .build());
+            FieldValueMapping.builder().fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:].")).fieldType(fieldValueMapping.getFieldType())
+                             .required(isRequired).isAncestorRequired(isAncestorRequired).build());
       }
     }
   }
@@ -325,12 +231,8 @@ public class ProtoBufExtractor {
     final List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(dotType), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       completeFieldList.add(
-          FieldValueMapping.builder()
-                           .fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:]."))
-                           .fieldType(fieldValueMapping.getFieldType())
-                           .required(isRequired)
-                           .isAncestorRequired(isAncestorRequired)
-                           .build());
+          FieldValueMapping.builder().fieldName(buildFieldName(subfield.getName(), fieldValueMapping.getFieldName(), "[:].")).fieldType(fieldValueMapping.getFieldType())
+                           .required(isRequired).isAncestorRequired(isAncestorRequired).build());
 
     }
   }
@@ -343,7 +245,7 @@ public class ProtoBufExtractor {
   @NotNull
   private String getFieldValueMappingPrepared(final FieldValueMapping fieldValueMapping) {
     final String[] splitText = fieldValueMapping.getFieldName().split("\\.");
-    final List<String> preparedField = Arrays.asList((Arrays.copyOfRange(splitText, 1, splitText.length)));
+    final List<String> preparedField = Arrays.asList(Arrays.copyOfRange(splitText, 1, splitText.length));
     return String.join(".", preparedField);
   }
 
@@ -358,24 +260,24 @@ public class ProtoBufExtractor {
   }
 
   private boolean isExternalType(final List<String> imports, final String fieldType) {
+    boolean externalType = false;
     for (String importType : imports) {
       final Pattern pattern = Pattern.compile("(/([^/]+)\\.)");
       final Matcher matcher = pattern.matcher(importType);
       if (matcher.find()) {
         final String extractedImportType = matcher.group(2);
         if (extractedImportType != null) {
-          if (extractedImportType.toLowerCase().contains(fieldType.toLowerCase())
-              || fieldType.toLowerCase().contains(extractedImportType.toLowerCase())) {
-            return true;
+          if (extractedImportType.toLowerCase().contains(fieldType.toLowerCase()) || fieldType.toLowerCase().contains(extractedImportType.toLowerCase())) {
+            externalType = true;
           } else {
             if (isExternalTypeByURL(importType, fieldType)) {
-              return true;
+              externalType = true;
             }
           }
         }
       }
     }
-    return false;
+    return externalType;
   }
 
   private boolean isExternalTypeByURL(final String importType, final String fieldType) {

@@ -37,9 +37,8 @@ public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(KeyFileSerializedConfigElement.class);
 
-    createPropertyGroup("key_serialized_load_generator", new String[]{
-      KEY_NAME_STRATEGY, KEY_SERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION, KEY_SCHEMA_PROPERTIES
-    });
+    createPropertyGroup("key_serialized_load_generator",
+                        new String[]{KEY_NAME_STRATEGY, KEY_SERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION, KEY_SCHEMA_PROPERTIES});
 
     final PropertyDescriptor nameStrategyPropertyProps = property(KEY_NAME_STRATEGY);
     nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
@@ -74,20 +73,9 @@ public class KeyFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     final TypeEditor tableEditor = TypeEditor.TableEditor;
     final PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
-    tableProperties.setValue(TableEditor.HEADERS,
-                             new String[]{
-                               "Field Name",
-                               "Field Type",
-                               "Field Length",
-                               "Field Values List"
-                             });
+    tableProperties.setValue(TableEditor.HEADERS, new String[]{"Field Name", "Field Type", "Field Length", "Field Values List"});
     tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
-                             new String[]{
-                               FieldValueMapping.FIELD_NAME,
-                               FieldValueMapping.FIELD_TYPE,
-                               FieldValueMapping.VALUE_LENGTH,
-                               FieldValueMapping.FIELD_VALUES_LIST
-                             });
+                             new String[]{FieldValueMapping.FIELD_NAME, FieldValueMapping.FIELD_TYPE, FieldValueMapping.VALUE_LENGTH, FieldValueMapping.FIELD_VALUES_LIST});
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
   }

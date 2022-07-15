@@ -52,7 +52,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object createMap(
+  public final Object createMap(
       final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
     final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
@@ -79,7 +79,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object createArray(
+  public final Object createArray(
       final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
     final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
@@ -99,7 +99,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object createValueObject(
+  public final Object createValueObject(
       final SchemaProcessorPOJO pojo) {
 
     final var descriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(pojo.getCompleteFieldName()), this.schema, new AtomicBoolean(false));
@@ -118,7 +118,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public void assignRecord(final SchemaProcessorPOJO pojo) {
+  public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final DynamicMessage.Builder builder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     builder.setField(findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false)),
@@ -126,7 +126,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public void createRecord(final String objectName, final String completeFieldName) {
+  public final void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
       entity.put("root", DynamicMessage.newBuilder(schema));
     } else {
@@ -141,12 +141,12 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object generateRecord() {
+  public final Object generateRecord() {
     return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(entity.get("root").build()).build();
   }
 
   @Override
-  public Object generateSubEntityRecord(final Object objectRecord) {
+  public final Object generateSubEntityRecord(final Object objectRecord) {
     Object returnObject = objectRecord;
     if (objectRecord instanceof Builder) {
       returnObject = ((Builder) objectRecord).build();
@@ -155,7 +155,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
+  public final boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(completeFieldName, level + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     return Type.MESSAGE.equals(fieldDescriptor.getType()) || fieldDescriptor.isRepeated() || fieldDescriptor.isMapField() && fieldDescriptor.isOptional();
@@ -174,7 +174,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
     return messageBuilder.build();
   }
 
-  public Object assignObject(final String targetObjectName, final Object objectToAssign, final Descriptors.FieldDescriptor descriptor) {
+  public final Object assignObject(final String targetObjectName, final Object objectToAssign, final Descriptors.FieldDescriptor descriptor) {
     final DynamicMessage.Builder builder = entity.get(targetObjectName);
     builder.setField(descriptor, objectToAssign);
     return builder;

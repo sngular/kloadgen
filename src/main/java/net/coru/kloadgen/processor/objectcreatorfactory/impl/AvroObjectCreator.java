@@ -51,7 +51,7 @@ public class AvroObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object createMap(
+  public final Object createMap(
       final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
 
     Map<Object, Object> map = new HashMap<>();
@@ -81,7 +81,7 @@ public class AvroObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object createArray(
+  public final Object createArray(
       final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
 
     List<Object> list = new ArrayList<>();
@@ -100,7 +100,7 @@ public class AvroObjectCreator implements ObjectCreator {
     return isInnerArray ? list : entity.get(pojo.getRootFieldName());
   }
 
-  public Object createValueObject(
+  public final Object createValueObject(
       final SchemaProcessorPOJO pojo) {
     final Schema fieldSchema = findSchema(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
 
@@ -112,14 +112,14 @@ public class AvroObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public void assignRecord(final SchemaProcessorPOJO pojo) {
+  public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
     entity.get(pojo.getRootFieldName());
   }
 
   @Override
-  public void createRecord(final String objectName, final String completeFieldName) {
+  public final void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
       entity.put(objectName, new GenericData.Record(this.schema));
     } else {
@@ -136,17 +136,17 @@ public class AvroObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object generateRecord() {
+  public final Object generateRecord() {
     return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(this.entity.get("root")).build();
   }
 
   @Override
-  public Object generateSubEntityRecord(final Object objectRecord) {
+  public final Object generateSubEntityRecord(final Object objectRecord) {
     return objectRecord;
   }
 
   @Override
-  public boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
+  public final boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
     var subSchema = findSchema(fieldName, this.schema, new AtomicBoolean(false));
     if (subSchema.getType().equals(Type.MAP)) {
       subSchema = findRecursiveSchemaForRecord(subSchema.getValueType());
@@ -161,7 +161,7 @@ public class AvroObjectCreator implements ObjectCreator {
                                                          pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
   }
 
-  public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
+  public final Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
     final GenericRecord entityObject = entity.get(targetObjectName);
     entityObject.put(fieldName, objectToAssign);
     return entityObject;

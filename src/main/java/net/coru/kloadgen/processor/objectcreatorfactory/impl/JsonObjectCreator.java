@@ -24,7 +24,7 @@ public class JsonObjectCreator implements ObjectCreator {
   private final Map<String, ObjectNode> entity = new HashMap<>();
 
   @Override
-  public Object createMap(
+  public final Object createMap(
       final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
     ObjectNode map = JsonNodeFactory.instance.objectNode();
     if (pojo.isLastFilterTypeOfLastElement()) {
@@ -58,7 +58,7 @@ public class JsonObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object createArray(
+  public final Object createArray(
       final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
     ArrayNode nodeArray = OBJECT_MAPPER.createArrayNode();
     if (pojo.isLastFilterTypeOfLastElement()) {
@@ -86,7 +86,7 @@ public class JsonObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public Object createValueObject(final SchemaProcessorPOJO pojo) {
+  public final Object createValueObject(final SchemaProcessorPOJO pojo) {
     final ObjectNode object = entity.get(pojo.getRootFieldName());
     object.putPOJO(pojo.getFieldNameSubEntity(), OBJECT_MAPPER.convertValue(
         STATELESS_GENERATOR_TOOL.generateObject(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList()), JsonNode.class));
@@ -94,28 +94,28 @@ public class JsonObjectCreator implements ObjectCreator {
   }
 
   @Override
-  public void assignRecord(final SchemaProcessorPOJO pojo) {
+  public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final ObjectNode parentNode = entity.get(pojo.getRootFieldName());
     parentNode.set(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
   }
 
   @Override
-  public void createRecord(final String objectName, final String completeFieldName) {
+  public final void createRecord(final String objectName, final String completeFieldName) {
     entity.put(objectName, JsonNodeFactory.instance.objectNode());
   }
 
   @Override
-  public Object generateRecord() {
+  public final Object generateRecord() {
     return entity.get("root");
   }
 
   @Override
-  public Object generateSubEntityRecord(final Object objectRecord) {
+  public final Object generateSubEntityRecord(final Object objectRecord) {
     return objectRecord;
   }
 
   @Override
-  public boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
+  public final boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
     return true;
   }
 

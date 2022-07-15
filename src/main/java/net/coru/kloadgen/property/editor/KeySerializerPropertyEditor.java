@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.property.editor;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -18,12 +16,12 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -59,10 +57,7 @@ public class KeySerializerPropertyEditor extends PropertyEditorSupport implement
 
   private void fillSerializer(final JComboBox<String> objectJComboBox) {
     serializerComboBox = objectJComboBox;
-    final Reflections reflections = new Reflections(
-        new ConfigurationBuilder()
-            .addUrls(ClasspathHelper.forClass(Serializer.class))
-            .setScanners(SubTypes));
+    final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClass(Serializer.class)).setScanners(Scanners.SubTypes));
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
   }
 
