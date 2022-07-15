@@ -31,13 +31,13 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class AvroGeneratorTool {
 
-  private final static Map<String, Object> CONTEXT = new HashMap<>();
-
   private final static RandomObject RANDOM_OBJECT = new RandomObject();
 
   private final static RandomArray RANDOM_ARRAY = new RandomArray();
 
   private final static RandomMap RANDOM_MAP = new RandomMap();
+
+  private final Map<String, Object> context = new HashMap<>();
 
   public Object generateObject(final Schema schema, final FieldValueMapping fieldValueMapping, final Map<ConstraintTypeEnum, String> constraints) {
     return generateObject(schema, fieldValueMapping.getFieldName(), fieldValueMapping.getFieldType(), fieldValueMapping.getValueLength(), fieldValueMapping.getFieldValuesList(),
@@ -70,17 +70,17 @@ public class AvroGeneratorTool {
       final String type = Type.UNION.getName().equals(ValueUtils.getValidTypeFromSchema(schema)) ? getRecordUnion(schema.getTypes()).getName()
                               : ValueUtils.getValidTypeFromSchema(schema);
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(type))) {
-        return RandomSequence.generateSequenceForFieldValueList(fieldName, type, fieldValuesList, CONTEXT);
+        value = RandomSequence.generateSequenceForFieldValueList(fieldName, type, fieldValuesList, context);
       } else {
-        value = RandomSequence.generateSeq(fieldName, type, parameterList, CONTEXT);
+        value = RandomSequence.generateSeq(fieldName, type, parameterList, context);
       }
     } else if ("it".equalsIgnoreCase(fieldType)) {
       String type = Type.UNION.getName().equals(ValueUtils.getValidTypeFromSchema(schema)) ? getRecordUnion(schema.getTypes()).getName()
                         : ValueUtils.getValidTypeFromSchema(schema);
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(type))) {
-        return RandomIterator.generateIteratorForFieldValueList(fieldName, type, fieldValuesList, CONTEXT);
+        value = RandomIterator.generateIteratorForFieldValueList(fieldName, type, fieldValuesList, context);
       } else {
-        value = RandomIterator.generateIt(fieldName, type, parameterList, CONTEXT);
+        value = RandomIterator.generateIt(fieldName, type, parameterList, context);
       }
     } else if (differentTypesNeedCast(fieldType, schema.getType())) {
 
@@ -102,9 +102,9 @@ public class AvroGeneratorTool {
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
       } else {
         if ("Seq".equalsIgnoreCase(fieldType)) {
-          value = new GenericData.EnumSymbol(schema, RandomSequence.generateSequenceForFieldValueList(fieldName, fieldValueMappingType, parameterList, CONTEXT));
+          value = new GenericData.EnumSymbol(schema, RandomSequence.generateSequenceForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));
         } else if ("It".equalsIgnoreCase((fieldType))) {
-          value = new GenericData.EnumSymbol(schema, RandomIterator.generateIteratorForFieldValueList(fieldName, fieldValueMappingType, parameterList, CONTEXT));
+          value = new GenericData.EnumSymbol(schema, RandomIterator.generateIteratorForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));
         } else {
           value = new GenericData.EnumSymbol(schema, parameterList.get(RandomUtils.nextInt(0, parameterList.size())));
         }
@@ -199,18 +199,18 @@ public class AvroGeneratorTool {
     final List value = new ArrayList<>(valueLength);
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
-        value.add(RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, CONTEXT));
+        value.add(RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
       } else if ("it".equals(fieldType)) {
         if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
-          value.add(RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, CONTEXT));
+          value.add(RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, context));
         } else {
           for (int i = arraySize; i > 0; i--) {
-            value.add(RandomIterator.generateIt(fieldName, fieldType, parameterList, CONTEXT));
+            value.add(RandomIterator.generateIt(fieldName, fieldType, parameterList, context));
           }
         }
       } else {
         for (int i = valueLength; i > 0; i--) {
-          value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, CONTEXT));
+          value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, context));
         }
       }
     } else {
@@ -231,21 +231,21 @@ public class AvroGeneratorTool {
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
         value.put(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()),
-                  RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, CONTEXT));
+                  RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
       } else if ("it".equals(fieldType)) {
         if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || !RandomIterator.isTypeSupported(fieldType))) {
           value.put(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()),
-                    RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, CONTEXT));
+                    RandomIterator.generateIteratorForFieldValueList(fieldName, fieldType, parameterList, context));
         } else {
           for (int i = mapSize; i > 0; i--) {
             value.put(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()),
-                      RandomIterator.generateIt(fieldName, fieldType, parameterList, CONTEXT));
+                      RandomIterator.generateIt(fieldName, fieldType, parameterList, context));
           }
         }
       } else {
         for (int i = mapSize; i > 0; i--) {
           value.put(RANDOM_OBJECT.generateRandom("string", valueLength, Collections.emptyList(), Collections.emptyMap()),
-                    RandomSequence.generateSeq(fieldName, fieldType, parameterList, CONTEXT));
+                    RandomSequence.generateSeq(fieldName, fieldType, parameterList, context));
         }
       }
     } else {

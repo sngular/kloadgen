@@ -6,6 +6,7 @@ import java.util.Map;
 
 import lombok.Builder;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
+import net.coru.kloadgen.model.FieldValueMapping;
 
 @Builder
 public class SchemaProcessorPOJO implements Cloneable {
@@ -26,7 +27,7 @@ public class SchemaProcessorPOJO implements Cloneable {
 
   private int level;
 
-  private ArrayDeque<?> fieldExpMappingsQueue;
+  private ArrayDeque<FieldValueMapping> fieldExpMappingsQueue;
 
   private String completeTypeFilterChain;
 
@@ -38,12 +39,8 @@ public class SchemaProcessorPOJO implements Cloneable {
     return rootFieldName;
   }
 
-  public ArrayDeque<?> getFieldExpMappingsQueue() {
+  public ArrayDeque<FieldValueMapping> getFieldExpMappingsQueue() {
     return fieldExpMappingsQueue;
-  }
-
-  public void setFieldExpMappingsQueue(final ArrayDeque<?> fieldExpMappingsQueue) {
-    this.fieldExpMappingsQueue = fieldExpMappingsQueue;
   }
 
   public String getFieldNameSubEntity() {
@@ -52,10 +49,6 @@ public class SchemaProcessorPOJO implements Cloneable {
 
   public String getCompleteTypeFilterChain() {
     return completeTypeFilterChain;
-  }
-
-  public void setCompleteTypeFilterChain(final String completeTypeFilterChain) {
-    this.completeTypeFilterChain = completeTypeFilterChain;
   }
 
   public Integer getValueLength() {
@@ -82,16 +75,8 @@ public class SchemaProcessorPOJO implements Cloneable {
     return lastFilterTypeOfLastElement;
   }
 
-  public void setLastFilterTypeOfLastElement(final boolean lastFilterTypeOfLastElement) {
-    this.lastFilterTypeOfLastElement = lastFilterTypeOfLastElement;
-  }
-
   public int getFieldSize() {
     return fieldSize;
-  }
-
-  public void setFieldSize(final int fieldSize) {
-    this.fieldSize = fieldSize;
   }
 
   public Map<ConstraintTypeEnum, String> getConstraints() {
@@ -100,6 +85,8 @@ public class SchemaProcessorPOJO implements Cloneable {
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    return super.clone();
+    Object cloned = super.clone();
+    ((SchemaProcessorPOJO) cloned).fieldExpMappingsQueue = this.fieldExpMappingsQueue.clone();
+    return cloned;
   }
 }

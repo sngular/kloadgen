@@ -1,7 +1,6 @@
 package net.coru.kloadgen.processor.objectcreatorfactory.impl;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
@@ -54,7 +53,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
 
   @Override
   public Object createMap(
-      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
     final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
@@ -67,11 +66,10 @@ public class ProtobufObjectCreator implements ObjectCreator {
         final Descriptors.FieldDescriptor keyFieldDescriptor = fieldDescriptor.getMessageType().findFieldByName("key");
         builder.setField(keyFieldDescriptor, generateString(pojo.getValueLength()));
         final Descriptors.FieldDescriptor valueFieldDescriptor = fieldDescriptor.getMessageType().findFieldByName("value");
-        //pojo.setFieldNameSubEntity(valueFieldDescriptor.getFullName());
-        if (i == pojo.getFieldSize() - 1) {
-          builder.setField(valueFieldDescriptor, generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
-        } else {
-          builder.setField(valueFieldDescriptor, generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
+        try {
+          builder.setField(valueFieldDescriptor, generateFunction.apply(i == pojo.getFieldSize() - 1 ? pojo : (SchemaProcessorPOJO) pojo.clone()));
+        } catch (final CloneNotSupportedException e) {
+          throw new KLoadGenException("Error cloning POJO");
         }
         messageMap.add(builder.build());
       }
@@ -82,7 +80,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
 
   @Override
   public Object createArray(
-      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
     final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
@@ -90,10 +88,10 @@ public class ProtobufObjectCreator implements ObjectCreator {
       messageBuilder.setField(fieldDescriptor, createFinalArray(fieldDescriptor, pojo));
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
-        if (i == pojo.getFieldSize() - 1) {
-          messageBuilder.addRepeatedField(fieldDescriptor, generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
-        } else {
-          messageBuilder.addRepeatedField(fieldDescriptor, generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
+        try {
+          messageBuilder.addRepeatedField(fieldDescriptor, generateFunction.apply(i == pojo.getFieldSize() - 1 ? pojo : (SchemaProcessorPOJO) pojo.clone()));
+        } catch (final CloneNotSupportedException e) {
+          throw new KLoadGenException("Error cloning POJO");
         }
       }
     }
@@ -210,7 +208,8 @@ public class ProtobufObjectCreator implements ObjectCreator {
       final var enumDescriptor = fieldDescriptor.getEnumType();
       objectReturn = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(), pojo.getFieldValuesList());
     } else {
-      objectReturn = ProtoBufGeneratorTool.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(), pojo.getFieldValuesList());
+      objectReturn = PROTOBUF_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(),
+                                                           pojo.getFieldValuesList());
     }
     return objectReturn;
   }

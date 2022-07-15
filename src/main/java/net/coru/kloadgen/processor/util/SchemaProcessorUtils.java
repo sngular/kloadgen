@@ -97,7 +97,7 @@ public class SchemaProcessorUtils {
   }
 
   public static boolean isNewFieldSharingRootFieldName(final int level, final FieldValueMapping fieldValueMapping, final String rootFieldName) {
-    return getCleanMethodName(fieldValueMapping, level).equalsIgnoreCase(rootFieldName);
+    return fieldValueMapping.getFieldName().split("\\.").length > level && getCleanMethodName(fieldValueMapping, level).equalsIgnoreCase(rootFieldName);
   }
 
   public static String getCleanMethodName(final FieldValueMapping fieldValueMapping, final int level) {
@@ -149,7 +149,7 @@ public class SchemaProcessorUtils {
   }
 
   private static DynamicSchema processImported(final List<String> importedLines) throws DescriptorValidationException {
-    
+
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
 
     String packageName = "";
@@ -294,5 +294,9 @@ public class SchemaProcessorUtils {
   public static boolean isLastLevel(final FieldValueMapping field, final int level) {
     final String[] fieldParts = field.getFieldName().split("\\.");
     return fieldParts.length - 1 == level;
+  }
+
+  public static boolean isFieldValueListNotAcceptingNullValues(List<String> fieldValueList) {
+    return !fieldValueList.contains("null");
   }
 }

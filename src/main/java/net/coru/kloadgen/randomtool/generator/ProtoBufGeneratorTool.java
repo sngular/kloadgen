@@ -19,13 +19,13 @@ import org.apache.jmeter.threads.JMeterContextService;
 
 public class ProtoBufGeneratorTool {
 
-  private static final Map<String, Object> CONTEXT = new HashMap<>();
-
   private static final RandomObject RANDOM_OBJECT = new RandomObject();
 
   private static final RandomArray RANDOM_ARRAY = new RandomArray();
 
-  public static Object generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
+  private final Map<String, Object> context = new HashMap<>();
+
+  public final Object generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
     final List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(
@@ -34,10 +34,10 @@ public class ProtoBufGeneratorTool {
     final List value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
-        value.add(RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, CONTEXT));
+        value.add(RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
       } else {
         for (int i = arraySize; i > 0; i--) {
-          value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, CONTEXT));
+          value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, context));
         }
       }
     } else {

@@ -1,6 +1,5 @@
 package net.coru.kloadgen.processor.objectcreatorfactory.impl;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -10,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
@@ -53,7 +52,7 @@ public class AvroObjectCreator implements ObjectCreator {
 
   @Override
   public Object createMap(
-      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
 
     Map<Object, Object> map = new HashMap<>();
     if (pojo.isLastFilterTypeOfLastElement()) {
@@ -61,10 +60,10 @@ public class AvroObjectCreator implements ObjectCreator {
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         final String key = generateString(pojo.getValueLength());
-        if (i == pojo.getFieldSize() - 1) {
-          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
-        } else {
-          map.put(key, generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
+        try {
+          map.put(key, generateFunction.apply(i == pojo.getFieldSize() - 1 ? pojo : (SchemaProcessorPOJO) pojo.clone()));
+        } catch (final CloneNotSupportedException e) {
+          throw new KLoadGenException("Error cloning POJO");
         }
       }
     }
@@ -83,27 +82,22 @@ public class AvroObjectCreator implements ObjectCreator {
 
   @Override
   public Object createArray(
-      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
 
     List<Object> list = new ArrayList<>();
     if (pojo.isLastFilterTypeOfLastElement()) {
       list = createFinalArray(pojo);
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
-        if (i == pojo.getFieldSize() - 1) {
-          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo));
-        } else {
-          list.add(generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), pojo));
+        try {
+          list.add(generateFunction.apply(i == pojo.getFieldSize() - 1 ? pojo : (SchemaProcessorPOJO) pojo.clone()));
+        } catch (final CloneNotSupportedException e) {
+          throw new KLoadGenException("Error cloning POJO");
         }
       }
     }
     entity.get(pojo.getRootFieldName()).put(pojo.getFieldNameSubEntity(), list);
     return isInnerArray ? list : entity.get(pojo.getRootFieldName());
-  }
-
-  private List<Object> createFinalArray(final SchemaProcessorPOJO pojo) {
-    return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
-                                                         pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
   }
 
   public Object createValueObject(
@@ -127,7 +121,7 @@ public class AvroObjectCreator implements ObjectCreator {
   @Override
   public void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
-      entity.put("root", new GenericData.Record(this.schema));
+      entity.put(objectName, new GenericData.Record(this.schema));
     } else {
       Schema innerSchema = findSchema(objectName, this.schema, new AtomicBoolean(false));
       if (innerSchema.getType().equals(Type.MAP)) {
@@ -160,6 +154,11 @@ public class AvroObjectCreator implements ObjectCreator {
       subSchema = findRecursiveSchemaForRecord(subSchema.getElementType());
     }
     return isOptionalField(subSchema);
+  }
+
+  private List<Object> createFinalArray(final SchemaProcessorPOJO pojo) {
+    return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
+                                                         pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
   }
 
   public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {

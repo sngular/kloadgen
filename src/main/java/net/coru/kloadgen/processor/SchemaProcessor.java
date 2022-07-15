@@ -19,6 +19,7 @@ import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
 import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
 import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 public class SchemaProcessor {
 
@@ -90,10 +91,10 @@ public class SchemaProcessor {
     final Object objectRecord;
     if (SchemaProcessorUtils.isTypeFilterMap(singleTypeFilter)) {
       objectRecord = this.objectCreator.createMap(pojo, this::processTypeFilterAfterComplexType, false);
-      removeFieldFromListIfNeededAfterProcessComplexType(fieldExpMappingsQueue, fieldValueMapping, lastTypeFilterOfLastElement);
+      removeFieldFromListIfNeededAfterProcessComplexType(fieldExpMappingsQueue, fieldValueMapping.getFieldValuesList(), lastTypeFilterOfLastElement);
     } else if (SchemaProcessorUtils.isTypeFilterArray(singleTypeFilter)) {
       objectRecord = this.objectCreator.createArray(pojo, this::processTypeFilterAfterComplexType, false);
-      removeFieldFromListIfNeededAfterProcessComplexType(fieldExpMappingsQueue, fieldValueMapping, lastTypeFilterOfLastElement);
+      removeFieldFromListIfNeededAfterProcessComplexType(fieldExpMappingsQueue, fieldValueMapping.getFieldValuesList(), lastTypeFilterOfLastElement);
     } else if (SchemaProcessorUtils.isTypeFilterRecord(singleTypeFilter)) {
       objectRecord = createObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldExpMappingsQueue, pojo.getLevel());
       this.objectCreator.assignRecord(pojo);
@@ -105,40 +106,40 @@ public class SchemaProcessor {
   }
 
   private void removeFieldFromListIfNeededAfterProcessComplexType(
-      final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final FieldValueMapping fieldValueMapping, final boolean lastTypeFilterOfLastElement) {
-    if (lastTypeFilterOfLastElement || fieldValueMapping.getFieldValuesList().contains("null")) {
+      final ArrayDeque<FieldValueMapping> fieldExpMappingsQueue, final List<String> fieldValuesList, final boolean lastTypeFilterOfLastElement) {
+    if (lastTypeFilterOfLastElement || fieldValuesList.contains("null")) {
       fieldExpMappingsQueue.remove();
     }
   }
 
-  private Object processTypeFilterAfterComplexType(final ArrayDeque<?> fieldExpMappingsQueue, final SchemaProcessorPOJO schemaProcessorPOJO) {
+  private Object processTypeFilterAfterComplexType(final SchemaProcessorPOJO pojo) {
     final Object returnObject;
-    final String singleTypeFilter = SchemaProcessorUtils.getFirstComplexType(schemaProcessorPOJO.getCompleteTypeFilterChain());
-    if (SchemaProcessorUtils.hasMapOrArrayTypeFilter(schemaProcessorPOJO.getCompleteTypeFilterChain())
+    final String singleTypeFilter = SchemaProcessorUtils.getFirstComplexType(pojo.getCompleteTypeFilterChain());
+    if (SchemaProcessorUtils.hasMapOrArrayTypeFilter(pojo.getCompleteTypeFilterChain())
         && (SchemaProcessorUtils.isTypeFilterMap(singleTypeFilter) || SchemaProcessorUtils.isTypeFilterArray(singleTypeFilter))) {
-      returnObject = processNestedComplexTypes(schemaProcessorPOJO, singleTypeFilter, fieldExpMappingsQueue);
+      returnObject = processNestedComplexTypes(pojo, singleTypeFilter);
     } else if (SchemaProcessorUtils.isTypeFilterRecord(singleTypeFilter)) {
-      returnObject = createObject(schemaProcessorPOJO.getFieldNameSubEntity(), schemaProcessorPOJO.getCompleteFieldName(), (ArrayDeque<FieldValueMapping>) fieldExpMappingsQueue,
-                                  schemaProcessorPOJO.getLevel());
+      returnObject = createObject(pojo.getFieldNameSubEntity(), pojo.getCompleteFieldName(), pojo.getFieldExpMappingsQueue(),
+                                  pojo.getLevel());
     } else {
-      fieldExpMappingsQueue.remove();
-      returnObject = this.objectCreator.createValueObject(schemaProcessorPOJO);
+      pojo.getFieldExpMappingsQueue().remove();
+      returnObject = this.objectCreator.createValueObject(pojo);
     }
     return returnObject;
   }
 
   @SneakyThrows
-  private Object processNestedComplexTypes(final SchemaProcessorPOJO pojo, final String singleTypeFilter, final ArrayDeque<?> fieldExpMappingsQueue) {
+  private Object processNestedComplexTypes(final SchemaProcessorPOJO pojo, final String singleTypeFilter) {
     final Object returnObject;
     final String remainingFilterChain = pojo.getCompleteTypeFilterChain().replaceFirst(singleTypeFilter.replaceAll("\\[", "\\\\["), "");
     final boolean lastTypeFilterOfLastElement = SchemaProcessorUtils.isLastTypeFilterOfLastElement(remainingFilterChain);
-    if (lastTypeFilterOfLastElement || pojo.getFieldValuesList().contains("null")) {
-      fieldExpMappingsQueue.remove();
-    }
-    final SchemaProcessorPOJO newPojo = (SchemaProcessorPOJO) pojo.clone();
-    newPojo.setFieldSize(SchemaProcessorUtils.calculateSizeFromTypeFilter(singleTypeFilter));
-    newPojo.setLastFilterTypeOfLastElement(lastTypeFilterOfLastElement);
-    newPojo.setCompleteTypeFilterChain(remainingFilterChain);
+    removeFieldFromListIfNeededAfterProcessComplexType(pojo.getFieldExpMappingsQueue(), pojo.getFieldValuesList(), lastTypeFilterOfLastElement);
+    final SchemaProcessorPOJO newPojo =
+        SchemaProcessorPOJO.builder().rootFieldName(pojo.getRootFieldName()).fieldExpMappingsQueue(pojo.getFieldExpMappingsQueue()).fieldNameSubEntity(pojo.getFieldNameSubEntity())
+                           .completeFieldName(pojo.getCompleteFieldName()).completeTypeFilterChain(remainingFilterChain)
+                           .fieldSize(SchemaProcessorUtils.calculateSizeFromTypeFilter(singleTypeFilter)).valueType(pojo.getValueType())
+                           .valueLength(pojo.getValueLength()).fieldValuesList(pojo.getFieldValuesList())
+                           .constraints(pojo.getConstraints()).level(pojo.getLevel()).lastFilterTypeOfLastElement(lastTypeFilterOfLastElement).build();
     if (SchemaProcessorUtils.isTypeFilterMap(singleTypeFilter)) {
       returnObject = this.objectCreator.createMap(newPojo, this::processTypeFilterAfterComplexType, true);
     } else {
@@ -221,13 +222,17 @@ public class SchemaProcessor {
       shouldProcess = false;
     } else {
       if (listFieldsSharingPath.size() > 0) {
-        makeFieldValueMappingRequiredAndNotNullable(listFieldsSharingPath.get(listFieldsSharingPath.size() - 1));
+        makeFieldValueMappingRequiredAndNotNullable(fetchFieldSharingPathToMakeItRequired(listFieldsSharingPath));
         shouldProcess = fieldValueMapping.getRequired();
       } else {
         shouldProcess = true;
       }
     }
     return shouldProcess;
+  }
+
+  private FieldValueMapping fetchFieldSharingPathToMakeItRequired(final List<FieldValueMapping> listFieldsSharingPath) {
+    return listFieldsSharingPath.get(RandomUtils.nextInt(0, listFieldsSharingPath.size()));
   }
 
   private List<FieldValueMapping> getFieldValueMappingsSharingLevel(

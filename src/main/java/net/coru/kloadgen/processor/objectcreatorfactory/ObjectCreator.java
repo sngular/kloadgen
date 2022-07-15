@@ -1,17 +1,16 @@
 package net.coru.kloadgen.processor.objectcreatorfactory;
 
-import java.util.ArrayDeque;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
 
 public interface ObjectCreator {
 
   Object createMap(
-      SchemaProcessorPOJO pojo, BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, boolean isInnerMap);
+      SchemaProcessorPOJO pojo, Function<SchemaProcessorPOJO, Object> generateFunction, boolean isInnerMap);
 
   Object createArray(
-      SchemaProcessorPOJO pojo, BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, boolean isInnerArray);
+      SchemaProcessorPOJO pojo, Function<SchemaProcessorPOJO, Object> generateFunction, boolean isInnerArray);
 
   Object createValueObject(
       SchemaProcessorPOJO pojo);

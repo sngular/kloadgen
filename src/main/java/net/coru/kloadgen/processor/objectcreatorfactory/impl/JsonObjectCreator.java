@@ -1,9 +1,8 @@
 package net.coru.kloadgen.processor.objectcreatorfactory.impl;
 
-import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,24 +25,18 @@ public class JsonObjectCreator implements ObjectCreator {
 
   @Override
   public Object createMap(
-      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
     ObjectNode map = JsonNodeFactory.instance.objectNode();
     if (pojo.isLastFilterTypeOfLastElement()) {
       map = createFinalMap(pojo);
-    } else if (!pojo.getFieldValuesList().contains("null")) {
+    } else if (SchemaProcessorUtils.isFieldValueListNotAcceptingNullValues(pojo.getFieldValuesList())) {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         final String key = generateString(pojo.getValueLength());
         final Object returnObject;
-        if (i == pojo.getFieldSize() - 1) {
-          returnObject = generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo);
-        } else {
-          try {
-            final SchemaProcessorPOJO newPojo = (SchemaProcessorPOJO) pojo.clone();
-            newPojo.setFieldExpMappingsQueue(pojo.getFieldExpMappingsQueue().clone());
-            returnObject = generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), newPojo);
-          } catch (final CloneNotSupportedException e) {
-            throw new KLoadGenException("Error cloning POJO");
-          }
+        try {
+          returnObject = generateFunction.apply(i == pojo.getFieldSize() - 1 ? pojo : (SchemaProcessorPOJO) pojo.clone());
+        } catch (final CloneNotSupportedException e) {
+          throw new KLoadGenException("Error cloning POJO");
         }
         if (null != returnObject) {
           map.set(key, OBJECT_MAPPER.convertValue(returnObject, JsonNode.class));
@@ -54,25 +47,29 @@ public class JsonObjectCreator implements ObjectCreator {
     return isInnerMap ? map : entity.get(pojo.getRootFieldName());
   }
 
+  private ObjectNode createFinalMap(final SchemaProcessorPOJO pojo) {
+    return OBJECT_MAPPER.convertValue(
+        STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+                                             pojo.getFieldSize()), ObjectNode.class);
+  }
+
+  private String generateString(final Integer valueLength) {
+    return String.valueOf(STATELESS_GENERATOR_TOOL.generateRandomString(valueLength));
+  }
+
   @Override
   public Object createArray(
-      final SchemaProcessorPOJO pojo, final BiFunction<ArrayDeque<?>, SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
     ArrayNode nodeArray = OBJECT_MAPPER.createArrayNode();
     if (pojo.isLastFilterTypeOfLastElement()) {
       nodeArray = createFinalArray(pojo);
-    } else if (!pojo.getFieldValuesList().contains("null")) {
+    } else if (SchemaProcessorUtils.isFieldValueListNotAcceptingNullValues(pojo.getFieldValuesList())) {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         final Object returnObject;
-        if (i == pojo.getFieldSize() - 1) {
-          returnObject = generateFunction.apply(pojo.getFieldExpMappingsQueue(), pojo);
-        } else {
-          try {
-            final SchemaProcessorPOJO newPojo = (SchemaProcessorPOJO) pojo.clone();
-            newPojo.setFieldExpMappingsQueue(pojo.getFieldExpMappingsQueue().clone());
-            returnObject = generateFunction.apply(pojo.getFieldExpMappingsQueue().clone(), newPojo);
-          } catch (final CloneNotSupportedException e) {
-            throw new KLoadGenException("Error cloning POJO");
-          }
+        try {
+          returnObject = generateFunction.apply(i == pojo.getFieldSize() - 1 ? pojo : (SchemaProcessorPOJO) pojo.clone());
+        } catch (final CloneNotSupportedException e) {
+          throw new KLoadGenException("Error cloning POJO");
         }
         if (null != returnObject) {
           if (((JsonNode) returnObject).isObject()) {
@@ -126,16 +123,6 @@ public class JsonObjectCreator implements ObjectCreator {
     return OBJECT_MAPPER.convertValue(
         STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
                                                pojo.getValueLength(), pojo.getFieldValuesList()), ArrayNode.class);
-  }
-
-  private ObjectNode createFinalMap(final SchemaProcessorPOJO pojo) {
-    return OBJECT_MAPPER.convertValue(
-        STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
-                                             pojo.getFieldSize()), ObjectNode.class);
-  }
-
-  private String generateString(final Integer valueLength) {
-    return String.valueOf(STATELESS_GENERATOR_TOOL.generateRandomString(valueLength));
   }
 
 }
