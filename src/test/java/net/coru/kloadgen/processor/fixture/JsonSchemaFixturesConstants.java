@@ -738,8 +738,18 @@ public class JsonSchemaFixturesConstants {
                        })
                        .build(),
       FieldValueMapping.builder()
-                       .fieldName("flowers.name[]")
+                       .fieldName("flowers[:].name[]")
                        .fieldType("string-array")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("Edelweiss")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("bush[:]")
+                       .fieldType("string-map")
                        .valueLength(0)
                        .required(true)
                        .isAncestorRequired(true)
@@ -748,28 +758,26 @@ public class JsonSchemaFixturesConstants {
                        })
                        .build(),
       FieldValueMapping.builder()
-                       .fieldName("bush.maxHeight[][:]")
+                       .fieldName("bush[:].maxHeight[2][:]")
                        .fieldType("int-map-array")
-                       .valueLength(0)
+                       .valueLength(4)
                        .required(true)
-                       .isAncestorRequired(false)
-                       .fieldValueList("0.5")
+                       .isAncestorRequired(true)
+                       .fieldValueList("asdf:14")
                        .constraints(new HashMap<ConstraintTypeEnum, String>() {
                        })
                        .build(),
       FieldValueMapping.builder()
-                       .fieldName("bush.leafs[:3][][:]")
-                       .fieldType("string-map-array-map")
-                       .valueLength(0)
+                       .fieldName("bush[:].leafs[][3:][]")
+                       .fieldType("string-array-map-array")
+                       .valueLength(8)
                        .required(true)
-                       .isAncestorRequired(false)
-                       .fieldValueList("null")
+                       .isAncestorRequired(true)
+                       .fieldValueList("oval")
                        .constraints(new HashMap<ConstraintTypeEnum, String>() {
                        })
                        .build()
   ));
-
-  public static final String SCHEMA_NESTED_ITERATION_EXPECTED = "{\"bush.maxHeight\": \"0.5\"}";
 
 
 }
