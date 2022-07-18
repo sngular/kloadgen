@@ -16,7 +16,6 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
@@ -68,7 +67,6 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
             .setScanners(Scanners.SubTypes));
 
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
-
   }
 
   @Override
