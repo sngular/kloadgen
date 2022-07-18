@@ -16,7 +16,7 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.model.ConstraintTypeEnum;
 import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
-import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
+import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
 import net.coru.kloadgen.serializer.EnrichedRecord;
@@ -27,7 +27,7 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
 
-public class AvroObjectCreator implements ObjectCreator {
+public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
 
@@ -39,7 +39,7 @@ public class AvroObjectCreator implements ObjectCreator {
 
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
-  public AvroObjectCreator(final Object schema, final Object metadata) {
+  public AvroObjectCreatorFactory(final Object schema, final Object metadata) {
     if (schema instanceof ParsedSchema) {
       this.schema = (Schema) ((ParsedSchema) schema).rawSchema();
     } else if (schema instanceof Schema) {

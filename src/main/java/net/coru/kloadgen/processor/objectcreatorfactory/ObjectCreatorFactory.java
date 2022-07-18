@@ -1,41 +1,27 @@
 package net.coru.kloadgen.processor.objectcreatorfactory;
 
-import java.io.IOException;
+import java.util.function.Function;
 
-import com.google.protobuf.Descriptors.DescriptorValidationException;
-import lombok.extern.slf4j.Slf4j;
-import net.coru.kloadgen.common.SchemaTypeEnum;
-import net.coru.kloadgen.exception.KLoadGenException;
-import net.coru.kloadgen.processor.objectcreatorfactory.impl.AvroObjectCreator;
-import net.coru.kloadgen.processor.objectcreatorfactory.impl.JsonObjectCreator;
-import net.coru.kloadgen.processor.objectcreatorfactory.impl.ProtobufObjectCreator;
+import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
 
-@Slf4j
-public class ObjectCreatorFactory {
+public interface ObjectCreatorFactory {
 
-  private ObjectCreatorFactory() {}
+  Object createMap(
+      SchemaProcessorPOJO pojo, Function<SchemaProcessorPOJO, Object> generateFunction, boolean isInnerMap);
 
-  public static ObjectCreator getInstance(final SchemaTypeEnum schemaType, final Object schema, final Object metadata) {
-    final ObjectCreator objectCreator;
-    try {
-      switch (schemaType) {
-        case JSON:
-          objectCreator = new JsonObjectCreator();
-          break;
-        case AVRO:
-          objectCreator = new AvroObjectCreator(schema, metadata);
-          break;
-        case PROTOBUF:
-          objectCreator = new ProtobufObjectCreator(schema, metadata);
-          break;
-        default:
-          throw new KLoadGenException("Unsupported schema type");
-      }
-    } catch (KLoadGenException | DescriptorValidationException | IOException e) {
-      final String logMsg = "Please, make sure that the schema sources fed are correct";
-      log.error(logMsg, e);
-      throw new KLoadGenException("Error obtaining object creator factory. " + logMsg);
-    }
-    return objectCreator;
-  }
+  Object createArray(
+      SchemaProcessorPOJO pojo, Function<SchemaProcessorPOJO, Object> generateFunction, boolean isInnerArray);
+
+  Object createValueObject(
+      SchemaProcessorPOJO pojo);
+
+  void assignRecord(SchemaProcessorPOJO pojo);
+
+  void createRecord(String objectName, String completeFieldName);
+
+  Object generateRecord();
+
+  Object generateSubEntityRecord(Object objectRecord);
+
+  boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level);
 }

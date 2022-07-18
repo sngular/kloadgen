@@ -11,11 +11,11 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
-import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
+import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 
-public class JsonObjectCreator implements ObjectCreator {
+public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final StatelessGeneratorTool STATELESS_GENERATOR_TOOL = new StatelessGeneratorTool();
 

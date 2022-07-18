@@ -24,13 +24,13 @@ import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.processor.model.SchemaProcessorPOJO;
-import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreator;
+import net.coru.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.commons.lang3.StringUtils;
 
-public class ProtobufObjectCreator implements ObjectCreator {
+public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
 
@@ -40,7 +40,7 @@ public class ProtobufObjectCreator implements ObjectCreator {
 
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
-  public ProtobufObjectCreator(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
+  public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
     if (schema instanceof ParsedSchema) {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema());
     } else if (schema instanceof ProtoFileElement) {
