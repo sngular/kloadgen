@@ -92,7 +92,7 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
   }
 
   @Override
-  public final void setAsText(final String text) throws IllegalArgumentException {
+  public final void setAsText(final String text) {
     this.serializerComboBox.setSelectedItem(text);
   }
 
