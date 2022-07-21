@@ -1,0 +1,61 @@
+{
+  "type": "record",
+  "name": "MyFruitsValue",
+  "namespace": "de.mycomp.avro.model",
+  "fields": [
+    {
+      "name": "aggregateAttribute",
+      "type": {
+        "type": "record",
+        "name": "AggregateAttribute",
+        "fields": [
+          {
+            "name": "fruitList",
+            "type": [
+              "null",
+              {
+                "type": "record",
+                "name": "FruitList",
+                "fields": [
+                  {
+                    "name": "fruits",
+                    "type": [
+                      "null",
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "record",
+                          "name": "Fruit",
+                          "fields": [
+                            {
+                              "name": "fruitType",
+                              "type": [
+                                "null",
+                                {
+                                  "type": "enum",
+                                  "name": "FruitType",
+                                  "symbols": [
+                                    "MY_ENUM_1",
+                                    "MY_ENUM_2",
+                                    "MY_ENUM_3"
+                                  ]
+                                }
+                              ],
+                              "default": null
+                            }
+                          ]
+                        }
+                      }
+                    ],
+                    "default": null
+                  }
+                ]
+              }
+            ],
+            "default": null
+          }
+        ]
+      }
+    }
+  ]
+}
