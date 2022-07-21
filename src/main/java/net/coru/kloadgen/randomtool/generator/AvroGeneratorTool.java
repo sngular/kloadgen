@@ -49,7 +49,7 @@ public class AvroGeneratorTool {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
         value = ValueUtils.castValue(value, field.schema().getType().getName());
       } else if (Type.ENUM == safeSchema.getType()) {
-        value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, safeSchema, parameterList, field.schema().getType().getName());
+        value = getEnumOrGenerate(fieldValueMapping.getFieldName(), fieldType, safeSchema, parameterList, safeSchema.getType().getName());
       } else {
         value = randomObject.generateRandom(fieldType, valueLength, parameterList, constraints);
         if ("null".equalsIgnoreCase(value.toString())) {
