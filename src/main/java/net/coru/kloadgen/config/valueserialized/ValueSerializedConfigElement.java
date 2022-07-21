@@ -28,7 +28,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-public class ValueSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
+public final class ValueSerializedConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String valueSubjectName;
 
@@ -41,7 +41,7 @@ public class ValueSerializedConfigElement extends ConfigTestElement implements T
   private String valueNameStrategy;
 
   @Override
-  public final void iterationStart(final LoopIterationEvent loopIterationEvent) {
+  public void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
     final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(PropsKeysHelper.VALUE_SUBJECT_NAME, valueSubjectName);
@@ -49,7 +49,5 @@ public class ValueSerializedConfigElement extends ConfigTestElement implements T
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA_TYPE, valueSchemaType);
     variables.putObject(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY, valueSerializerConfiguration);
     variables.putObject(ProducerKeysHelper.VALUE_NAME_STRATEGY, valueNameStrategy);
-
   }
-
 }

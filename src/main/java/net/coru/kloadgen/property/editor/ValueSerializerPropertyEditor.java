@@ -68,7 +68,6 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
             .setScanners(Scanners.SubTypes));
 
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
-
   }
 
   @Override

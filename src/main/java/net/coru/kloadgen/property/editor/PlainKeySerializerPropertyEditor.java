@@ -88,23 +88,23 @@ public class PlainKeySerializerPropertyEditor extends PropertyEditorSupport impl
   }
 
   @Override
-  public final void setAsText(final String text) throws IllegalArgumentException {
-    this.serializerComboBox.setSelectedItem(text);
-  }
-
-  @Override
   public final Component getCustomEditor() {
     return this.panel;
   }
 
   @Override
-  public final Object getValue() {
-    return this.serializerComboBox.getSelectedItem();
+  public final void setAsText(final String text) {
+    this.serializerComboBox.setSelectedItem(text);
   }
 
   @Override
   public final void setValue(final Object value) {
     this.serializerComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
+  }
+
+  @Override
+  public final Object getValue() {
+    return this.serializerComboBox.getSelectedItem();
   }
 
   @Override

@@ -6,11 +6,10 @@
 
 package net.coru.kloadgen.config.keysimple;
 
+import java.util.Objects;
+
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.config.ConfigTestElement;
@@ -20,13 +19,10 @@ import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
-@Getter
-@Setter
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class KeySimpleConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
+public final class KeySimpleConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String keyValue;
 
@@ -35,13 +31,60 @@ public class KeySimpleConfigElement extends ConfigTestElement implements TestBea
   private String keySerializerConfiguration;
 
   @Override
-  public final void iterationStart(final LoopIterationEvent loopIterationEvent) {
+  public void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
     final JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(PropsKeysHelper.KEY_VALUE, keyValue);
-    variables.putObject(PropsKeysHelper.KEY_TYPE, keyType);
-    variables.putObject(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY, keySerializerConfiguration);
+    variables.putObject(PropsKeysHelper.KEY_VALUE, getKeyValue());
+    variables.putObject(PropsKeysHelper.KEY_TYPE, getKeyType());
+    variables.putObject(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY, getKeySerializerConfiguration());
     variables.putObject(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
 
+  public String getKeyValue() {
+    return getPropertyAsString("keyValue");
+  }
+
+  public String getKeyType() {
+    return getPropertyAsString("keyType");
+  }
+
+  public String getKeySerializerConfiguration() {
+    return getPropertyAsString("keySerializerConfiguration");
+  }
+
+  public void setKeyValue(final String keyValue) {
+    setProperty("keyValue", keyValue);
+    this.keyValue = keyValue;
+  }
+
+  public void setKeyType(final String keyType) {
+    setProperty("keyType", keyType);
+    this.keyType = keyType;
+  }
+
+  public void setKeySerializerConfiguration(final String keySerializerConfiguration) {
+    setProperty("keySerializerConfiguration", keySerializerConfiguration);
+    this.keySerializerConfiguration = keySerializerConfiguration;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    final KeySimpleConfigElement that = (KeySimpleConfigElement) o;
+    return Objects.equals(getKeyValue(), that.getKeyValue()) && Objects.equals(getKeyType(), that.getKeyType())
+           && Objects.equals(getKeySerializerConfiguration(), that.getKeySerializerConfiguration());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), getKeyValue(), getKeyType(), getKeySerializerConfiguration());
+  }
 }

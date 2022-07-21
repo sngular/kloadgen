@@ -39,7 +39,7 @@ public class KeySimpleConfigElementBeanInfo extends BeanInfoSupport {
     final PropertyDescriptor schemaType = property(KEY_SERIALIZER_PROPERTY);
     schemaType.setPropertyEditorClass(PlainKeySerializerPropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    schemaType.setValue(DEFAULT, "<avro subject>");
+    schemaType.setValue(DEFAULT, "org.apache.kafka.common.serialization.StringSerializer");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
   }
 }
