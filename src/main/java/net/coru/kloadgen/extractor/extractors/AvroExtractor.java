@@ -200,7 +200,7 @@ public class AvroExtractor {
     if (checkIfLogicalType(innerField.schema())) {
       typeName += "_" + innerField.schema().getLogicalType().getName();
     }
-    if (checkIfEnumField(innerField.schema().getType())) {
+    if (checkIfEnum(innerField.schema())) {
       final var fieldValueList = String.join(",", innerField.schema().getEnumSymbols());
       completeFieldList.add(
           FieldValueMapping.builder()
@@ -284,7 +284,7 @@ public class AvroExtractor {
   private Schema getRecordUnion(final List<Schema> types) {
     Schema isRecord = null;
     for (Schema schema : types) {
-      if (checkIfRecord(schema) || checkIfArray(schema) || checkIfMap(schema) || typesSet.contains(schema.getType())) {
+      if (checkIfRecord(schema) || checkIfArray(schema) || checkIfMap(schema) || checkIfEnum(schema) || typesSet.contains(schema.getType())) {
         isRecord = schema;
       }
     }
@@ -330,8 +330,8 @@ public class AvroExtractor {
     return Type.UNION.equals(innerSchema.getType());
   }
 
-  private boolean checkIfEnumField(final Schema.Type type) {
-    return type.equals(Type.ENUM);
+  private boolean checkIfEnum(final Schema type) {
+    return Type.ENUM.equals(type.getType());
   }
 
   private boolean checkIfLogicalType(final Schema innerSchema) {
