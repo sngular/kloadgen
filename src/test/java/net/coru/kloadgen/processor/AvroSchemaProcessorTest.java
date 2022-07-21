@@ -56,501 +56,501 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class AvroSchemaProcessorTest {
 
-    private final FileHelper fileHelper = new FileHelper();
-    private final SchemaExtractor extractor = new SchemaExtractorImpl();
+  private final FileHelper fileHelper = new FileHelper();
+  private final SchemaExtractor extractor = new SchemaExtractorImpl();
 
-    @BeforeEach
-    public void setUp() {
-        File file = new File("src/test/resources");
-        String absolutePath = file.getAbsolutePath();
-        JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
-        JMeterContext jmcx = JMeterContextService.getContext();
-        jmcx.setVariables(new JMeterVariables());
-        JMeterUtils.setLocale(Locale.ENGLISH);
-    }
+  @BeforeEach
+  public void setUp() {
+    File file = new File("src/test/resources");
+    String absolutePath = file.getAbsolutePath();
+    JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
+    JMeterContext jmcx = JMeterContextService.getContext();
+    jmcx.setVariables(new JMeterVariables());
+    JMeterUtils.setLocale(Locale.ENGLISH);
+  }
 
-    private GenericRecord setUpEntityForAvroTestWithSubEntitySimpleArray(ParsedSchema parsedSchema) {
-        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
-        Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
-        GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
-        Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
-        GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
-        anotherLevelRecord.put("subEntityIntArray", asList(1, 1));
-        subEntityRecord.put("anotherLevel", anotherLevelRecord);
+  private GenericRecord setUpEntityForAvroTestWithSubEntitySimpleArray(ParsedSchema parsedSchema) {
+    GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+    Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
+    GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
+    Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
+    GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
+    anotherLevelRecord.put("subEntityIntArray", asList(1, 1));
+    subEntityRecord.put("anotherLevel", anotherLevelRecord);
 
-        entity.put("subEntity", subEntityRecord);
-        entity.put("topLevelIntArray", asList(2, 2, 2));
+    entity.put("subEntity", subEntityRecord);
+    entity.put("topLevelIntArray", asList(2, 2, 2));
 
-        return entity;
-    }
+    return entity;
+  }
 
-    @Test
-    @DisplayName("Should process an Avro Schema Processor With Sub Entity Simple Array")
-    void testAvroSchemaProcessorWithSubEntitySimpleArray() throws IOException {
-        List<FieldValueMapping> fieldValueMappings = asList(
-            FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1]").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("topLevelIntArray[3]").fieldType("int-array").valueLength(0).fieldValueList("[2]").required(true).isAncestorRequired(true).build());
+  @Test
+  @DisplayName("Should process an Avro Schema Processor With Sub Entity Simple Array")
+  void testAvroSchemaProcessorWithSubEntitySimpleArray() throws IOException {
+    List<FieldValueMapping> fieldValueMappings = asList(
+        FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("topLevelIntArray[3]").fieldType("int-array").valueLength(0).fieldValueList("[2]").required(true).isAncestorRequired(true).build());
 
-        File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
-        GenericRecord entity = setUpEntityForAvroTestWithSubEntitySimpleArray(parsedSchema);
-        EnrichedRecord message = avroSchemaProcessor.next();
+    File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+    ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    GenericRecord entity = setUpEntityForAvroTestWithSubEntitySimpleArray(parsedSchema);
+    EnrichedRecord message = avroSchemaProcessor.next();
 
-        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-        assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(message.getGenericRecord()).isEqualTo(entity);
-    }
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord()).isEqualTo(entity);
+  }
 
-    private GenericRecord setUpEntityForAvroTestWithSubEntityArray(ParsedSchema parsedSchema) {
-        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
-        Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
-        GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
-        Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
-        Schema subEntityRecordArraySchema = anotherLevelSchema.getField("subEntityRecordArray").schema().getElementType();
-        GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
-        GenericRecord subEntityItemsRecord = new GenericData.Record(subEntityRecordArraySchema);
-        subEntityItemsRecord.put("name", "second");
-        anotherLevelRecord.put("subEntityRecordArray", asList(subEntityItemsRecord, subEntityItemsRecord));
+  private GenericRecord setUpEntityForAvroTestWithSubEntityArray(ParsedSchema parsedSchema) {
+    GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+    Schema subEntitySchema = entity.getSchema().getField("subEntity").schema();
+    GenericRecord subEntityRecord = new GenericData.Record(subEntitySchema);
+    Schema anotherLevelSchema = subEntitySchema.getField("anotherLevel").schema();
+    Schema subEntityRecordArraySchema = anotherLevelSchema.getField("subEntityRecordArray").schema().getElementType();
+    GenericRecord anotherLevelRecord = new GenericData.Record(anotherLevelSchema);
+    GenericRecord subEntityItemsRecord = new GenericData.Record(subEntityRecordArraySchema);
+    subEntityItemsRecord.put("name", "second");
+    anotherLevelRecord.put("subEntityRecordArray", asList(subEntityItemsRecord, subEntityItemsRecord));
 
-        subEntityRecord.put("anotherLevel", anotherLevelRecord);
-        entity.put("subEntity", subEntityRecord);
+    subEntityRecord.put("anotherLevel", anotherLevelRecord);
+    entity.put("subEntity", subEntityRecord);
 
-        GenericRecord topLevelRecordArray =
-            new GenericData.Record(entity.getSchema().getField("topLevelRecordArray").schema().getElementType());
-        topLevelRecordArray.put("name", "third");
-        entity.put("topLevelRecordArray", singletonList(topLevelRecordArray));
+    GenericRecord topLevelRecordArray =
+        new GenericData.Record(entity.getSchema().getField("topLevelRecordArray").schema().getElementType());
+    topLevelRecordArray.put("name", "third");
+    entity.put("topLevelRecordArray", singletonList(topLevelRecordArray));
 
-        return entity;
-    }
+    return entity;
+  }
 
-    @Test
-    @DisplayName("Should process Avro Schema Processor With SubEntity Array")
-    void testAvroSchemaProcessorWithSubEntityArray() throws IOException {
-        List<FieldValueMapping> fieldValueMappings = asList(
-            FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityRecordArray[2].name").fieldType("string").valueLength(0).fieldValueList("second").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("topLevelRecordArray[1].name").fieldType("string").valueLength(0).fieldValueList("third").required(true).isAncestorRequired(true).build());
+  @Test
+  @DisplayName("Should process Avro Schema Processor With SubEntity Array")
+  void testAvroSchemaProcessorWithSubEntityArray() throws IOException {
+    List<FieldValueMapping> fieldValueMappings = asList(
+        FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityRecordArray[2].name").fieldType("string").valueLength(0).fieldValueList("second").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("topLevelRecordArray[1].name").fieldType("string").valueLength(0).fieldValueList("third").required(true).isAncestorRequired(true).build());
 
-        File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
-        GenericRecord entity = setUpEntityForAvroTestWithSubEntityArray(parsedSchema);
-        EnrichedRecord message = avroSchemaProcessor.next();
+    File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+    ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    GenericRecord entity = setUpEntityForAvroTestWithSubEntityArray(parsedSchema);
+    EnrichedRecord message = avroSchemaProcessor.next();
 
-        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-        assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(message.getGenericRecord()).isEqualTo(entity);
-    }
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord()).isEqualTo(entity);
+  }
 
-    private GenericRecord setUpEntityForEmbeddedAvroTest(ParsedSchema parsedSchema) {
-        GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
-        GenericRecord subEntityFieldMySchema = new GenericData.Record(entity.getSchema().getField("fieldMySchema").schema());
+  private GenericRecord setUpEntityForEmbeddedAvroTest(ParsedSchema parsedSchema) {
+    GenericRecord entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+    GenericRecord subEntityFieldMySchema = new GenericData.Record(entity.getSchema().getField("fieldMySchema").schema());
 
-        subEntityFieldMySchema.put("testInt_id", 4);
-        subEntityFieldMySchema.put("testLong", 3L);
-        subEntityFieldMySchema.put("fieldString", "testing");
+    subEntityFieldMySchema.put("testInt_id", 4);
+    subEntityFieldMySchema.put("testLong", 3L);
+    subEntityFieldMySchema.put("fieldString", "testing");
 
-        entity.put("fieldMySchema", subEntityFieldMySchema);
-        entity.put("timestamp", 5L);
+    entity.put("fieldMySchema", subEntityFieldMySchema);
+    entity.put("timestamp", 5L);
 
-        return entity;
-    }
+    return entity;
+  }
 
-    @Test
-    @DisplayName("Should process Embedded Avro Schema Processor")
-    void testEmbeddedAvroSchemaProcessor() throws IOException {
-        List<FieldValueMapping> fieldValueMappings = asList(
-            FieldValueMapping.builder().fieldName("fieldMySchema.testInt_id").fieldType("int").valueLength(0).fieldValueList("4").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("fieldMySchema.testLong").fieldType("long").valueLength(0).fieldValueList("3").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("fieldMySchema.fieldString").fieldType("string").valueLength(0).fieldValueList("testing").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("timestamp").fieldType("long").valueLength(0).fieldValueList("5").required(true).isAncestorRequired(true).build()
-        );
-        File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
-        EnrichedRecord message = avroSchemaProcessor.next();
-        GenericRecord entity = setUpEntityForEmbeddedAvroTest(parsedSchema);
+  @Test
+  @DisplayName("Should process Embedded Avro Schema Processor")
+  void testEmbeddedAvroSchemaProcessor() throws IOException {
+    List<FieldValueMapping> fieldValueMappings = asList(
+        FieldValueMapping.builder().fieldName("fieldMySchema.testInt_id").fieldType("int").valueLength(0).fieldValueList("4").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("fieldMySchema.testLong").fieldType("long").valueLength(0).fieldValueList("3").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("fieldMySchema.fieldString").fieldType("string").valueLength(0).fieldValueList("testing").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("timestamp").fieldType("long").valueLength(0).fieldValueList("5").required(true).isAncestorRequired(true).build()
+    );
+    File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
+    ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    EnrichedRecord message = avroSchemaProcessor.next();
+    GenericRecord entity = setUpEntityForEmbeddedAvroTest(parsedSchema);
 
-        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-        assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(message.getGenericRecord()).isEqualTo(entity);
-    }
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord()).isEqualTo(entity);
+  }
 
-    @Test
-    @DisplayName("Should process Avro Schema Processor")
-    void textAvroSchemaProcessor() throws KLoadGenException {
-        List<FieldValueMapping> fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(
-            SchemaBuilder.builder().record("testing").fields().requiredString("name").optionalInt("age").endRecord(),
-            new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-        EnrichedRecord message = avroSchemaProcessor.next();
-        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-        assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(message.getGenericRecord()).hasFieldOrPropertyWithValue("values", asList("Jose", 43).toArray());
-    }
+  @Test
+  @DisplayName("Should process Avro Schema Processor")
+  void textAvroSchemaProcessor() throws KLoadGenException {
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        FieldValueMapping.builder().fieldName("name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(
+        SchemaBuilder.builder().record("testing").fields().requiredString("name").optionalInt("age").endRecord(),
+        new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord()).hasFieldOrPropertyWithValue("values", asList("Jose", 43).toArray());
+  }
 
-    @Test
-    @DisplayName("Should process Avro Schema Processor Logical Type")
-    void textAvroSchemaProcessorLogicalType() throws KLoadGenException {
-        Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
-        LogicalTypes.decimal(5, 2).addToSchema(decimalSchemaBytes);
+  @Test
+  @DisplayName("Should process Avro Schema Processor Logical Type")
+  void textAvroSchemaProcessorLogicalType() throws KLoadGenException {
+    Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
+    LogicalTypes.decimal(5, 2).addToSchema(decimalSchemaBytes);
 
-        List<FieldValueMapping> fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("decimal").fieldType("bytes_decimal").valueLength(0).fieldValueList("44.444").required(true).isAncestorRequired(true).build());
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        FieldValueMapping.builder().fieldName("name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("decimal").fieldType("bytes_decimal").valueLength(0).fieldValueList("44.444").required(true).isAncestorRequired(true).build());
 
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(SchemaBuilder.builder().record("testing").fields().requiredString("name").name(
-            "decimal").type(decimalSchemaBytes).noDefault().endRecord(),
-                                          new SchemaMetadata(1, 1, ""), fieldValueMappingList);
-        EnrichedRecord message = avroSchemaProcessor.next();
-        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-        assertThat(message.getGenericRecord()).isNotNull();
-        assertThat(message.getGenericRecord()).hasFieldOrPropertyWithValue("values",
-                                                                           asList("Jose", new BigDecimal("44.444")).toArray());
-    }
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder.builder().record("testing").fields().requiredString("name").name(
+                                          "decimal").type(decimalSchemaBytes).noDefault().endRecord(),
+                                      new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord()).hasFieldOrPropertyWithValue("values",
+                                                                       asList("Jose", new BigDecimal("44.444")).toArray());
+  }
 
-    @Test
-    @DisplayName("Should process Avro Schema Processor Array Map")
-    void textAvroSchemaProcessorArrayMap() throws KLoadGenException {
-        List<FieldValueMapping> fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("values[2][2:]").fieldType("string-map-array").valueLength(2).fieldValueList("n:1, t:2").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("topLevelRecord.subvalues[2][2:]").fieldType("string-map-array").valueLength(2).fieldValueList("n:1, t:2").required(true).isAncestorRequired(true).build());
+  @Test
+  @DisplayName("Should process Avro Schema Processor Array Map")
+  void textAvroSchemaProcessorArrayMap() throws KLoadGenException {
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        FieldValueMapping.builder().fieldName("values[2][2:]").fieldType("string-map-array").valueLength(2).fieldValueList("n:1, t:2").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("topLevelRecord.subvalues[2][2:]").fieldType("string-map-array").valueLength(2).fieldValueList("n:1, t:2").required(true).isAncestorRequired(true).build());
 
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(SchemaBuilder
-                                              .builder()
-                                              .record("arrayMap")
-                                              .fields()
-                                              .name("values")
-                                              .type()
-                                              .array()
-                                              .items()
-                                              .type(SchemaBuilder
-                                                        .builder()
-                                                        .map()
-                                                        .values()
-                                                        .stringType()
-                                                        .getValueType())
-                                              .noDefault()
-                                              .name("topLevelRecord")
-                                              .type()
-                                              .record("subvalues")
-                                              .fields()
-                                              .name("subvalues")
-                                              .type()
-                                              .array()
-                                              .items()
-                                              .type(SchemaBuilder
-                                                        .builder()
-                                                        .map()
-                                                        .values()
-                                                        .stringType()
-                                                        .getValueType())
-                                              .noDefault()
-                                              .endRecord()
-                                              .noDefault()
-                                              .endRecord(),
-                                          new SchemaMetadata(1, 1, ""),
-                                          fieldValueMappingList);
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder
+                                          .builder()
+                                          .record("arrayMap")
+                                          .fields()
+                                          .name("values")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .map()
+                                                    .values()
+                                                    .stringType()
+                                                    .getValueType())
+                                          .noDefault()
+                                          .name("topLevelRecord")
+                                          .type()
+                                          .record("subvalues")
+                                          .fields()
+                                          .name("subvalues")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .map()
+                                                    .values()
+                                                    .stringType()
+                                                    .getValueType())
+                                          .noDefault()
+                                          .endRecord()
+                                          .noDefault()
+                                          .endRecord(),
+                                      new SchemaMetadata(1, 1, ""),
+                                      fieldValueMappingList);
 
-        EnrichedRecord message = avroSchemaProcessor.next();
-        assertThat(message)
-            .isNotNull()
-            .isInstanceOf(EnrichedRecord.class)
-            .extracting(EnrichedRecord::getGenericRecord)
-            .isNotNull()
-            .hasFieldOrProperty("values")
-            .extracting("values")
-            .extracting(Arrays::asList)
-            .asList()
-            .hasSize(1);
-        List<Map<String, Object>> valuesElement = (List<Map<String, Object>>) ((GenericRecord) message.getGenericRecord()).get("values");
-        assertThat(valuesElement).hasSize(2).containsExactlyInAnyOrder(Maps.of("n", "1", "t", "2"), Maps.of("n", "1", "t", "2"));
-        List<Map<String, Object>> subvaluesElement = (List<Map<String, Object>>) ((GenericRecord) ((GenericRecord) message.getGenericRecord()).get("topLevelRecord")).get("subvalues");
-        assertThat(subvaluesElement).hasSize(2).containsExactlyInAnyOrder(Maps.of("n", "1", "t", "2"), Maps.of("n", "1", "t", "2"));
-    }
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message)
+        .isNotNull()
+        .isInstanceOf(EnrichedRecord.class)
+        .extracting(EnrichedRecord::getGenericRecord)
+        .isNotNull()
+        .hasFieldOrProperty("values")
+        .extracting("values")
+        .extracting(Arrays::asList)
+        .asList()
+        .hasSize(1);
+    List<Map<String, Object>> valuesElement = (List<Map<String, Object>>) ((GenericRecord) message.getGenericRecord()).get("values");
+    assertThat(valuesElement).hasSize(2).containsExactlyInAnyOrder(Maps.of("n", "1", "t", "2"), Maps.of("n", "1", "t", "2"));
+    List<Map<String, Object>> subvaluesElement = (List<Map<String, Object>>) ((GenericRecord) ((GenericRecord) message.getGenericRecord()).get("topLevelRecord")).get("subvalues");
+    assertThat(subvaluesElement).hasSize(2).containsExactlyInAnyOrder(Maps.of("n", "1", "t", "2"), Maps.of("n", "1", "t", "2"));
+  }
 
-    @Test
-    @DisplayName("Should process Avro Schema Processor Array Record")
-    void textAvroSchemaProcessorArrayRecord() throws KLoadGenException {
-        List<FieldValueMapping> fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("values[2].name").fieldType("string").valueLength(2).fieldValueList("Jose, Andres").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("values[].amount").fieldType("float").valueLength(2).fieldValueList("0.5, 0.6").required(true).isAncestorRequired(true).build());
+  @Test
+  @DisplayName("Should process Avro Schema Processor Array Record")
+  void textAvroSchemaProcessorArrayRecord() throws KLoadGenException {
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        FieldValueMapping.builder().fieldName("values[2].name").fieldType("string").valueLength(2).fieldValueList("Jose, Andres").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("values[].amount").fieldType("float").valueLength(2).fieldValueList("0.5, 0.6").required(true).isAncestorRequired(true).build());
 
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(SchemaBuilder
-                                              .builder()
-                                              .record("array")
-                                              .fields()
-                                              .name("values")
-                                              .type()
-                                              .array()
-                                              .items()
-                                              .type(SchemaBuilder
-                                                        .builder()
-                                                        .record("test")
-                                                        .fields()
-                                                        .requiredString("name")
-                                                        .requiredFloat("amount")
-                                                        .endRecord())
-                                              .noDefault()
-                                              .endRecord(),
-                                          new SchemaMetadata(1, 1, ""),
-                                          fieldValueMappingList);
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder
+                                          .builder()
+                                          .record("array")
+                                          .fields()
+                                          .name("values")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .record("test")
+                                                    .fields()
+                                                    .requiredString("name")
+                                                    .requiredFloat("amount")
+                                                    .endRecord())
+                                          .noDefault()
+                                          .endRecord(),
+                                      new SchemaMetadata(1, 1, ""),
+                                      fieldValueMappingList);
 
-        EnrichedRecord message = avroSchemaProcessor.next();
-        assertThat(message)
-            .isNotNull()
-            .isInstanceOf(EnrichedRecord.class)
-            .extracting(EnrichedRecord::getGenericRecord)
-            .isNotNull()
-            .hasFieldOrProperty("values")
-            .extracting("values")
-            .extracting(Arrays::asList)
-            .asList()
-            .hasSize(1);
-    }
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message)
+        .isNotNull()
+        .isInstanceOf(EnrichedRecord.class)
+        .extracting(EnrichedRecord::getGenericRecord)
+        .isNotNull()
+        .hasFieldOrProperty("values")
+        .extracting("values")
+        .extracting(Arrays::asList)
+        .asList()
+        .hasSize(1);
+  }
 
-    @Test
-    @DisplayName("Should Process Avro Schema Processor Map")
-    void textAvroSchemaProcessorMap() throws KLoadGenException {
-        List<FieldValueMapping> fieldValueMappingList = singletonList(
-            FieldValueMapping.builder().fieldName("values[2:]").fieldType("string-map").valueLength(2).fieldValueList("n:1, t:2").required(true).isAncestorRequired(true).build());
+  @Test
+  @DisplayName("Should Process Avro Schema Processor Map")
+  void textAvroSchemaProcessorMap() throws KLoadGenException {
+    List<FieldValueMapping> fieldValueMappingList = singletonList(
+        FieldValueMapping.builder().fieldName("values[2:]").fieldType("string-map").valueLength(2).fieldValueList("n:1, t:2").required(true).isAncestorRequired(true).build());
 
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(SchemaBuilder
-                                              .builder()
-                                              .record("arrayMap")
-                                              .fields()
-                                              .name("values")
-                                              .type()
-                                              .array()
-                                              .items()
-                                              .type(SchemaBuilder
-                                                        .builder()
-                                                        .map()
-                                                        .values()
-                                                        .stringType()
-                                                        .getValueType())
-                                              .noDefault()
-                                              .endRecord(),
-                                          new SchemaMetadata(1, 1, ""),
-                                          fieldValueMappingList);
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(SchemaBuilder
+                                          .builder()
+                                          .record("arrayMap")
+                                          .fields()
+                                          .name("values")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .map()
+                                                    .values()
+                                                    .stringType()
+                                                    .getValueType())
+                                          .noDefault()
+                                          .endRecord(),
+                                      new SchemaMetadata(1, 1, ""),
+                                      fieldValueMappingList);
 
-        EnrichedRecord message = avroSchemaProcessor.next();
-        assertThat(message)
-            .isNotNull()
-            .isInstanceOf(EnrichedRecord.class)
-            .extracting(EnrichedRecord::getGenericRecord)
-            .isNotNull()
-            .hasFieldOrProperty("values")
-            .extracting("values")
-            .extracting(Arrays::asList)
-            .asList()
-            .hasSize(1);
-        Map<String, String> result = (Map<String, String>) ((GenericRecord) message.getGenericRecord()).get("values");
-        assertThat(result).hasSize(2).containsEntry("n", "1").containsEntry("t", "2");
-    }
+    EnrichedRecord message = avroSchemaProcessor.next();
+    assertThat(message)
+        .isNotNull()
+        .isInstanceOf(EnrichedRecord.class)
+        .extracting(EnrichedRecord::getGenericRecord)
+        .isNotNull()
+        .hasFieldOrProperty("values")
+        .extracting("values")
+        .extracting(Arrays::asList)
+        .asList()
+        .hasSize(1);
+    Map<String, String> result = (Map<String, String>) ((GenericRecord) message.getGenericRecord()).get("values");
+    assertThat(result).hasSize(2).containsEntry("n", "1").containsEntry("t", "2");
+  }
 
 
-    private static Stream<Object> parametersForTestNullOnOptionalField(){
-        return Stream.of(
-            Arguments.of(BASIC_STRING_ARRAY_MAP_NULL, BASIC_STRING_ARRAY_MAP_NULL_FIELDS),
-            Arguments.of(ARRAY_OPTIONAL_NULL, ARRAY_OPTIONAL_NULL_FIELDS),
-            Arguments.of(MAP_OPTIONAL_NULL, MAP_OPTIONAL_NULL_FIELDS)
-        );
-    }
+  private static Stream<Object> parametersForTestNullOnOptionalField(){
+    return Stream.of(
+        Arguments.of(BASIC_STRING_ARRAY_MAP_NULL, BASIC_STRING_ARRAY_MAP_NULL_FIELDS),
+        Arguments.of(ARRAY_OPTIONAL_NULL, ARRAY_OPTIONAL_NULL_FIELDS),
+        Arguments.of(MAP_OPTIONAL_NULL, MAP_OPTIONAL_NULL_FIELDS)
+    );
+  }
 
-    @ParameterizedTest
-    @MethodSource("parametersForTestNullOnOptionalField")
-    void testNullOnOptionalField(Schema schema, List<FieldValueMapping> fieldValueMapping){
-        SchemaMetadata metadata = new SchemaMetadata(1, 1, "");
+  @ParameterizedTest
+  @MethodSource("parametersForTestNullOnOptionalField")
+  void testNullOnOptionalField(Schema schema, List<FieldValueMapping> fieldValueMapping){
+    SchemaMetadata metadata = new SchemaMetadata(1, 1, "");
 
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(schema, metadata, fieldValueMapping);
-        EnrichedRecord message = avroSchemaProcessor.next();
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(schema, metadata, fieldValueMapping);
+    EnrichedRecord message = avroSchemaProcessor.next();
 
-        assertThat(message)
-            .isNotNull()
-            .extracting(EnrichedRecord::getGenericRecord)
-            .isNotNull();
+    assertThat(message)
+        .isNotNull()
+        .extracting(EnrichedRecord::getGenericRecord)
+        .isNotNull();
 
-        GenericRecord record = (GenericRecord) message.getGenericRecord();
-        assertThat(record.get(0)).isNotNull();
-        assertThat(record.get(1)).isNull();
+    GenericRecord record = (GenericRecord) message.getGenericRecord();
+    assertThat(record.get(0)).isNotNull();
+    assertThat(record.get(1)).isNull();
 
-    }
+  }
 
-    private GenericRecord entityForCustomSequenceOfValuesWithSameStartingStartingValue(Schema schema, List<String> idValues, List<String> otherIdValues) {
-        GenericRecord entity = new GenericData.Record(schema);
-        Schema valuesSchema = entity.getSchema().getField("values").schema();
-        Schema valuesDataSchema = valuesSchema.getElementType();
-        List<GenericRecord> valuesData = Streams.zip(idValues.stream(), otherIdValues.stream(), (id, otherId) -> {
-            GenericRecord valuesDataRecord = new GenericData.Record(valuesDataSchema);
-            valuesDataRecord.put("id", id);
-            valuesDataRecord.put("otherId", Long.valueOf(otherId));
-            return valuesDataRecord;
-        }).collect(toList());
+  private GenericRecord entityForCustomSequenceOfValuesWithSameStartingStartingValue(Schema schema, List<String> idValues, List<String> otherIdValues) {
+    GenericRecord entity = new GenericData.Record(schema);
+    Schema valuesSchema = entity.getSchema().getField("values").schema();
+    Schema valuesDataSchema = valuesSchema.getElementType();
+    List<GenericRecord> valuesData = Streams.zip(idValues.stream(), otherIdValues.stream(), (id, otherId) -> {
+      GenericRecord valuesDataRecord = new GenericData.Record(valuesDataSchema);
+      valuesDataRecord.put("id", id);
+      valuesDataRecord.put("otherId", Long.valueOf(otherId));
+      return valuesDataRecord;
+    }).collect(toList());
 
-        entity.put("values", valuesData);
-        return entity;
-    }
+    entity.put("values", valuesData);
+    return entity;
+  }
 
-    @Test
-    @DisplayName("Should process Custom Sequence Of Values With Same Starting Starting Value")
-    void testCustomSequenceOfValuesWithSameStartingStartingValue() {
-        List<FieldValueMapping> fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("values[3].id").fieldType("seq").valueLength(0).fieldValueList("[1,2]").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("values[3].otherId").fieldType("seq").valueLength(0).fieldValueList("[1,3]").required(true).isAncestorRequired(true).build());
+  @Test
+  @DisplayName("Should process Custom Sequence Of Values With Same Starting Starting Value")
+  void testCustomSequenceOfValuesWithSameStartingStartingValue() {
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        FieldValueMapping.builder().fieldName("values[3].id").fieldType("seq").valueLength(0).fieldValueList("[1,2]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("values[3].otherId").fieldType("seq").valueLength(0).fieldValueList("[1,3]").required(true).isAncestorRequired(true).build());
 
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
+                                                             .builder()
+                                                             .record("Root")
+                                                             .fields()
+                                                             .name("values")
+                                                             .type()
+                                                             .array()
+                                                             .items()
+                                                             .type(SchemaBuilder.builder()
+                                                                                .record("valuesData")
+                                                                                .fields()
+                                                                                .name("id")
+                                                                                .type(Schema.Type.STRING.getName())
+                                                                                .noDefault()
+                                                                                .name("otherId")
+                                                                                .type(Schema.Type.LONG.getName())
+                                                                                .noDefault()
+                                                                                .endRecord())
+                                                             .noDefault()
+                                                             .endRecord();
+    GenericRecord entity = entityForCustomSequenceOfValuesWithSameStartingStartingValue(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2", "1"), asList("1", "3", "1"));
+    avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
+                                      new SchemaMetadata(1, 1, ""),
+                                      fieldValueMappingList);
+
+    EnrichedRecord message = avroSchemaProcessor.next();
+
+    assertThat(message.getGenericRecord()).isEqualTo(entity);
+  }
+
+  private GenericRecord entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(Schema schema, List<String> idValues, List<String> idOtherValues) {
+    GenericRecord entity = new GenericData.Record(schema);
+    List<GenericRecord> valuesData = getIdRecordsList(entity, "values", idValues);
+    List<GenericRecord> otherValuesData = getIdRecordsList(entity, "otherValues", idOtherValues);
+
+    entity.put("values", valuesData);
+    entity.put("otherValues", otherValuesData);
+    return entity;
+  }
+
+  private List<GenericRecord> getIdRecordsList(GenericRecord entity, String fieldNameContainingId, List<String> idValues) {
+    Schema schemaArrayContainingId = entity.getSchema().getField(fieldNameContainingId).schema();
+    Schema schemaContainingId = schemaArrayContainingId.getElementType();
+    return idValues.stream().map(id -> {
+      GenericRecord recordContainingId = new GenericData.Record(schemaContainingId);
+      recordContainingId.put("id", new BigDecimal(id));
+      return recordContainingId;
+    }).collect(toList());
+  }
+
+  @Test
+  @DisplayName("Should process Custom Sequence Of Values With Same FieldName In Different Mappings")
+  void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
+    List<FieldValueMapping> fieldValueMappingList = asList(
+        FieldValueMapping.builder().fieldName("values[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,2.44,3.6]").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("otherValues[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,3.02,4.98]").required(true).isAncestorRequired(true).build());
+
+    Schema idSchema = LogicalTypes.decimal(5, 2).addToSchema(SchemaBuilder.builder().bytesBuilder().endBytes());
+
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
+                                                             .builder()
+                                                             .record("Root")
+                                                             .fields()
+                                                             .name("values")
+                                                             .type()
+                                                             .array()
+                                                             .items()
+                                                             .type(SchemaBuilder.builder()
+                                                                                .record("valuesData")
+                                                                                .fields()
+                                                                                .name("id")
+                                                                                .type(idSchema)
+                                                                                .noDefault()
+                                                                                .endRecord())
+                                                             .noDefault()
+                                                             .name("otherValues")
+                                                             .type()
+                                                             .array()
+                                                             .items()
+                                                             .type(SchemaBuilder.builder()
+                                                                                .record("otherValuesData")
+                                                                                .fields()
+                                                                                .name("id")
+                                                                                .type(idSchema)
+                                                                                .noDefault()
+                                                                                .endRecord())
+                                                             .noDefault()
+                                                             .endRecord();
+    GenericRecord entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2.44", "3.6", "1"), asList("1", "3.02", "4.98", "1"));
+    avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
+                                      new SchemaMetadata(1, 1, ""),
+                                      fieldValueMappingList);
+
+    EnrichedRecord message = avroSchemaProcessor.next();
+
+    assertThat(message.getGenericRecord()).isEqualTo(entity);
+  }
+
+  private GenericRecord entityForEnumMappings(Schema schema) {
+    var aggregate = new GenericData.Record(schema);
+    var aggregateAttribute = aggregate.getSchema().getField("aggregateAttribute").schema();
+    var aggregateAttributeRecord = new GenericData.Record(aggregateAttribute);
+    var fruitList = aggregateAttribute.getField("fruitList").schema().getTypes().get(1);
+    var fruitListRecord = new GenericData.Record(fruitList);
+    var fruitArraySc = fruitList.getField("fruits").schema().getTypes().get(1);
+    var fruitArray = new GenericData.Array<>(fruitArraySc, emptyList());
+    var fruit = fruitArraySc.getElementType();
+    var fruitRecord = new GenericData.Record(fruit);
+    var fruitEnumType = fruit.getField("fruitType").schema();
+    var fruitEnumRecord = new GenericData.EnumSymbol(fruitEnumType, "MY_ENUM_1");
+    fruitRecord.put("fruitType", fruitEnumRecord);
+    fruitArray.add(fruitRecord);
+    fruitListRecord.put("fruits", fruitArray);
+    aggregateAttributeRecord.put("fruitList", fruitListRecord);
+    aggregate.put("aggregateAttribute", aggregateAttributeRecord);
+    return aggregate;
+  }
+  @Test
+  @DisplayName("Should process Embedded Avro Schema Processor")
+  void testEnumProcessor() throws IOException {
+    List<FieldValueMapping> fieldValueMappings = singletonList(
+        FieldValueMapping
             .builder()
-            .record("Root")
-            .fields()
-            .name("values")
-            .type()
-            .array()
-            .items()
-            .type(SchemaBuilder.builder()
-                               .record("valuesData")
-                               .fields()
-                               .name("id")
-                               .type(Schema.Type.STRING.getName())
-                               .noDefault()
-                               .name("otherId")
-                               .type(Schema.Type.LONG.getName())
-                               .noDefault()
-                               .endRecord())
-            .noDefault()
-            .endRecord();
-        GenericRecord entity = entityForCustomSequenceOfValuesWithSameStartingStartingValue(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2", "1"), asList("1", "3", "1"));
-        avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
-                                          new SchemaMetadata(1, 1, ""),
-                                          fieldValueMappingList);
+            .fieldName("aggregateAttribute.fruitList.fruits[].fruitType")
+            .fieldType("enum")
+            .fieldValueList("[MY_ENUM_1]")
+            .valueLength(0)
+            .required(true)
+            .isAncestorRequired(true)
+            .build()
+    );
+    File testFile = fileHelper.getFile("/avro-files/optionalEnum.avsc");
+    ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    EnrichedRecord message = avroSchemaProcessor.next();
 
-        EnrichedRecord message = avroSchemaProcessor.next();
-
-        assertThat(message.getGenericRecord()).isEqualTo(entity);
-    }
-
-    private GenericRecord entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(Schema schema, List<String> idValues, List<String> idOtherValues) {
-        GenericRecord entity = new GenericData.Record(schema);
-        List<GenericRecord> valuesData = getIdRecordsList(entity, "values", idValues);
-        List<GenericRecord> otherValuesData = getIdRecordsList(entity, "otherValues", idOtherValues);
-
-        entity.put("values", valuesData);
-        entity.put("otherValues", otherValuesData);
-        return entity;
-    }
-
-    private List<GenericRecord> getIdRecordsList(GenericRecord entity, String fieldNameContainingId, List<String> idValues) {
-        Schema schemaArrayContainingId = entity.getSchema().getField(fieldNameContainingId).schema();
-        Schema schemaContainingId = schemaArrayContainingId.getElementType();
-        return idValues.stream().map(id -> {
-            GenericRecord recordContainingId = new GenericData.Record(schemaContainingId);
-            recordContainingId.put("id", new BigDecimal(id));
-            return recordContainingId;
-        }).collect(toList());
-    }
-
-    @Test
-    @DisplayName("Should process Custom Sequence Of Values With Same FieldName In Different Mappings")
-    void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
-        List<FieldValueMapping> fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("values[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,2.44,3.6]").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("otherValues[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,3.02,4.98]").required(true).isAncestorRequired(true).build());
-
-        Schema idSchema = LogicalTypes.decimal(5, 2).addToSchema(SchemaBuilder.builder().bytesBuilder().endBytes());
-
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        Schema schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
-            .builder()
-            .record("Root")
-            .fields()
-            .name("values")
-            .type()
-            .array()
-            .items()
-            .type(SchemaBuilder.builder()
-                               .record("valuesData")
-                               .fields()
-                               .name("id")
-                               .type(idSchema)
-                               .noDefault()
-                               .endRecord())
-            .noDefault()
-            .name("otherValues")
-            .type()
-            .array()
-            .items()
-            .type(SchemaBuilder.builder()
-                               .record("otherValuesData")
-                               .fields()
-                               .name("id")
-                               .type(idSchema)
-                               .noDefault()
-                               .endRecord())
-            .noDefault()
-            .endRecord();
-        GenericRecord entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2.44", "3.6", "1"), asList("1", "3.02", "4.98", "1"));
-        avroSchemaProcessor.processSchema(schemaWithTwoSequencesWithSameStartingValue,
-                                          new SchemaMetadata(1, 1, ""),
-                                          fieldValueMappingList);
-
-        EnrichedRecord message = avroSchemaProcessor.next();
-
-        assertThat(message.getGenericRecord()).isEqualTo(entity);
-    }
-
-    private GenericRecord entityForEnumMappings(Schema schema) {
-        var aggregate = new GenericData.Record(schema);
-        var aggregateAttribute = aggregate.getSchema().getField("aggregateAttribute").schema();
-        var aggregateAttributeRecord = new GenericData.Record(aggregateAttribute);
-        var fruitList = aggregateAttribute.getField("fruitList").schema().getTypes().get(1);
-        var fruitListRecord = new GenericData.Record(fruitList);
-        var fruitArraySc = fruitList.getField("fruits").schema().getTypes().get(1);
-        var fruitArray = new GenericData.Array<>(fruitArraySc, emptyList());
-        var fruit = fruitArraySc.getElementType();
-        var fruitRecord = new GenericData.Record(fruit);
-        var fruitEnumType = fruit.getField("fruitType").schema();
-        var fruitEnumRecord = new GenericData.EnumSymbol(fruitEnumType, "MY_ENUM_1");
-        fruitRecord.put("fruitType", fruitEnumRecord);
-        fruitArray.add(fruitRecord);
-        fruitListRecord.put("fruits", fruitArray);
-        aggregateAttributeRecord.put("fruitList", fruitListRecord);
-        aggregate.put("aggregateAttribute", aggregateAttributeRecord);
-        return aggregate;
-    }
-    @Test
-    @DisplayName("Should process Embedded Avro Schema Processor")
-    void testEnumProcessor() throws IOException {
-        List<FieldValueMapping> fieldValueMappings = singletonList(
-            FieldValueMapping
-                .builder()
-                .fieldName("aggregateAttribute.fruitList.fruits[].fruitType")
-                .fieldType("enum")
-                .fieldValueList("[MY_ENUM_1]")
-                .valueLength(0)
-                .required(true)
-                .isAncestorRequired(true)
-                .build()
-        );
-        File testFile = fileHelper.getFile("/avro-files/optionalEnum.avsc");
-        ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
-        AvroSchemaProcessor avroSchemaProcessor = new AvroSchemaProcessor();
-        avroSchemaProcessor.processSchema(parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
-        EnrichedRecord message = avroSchemaProcessor.next();
-
-        var entity = entityForEnumMappings((Schema) parsedSchema.rawSchema());
-        assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-        assertThat(message.getGenericRecord()).isNotNull();
-    }
+    var entity = entityForEnumMappings((Schema) parsedSchema.rawSchema());
+    assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
+    assertThat(message.getGenericRecord()).isNotNull();
+  }
 }
