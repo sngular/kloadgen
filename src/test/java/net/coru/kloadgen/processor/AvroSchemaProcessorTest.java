@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Streams;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import net.coru.kloadgen.exception.KLoadGenException;
@@ -403,12 +403,14 @@ class AvroSchemaProcessorTest {
     final var entity = new GenericData.Record(schema);
     final var valuesSchema = entity.getSchema().getField("values").schema();
     final var valuesDataSchema = valuesSchema.getElementType();
-    final var valuesData = Streams.zip(idValues.stream(), otherIdValues.stream(), (id, otherId) -> {
-      final var valuesDataRecord = new GenericData.Record(valuesDataSchema);
-      valuesDataRecord.put("id", id);
-      valuesDataRecord.put("otherId", Long.valueOf(otherId));
-      return valuesDataRecord;
-    }).collect(Collectors.toList());
+    final var valuesData = IntStream
+                               .range(0, Math.min(idValues.size(), otherIdValues.size()))
+                               .mapToObj(idx -> {
+                                 final var valuesDataRecord = new GenericData.Record(valuesDataSchema);
+                                 valuesDataRecord.put("id", idValues.get(idx));
+                                 valuesDataRecord.put("otherId", Long.valueOf(otherIdValues.get(idx)));
+                                 return valuesDataRecord;
+                               }).collect(Collectors.toList());
 
     entity.put("values", valuesData);
     return entity;
