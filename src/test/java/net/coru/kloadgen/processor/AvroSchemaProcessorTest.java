@@ -521,7 +521,7 @@ class AvroSchemaProcessorTest {
     var fruit = fruitArraySc.getElementType();
     var fruitRecord = new GenericData.Record(fruit);
     var fruitEnumType = fruit.getField("fruitType").schema();
-    var fruitEnumRecord = new GenericData.EnumSymbol(fruitEnumType, "MY_ENUM_1");
+    var fruitEnumRecord = new GenericData.EnumSymbol(fruitEnumType.getTypes().get(1), "MY_ENUM_1");
     fruitRecord.put("fruitType", fruitEnumRecord);
     fruitArray.add(fruitRecord);
     fruitListRecord.put("fruits", fruitArray);
@@ -535,7 +535,7 @@ class AvroSchemaProcessorTest {
     List<FieldValueMapping> fieldValueMappings = singletonList(
         FieldValueMapping
             .builder()
-            .fieldName("aggregateAttribute.fruitList.fruits[].fruitType")
+            .fieldName("aggregateAttribute.fruitList.fruits[1].fruitType")
             .fieldType("enum")
             .fieldValueList("[MY_ENUM_1]")
             .valueLength(0)
@@ -551,6 +551,6 @@ class AvroSchemaProcessorTest {
 
     var entity = entityForEnumMappings((Schema) parsedSchema.rawSchema());
     assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
-    assertThat(message.getGenericRecord()).isNotNull();
+    assertThat(message.getGenericRecord()).isNotNull().isEqualTo(entity);
   }
 }
