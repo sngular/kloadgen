@@ -38,6 +38,31 @@ class AvroExtractorTest {
   }
 
   @Test
+  @DisplayName("Should extract Optional Enum")
+  void testOptionalEnum() throws Exception {
+
+    String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
+    ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    Schema schema = (Schema) parsedSchema.rawSchema();
+
+    List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+
+    assertThat(fieldValueMappingList)
+        .hasSize(1)
+        .containsExactlyInAnyOrder(
+            FieldValueMapping
+                .builder()
+                .fieldName("aggregateAttribute.fruitList.fruits[].fruitType")
+                .fieldType("enum")
+                .fieldValueList("")
+                .valueLength(0)
+                .required(true)
+                .isAncestorRequired(true)
+                .build()
+        );
+  }
+
+  @Test
   @DisplayName("Should extract Optional Map with Array/Record")
   void testFlatPropertiesOptionalMapArray() throws Exception {
 
