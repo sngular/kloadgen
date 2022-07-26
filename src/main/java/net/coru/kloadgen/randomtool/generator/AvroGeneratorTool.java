@@ -97,7 +97,8 @@ public class AvroGeneratorTool {
 
   private Object getEnumOrGenerate(final String fieldName, final String fieldType, final Schema schema, final List<String> parameterList, final String fieldValueMappingType) {
     final Object value;
-    if ("ENUM".equalsIgnoreCase(fieldValueMappingType)) {
+
+    if ("ENUM".equalsIgnoreCase(fieldType)) {
       if (parameterList.isEmpty()) {
         final List<String> enumValueList = schema.getEnumSymbols();
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
