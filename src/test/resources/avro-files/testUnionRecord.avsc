@@ -65,7 +65,8 @@
                               "type":[
                                  "null",
                                  "ValidateInnerObject"
-                              ]
+                              ],
+                              "default": null
                            }
                         ],
                         "name":"InnerPrice",
