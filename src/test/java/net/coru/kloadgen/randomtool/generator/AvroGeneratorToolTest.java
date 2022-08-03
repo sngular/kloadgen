@@ -6,9 +6,6 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -126,7 +123,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
+    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest
@@ -143,15 +140,15 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, constraints)).isEqualTo(expected);
+    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, constraints)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
     return Stream.of(
-        Arguments.of("int", 5, emptyList(), new Field("name", SchemaBuilder.builder().intType())),
-        Arguments.of("long", 6, emptyList(), new Field("name", SchemaBuilder.builder().longType())),
-        Arguments.of("float", 5, emptyList(), new Field("name", SchemaBuilder.builder().floatType())),
-        Arguments.of("double", 6, emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
+        Arguments.of("int", 5, Collections.emptyList(), new Field("name", SchemaBuilder.builder().intType())),
+        Arguments.of("long", 6, Collections.emptyList(), new Field("name", SchemaBuilder.builder().longType())),
+        Arguments.of("float", 5, Collections.emptyList(), new Field("name", SchemaBuilder.builder().floatType())),
+        Arguments.of("double", 6, Collections.emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
   }
 
   @Disabled
@@ -167,7 +164,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    Object number = new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap());
+    Object number = new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap());
     assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
     assertThat(String.valueOf(number)).hasSize(valueLength);
   }
@@ -203,7 +200,7 @@ class AvroGeneratorToolTest {
                                                            .build();
     AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
-      intList.add(avroGeneratorTool.generateObject(field, fieldValueMapping, emptyMap()));
+      intList.add(avroGeneratorTool.generateObject(field.schema(), fieldValueMapping, Collections.emptyMap()));
     }
     assertThat(intList).containsExactlyElementsOf(expected);
   }
@@ -226,7 +223,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap()))
+    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap()))
         .hasFieldOrPropertyWithValue("symbol", expected);
   }
 
@@ -253,7 +250,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
+    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
@@ -325,7 +322,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,Collections.emptyMap()))
+    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping,Collections.emptyMap()))
         .isEqualTo(expected);
   }
 
@@ -345,7 +342,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field, fieldValueMapping,constraints))
+    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping,constraints))
         .isEqualTo(expected);
   }
 }

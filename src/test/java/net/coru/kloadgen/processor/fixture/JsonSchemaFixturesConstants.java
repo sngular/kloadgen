@@ -687,5 +687,97 @@ public class JsonSchemaFixturesConstants {
                        .build()
   ));
 
+  public static final List<FieldValueMapping> SIMPLE_SCHEMA_REQUIRED = new ArrayList<FieldValueMapping>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("firstName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("Diana")
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {{
+                         put(MINIMUM_VALUE, "0");
+                         put(MAXIMUM_VALUE, "0");
+                       }})
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("lastName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("García")
+                       .required(true)
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {{
+                         put(MINIMUM_VALUE, "0");
+                         put(MAXIMUM_VALUE, "0");
+                       }})
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("age")
+                       .fieldType("int")
+                       .valueLength(0)
+                       .fieldValueList("2")
+                       .required(true)
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build()
+  ));
+
+  public static final String SIMPLE_SCHEMA_REQUIRED_EXPECTED = "{\"firstName\": \"Diana\",\"lastName\":\"García\"  ,\"age\":2}";
+
+
+
+  public static final List<FieldValueMapping> SCHEMA_NESTED_ITERATION = new ArrayList<FieldValueMapping>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("flowers[:]")
+                       .fieldType("string-map")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("null")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("flowers[:].name[]")
+                       .fieldType("string-array")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("Edelweiss")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("bush[:]")
+                       .fieldType("string-map")
+                       .valueLength(0)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("null")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("bush[:].maxHeight[2][:]")
+                       .fieldType("int-map-array")
+                       .valueLength(4)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("asdf:14")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("bush[:].leafs[][3:][]")
+                       .fieldType("string-array-map-array")
+                       .valueLength(8)
+                       .required(true)
+                       .isAncestorRequired(true)
+                       .fieldValueList("oval")
+                       .constraints(new HashMap<ConstraintTypeEnum, String>() {
+                       })
+                       .build()
+  ));
+
 
 }

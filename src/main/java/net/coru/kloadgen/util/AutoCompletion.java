@@ -17,6 +17,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
+
 import net.coru.kloadgen.exception.KLoadGenException;
 
 /* This work is hereby released into the Public Domain.
@@ -60,7 +61,7 @@ public class AutoCompletion extends PlainDocument {
       }
     });
     editorKeyListener = new KeyAdapter() {
-      public void keyPressed(KeyEvent e) {
+      public void keyPressed(final KeyEvent e) {
         if (comboBox.isDisplayable()) {
           comboBox.setPopupVisible(true);
         }

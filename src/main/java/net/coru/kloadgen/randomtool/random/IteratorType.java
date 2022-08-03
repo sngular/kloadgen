@@ -10,17 +10,17 @@ import java.util.function.Supplier;
 
 class IteratorType<T> {
 
-    private final Supplier<T> getDefaultForType;
+  private final Supplier<T> getDefaultForType;
 
-    public IteratorType(Supplier<T> getDefaultForType) {
-        this.getDefaultForType = getDefaultForType;
-    }
+  public IteratorType(final Supplier<T> getDefaultForType) {
+    this.getDefaultForType = getDefaultForType;
+  }
 
-    public static <T> IteratorType<T> of(Supplier<T> getDefaultForType) {
-        return new IteratorType<T>(getDefaultForType);
-    }
+  public static <T> IteratorType<T> of(final Supplier<T> getDefaultForType) {
+    return new IteratorType<T>(getDefaultForType);
+  }
 
-    Object getDefaultForType() {
-        return getDefaultForType.get();
-    }
+  Object getDefaultForType() {
+    return getDefaultForType.get();
+  }
 }

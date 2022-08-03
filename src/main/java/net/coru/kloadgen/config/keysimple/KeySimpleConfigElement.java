@@ -79,8 +79,8 @@ public final class KeySimpleConfigElement extends ConfigTestElement implements T
       return false;
     }
     final KeySimpleConfigElement that = (KeySimpleConfigElement) o;
-    return Objects.equals(getKeyValue(), that.getKeyValue()) && Objects.equals(getKeyType(), that.getKeyType()) &&
-           Objects.equals(getKeySerializerConfiguration(), that.getKeySerializerConfiguration());
+    return Objects.equals(getKeyValue(), that.getKeyValue()) && Objects.equals(getKeyType(), that.getKeyType())
+           && Objects.equals(getKeySerializerConfiguration(), that.getKeySerializerConfiguration());
   }
 
   @Override

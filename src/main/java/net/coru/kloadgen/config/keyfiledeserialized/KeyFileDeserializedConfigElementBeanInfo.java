@@ -40,10 +40,8 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(KeyFileDeserializedConfigElement.class);
 
-    createPropertyGroup("key_deserialized_load_generator", new String[]{
-        KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION,
-        KEY_SCHEMA_PROPERTIES
-    });
+    createPropertyGroup("key_deserialized_load_generator",
+                        new String[]{KEY_DESERIALIZER_PROPERTY, KEY_SCHEMA_TYPE, KEY_SUBJECT_NAME, KEY_SCHEMA_DEFINITION, KEY_SCHEMA_PROPERTIES});
 
     final PropertyDescriptor serializerPropertyProps = property(KEY_DESERIALIZER_PROPERTY);
     serializerPropertyProps.setPropertyEditorClass(KeyDeserializerPropertyEditor.class);
@@ -72,16 +70,8 @@ public class KeyFileDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     final TypeEditor tableEditor = TypeEditor.TableEditor;
     final PropertyDescriptor tableProperties = property(KEY_SCHEMA_PROPERTIES, tableEditor);
     tableProperties.setValue(TableEditor.CLASSNAME, FieldValueMapping.class.getName());
-    tableProperties.setValue(TableEditor.HEADERS,
-                             new String[]{
-                               "Field Name",
-                               "Field Type"
-                             });
-    tableProperties.setValue(TableEditor.OBJECT_PROPERTIES,
-                             new String[]{
-                               FieldValueMapping.FIELD_NAME,
-                               FieldValueMapping.FIELD_TYPE
-                             });
+    tableProperties.setValue(TableEditor.HEADERS, new String[]{"Field Name", "Field Type"});
+    tableProperties.setValue(TableEditor.OBJECT_PROPERTIES, new String[]{FieldValueMapping.FIELD_NAME, FieldValueMapping.FIELD_TYPE});
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
   }

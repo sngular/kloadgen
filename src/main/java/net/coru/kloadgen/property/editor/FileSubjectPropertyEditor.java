@@ -113,7 +113,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         subjectNameComboBox.removeAllItems();
         subjectNameComboBox.addItem(parserSchema.name());
         subjectNameComboBox.setSelectedItem(parserSchema.name());
-      } catch (IOException e) {
+      } catch (final IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
                                       JOptionPane.ERROR_MESSAGE);
         log.error(e.getMessage(), e);

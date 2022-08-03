@@ -13,10 +13,11 @@ import java.util.Map;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
-import net.coru.kloadgen.processor.AvroSchemaProcessor;
+import net.coru.kloadgen.processor.SchemaProcessor;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
 
@@ -24,16 +25,16 @@ import org.apache.avro.Schema;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class AvroSRLoadGenerator implements SRLoadGenerator, BaseLoadGenerator {
 
-  private final AvroSchemaProcessor avroSchemaProcessor;
+  private final SchemaProcessor avroSchemaProcessor;
 
   public AvroSRLoadGenerator() {
-    avroSchemaProcessor = new AvroSchemaProcessor();
+    avroSchemaProcessor = new SchemaProcessor();
   }
 
   public void setUpGenerator(final Map<String, String> originals, final String avroSchemaName, final List<FieldValueMapping> fieldExprMappings) {
     try {
       final var schema = retrieveSchema(originals, avroSchemaName);
-      this.avroSchemaProcessor.processSchema(schema.getRight(), schema.getLeft(), fieldExprMappings);
+      this.avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, schema.getRight(), schema.getLeft(), fieldExprMappings);
     } catch (final IOException | RestClientException exc) {
       log.error("Please make sure that properties data type and expression function return type are compatible with each other", exc);
       throw new KLoadGenException(exc);
@@ -42,11 +43,11 @@ public final class AvroSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
 
   public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final Schema.Parser parser = new Schema.Parser();
-    this.avroSchemaProcessor.processSchema(parser.parse(schema), new SchemaMetadata(1, 1, schema), fieldExprMappings);
+    this.avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parser.parse(schema), new SchemaMetadata(1, 1, schema), fieldExprMappings);
   }
 
   public EnrichedRecord nextMessage() {
-    return avroSchemaProcessor.next();
+    return (EnrichedRecord) avroSchemaProcessor.next();
   }
 
 

@@ -35,6 +35,8 @@ public final class KLoadGenStandalone {
 
   private static final Logger LOG = Logger.getLogger("KLoadGenStandalone");
 
+  private KLoadGenStandalone() {}
+
   public static void main(final String... args) {
     final var options = createCLIOptions();
 

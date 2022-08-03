@@ -33,9 +33,7 @@ public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(ValueDeserializedConfigElement.class);
 
-    createPropertyGroup("value_deserialized_load_generator", new String[]{
-      VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE
-    });
+    createPropertyGroup("value_deserialized_load_generator", new String[]{VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE});
 
     final PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);
     nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);

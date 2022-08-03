@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>4.12.2</version>
+  <version>4.13.0</version>
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial data based on Data specification</description>
   <url>https://corunet.github.io/kloadgen/</url>
@@ -25,7 +25,7 @@
     <developer>
       <id>jegarcia</id>
       <name>Jose Enrique Garcia Maciñeiras</name>
-      <email>jegarcia@corunet.com</email>
+      <email>joseenrique.garcia@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
@@ -59,7 +59,7 @@
     <developer>
       <id>rivarsal</id>
       <name>Pablo José López Rivadulla</name>
-      <email>plopez@corunet.com</email>
+      <email>pablo.lopezr@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
@@ -70,7 +70,7 @@
     <developer>
       <id>fcampostato</id>
       <name>Fernando Campos Tato</name>
-      <email>fcampos@corunet.com</email>
+      <email>fernando.campos@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
@@ -81,7 +81,7 @@
     <developer>
       <id>jmejutovazquez</id>
       <name>Javier Mejuto Vázquez</name>
-      <email>jmejuto@corunet.com</email>
+      <email>javier.mejuto@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
@@ -92,7 +92,7 @@
     <developer>
       <id>mcabezasp</id>
       <name>Miguel Cabezas Puerto</name>
-      <email>mcabezas@corunet.com</email>
+      <email>miguel.cabezas@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
@@ -103,7 +103,7 @@
     <developer>
       <id>irodigl</id>
       <name>Isabel Rodríguez Iglesias</name>
-      <email>irodriguez@corunet.com</email>
+      <email>isabel.rodriguez@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
@@ -114,7 +114,7 @@
     <developer>
       <id>IsaUlloa</id>
       <name>Isabel López Ulloa</name>
-      <email>ilopez@corunet.com</email>
+      <email>isabel.lopez@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
@@ -136,11 +136,33 @@
     <developer>
       <id>jgbriz</id>
       <name>Juan García Briz</name>
-      <email>jgarciab@corunet.com</email>
+      <email>juan.garcia@sngular.com</email>
       <organization>Corunet</organization>
       <organizationUrl>https://corunet.github.io/</organizationUrl>
       <roles>
         <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>Mike Ortiz</id>
+      <name>Miguel Ángel Ortiz Amores</name>
+      <email>miguel.ortiz@sngular.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Senior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>dianaGomezGar</id>
+      <name>Diana Gómez García</name>
+      <email>diana.gomez@sngular.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
@@ -166,6 +188,7 @@
   <properties>
     <assertj-core.version>3.22.0</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
+    <jsonassert.version>1.5.1</jsonassert.version>
     <avro.version>1.11.0</avro.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <commons-collections4.version>4.4</commons-collections4.version>
@@ -355,6 +378,12 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <version>${assertj-core.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.skyscreamer</groupId>
+      <artifactId>jsonassert</artifactId>
+      <version>${jsonassert.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -1,30 +1,36 @@
 package net.coru.kloadgen.processor;
 
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_COMPLEX_COLLECTIONS;
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SCHEMA_NESTED_COLLECTIONS;
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA;
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_EXPECTED;
-import static net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants.SIMPLE_SCHEMA_MAP;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import net.coru.kloadgen.common.SchemaTypeEnum;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class JsonSchemaProcessorTest {
+
+  private static Stream<Object> parametersForTestNullOnOptionalField() {
+    return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_EXPECTED));
+  }
+
+  private static Stream<Object> parametersForTestBasicStructure() {
+    return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED_EXPECTED));
+  }
 
   @BeforeEach
   public void setUp() {
@@ -36,57 +42,79 @@ public class JsonSchemaProcessorTest {
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
-  private static Stream<Object> parametersForTestNullOnOptionalField() {
-    return Stream.of(
-        Arguments.of(SIMPLE_SCHEMA , SIMPLE_SCHEMA_EXPECTED)
-    );
-  }
-
   @ParameterizedTest
   @MethodSource("parametersForTestNullOnOptionalField")
   void testNullOnOptionalField(List<FieldValueMapping> schemaAsJson, String expected) {
 
-    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
 
-    jsonSchemaProcessor.processSchema(schemaAsJson);
-    ObjectNode message = jsonSchemaProcessor.next();
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
-    assertThat(message.toString()).hasToString(expected);
+    JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
   }
 
   @Test
   void testNullOnMapWithChildren() {
-    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
-    jsonSchemaProcessor.processSchema(SIMPLE_SCHEMA_MAP);
-    ObjectNode message = jsonSchemaProcessor.next();
 
-    assertThat(message.toString()).contains("lastName\":\"García")
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_MAP);
+
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+
+    Assertions.assertThat(message.toString()).contains("lastName\":\"García")
                                   .contains("itemTipo\":{").contains("itemType\":{");
-
   }
 
   @Test
   void testNullOnNestedCollections() {
-    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
-    jsonSchemaProcessor.processSchema(SCHEMA_NESTED_COLLECTIONS);
-    ObjectNode message = jsonSchemaProcessor.next();
 
-    assertThat(message.toString()).contains("fruits\":[").contains("vegetables\":{")
-                                  .contains("\"birds\":[").contains("\"animals\":{");
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SCHEMA_NESTED_COLLECTIONS);
+
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+
+    Assertions.assertThat(message.toString()).contains("fruits\":[").contains("vegetables\":{").contains("\"birds\":[").contains("\"animals\":{");
 
   }
 
   @Test
   void testNullOnComplexCollections() {
-    JsonSchemaProcessor jsonSchemaProcessor = new JsonSchemaProcessor();
-    jsonSchemaProcessor.processSchema(SCHEMA_COMPLEX_COLLECTIONS);
-    ObjectNode message = jsonSchemaProcessor.next();
 
-    assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SCHEMA_COMPLEX_COLLECTIONS);
+
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+
+    Assertions.assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
                                   .contains("\"birds\":[[{\"nameBird\":")
                                   .contains("\"animals\":{").contains("nameAnimal\":");
 
   }
+  
+  @ParameterizedTest
+  @MethodSource("parametersForTestBasicStructure")
+  void testBasicStructure(List<FieldValueMapping> schemaAsJson, String expected) {
 
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+
+    JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
+  }
+
+  @Test
+  void testNestedComplexLevels() {
+
+    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SCHEMA_NESTED_ITERATION);
+
+    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+
+    Assertions.assertThat(message.toString()).containsPattern("^\\{\"flowers\":\\{(\"\\w+\":\\{\"name\":\\[(\"Edelweiss\",?)+],?)+.*");
+    Assertions.assertThat(message.toString()).containsPattern(
+        ".*\\\"bush\":\\{\"\\w+\":\\{\"maxHeight\":(\\[(\\{(\"\\w+\":\\d+,?)+},?)+],?)*\"leafs\":(\\[\\{(\"\\w+\":\\[(\"oval\",?)+],?)+}+],+)*.*$");
+  }
 
 }

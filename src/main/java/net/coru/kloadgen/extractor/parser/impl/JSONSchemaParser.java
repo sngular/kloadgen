@@ -303,6 +303,7 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildDefinitionObjectField(final String fieldName, final JsonNode jsonNode, final JsonNode definitions, final Boolean required, final Boolean isParentObject) {
+    final Field returnField;
     final List<Field> properties = new ArrayList<>();
     if (Objects.nonNull(jsonNode.get(PROPERTIES))) {
       final JsonNode requiredList = jsonNode.path(REQUIRED);
@@ -312,28 +313,29 @@ public class JSONSchemaParser implements SchemaParser {
       CollectionUtils.collect(jsonNode.path(PROPERTIES).fields(),
                               field -> buildDefinition(field.getKey(), field.getValue(), definitions, strRequired.contains(field.getKey()), true), properties);
       if (required != null) {
-        return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).isFieldRequired(required).build();
+        returnField = ObjectField.builder().name(fieldName).properties(properties).required(strRequired).isFieldRequired(required).build();
       } else {
-        return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).build();
+        returnField = ObjectField.builder().name(fieldName).properties(properties).required(strRequired).build();
       }
     } else if (!jsonNode.path(ADDITIONAL_PROPERTIES).isNull() && !jsonNode.path(ADDITIONAL_PROPERTIES).isEmpty()) {
       final Field internalMapField = buildDefinition(INTERNAL_MAP_FIELD, jsonNode.path(ADDITIONAL_PROPERTIES), definitions, required, null);
-      return MapField.builder().name(fieldName).mapType(internalMapField).isFieldRequired(checkRequiredCollection(isParentObject, required)).build();
+      returnField = MapField.builder().name(fieldName).mapType(internalMapField).isFieldRequired(checkRequiredCollection(isParentObject, required)).build();
     } else if (Objects.nonNull(jsonNode.get(REF))) {
       final String referenceName = extractRefName(jsonNode);
       if (definitionsMap.containsKey(referenceName)) {
-        return definitionsMap.get(referenceName).cloneField(fieldName);
+        returnField = definitionsMap.get(referenceName).cloneField(fieldName);
       } else if (CYCLING_SET.add(referenceName)) {
-        return extractDefinition(referenceName, definitions, required, isParentObject);
+        returnField = extractDefinition(referenceName, definitions, required, isParentObject);
       } else {
-        return null;
+        returnField = null;
       }
     } else {
       final List<Field> fieldList = new ArrayList<>();
       jsonNode.fields()
               .forEachRemaining(property -> fieldList.add(buildProperty(property.getKey(), property.getValue())));
-      return ObjectField.builder().name(fieldName).properties(fieldList).build();
+      returnField = ObjectField.builder().name(fieldName).properties(fieldList).build();
     }
+    return returnField;
   }
 
   private boolean isRefNodeSupported(final JsonNode jsonNode) {
@@ -605,6 +607,7 @@ public class JSONSchemaParser implements SchemaParser {
   }
 
   private Field buildObjectField(final String fieldName, final JsonNode jsonNode, final Boolean required, final Boolean isParentObject) {
+    final Field returnField;
     final List<Field> properties = new ArrayList<>();
     final JsonNode requiredList = jsonNode.path(REQUIRED);
     final List<String> strRequired = new ArrayList<>();
@@ -617,28 +620,27 @@ public class JSONSchemaParser implements SchemaParser {
                                 field -> buildProperty(field.getKey(), field.getValue(), strRequired.contains(field.getKey()), true),
                                 properties);
         if (required != null) {
-          return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).isFieldRequired(required).build();
+          returnField = ObjectField.builder().name(fieldName).properties(properties).required(strRequired).isFieldRequired(required).build();
         } else {
-          return ObjectField.builder().name(fieldName).properties(properties).required(strRequired).build();
+          returnField = ObjectField.builder().name(fieldName).properties(properties).required(strRequired).build();
         }
       } else {
         final JsonNode fieldReaded = jsonNode.path(ADDITIONAL_PROPERTIES);
         final Field field2 = buildProperty(INTERNAL_MAP_FIELD, fieldReaded, false);
-        return MapField.builder().name(fieldName).mapType(field2).isFieldRequired(checkRequiredCollection(isParentObject, required)).build();
+        returnField = MapField.builder().name(fieldName).mapType(field2).isFieldRequired(checkRequiredCollection(isParentObject, required)).build();
       }
 
 
     } else {
-      final Field result;
       if (Objects.nonNull(jsonNode.get(ANY_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ANY_OF);
+        returnField = chooseAnyOf(fieldName, jsonNode, ANY_OF);
       } else if (Objects.nonNull(jsonNode.get(ALL_OF))) {
-        result = chooseAnyOf(fieldName, jsonNode, ALL_OF);
+        returnField = chooseAnyOf(fieldName, jsonNode, ALL_OF);
       } else {
-        result = chooseAnyOf(fieldName, jsonNode, ONE_OF);
+        returnField = chooseAnyOf(fieldName, jsonNode, ONE_OF);
       }
-      return result;
     }
+    return returnField;
   }
 
   private Field buildObjectField(final String fieldName, final List<Field> properties, final Boolean required) {
