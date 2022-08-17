@@ -103,9 +103,15 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   public final Object createValueObject(
       final SchemaProcessorPOJO pojo) {
     final Schema fieldSchema = findSchema(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
-
+    final String valueType;
+    final boolean logicalType = Objects.nonNull(fieldSchema.getLogicalType());
+    if (!logicalType) {
+      valueType = SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType());
+    } else {
+      valueType = pojo.getValueType();
+    }
     final Object valueObject = AVRO_GENERATOR_TOOL.generateObject(Objects.requireNonNull(fieldSchema), pojo.getCompleteFieldName(),
-                                                                  SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
+                                                                  valueType, pojo.getValueLength(),
                                                                   pojo.getFieldValuesList(), extractConstraints(fieldSchema));
 
     return assignObject(pojo.getRootFieldName(), pojo.getFieldNameSubEntity(), valueObject);
