@@ -10,6 +10,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,22 +47,24 @@ class RandomSequenceTest {
   private static Stream<Arguments> parametersForGenerateRandomValueWithList() {
     return Stream.of(
             Arguments.of(18,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")),
-            Arguments.of(20,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20", "1", "2")));
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")));
   }
 
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value With a List of Values")
   @MethodSource("parametersForGenerateRandomValueWithList")
-  void testGenerateRandomValueWithList(final int size, final List<String> values, final List<String> expected) {
-    final var intList = new ArrayList<>();
-    final var context = new HashMap<String, Object>();
-    for (int i=0; i <= size; i++) {
-      intList.add(RandomSequence.generateSequenceForFieldValueList("ClientCode", "seq", values, context));
-    }
-    assertThat(intList).containsExactlyElementsOf(expected);
+  void testGenerateRandomValueWithList(final int size, final List<String> values) {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      final var intList = new ArrayList<>();
+      final var context = new HashMap<String, Object>();
+      for (int i=0; i <= size; i++) {
+        intList.add(RandomSequence.generateSeq("ClientCode", "seq", values, context));
+      }
+    });
+
+    String expectedMessage = "Sequences do not accept more than one option as initial value";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
   }
 }
