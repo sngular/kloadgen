@@ -45,7 +45,7 @@ public final class RandomSequence {
   }
 
   private static Object getFirstValueOrDefaultForType(final List<String> fieldValueList, final String fieldType) {
-    Object result;
+    final Object result;
     if (!fieldValueList.isEmpty()) {
       result = ValueUtils.castValue(fieldValueList.get(0), fieldType);
     } else {

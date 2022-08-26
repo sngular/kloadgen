@@ -10,8 +10,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Assertions;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -54,7 +53,7 @@ class RandomSequenceTest {
   @DisplayName("Testing Generate a Random Value With a List of Values")
   @MethodSource("parametersForGenerateRandomValueWithList")
   void testGenerateRandomValueWithList(final int size, final List<String> values) {
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+    final Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
       final var intList = new ArrayList<>();
       final var context = new HashMap<String, Object>();
       for (int i=0; i <= size; i++) {
@@ -62,9 +61,9 @@ class RandomSequenceTest {
       }
     });
 
-    String expectedMessage = "Sequences do not accept more than one option as initial value";
-    String actualMessage = exception.getMessage();
+    final String expectedMessage = "Sequences do not accept more than one option as initial value";
+    final String actualMessage = exception.getMessage();
 
-    assertTrue(actualMessage.contains(expectedMessage));
+    Assertions.assertTrue(actualMessage.contains(expectedMessage));
   }
 }
