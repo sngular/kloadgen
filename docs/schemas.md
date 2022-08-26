@@ -86,13 +86,15 @@ A special type has also been created, `seq`, to allow creating a custom sequence
 
 In order to create a sequence, you need to specify `seq` as **Field Type**.
 
-> In previous versions (up to 4.0.0), typing `{` in **Field Value List** was another requirement in order to create sequences. This is no longer required or supported.
+> In previous versions (up to 4.0.0), typing `{` in **Field Values List** was another requirement in order to create sequences. This is no longer required or supported.
 
 | Type | Details                                                             |  Returns |
 |----------|-------------------------------------------------------------------------------|--------|
 | seq | Generates a numeric sequence starting in 1. Will cast to the AVRO Field Type. | Returns a sequence starting in 1 |
 
-**Note:** If you want to specify a starting value, put it in the first position in the **Field Values List** field. The other values within the field will be considered constants for this field and converted to the corresponding field type.
+**Note:** If you want to specify a starting value, put it in the **Field Values List** field.
+
+> Sequences don't accept more than one value in the **Field Values List** field.
 
 > Keep in mind to avoid Cast exceptions.
 
