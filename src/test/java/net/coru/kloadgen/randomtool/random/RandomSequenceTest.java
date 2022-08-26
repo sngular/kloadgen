@@ -10,8 +10,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Assertions;
 
+import org.junit.jupiter.api.Assertions;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
