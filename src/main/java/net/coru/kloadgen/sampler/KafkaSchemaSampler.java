@@ -16,6 +16,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JOptionPane;
+
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
@@ -25,6 +27,7 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.serializer.ProtobufSerializer;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.PropsKeysHelper;
+import nonapi.io.github.classgraph.json.JSONUtils;
 import org.apache.avro.Conversions;
 import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;
@@ -40,37 +43,34 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
-
   private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
-
   private static final long serialVersionUID = 1L;
-
   private final transient StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
-
   private transient KafkaProducer<Object, Object> producer;
-
   private String topic;
-
   private String msgKeyType;
-
   private List<String> msgKeyValue;
-
+  private List<String> msgValue;
   private boolean keyMessageFlag = false;
-
   private transient BaseLoadGenerator generator;
-
   private transient BaseLoadGenerator keyGenerator;
-
   private transient Properties props;
 
   @Override
   public void setupTest(final JavaSamplerContext context) {
     props = properties(context);
-    generator = SamplerUtil.configureValueGenerator(props);
+
+    if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(PropsKeysHelper.VALUE_SUBJECT_NAME))) {
+      generator = SamplerUtil.configureValueGenerator(props);
+    } else {
+      msgValue = Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_VALUE));
+    }
 
     configGenericData();
 
@@ -82,7 +82,7 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
       } else {
         msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
         msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
-            ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+                        ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
       }
     } else {
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
@@ -136,7 +136,22 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
     final var sampleResult = new SampleResult();
     sampleResult.sampleStart();
     final var jMeterContext = JMeterContextService.getContext();
-    final var messageVal = generator.nextMessage();
+    final EnrichedRecord messageVal;
+    if (null != generator) {
+      messageVal = generator.nextMessage();
+    } else {
+      final String valueStrTmp = statelessGeneratorTool.generateObject("value", "string", 0, msgValue).toString();
+      final String valueStr;
+      try {
+        JSONObject jsonObject = new JSONObject(valueStrTmp);
+        valueStr = jsonObject.toString();
+      } catch (JSONException e) {
+        super.getNewLogger().error("Invalid JSON input value: " + e);
+        throw new KLoadGenException(e);
+      }
+      messageVal = EnrichedRecord.builder().genericRecord(valueStr).build();
+    }
+
     final var kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
     if (Objects.nonNull(messageVal)) {
