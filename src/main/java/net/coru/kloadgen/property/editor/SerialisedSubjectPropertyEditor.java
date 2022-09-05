@@ -183,7 +183,8 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
 
   private Predicate<FieldValueMapping> compare(final FieldValueMapping fieldValue2) {
     return fieldValue -> fieldValue.getFieldName().equalsIgnoreCase(fieldValue2.getFieldName())
-                         && fieldValue.getFieldType().equalsIgnoreCase(fieldValue2.getFieldType());
+                         && fieldValue.getFieldType().equalsIgnoreCase(fieldValue2.getFieldType())
+                        && fieldValue.getRequired().equals(fieldValue2.getRequired());
   }
 
 }
