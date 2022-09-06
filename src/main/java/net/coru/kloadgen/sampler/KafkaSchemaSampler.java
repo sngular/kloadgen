@@ -140,15 +140,7 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
     if (null != generator) {
       messageVal = generator.nextMessage();
     } else {
-      final String valueStrTmp = statelessGeneratorTool.generateObject("value", "string", 0, msgValue).toString();
-      final String valueStr;
-      try {
-        JSONObject jsonObject = new JSONObject(valueStrTmp);
-        valueStr = jsonObject.toString();
-      } catch (JSONException e) {
-        super.getNewLogger().error("Invalid JSON input value: " + e);
-        throw new KLoadGenException(e);
-      }
+      final String valueStr = statelessGeneratorTool.generateObject("value", "string", 0, msgValue).toString();
       messageVal = EnrichedRecord.builder().genericRecord(valueStr).build();
     }
 
