@@ -34,7 +34,7 @@ public class ProtoBufGeneratorTool {
     final List value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
-        value.add(RandomSequence.generateSequenceForFieldValueList(fieldName, fieldType, parameterList, context));
+        value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, context));
       } else {
         for (int i = arraySize; i > 0; i--) {
           value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, context));
