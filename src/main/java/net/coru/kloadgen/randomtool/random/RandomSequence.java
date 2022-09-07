@@ -35,22 +35,17 @@ public final class RandomSequence {
   }
 
   public static Object generateSeq(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
+    if (!fieldValueList.isEmpty() && fieldValueList.size() > 1) {
+      throw new IllegalArgumentException("Sequences do not accept more than one option as initial value");
+    }
     return context.compute(fieldName, (fieldNameMap, seqObject) ->
         seqObject == null
             ? getFirstValueOrDefaultForType(fieldValueList, fieldType)
             : addOneCasted(seqObject, fieldType));
   }
 
-  public static Object generateSequenceForFieldValueList(final String fieldName, final String fieldType, final List<String> fieldValueList, final Map<String, Object> context) {
-    final var index = (Integer) context.compute(fieldName, (fieldNameMap, seqObject) -> seqObject == null ? 0 : (((Integer) seqObject) + 1) % fieldValueList.size());
-    return ValueUtils.castValue(fieldValueList.get(index), fieldType);
-  }
-
   private static Object getFirstValueOrDefaultForType(final List<String> fieldValueList, final String fieldType) {
-    Object result = null;
-    if (isTypeNotSupported(fieldType)) {
-      throw new IllegalArgumentException("Field type is not supported for sequences");
-    }
+    final Object result;
     if (!fieldValueList.isEmpty()) {
       result = ValueUtils.castValue(fieldValueList.get(0), fieldType);
     } else {

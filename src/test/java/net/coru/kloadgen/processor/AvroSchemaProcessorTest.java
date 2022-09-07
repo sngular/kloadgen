@@ -417,11 +417,11 @@ class AvroSchemaProcessorTest {
   }
 
     @Test
-    @DisplayName("Should process Custom Sequence Of Values With Same Starting Starting Value")
-    void testCustomSequenceOfValuesWithSameStartingStartingValue() {
+    @DisplayName("Should process Custom Iterator Of Values With Same Starting Value")
+    void testCustomSequenceOfValuesWithSameStartingValue() {
       final var fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("values[3].id").fieldType("seq").valueLength(0).fieldValueList("[1,2]").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("values[3].otherId").fieldType("seq").valueLength(0).fieldValueList("[1,3]").required(true).isAncestorRequired(true).build());
+            FieldValueMapping.builder().fieldName("values[3].id").fieldType("it").valueLength(0).fieldValueList("[1,2]").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("values[3].otherId").fieldType("it").valueLength(0).fieldValueList("[1,3]").required(true).isAncestorRequired(true).build());
 
       final var avroSchemaProcessor = new SchemaProcessor();
       final var schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
@@ -454,7 +454,7 @@ class AvroSchemaProcessorTest {
       Assertions.assertThat(message.getGenericRecord()).isEqualTo(entity);
     }
 
-  private GenericRecord entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(final Schema schema, final List<String> idValues, final List<String> idOtherValues) {
+  private GenericRecord entityForCustomIteratorOfValuesWithSameFieldNameInDifferentMappings(final Schema schema, final List<String> idValues, final List<String> idOtherValues) {
     final var entity = new GenericData.Record(schema);
     final var valuesData = getIdRecordsList(entity, "values", idValues);
     final var otherValuesData = getIdRecordsList(entity, "otherValues", idOtherValues);
@@ -475,16 +475,16 @@ class AvroSchemaProcessorTest {
     }
 
     @Test
-    @DisplayName("Should process Custom Sequence Of Values With Same FieldName In Different Mappings")
-    void testCustomSequenceOfValuesWithSameFieldNameInDifferentMappings() {
+    @DisplayName("Should process Custom Iterator Of Values With Same FieldName In Different Mappings")
+    void testCustomIteratorOfValuesWithSameFieldNameInDifferentMappings() {
       final var fieldValueMappingList = asList(
-            FieldValueMapping.builder().fieldName("values[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,2.44,3.6]").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("otherValues[4].id").fieldType("seq").valueLength(0).fieldValueList("[1,3.02,4.98]").required(true).isAncestorRequired(true).build());
+            FieldValueMapping.builder().fieldName("values[4].id").fieldType("it").valueLength(0).fieldValueList("[1,2.44,3.6]").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("otherValues[4].id").fieldType("it").valueLength(0).fieldValueList("[1,3.02,4.98]").required(true).isAncestorRequired(true).build());
 
     final var idSchema = LogicalTypes.decimal(5, 2).addToSchema(SchemaBuilder.builder().bytesBuilder().endBytes());
 
       final var avroSchemaProcessor = new SchemaProcessor();
-      final var schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
+      final var schemaWithTwoIteratorsWithSameStartingValue = SchemaBuilder
             .builder()
             .record("Root")
             .fields()
@@ -513,8 +513,8 @@ class AvroSchemaProcessorTest {
                                .endRecord())
             .noDefault()
             .endRecord();
-      final var entity = entityForCustomSequenceOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoSequencesWithSameStartingValue, asList("1", "2.44", "3.6", "1"), asList("1", "3.02", "4.98", "1"));
-        avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, schemaWithTwoSequencesWithSameStartingValue,
+      final var entity = entityForCustomIteratorOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoIteratorsWithSameStartingValue, asList("1", "2.44", "3.6", "1"), asList("1", "3.02", "4.98", "1"));
+        avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, schemaWithTwoIteratorsWithSameStartingValue,
                                           new SchemaMetadata(1, 1, ""),
                                           fieldValueMappingList);
 

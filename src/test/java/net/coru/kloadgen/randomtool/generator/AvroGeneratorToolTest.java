@@ -169,7 +169,7 @@ class AvroGeneratorToolTest {
     assertThat(String.valueOf(number)).hasSize(valueLength);
   }
 
-  private static Stream<Arguments> parametersForGenerateFieldValuesListSequence() {
+  private static Stream<Arguments> parametersForGenerateFieldValuesListIterator() {
     return Stream.of(
         Arguments.of(18,
                      List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
@@ -186,15 +186,15 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
-  @DisplayName("Testing generate a sequence of a list of values")
-  @MethodSource("parametersForGenerateFieldValuesListSequence")
+  @DisplayName("Testing generate an iterator of a list of values")
+  @MethodSource("parametersForGenerateFieldValuesListIterator")
   void testGenerateFieldValuesListSequence(int size, List<String> fieldValuesList, String fieldType, List<Object> expected) {
     var intList = new ArrayList<>();
     Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
     Field field = new Field("name", schema);
     FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
-                                                           .fieldType("seq")
+                                                           .fieldType("it")
                                                            .valueLength(0)
                                                            .fieldValueList(String.join(",", fieldValuesList))
                                                            .build();
@@ -229,7 +229,7 @@ class AvroGeneratorToolTest {
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
     return Stream.of(
-        Arguments.of("seq", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), "0"),
+        Arguments.of("seq", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().intType()), 0),
         Arguments.of("seq", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
         Arguments.of("seq", 1, Collections.singletonList("2"), new Field("name", SchemaBuilder.builder().intType()), 2),
         Arguments.of("it", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), "0"),

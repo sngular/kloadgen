@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.groovy.util.Maps;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -45,22 +46,24 @@ class RandomSequenceTest {
   private static Stream<Arguments> parametersForGenerateRandomValueWithList() {
     return Stream.of(
             Arguments.of(18,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")),
-            Arguments.of(20,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20", "1", "2")));
+                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "14", "17", "17", "17", "17", "18", "19", "20")));
   }
 
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value With a List of Values")
   @MethodSource("parametersForGenerateRandomValueWithList")
-  void testGenerateRandomValueWithList(final int size, final List<String> values, final List<String> expected) {
-    final var intList = new ArrayList<>();
-    final var context = new HashMap<String, Object>();
-    for (int i=0; i <= size; i++) {
-      intList.add(RandomSequence.generateSequenceForFieldValueList("ClientCode", "seq", values, context));
-    }
-    assertThat(intList).containsExactlyElementsOf(expected);
+  void testGenerateRandomValueWithList(final int size, final List<String> values) {
+    final Exception exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      final var intList = new ArrayList<>();
+      final var context = new HashMap<String, Object>();
+      for (int i=0; i <= size; i++) {
+        intList.add(RandomSequence.generateSeq("ClientCode", "seq", values, context));
+      }
+    });
+
+    final String expectedMessage = "Sequences do not accept more than one option as initial value";
+    final String actualMessage = exception.getMessage();
+
+    Assertions.assertTrue(actualMessage.contains(expectedMessage));
   }
 }
