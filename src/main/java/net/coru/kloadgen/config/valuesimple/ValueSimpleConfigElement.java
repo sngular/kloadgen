@@ -7,6 +7,7 @@
 package net.coru.kloadgen.config.valuesimple;
 
 import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

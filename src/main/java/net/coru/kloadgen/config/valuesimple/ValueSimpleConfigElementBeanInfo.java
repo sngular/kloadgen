@@ -7,6 +7,7 @@
 package net.coru.kloadgen.config.valuesimple;
 
 import java.beans.PropertyDescriptor;
+
 import net.coru.kloadgen.property.editor.PlainValueSerializerPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 

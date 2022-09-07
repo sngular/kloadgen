@@ -16,8 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JOptionPane;
-
 import net.coru.kloadgen.exception.KLoadGenException;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.HeaderMapping;
@@ -27,7 +25,7 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.serializer.ProtobufSerializer;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.PropsKeysHelper;
-import nonapi.io.github.classgraph.json.JSONUtils;
+
 import org.apache.avro.Conversions;
 import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;
@@ -43,8 +41,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
 

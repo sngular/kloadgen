@@ -9,14 +9,17 @@ package net.coru.kloadgen.config.valuesimple;
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Locale;
+
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
-import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ValueSimpleConfigElementTest {
 
@@ -24,8 +27,8 @@ class ValueSimpleConfigElementTest {
 
   @BeforeEach
   public void setUp() {
-    File file = new File("src/test/resources");
-    String absolutePath = file.getAbsolutePath();
+    final File file = new File("src/test/resources");
+    final String absolutePath = file.getAbsolutePath();
     JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
     jmcx = JMeterContextService.getContext();
     jmcx.setVariables(new JMeterVariables());
@@ -36,13 +39,13 @@ class ValueSimpleConfigElementTest {
   @DisplayName("Should configure Value Simple Properties")
   void iterationStart() {
 
-    ValueSimpleConfigElement valueSimpleConfigElement = new ValueSimpleConfigElement();
+    final ValueSimpleConfigElement valueSimpleConfigElement = new ValueSimpleConfigElement();
     valueSimpleConfigElement.setValue("");
     valueSimpleConfigElement.setValueSerializerConfiguration("org.apache.kafka.common.serialization.StringSerializer");
 
     valueSimpleConfigElement.iterationStart(null);
 
-    var variables = jmcx.getVariables();
+    final var variables = jmcx.getVariables();
 
     assertThat(variables).isNotNull();
     assertThat(variables.entrySet())
