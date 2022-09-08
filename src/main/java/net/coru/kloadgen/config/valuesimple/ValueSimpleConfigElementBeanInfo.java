@@ -13,7 +13,7 @@ import org.apache.jmeter.testbeans.BeanInfoSupport;
 
 public class ValueSimpleConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String VALUE = "value";
+  private static final String VALUE_SCHEMA_PROPERTIES = "valueSchemaProperties";
 
   private static final String VALUE_SERIALIZER_PROPERTY = "valueSerializerConfiguration";
 
@@ -21,9 +21,9 @@ public class ValueSimpleConfigElementBeanInfo extends BeanInfoSupport {
 
     super(ValueSimpleConfigElement.class);
 
-    createPropertyGroup("value_simple_configuration", new String[]{VALUE, VALUE_SERIALIZER_PROPERTY});
+    createPropertyGroup("value_simple_configuration", new String[]{VALUE_SCHEMA_PROPERTIES, VALUE_SERIALIZER_PROPERTY});
 
-    final PropertyDescriptor keyValueProp = property(VALUE);
+    final PropertyDescriptor keyValueProp = property(VALUE_SCHEMA_PROPERTIES);
     keyValueProp.setValue(DEFAULT, "");
     keyValueProp.setValue(NOT_UNDEFINED, Boolean.TRUE);
     keyValueProp.setValue(NOT_EXPRESSION, Boolean.FALSE);
@@ -33,5 +33,6 @@ public class ValueSimpleConfigElementBeanInfo extends BeanInfoSupport {
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
     schemaType.setValue(DEFAULT, "org.apache.kafka.common.serialization.StringSerializer");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
   }
 }

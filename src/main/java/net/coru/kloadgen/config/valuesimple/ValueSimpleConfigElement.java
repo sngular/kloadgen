@@ -24,7 +24,11 @@ import org.apache.jmeter.threads.JMeterVariables;
 @NoArgsConstructor
 public final class ValueSimpleConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
-  private String value;
+  private String valueSchemaProperties;
+
+  private String schema = "NoSchema";
+
+  private String valueSubjectName = "";
 
   private String valueSerializerConfiguration;
 
@@ -32,22 +36,24 @@ public final class ValueSimpleConfigElement extends ConfigTestElement implements
   public void iterationStart(final LoopIterationEvent loopIterationEvent) {
 
     final JMeterVariables variables = JMeterContextService.getContext().getVariables();
-    variables.putObject(PropsKeysHelper.VALUE, getValue());
+    variables.putObject(PropsKeysHelper.VALUE_SUBJECT_NAME, valueSubjectName);
+    variables.putObject(PropsKeysHelper.VALUE_SCHEMA_TYPE, schema);
+    variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, getValueSchemaProperties());
     variables.putObject(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY, getValueSerializerConfiguration());
     variables.putObject(PropsKeysHelper.SIMPLE_VALUED_MESSAGE_KEY, Boolean.TRUE);
   }
 
-  public String getValue() {
-    return getPropertyAsString("value");
+  public String getValueSchemaProperties() {
+    return getPropertyAsString("valueSchemaProperties");
   }
 
   public String getValueSerializerConfiguration() {
     return getPropertyAsString("valueSerializerConfiguration");
   }
 
-  public void setValue(final String value) {
-    setProperty("value", value);
-    this.value = value;
+  public void setValueSchemaProperties(final String value) {
+    setProperty("valueSchemaProperties", value);
+    this.valueSchemaProperties = value;
   }
 
   public void setValueSerializerConfiguration(final String valueSerializerConfiguration) {
@@ -67,12 +73,12 @@ public final class ValueSimpleConfigElement extends ConfigTestElement implements
       return false;
     }
     final ValueSimpleConfigElement that = (ValueSimpleConfigElement) o;
-    return Objects.equals(getValue(), that.getValue())
+    return Objects.equals(getValueSchemaProperties(), that.getValueSchemaProperties())
            && Objects.equals(getValueSerializerConfiguration(), that.getValueSerializerConfiguration());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), getValue(), getValueSerializerConfiguration());
+    return Objects.hash(super.hashCode(), getValueSchemaProperties(), getValueSerializerConfiguration());
   }
 }
