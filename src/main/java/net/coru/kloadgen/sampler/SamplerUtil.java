@@ -327,23 +327,12 @@ public final class SamplerUtil {
       props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, valueNameStrategy);
     }
 
-    if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).toLowerCase())) {
-        generator = new JsonSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
-        generator = new AvroSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
-        generator = new ProtobufLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
-        generator = new PlainTextLoadGenerator();
-        final List<FieldValueMapping> list = new ArrayList<>();
-        list.add(FieldValueMapping.builder().fieldName(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES)).build());
-        props.put(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, list);
-      } else {
-        throw new KLoadGenException("Unsupported Serializer");
-      }
-    } else {
-      generator = new AvroSRLoadGenerator();
+    generator = getLoadGenerator(jMeterVariables);
+
+    if (generator.getClass().equals(PlainTextLoadGenerator.class)) {
+      final List<FieldValueMapping> list = new ArrayList<>();
+      list.add(FieldValueMapping.builder().fieldName(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES)).build());
+      props.put(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, list);
     }
 
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
@@ -451,4 +440,28 @@ public final class SamplerUtil {
     }
     return headersSB;
   }
+
+  private static BaseLoadGenerator getLoadGenerator(final JMeterVariables jMeterVariables) {
+    final BaseLoadGenerator generator;
+
+    if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
+      if (JSON_TYPE_SET.contains(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).toLowerCase())) {
+        generator = new JsonSRLoadGenerator();
+      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
+        generator = new AvroSRLoadGenerator();
+      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+        generator = new ProtobufLoadGenerator();
+      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
+        generator = new PlainTextLoadGenerator();
+      } else {
+        throw new KLoadGenException("Unsupported Serializer");
+      }
+    } else {
+      generator = new AvroSRLoadGenerator();
+    }
+
+    return generator;
+  }
+
+
 }
