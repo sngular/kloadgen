@@ -441,17 +441,17 @@ public final class SamplerUtil {
     return headersSB;
   }
 
-  private static BaseLoadGenerator getLoadGenerator(final JMeterVariables jMeterVariables) {
+  private static BaseLoadGenerator getLoadGenerator(final JMeterVariables jmeterVariables) {
     final BaseLoadGenerator generator;
 
-    if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).toLowerCase())) {
+    if (Objects.nonNull(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
+      if (JSON_TYPE_SET.contains(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).toLowerCase())) {
         generator = new JsonSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
+      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
         generator = new AvroSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
         generator = new ProtobufLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
+      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
         generator = new PlainTextLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");
