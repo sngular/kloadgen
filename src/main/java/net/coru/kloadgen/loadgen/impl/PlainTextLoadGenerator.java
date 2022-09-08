@@ -9,6 +9,7 @@ package net.coru.kloadgen.loadgen.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
@@ -29,8 +30,9 @@ public final class PlainTextLoadGenerator implements SRLoadGenerator, BaseLoadGe
   public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     this.fieldExprMappings = fieldExprMappings;
   }
+
   public EnrichedRecord nextMessage() {
-    FieldValueMapping fieldValueMapping = fieldExprMappings.get(0);
+    final FieldValueMapping fieldValueMapping = fieldExprMappings.get(0);
     return EnrichedRecord.builder().genericRecord(fieldValueMapping.getFieldName()).build();
   }
 

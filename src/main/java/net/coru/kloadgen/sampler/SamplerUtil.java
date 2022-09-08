@@ -336,7 +336,7 @@ public final class SamplerUtil {
         generator = new ProtobufLoadGenerator();
       } else if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
         generator = new PlainTextLoadGenerator();
-        List<FieldValueMapping> list = new ArrayList<>();
+        final List<FieldValueMapping> list = new ArrayList<>();
         list.add(FieldValueMapping.builder().fieldName(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES)).build());
         props.put(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, list);
       } else {
@@ -369,10 +369,10 @@ public final class SamplerUtil {
           throw exc;
         }
       }
-    } else if (Objects.nonNull(jMeterVariables.getObject(PropsKeysHelper.SIMPLE_VALUED_MESSAGE_KEY))){
+    } else if (Objects.nonNull(jMeterVariables.getObject(PropsKeysHelper.SIMPLE_VALUED_MESSAGE_KEY))) {
       generator.setUpGenerator(
-        jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
-        (List<FieldValueMapping>) props.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+          jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
+          (List<FieldValueMapping>) props.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
     } else {
       generator.setUpGenerator(
           jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
