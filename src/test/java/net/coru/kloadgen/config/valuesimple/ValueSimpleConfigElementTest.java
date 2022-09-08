@@ -52,7 +52,7 @@ class ValueSimpleConfigElementTest {
         .hasSize(5)
         .containsExactlyInAnyOrder(new SimpleEntry<>("value.schema.properties", ""),
                                    new SimpleEntry<>("value.subject.name", ""),
-                                   new SimpleEntry<>("value.schema.type","NoSchema"),
+                                   new SimpleEntry<>("value.schema.type", "NoSchema"),
                                    new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
                                    new SimpleEntry<>("simple.valued.message", true));
   }
