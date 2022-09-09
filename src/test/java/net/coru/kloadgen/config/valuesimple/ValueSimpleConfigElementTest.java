@@ -38,7 +38,7 @@ class ValueSimpleConfigElementTest {
   void iterationStart() {
 
     final ValueSimpleConfigElement valueSimpleConfigElement = new ValueSimpleConfigElement();
-    valueSimpleConfigElement.setValue("");
+    valueSimpleConfigElement.setValueSchemaProperties("");
     valueSimpleConfigElement.setValueSerializerConfiguration("org.apache.kafka.common.serialization.StringSerializer");
 
     valueSimpleConfigElement.iterationStart(null);
@@ -47,8 +47,10 @@ class ValueSimpleConfigElementTest {
 
     Assertions.assertThat(variables).isNotNull();
     Assertions.assertThat(variables.entrySet())
-              .hasSize(3)
-              .containsExactlyInAnyOrder(new SimpleEntry<>("value", ""),
+              .hasSize(5)
+              .containsExactlyInAnyOrder(new SimpleEntry<>("value.schema.properties", ""),
+                                         new SimpleEntry<>("value.subject.name", ""),
+                                         new SimpleEntry<>("value.schema.type", "NoSchema"),
                                    new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
                                    new SimpleEntry<>("simple.valued.message", true));
   }

@@ -51,7 +51,6 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
   private String topic;
   private String msgKeyType;
   private List<String> msgKeyValue;
-  private List<String> msgValue;
   private boolean keyMessageFlag = false;
   private transient BaseLoadGenerator generator;
   private transient BaseLoadGenerator keyGenerator;
@@ -61,11 +60,7 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
   public void setupTest(final JavaSamplerContext context) {
     props = properties(context);
 
-    if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(PropsKeysHelper.VALUE_SUBJECT_NAME))) {
-      generator = SamplerUtil.configureValueGenerator(props);
-    } else {
-      msgValue = Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_VALUE));
-    }
+    generator = SamplerUtil.configureValueGenerator(props);
 
     configGenericData();
 
@@ -131,14 +126,7 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
     final var sampleResult = new SampleResult();
     sampleResult.sampleStart();
     final var jMeterContext = JMeterContextService.getContext();
-    final EnrichedRecord messageVal;
-    if (null != generator) {
-      messageVal = generator.nextMessage();
-    } else {
-      final String valueStr = statelessGeneratorTool.generateObject("value", "string", 0, msgValue).toString();
-      messageVal = EnrichedRecord.builder().genericRecord(valueStr).build();
-    }
-
+    final var messageVal = generator.nextMessage();
     final var kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
     if (Objects.nonNull(messageVal)) {
