@@ -21,8 +21,6 @@ import org.apache.jmeter.testbeans.BeanInfoSupport;
 
 public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
-  private static final String VALUE_SCHEMA_PROPERTIES = "valueSchemaProperties";
-
   private static final String VALUE_SCHEMA_TYPE = "valueSchemaType";
 
   private static final String VALUE_DESERIALIZER_PROPERTY = "valueDeSerializerConfiguration";
@@ -33,7 +31,7 @@ public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
 
     super(ValueDeserializedConfigElement.class);
 
-    createPropertyGroup("value_deserialized_load_generator", new String[]{VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_PROPERTIES, VALUE_SCHEMA_TYPE});
+    createPropertyGroup("value_deserialized_load_generator", new String[]{VALUE_NAME_STRATEGY, VALUE_DESERIALIZER_PROPERTY, VALUE_SCHEMA_TYPE});
 
     final PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);
     nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
@@ -50,7 +48,7 @@ public class ValueDeserializedConfigElementBeanInfo extends BeanInfoSupport {
     final PropertyDescriptor schemaType = property(VALUE_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
     schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    schemaType.setValue(DEFAULT, "<avro subject>");
+    schemaType.setValue(DEFAULT, "");
     schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
   }
 }

@@ -6,13 +6,12 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -34,8 +33,8 @@ class RandomArrayTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateArrayRandomValue")
-  void generateArrayRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Object expected) {
-    assertThat((List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap()))
-        .allMatch(value -> value.equals(expected));
+  void generateArrayRandomValue(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Object expected) {
+    Assertions.assertThat((List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap()))
+              .allMatch(value -> value.equals(expected));
   }
 }

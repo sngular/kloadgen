@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -17,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -69,26 +68,24 @@ class StatelessGeneratorToolTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateRandomValueForField")
   void testGenerateRandomValueForField(
-      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
-      Object expected) {
-    assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
+      final String fieldName, final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Object expected) {
+    Assertions.assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expected);
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateSequenceValueForField")
   void testGenerateSequenceValueForField(
-      String fieldName, String fieldType, Integer valueLength, List<String> fieldValuesList,
-      Object expectedTyped) {
-    assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
+      final String fieldName, final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Object expectedTyped) {
+    Assertions.assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, fieldValuesList)).isEqualTo(expectedTyped);
   }
 
   @ParameterizedTest
   @MethodSource("parametersForShouldRecoverVariableFromContext")
-  void shouldRecoverVariableFromContext(String fieldName, String fieldType, Integer valueLength, String value, Object expected) {
-    JMeterVariables variables = new JMeterVariables();
+  void shouldRecoverVariableFromContext(final String fieldName, final String fieldType, final Integer valueLength, final String value, final Object expected) {
+    final JMeterVariables variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, Collections.singletonList("${VARIABLE}")))
-        .isEqualTo(expected);
+    Assertions.assertThat(new StatelessGeneratorTool().generateObject(fieldName, fieldType, valueLength, Collections.singletonList("${VARIABLE}")))
+              .isEqualTo(expected);
   }
 }

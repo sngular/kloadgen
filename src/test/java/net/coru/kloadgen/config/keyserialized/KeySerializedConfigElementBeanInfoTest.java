@@ -6,12 +6,11 @@
 
 package net.coru.kloadgen.config.keyserialized;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.beans.PropertyDescriptor;
 import java.util.Locale;
 
 import org.apache.jmeter.util.JMeterUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,12 +36,12 @@ class KeySerializedConfigElementBeanInfoTest {
 
   @Test
   void shouldGenerateElements() {
-    PropertyDescriptor[] propertyDescriptors = keySerializedConfigElementBeanInfo.getPropertyDescriptors();
-    assertThat(propertyDescriptors).hasSize(5);
-    assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_NAME_STRATEGY);
-    assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
-    assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_TYPE);
-    assertThat(propertyDescriptors[3].getName()).isEqualTo(KEY_SERIALIZER_CONFIGURATION);
-    assertThat(propertyDescriptors[4].getName()).isEqualTo(KEY_SUBJECT_NAME);
+    final PropertyDescriptor[] propertyDescriptors = keySerializedConfigElementBeanInfo.getPropertyDescriptors();
+    Assertions.assertThat(propertyDescriptors).hasSize(5);
+    Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_NAME_STRATEGY);
+    Assertions.assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
+    Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_TYPE);
+    Assertions.assertThat(propertyDescriptors[3].getName()).isEqualTo(KEY_SERIALIZER_CONFIGURATION);
+    Assertions.assertThat(propertyDescriptors[4].getName()).isEqualTo(KEY_SUBJECT_NAME);
   }
 }

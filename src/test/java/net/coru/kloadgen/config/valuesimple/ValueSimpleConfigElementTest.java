@@ -14,12 +14,10 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ValueSimpleConfigElementTest {
 
@@ -47,10 +45,10 @@ class ValueSimpleConfigElementTest {
 
     final var variables = jmcx.getVariables();
 
-    assertThat(variables).isNotNull();
-    assertThat(variables.entrySet())
-        .hasSize(3)
-        .containsExactlyInAnyOrder(new SimpleEntry<>("value", ""),
+    Assertions.assertThat(variables).isNotNull();
+    Assertions.assertThat(variables.entrySet())
+              .hasSize(3)
+              .containsExactlyInAnyOrder(new SimpleEntry<>("value", ""),
                                    new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
                                    new SimpleEntry<>("simple.valued.message", true));
   }

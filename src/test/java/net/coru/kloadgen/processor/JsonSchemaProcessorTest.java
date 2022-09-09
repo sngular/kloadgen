@@ -33,58 +33,58 @@ public class JsonSchemaProcessorTest {
   }
 
   @BeforeEach
-  public void setUp() {
-    File file = new File("src/test/resources");
-    String absolutePath = file.getAbsolutePath();
+  public final void setUp() {
+    final File file = new File("src/test/resources");
+    final String absolutePath = file.getAbsolutePath();
     JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
-    JMeterContext jmcx = JMeterContextService.getContext();
+    final JMeterContext jmcx = JMeterContextService.getContext();
     jmcx.setVariables(new JMeterVariables());
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
   @ParameterizedTest
   @MethodSource("parametersForTestNullOnOptionalField")
-  void testNullOnOptionalField(List<FieldValueMapping> schemaAsJson, String expected) {
+  final void testNullOnOptionalField(final List<FieldValueMapping> schemaAsJson, final String expected) {
 
-    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
 
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
-    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
   }
 
   @Test
-  void testNullOnMapWithChildren() {
+  final void testNullOnMapWithChildren() {
 
-    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_MAP);
 
-    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).contains("lastName\":\"García")
                                   .contains("itemTipo\":{").contains("itemType\":{");
   }
 
   @Test
-  void testNullOnNestedCollections() {
+  final void testNullOnNestedCollections() {
 
-    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SCHEMA_NESTED_COLLECTIONS);
 
-    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).contains("fruits\":[").contains("vegetables\":{").contains("\"birds\":[").contains("\"animals\":{");
 
   }
 
   @Test
-  void testNullOnComplexCollections() {
+  final void testNullOnComplexCollections() {
 
-    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SCHEMA_COMPLEX_COLLECTIONS);
 
-    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
                                   .contains("\"birds\":[[{\"nameBird\":")
@@ -94,23 +94,23 @@ public class JsonSchemaProcessorTest {
   
   @ParameterizedTest
   @MethodSource("parametersForTestBasicStructure")
-  void testBasicStructure(List<FieldValueMapping> schemaAsJson, String expected) {
+  final void testBasicStructure(final List<FieldValueMapping> schemaAsJson, final String expected) {
 
-    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
 
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
-    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
   }
 
   @Test
-  void testNestedComplexLevels() {
+  final void testNestedComplexLevels() {
 
-    SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, JsonSchemaFixturesConstants.SCHEMA_NESTED_ITERATION);
 
-    ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).containsPattern("^\\{\"flowers\":\\{(\"\\w+\":\\{\"name\":\\[(\"Edelweiss\",?)+],?)+.*");
     Assertions.assertThat(message.toString()).containsPattern(

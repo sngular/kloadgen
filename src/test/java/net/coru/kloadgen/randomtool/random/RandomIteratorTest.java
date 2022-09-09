@@ -6,13 +6,9 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +16,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.groovy.util.Maps;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,23 +26,23 @@ class RandomIteratorTest {
 
   private static Stream<Arguments> parametersForGenerateIteratorValueForField() {
     return Stream.of(
-            Arguments.of("name", "int", emptyList(), new HashMap<>(), null),
-            Arguments.of("name", "float", singletonList("1"), new HashMap<>(), 1f),
-            Arguments.of("name", "long", singletonList("2"), new HashMap<>(), 2L),
-            Arguments.of("name", "bytes_decimal", singletonList("1"), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("1")),
-            Arguments.of("name15", "bytes_decimal", emptyList(), new HashMap<>(Maps.of("name15", new BigDecimal("15"))), null));
+            Arguments.of("name", "int", Collections.emptyList(), new HashMap<>(), null),
+            Arguments.of("name", "float", Collections.singletonList("1"), new HashMap<>(), 1f),
+            Arguments.of("name", "long", Collections.singletonList("2"), new HashMap<>(), 2L),
+            Arguments.of("name", "bytes_decimal", Collections.singletonList("1"), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("1")),
+            Arguments.of("name15", "bytes_decimal", Collections.emptyList(), new HashMap<>(Maps.of("name15", new BigDecimal("15"))), null));
   }
 
   @ParameterizedTest
   @DisplayName("Testing Generate an Iterator With an empty list or a list with one value")
   @MethodSource("parametersForGenerateIteratorValueForField")
-  void testGenerateIteratorValueForField(String fieldName, String fieldType, List<String> fieldValuesList, Map<String, Object> context,
-                                         Object expectedStored) {
-    assertThat(RandomIterator.generateIt(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
+  void testGenerateIteratorValueForField(final String fieldName, final String fieldType, final List<String> fieldValuesList, final Map<String, Object> context,
+      final Object expectedStored) {
+    Assertions.assertThat(RandomIterator.generateIt(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
     if (Objects.isNull(expectedStored)) {
-      assertThat(context).doesNotContainKey(fieldName);
+      Assertions.assertThat(context).doesNotContainKey(fieldName);
     } else {
-      assertThat(context).containsEntry(fieldName, expectedStored);
+      Assertions.assertThat(context).containsEntry(fieldName, expectedStored);
     }
   }
 
@@ -62,12 +59,12 @@ class RandomIteratorTest {
   @ParameterizedTest
   @DisplayName("Testing Generate an Iterator With a List of Values")
   @MethodSource("parametersForGenerateValueWithList")
-  void testGenerateRandomValueWithList(int size, List<String> values, List<String> expected) {
-    var intList = new ArrayList<>();
-    var context = new HashMap<String, Object>();
-    for (int i=0; i <= size; i++) {
+  void testGenerateRandomValueWithList(final int size, final List<String> values, final List<String> expected) {
+    final var intList = new ArrayList<>();
+    final var context = new HashMap<String, Object>();
+    for (int i = 0; i <= size; i++) {
       intList.add(RandomIterator.generateIteratorForFieldValueList("ClientCode", "it", values, context));
     }
-    assertThat(intList).containsExactlyElementsOf(expected);
+    Assertions.assertThat(intList).containsExactlyElementsOf(expected);
   }
 }

@@ -25,7 +25,6 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.serializer.ProtobufSerializer;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.PropsKeysHelper;
-
 import org.apache.avro.Conversions;
 import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;

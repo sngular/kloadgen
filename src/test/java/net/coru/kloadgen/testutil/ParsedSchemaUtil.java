@@ -5,7 +5,7 @@ import java.util.List;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 
-public class ParsedSchemaUtil implements ParsedSchema {
+public final class ParsedSchemaUtil implements ParsedSchema {
 
   @Override
   public String schemaType() {

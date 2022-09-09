@@ -1,18 +1,19 @@
 package net.coru.kloadgen.extractor.parser.fixture;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import net.coru.kloadgen.model.json.ArrayField;
 import net.coru.kloadgen.model.json.BooleanField;
 import net.coru.kloadgen.model.json.DateField;
 import net.coru.kloadgen.model.json.EnumField;
 import net.coru.kloadgen.model.json.IntegerField;
+import net.coru.kloadgen.model.json.MapField;
 import net.coru.kloadgen.model.json.NumberField;
 import net.coru.kloadgen.model.json.ObjectField;
 import net.coru.kloadgen.model.json.Schema;
 import net.coru.kloadgen.model.json.StringField;
-import net.coru.kloadgen.model.json.MapField;
 
 public class JsonSchemaFixturesConstants {
 
@@ -21,7 +22,7 @@ public class JsonSchemaFixturesConstants {
             .id("https://example.com/person.schema.json")
             .name("http://json-schema.org/draft-07/schema#")
             .type("object")
-            .requiredFields(asList("lastName", "age"))
+            .requiredFields(Arrays.asList("lastName", "age"))
             .property(StringField.builder().name("firstName").build())
             .property(StringField.builder().name("lastName").build())
             .property(IntegerField.builder().name("age").build())
@@ -32,7 +33,7 @@ public class JsonSchemaFixturesConstants {
             .id("https://example.com/geographical-location.schema.json")
             .name("http://json-schema.org/draft-07/schema#")
             .type("object")
-            .requiredFields(asList("latitude", "longitude"))
+            .requiredFields(Arrays.asList("latitude", "longitude"))
             .property(NumberField
                           .builder()
                           .name("latitude")
@@ -67,7 +68,7 @@ public class JsonSchemaFixturesConstants {
                                      .property(StringField.builder().name("veggieName").build())
                                      .property(BooleanField.builder().name("veggieLike").build())
                                      .isFieldRequired(false)
-                                     .required(asList("veggieName", "veggieLike"))
+                                     .required(Arrays.asList("veggieName", "veggieLike"))
                                      .build())
                           .isFieldRequired(true)
                           .build())
@@ -77,7 +78,7 @@ public class JsonSchemaFixturesConstants {
                              .property(StringField.builder().name("veggieName").build())
                              .property(BooleanField.builder().name("veggieLike").build())
                              .isFieldRequired(false)
-                             .required(asList("veggieName", "veggieLike"))
+                             .required(Arrays.asList("veggieName", "veggieLike"))
                              .build())
             .build();
 
@@ -87,10 +88,12 @@ public class JsonSchemaFixturesConstants {
             .name("http://json-schema.org/draft-04/schema#")
             .type("object")
             .requiredFields(
-                asList("_id", "userId", "storeId", "snapshotId", "addressId", "addressLine", "alias", "contactInformation", "countryCode", "geopoliticalSubdivisions", "_metadata",
-                       "_entity", "_class", "contactInformation.email", "contactInformation.firstName", "contactInformation.phones", "geopoliticalSubdivisions.level1",
-                       "_metadata.createdAt", "_metadata.createdBy", "_metadata.lastUpdatedAt", "_metadata.lastUpdatedBy", "_metadata.projectVersion", "_metadata.projectName",
-                       "_metadata.schema"))
+                Arrays.asList("_id", "userId", "storeId", "snapshotId", "addressId", "addressLine", "alias", "contactInformation", "countryCode", "geopoliticalSubdivisions",
+                              "_metadata",
+                              "_entity", "_class", "contactInformation.email", "contactInformation.firstName", "contactInformation.phones", "geopoliticalSubdivisions.level1",
+                              "_metadata.createdAt", "_metadata.createdBy", "_metadata.lastUpdatedAt", "_metadata.lastUpdatedBy", "_metadata.projectVersion",
+                              "_metadata.projectName",
+                              "_metadata.schema"))
             .property(StringField.builder().name("_id").build())
             .property(NumberField.builder().name("userId").minimum(1).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
             .property(NumberField.builder().name("storeId").minimum(0).maximum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
@@ -113,12 +116,12 @@ public class JsonSchemaFixturesConstants {
                                                    .builder()
                                                    .property(StringField.builder().name("prefix").maxlength(3).minLength(2).build())
                                                    .property(StringField.builder().name("number").maxlength(6).build())
-                                                   .required(asList("prefix", "number"))
+                                                   .required(Arrays.asList("prefix", "number"))
                                                    .isFieldRequired(false)
                                                    .build())
                                         .isFieldRequired(true)
                                         .build())
-                          .required(asList("email", "firstName", "phones"))
+                          .required(Arrays.asList("email", "firstName", "phones"))
                           .isFieldRequired(true)
                           .build())
             .property(StringField.builder().name("countryCode").maxlength(2).minLength(2).regex("^[a-zA-Z]{2}$").build())
@@ -173,11 +176,11 @@ public class JsonSchemaFixturesConstants {
                           .property(StringField.builder().name("projectName").build())
                           .property(StringField.builder().name("deletedBy").build())
                           .property(NumberField.builder().name("schema").minimum(0).maximum(0).exclusiveMaximum(0).exclusiveMinimum(0).multipleOf(0).build())
-                          .required(asList("createdAt", "createdBy", "lastUpdatedAt", "lastUpdatedBy", "projectVersion", "projectName", "schema"))
+                          .required(Arrays.asList("createdAt", "createdBy", "lastUpdatedAt", "lastUpdatedBy", "projectVersion", "projectName", "schema"))
                           .isFieldRequired(true)
                           .build())
-            .property(EnumField.builder().name("_entity").enumValues(singletonList("AddressSnapshot")).defaultValue("AddressSnapshot").build())
-            .property(EnumField.builder().name("_class").enumValues(singletonList("AddressSnapshot")).defaultValue("AddressSnapshot").build())
+            .property(EnumField.builder().name("_entity").enumValues(Collections.singletonList("AddressSnapshot")).defaultValue("AddressSnapshot").build())
+            .property(EnumField.builder().name("_class").enumValues(Collections.singletonList("AddressSnapshot")).defaultValue("AddressSnapshot").build())
             .build();
 
   public static final Schema MEDIUM_COMPLEX_SCHEMA =
@@ -185,8 +188,8 @@ public class JsonSchemaFixturesConstants {
             .id("")
             .name("http://json-schema.org/draft-04/schema#")
             .type("object")
-            .property(EnumField.builder().name("_class").enumValues(singletonList("OrderPublicDetailDocument")).defaultValue("OrderPublicDetailDocument").build())
-            .property(EnumField.builder().name("_entity").enumValues(singletonList("OrderPublicDetailDocument")).defaultValue("OrderPublicDetailDocument").build())
+            .property(EnumField.builder().name("_class").enumValues(Collections.singletonList("OrderPublicDetailDocument")).defaultValue("OrderPublicDetailDocument").build())
+            .property(EnumField.builder().name("_entity").enumValues(Collections.singletonList("OrderPublicDetailDocument")).defaultValue("OrderPublicDetailDocument").build())
             .property(ObjectField
                           .builder()
                           .name("_metadata")
@@ -199,7 +202,7 @@ public class JsonSchemaFixturesConstants {
                           .property(StringField.builder().name("projectName").build())
                           .property(StringField.builder().name("projectVersion").build())
                           .property(NumberField.builder().name("schema").minimum(0).maximum(0).exclusiveMaximum(0).exclusiveMinimum(0).multipleOf(0).build())
-                          .required(asList("createdAt", "createdBy", "lastUpdatedAt", "lastUpdatedBy"))
+                          .required(Arrays.asList("createdAt", "createdBy", "lastUpdatedAt", "lastUpdatedBy"))
                           .isFieldRequired(true)
                           .build())
             .property(StringField.builder().name("orderId").regex("^(.*)$").build())
@@ -209,19 +212,22 @@ public class JsonSchemaFixturesConstants {
             .property(StringField.builder().name("externalId").regex("^(.*)$").build())
             .property(IntegerField.builder().name("editorId").build())
             .property(
-                EnumField.builder().name("type").enumValues(asList("REGULAR", "REPLACEMENT", "EXCHANGE", "REPOSITION", "ONLINE_EXCHANGE", "STORE_EXCHANGE")).defaultValue("REGULAR")
+                EnumField.builder().name("type").enumValues(Arrays.asList("REGULAR", "REPLACEMENT", "EXCHANGE", "REPOSITION", "ONLINE_EXCHANGE", "STORE_EXCHANGE"))
+                         .defaultValue("REGULAR")
                          .build())
             .property(
-                EnumField.builder().name("status").enumValues(asList("RECEIVED", "VALIDATED", "PREPARING", "SHIPPED", "CLOSED", "CANCELLED")).defaultValue("RECEIVED").build())
+                EnumField.builder().name("status").enumValues(Arrays.asList("RECEIVED", "VALIDATED", "PREPARING", "SHIPPED", "CLOSED", "CANCELLED")).defaultValue("RECEIVED")
+                         .build())
             .property(
-                EnumField.builder().name("fraudStatus").enumValues(asList("NOT_APPLIED", "PENDING", "ACCEPTED", "REQUIRED_REVIEW", "REJECTED")).defaultValue("NOT_APPLIED").build())
-            .property(EnumField.builder().name("stockStatus").enumValues(asList("UNKNOWN", "NOT_APPLIED", "SYNCHRONIZED", "SKIPPED")).defaultValue("UNKNOWN").build())
-            .property(EnumField.builder().name("paymentStatus").enumValues(asList("NOT_APPLIED", "UNKNOWN", "REJECTED", "ACCEPTED")).defaultValue("NOT_APPLIED").build())
-            .property(EnumField.builder().name("paymentSystem").enumValues(asList("UNKNOWN", "ALPHA", "WCS")).defaultValue("UNKNOWN").build())
-            .property(EnumField.builder().name("manualReviewStatus").enumValues(asList("NA", "PENDING", "ACCEPTED", "REFUSED")).defaultValue("NA").build())
+                EnumField.builder().name("fraudStatus").enumValues(Arrays.asList("NOT_APPLIED", "PENDING", "ACCEPTED", "REQUIRED_REVIEW", "REJECTED")).defaultValue("NOT_APPLIED")
+                         .build())
+            .property(EnumField.builder().name("stockStatus").enumValues(Arrays.asList("UNKNOWN", "NOT_APPLIED", "SYNCHRONIZED", "SKIPPED")).defaultValue("UNKNOWN").build())
+            .property(EnumField.builder().name("paymentStatus").enumValues(Arrays.asList("NOT_APPLIED", "UNKNOWN", "REJECTED", "ACCEPTED")).defaultValue("NOT_APPLIED").build())
+            .property(EnumField.builder().name("paymentSystem").enumValues(Arrays.asList("UNKNOWN", "ALPHA", "WCS")).defaultValue("UNKNOWN").build())
+            .property(EnumField.builder().name("manualReviewStatus").enumValues(Arrays.asList("NA", "PENDING", "ACCEPTED", "REFUSED")).defaultValue("NA").build())
             .property(IntegerField.builder().name("customerId").build())
-            .property(EnumField.builder().name("customerType").enumValues(asList("REGISTERED", "GUEST")).defaultValue("REGISTERED").build())
-            .property(EnumField.builder().name("guestAction").enumValues(asList("NO_ACTION", "CONVERSION", "LINK_ACCOUNT")).defaultValue("NO_ACTION").build())
+            .property(EnumField.builder().name("customerType").enumValues(Arrays.asList("REGISTERED", "GUEST")).defaultValue("REGISTERED").build())
+            .property(EnumField.builder().name("guestAction").enumValues(Arrays.asList("NO_ACTION", "CONVERSION", "LINK_ACCOUNT")).defaultValue("NO_ACTION").build())
             .property(StringField.builder().name("locale").regex("^(.*)$").build())
             .property(BooleanField.builder().name("preorder").build())
             .property(BooleanField.builder().name("fastSint").build())
@@ -239,7 +245,7 @@ public class JsonSchemaFixturesConstants {
                                         .property(IntegerField.builder().name("value").build())
                                         .property(StringField.builder().name("currency").regex("^(.*)$").build())
                                         .property(IntegerField.builder().name("exponent").build())
-                                        .required(asList("value", "currency", "exponent"))
+                                        .required(Arrays.asList("value", "currency", "exponent"))
                                         .build())
                           .property(ObjectField
                                         .builder()
@@ -247,21 +253,21 @@ public class JsonSchemaFixturesConstants {
                                         .property(IntegerField.builder().name("value").build())
                                         .property(StringField.builder().name("currency").regex("^(.*)$").build())
                                         .property(IntegerField.builder().name("exponent").build())
-                                        .required(asList("value", "currency", "exponent"))
+                                        .required(Arrays.asList("value", "currency", "exponent"))
                                         .build())
                           .build())
             .property(ObjectField
                           .builder()
                           .name("billing")
-                          .property(EnumField.builder().name("status").enumValues(asList("NOT_APPLIED", "PENDING", "BILLED")).defaultValue("NOT_APPLIED").build())
+                          .property(EnumField.builder().name("status").enumValues(Arrays.asList("NOT_APPLIED", "PENDING", "BILLED")).defaultValue("NOT_APPLIED").build())
                           .property(StringField.builder().name("addressId").regex("^(.*)$").build())
-                          .required(asList("status", "addressId"))
+                          .required(Arrays.asList("status", "addressId"))
                           .build())
             .property(ObjectField
                           .builder()
                           .name("origin")
                           .property(StringField.builder().name("systemCode").regex("^(.*)$").build())
-                          .property(EnumField.builder().name("systemType").enumValues(asList("CHECKOUT", "MPS", "BACKOFFICE", "STORE")).defaultValue("CHECKOUT").build())
+                          .property(EnumField.builder().name("systemType").enumValues(Arrays.asList("CHECKOUT", "MPS", "BACKOFFICE", "STORE")).defaultValue("CHECKOUT").build())
                           .property(StringField.builder().name("systemUser").regex("^(.*)$").build())
                           .property(StringField.builder().name("systemDeviceId").regex("^(.*)$").build())
                           .property(StringField.builder().name("deviceType").regex("^(.*)$").build())
@@ -277,9 +283,10 @@ public class JsonSchemaFixturesConstants {
                                      .property(StringField.builder().name("id").regex("^(.*)$").build())
                                      .property(StringField.builder().name("partNumber").regex("^(.*)$").build())
                                      .property(EnumField.builder().name("type").defaultValue("PRODUCT")
-                                                        .enumValues(asList("PRODUCT", "VIRTUAL_GIFT_CARD", "PHYSICAL_GIFT_CARD", "SHIPPING_COST", "SERVICE")).build())
+                                                        .enumValues(Arrays.asList("PRODUCT", "VIRTUAL_GIFT_CARD", "PHYSICAL_GIFT_CARD", "SHIPPING_COST", "SERVICE")).build())
                                      .property(
-                                         EnumField.builder().name("status").defaultValue("RECEIVED").enumValues(asList("RECEIVED", "PREPARING", "SHIPPED", "CLOSED", "CANCELLED"))
+                                         EnumField.builder().name("status").defaultValue("RECEIVED").enumValues(
+                                                      Arrays.asList("RECEIVED", "PREPARING", "SHIPPED", "CLOSED", "CANCELLED"))
                                                   .build())
                                      .property(StringField.builder().name("statusReason").regex("^(.*)$").build())
                                      .property(StringField.builder().name("statusDatetime").regex("^(.*)$").build())
@@ -289,7 +296,7 @@ public class JsonSchemaFixturesConstants {
                                                    .property(IntegerField.builder().name("value").build())
                                                    .property(StringField.builder().name("currency").regex("^(.*)$").build())
                                                    .property(IntegerField.builder().name("exponent").build())
-                                                   .required(asList("value", "currency", "exponent"))
+                                                   .required(Arrays.asList("value", "currency", "exponent"))
                                                    .isFieldRequired(true)
                                                    .build())
                                      .property(ObjectField
@@ -298,7 +305,7 @@ public class JsonSchemaFixturesConstants {
                                                    .property(IntegerField.builder().name("value").build())
                                                    .property(StringField.builder().name("currency").regex("^(.*)$").build())
                                                    .property(IntegerField.builder().name("exponent").build())
-                                                   .required(asList("value", "currency", "exponent"))
+                                                   .required(Arrays.asList("value", "currency", "exponent"))
                                                    .build())
                                      .property(NumberField.builder().name("taxesPercentage").maximum(0).minimum(0).exclusiveMinimum(0).exclusiveMaximum(0).multipleOf(0).build())
                                      .property(StringField.builder().name("initialMinimumDate").regex("^(.*)$").build())
@@ -309,16 +316,17 @@ public class JsonSchemaFixturesConstants {
                                                    .property(IntegerField.builder().name("value").build())
                                                    .property(StringField.builder().name("currency").regex("^(.*)$").build())
                                                    .property(IntegerField.builder().name("exponent").build())
-                                                   .required(asList("value", "currency", "exponent"))
+                                                   .required(Arrays.asList("value", "currency", "exponent"))
                                                    .build())
                                      .property(ObjectField
                                                    .builder()
                                                    .name("product")
                                                    .property(IntegerField.builder().name("catalogEntryId").build())
                                                    .property(EnumField.builder().name("stockMode")
-                                                                      .enumValues(asList("UNKNOWN", "NORMAL", "TRANSIT_PRESALE", "VIRTUALSTOCK_PRESALE", "SOD_PRESALE", "PREORDER"))
+                                                                      .enumValues(
+                                                                          Arrays.asList("UNKNOWN", "NORMAL", "TRANSIT_PRESALE", "VIRTUALSTOCK_PRESALE", "SOD_PRESALE", "PREORDER"))
                                                                       .defaultValue("UNKNOWN").build())
-                                                   .required(asList("catalogEntryId", "stockMode"))
+                                                   .required(Arrays.asList("catalogEntryId", "stockMode"))
                                                    .build())
                                      .property(ObjectField
                                                    .builder()
@@ -339,21 +347,22 @@ public class JsonSchemaFixturesConstants {
                                                    .property(StringField.builder().name("receiverPhonePrefix").regex("^(.*)$").build())
                                                    .property(StringField.builder().name("receiverPhoneNumber").regex("^(.*)$").build())
                                                    .build())
-                                     .required(asList("id", "type", "pvpAmount", "promotions"))
+                                     .required(Arrays.asList("id", "type", "pvpAmount", "promotions"))
                                      .isFieldRequired(false)
                                      .build())
                           .isFieldRequired(true)
                           .build())
-            .requiredFields(asList("_class", "_entity", "_metadata", "orderId", "storeId", "type", "status", "origin", "orderItems", "_metadata.createdAt", "_metadata.createdBy",
-                                   "_metadata.lastUpdatedAt", "_metadata.lastUpdatedBy", "billing.status", "billing.addressId", "origin.systemType"))
-            .definitions(asList(
+            .requiredFields(
+                Arrays.asList("_class", "_entity", "_metadata", "orderId", "storeId", "type", "status", "origin", "orderItems", "_metadata.createdAt", "_metadata.createdBy",
+                              "_metadata.lastUpdatedAt", "_metadata.lastUpdatedBy", "billing.status", "billing.addressId", "origin.systemType"))
+            .definitions(Arrays.asList(
                              ObjectField
                                  .builder()
                                  .name("amount")
                                  .property(IntegerField.builder().name("value").build())
                                  .property(StringField.builder().name("currency").regex("^(.*)$").build())
                                  .property(IntegerField.builder().name("exponent").build())
-                                 .required(asList("value", "currency", "exponent"))
+                                 .required(Arrays.asList("value", "currency", "exponent"))
                                  .build(),
                              ObjectField
                                  .builder()
@@ -421,7 +430,7 @@ public class JsonSchemaFixturesConstants {
                                                    .build())
                                  .isFieldRequired(true)
                                  .build())
-            .requiredFields(asList("objectOfCollectionsOfBasicTypes", "objectOfCollectionsOfObject"))
+            .requiredFields(Arrays.asList("objectOfCollectionsOfBasicTypes", "objectOfCollectionsOfObject"))
             .build();
 
   public static final Schema NESTED_COLLECTIONS_SCHEMA =
@@ -478,19 +487,19 @@ public class JsonSchemaFixturesConstants {
                                  .property(MapField.builder().name("mapOfStrings").mapType(
                                                        StringField.builder().name("internalMapField").build())
                                                    .isFieldRequired(true).build())
-                                 .required(asList("stringControl", "arrayOfStrings")).isFieldRequired(true).build())
+                                 .required(List.of("stringControl", "arrayOfStrings")).isFieldRequired(true).build())
             .property(ArrayField.builder().name("arrayOfObjects").value(
                                     ObjectField.builder()
                                                .property(StringField.builder().name("stringOfObject").build())
                                                .property(IntegerField.builder().name("numberOfObject").maximum(0).minimum(0).build())
-                                               .required(asList("numberOfObject"))
+                                               .required(List.of("numberOfObject"))
                                                .build())
                                 .isFieldRequired(true).build())
             .property(MapField.builder().name("mapOfObjects").mapType(
                 ObjectField.builder().name("internalMapField")
                            .property(ArrayField.builder().name("arrayOfInternalObject").value(StringField.builder().build())
                                                .isFieldRequired(true).build())
-                           .required(asList("arrayOfInternalObject")).build()
+                           .required(List.of("arrayOfInternalObject")).build()
             ).isFieldRequired(true).build())
             .property(MapField.builder().name("mapOfMaps").mapType(
                 MapField.builder().name("internalMapField").mapType(
@@ -501,15 +510,15 @@ public class JsonSchemaFixturesConstants {
                                        StringField.builder().build()
                                    ).minItems(1).build()
                                ).isFieldRequired(true).build())
-                               .required(asList("stringControlObject")).build()
+                               .required(List.of("stringControlObject")).build()
                 ).build()
             ).isFieldRequired(true).build())
-            .requiredFields(asList("objectOfDefinitions", "objectOfDefinitions.stringControl", "objectOfDefinitions.arrayOfStrings"))
-            .definitions(asList(
+            .requiredFields(Arrays.asList("objectOfDefinitions", "objectOfDefinitions.stringControl", "objectOfDefinitions.arrayOfStrings"))
+            .definitions(Arrays.asList(
                 ObjectField.builder().name("objectDef")
                            .property(StringField.builder().name("stringOfObject").build())
                            .property(IntegerField.builder().name("numberOfObject").maximum(0).minimum(0).build())
-                           .required(asList("numberOfObject"))
+                           .required(List.of("numberOfObject"))
                            .build(),
                 MapField.builder().name("mapOfStringsDef").mapType(StringField.builder().name("internalMapField").build())
                         .build(),
@@ -521,16 +530,19 @@ public class JsonSchemaFixturesConstants {
                                        StringField.builder().build()
                                    ).minItems(1).build()
                                ).isFieldRequired(true).build())
-                               .required(asList("stringControlObject")).build()
+                               .required(List.of("stringControlObject")).build()
                 ).build(),
                 ObjectField.builder().name("objectOfArraysDef")
                            .property(ArrayField.builder().name("arrayOfInternalObject").value(StringField.builder().build())
                                                .isFieldRequired(true).build())
-                           .required(asList("arrayOfInternalObject"))
+                           .required(List.of("arrayOfInternalObject"))
                            .build(),
                 ArrayField.builder().name("arrayOfStringsDef").value(StringField.builder().build())
                           .minItems(1).build()
 
             ))
             .build();
+
+  protected JsonSchemaFixturesConstants() {
+  }
 }
