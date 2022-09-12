@@ -158,7 +158,7 @@ public class ProtoBufExtractor {
   private List<FieldValueMapping> extractDotTypesWhenIsInNestedType(
       final HashMap<String, TypeElement> nestedTypes, final FieldElement subfield, final boolean isArray, final String dotType,
       final List<String> imports, final boolean isRequired, final boolean isAncestorRequired) {
-    List<FieldValueMapping> finalFieldValueMapping = new ArrayList<>();
+    final List<FieldValueMapping> finalFieldValueMapping = new ArrayList<>();
     final List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(dotType), imports);
     for (FieldValueMapping fieldValueMapping : fieldValueMappingList) {
       if (isArray) {
