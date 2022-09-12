@@ -54,19 +54,20 @@ public class JsonExtractor {
   }
 
   private Transformer<FieldValueMapping, FieldValueMapping> fixName(final String fieldName, final String splitter) {
-    final String[] fieldNameClean = new String[1];
     return fieldValue -> {
-      if (fieldName.endsWith("[][]") || fieldName.endsWith("[:][]")) {
-        fieldNameClean[0] = fieldName.substring(0, fieldName.length() - 2);
-      } else if (fieldName.endsWith("[][:]") || fieldName.endsWith("[:][:]")) {
-        fieldNameClean[0] = fieldName.substring(0, fieldName.length() - 3);
-      } else {
-        fieldNameClean[0] = fieldName;
-      }
-
-      fieldValue.setFieldName(fieldNameClean[0] + splitter + fieldValue.getFieldName());
+      fieldValue.setFieldName(extractFieldName(fieldName) + splitter + fieldValue.getFieldName());
       return fieldValue;
     };
+  }
+
+  private static String extractFieldName(final String fieldName) {
+    String fieldNameClean = fieldName;
+    if (fieldName.endsWith("[][]") || fieldName.endsWith("[:][]")) {
+      fieldNameClean = fieldName.substring(0, fieldName.length() - 2);
+    } else if (fieldName.endsWith("[][:]") || fieldName.endsWith("[:][:]")) {
+      fieldNameClean = fieldName.substring(0, fieldName.length() - 3);
+    }
+    return fieldNameClean;
   }
 
   private List<FieldValueMapping> processField(final Field innerField, final Boolean isRootElement, final Boolean isAncestorRequired) {

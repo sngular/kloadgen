@@ -39,11 +39,11 @@ class ProtobufSerializerTest {
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
 
-    final var record = protobufSchemaProcessor.next();
+    final var generatedRecord = protobufSchemaProcessor.next();
 
     final var message = protobufSerializer.serialize("the-topic", EnrichedRecord.builder()
-                                                                          .genericRecord(((EnrichedRecord) record).getGenericRecord())
-                                                                          .schemaMetadata(((EnrichedRecord) record).getSchemaMetadata())
+                                                                          .genericRecord(((EnrichedRecord) generatedRecord).getGenericRecord())
+                                                                          .schemaMetadata(((EnrichedRecord) generatedRecord).getSchemaMetadata())
                                                                           .build());
     Assertions.assertThat(message).isNotNull();
   }

@@ -274,8 +274,9 @@
     <module name="AvoidStaticImport"/>
     <module name="IllegalImport"/>
     <module name="CustomImportOrder">
-      <property name="customImportOrderRules"
-        value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE"/>
+      <property name="customImportOrderRules" value="STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE"/>
+      <property name="specialImportsRegExp" value="^javax\."/>
+      <property name="standardPackageRegExp" value="^java\."/>
       <property name="separateLineBetweenGroups" value="true"/>
       <property name="sortImportsInGroupAlphabetically" value="true"/>
     </module>
@@ -361,11 +362,6 @@
     <module name="AbstractClassName"/>
     <module name="StaticVariableName"/>
     <module name="LocalFinalVariableName"/>
-    <module name="ImportOrder">
-      <property name="groups" value="java,javax"/>
-      <property name="separated" value="true"/>
-      <property name="separatedStaticGroups" value="true"/>
-    </module>
   </module>
   <module name="BeforeExecutionExclusionFileFilter">
     <property name="fileNamePattern" value="module\-info\.java$"/>
