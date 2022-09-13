@@ -14,12 +14,12 @@ import org.apache.commons.io.IOUtils;
 
 public final class FileHelper {
 
-  public File getFile(String fileName) {
-    URL url = this.getClass().getResource(fileName);
+  public File getFile(final String fileName) {
+    final URL url = this.getClass().getResource(fileName);
     return new File(url.getFile());
   }
 
-  public String getContent(String fileName) throws Exception {
+  public String getContent(final String fileName) throws Exception {
     return IOUtils.toString(
         getClass().getResourceAsStream(fileName),
         StandardCharsets.UTF_8

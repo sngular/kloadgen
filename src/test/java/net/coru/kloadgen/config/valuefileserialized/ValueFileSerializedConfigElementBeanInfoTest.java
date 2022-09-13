@@ -6,12 +6,11 @@
 
 package net.coru.kloadgen.config.valuefileserialized;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.beans.PropertyDescriptor;
 import java.util.Locale;
 
 import org.apache.jmeter.util.JMeterUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,13 +38,13 @@ class ValueFileSerializedConfigElementBeanInfoTest {
 
   @Test
   void shouldGenerateElements() {
-    PropertyDescriptor[] propertyDescriptors = valueFileSerializedConfigElementBeanInfo.getPropertyDescriptors();
-    assertThat(propertyDescriptors).hasSize(6);
-    assertThat(propertyDescriptors[0].getName()).isEqualTo(VALUE_NAME_STRATEGY);
-    assertThat(propertyDescriptors[1].getName()).isEqualTo(VALUE_SCHEMA_DEFINITION);
-    assertThat(propertyDescriptors[2].getName()).isEqualTo(VALUE_SCHEMA_PROPERTIES);
-    assertThat(propertyDescriptors[3].getName()).isEqualTo(VALUE_SCHEMA_TYPE);
-    assertThat(propertyDescriptors[4].getName()).isEqualTo(SERIALIZER_PROPERTY);
-    assertThat(propertyDescriptors[5].getName()).isEqualTo(VALUE_SUBJECT_NAME);
+    final PropertyDescriptor[] propertyDescriptors = valueFileSerializedConfigElementBeanInfo.getPropertyDescriptors();
+    Assertions.assertThat(propertyDescriptors).hasSize(6);
+    Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(VALUE_NAME_STRATEGY);
+    Assertions.assertThat(propertyDescriptors[1].getName()).isEqualTo(VALUE_SCHEMA_DEFINITION);
+    Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(VALUE_SCHEMA_PROPERTIES);
+    Assertions.assertThat(propertyDescriptors[3].getName()).isEqualTo(VALUE_SCHEMA_TYPE);
+    Assertions.assertThat(propertyDescriptors[4].getName()).isEqualTo(SERIALIZER_PROPERTY);
+    Assertions.assertThat(propertyDescriptors[5].getName()).isEqualTo(VALUE_SUBJECT_NAME);
   }
 }

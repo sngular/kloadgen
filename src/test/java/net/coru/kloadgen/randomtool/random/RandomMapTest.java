@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.randomtool.random;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +13,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.apache.groovy.util.Maps;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -75,31 +74,29 @@ class RandomMapTest {
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapRandomValueFromList")
   void generateMapRandomValueFromList(
-      String fieldType, Integer valueLength, List<String> fieldValuesList, Map<String, Object> expected,
-      Integer size) {
-    Map.Entry<String, Object>[] expectedMap = expected.entrySet().toArray(new Map.Entry[1]);
-    Map<String, Object> result =
+      final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<String, Object> expected, final Integer size) {
+    final Map.Entry<String, Object>[] expectedMap = expected.entrySet().toArray(new Map.Entry[1]);
+    final Map<String, Object> result =
         (Map<String, Object>) new RandomMap().generateMap(fieldType, valueLength, fieldValuesList, size, Collections.emptyMap());
-    assertThat(result).containsExactly(expectedMap);
+    Assertions.assertThat(result).containsExactly(expectedMap);
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapArrayRandomValueFromList")
-  void generateMapArrayRandomValueFromList(
-      String fieldType, Integer valueLength, List<String> fieldValuesList,
-      List<Map<String, Object>> expected, Integer size) {
+  void generateMapArrayRandomValueFromList(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final List<Map<String, Object>> expected,
+      final Integer size) {
 
-    List<Map<String, Object>> result =
+    final List<Map<String, Object>> result =
         (List<Map<String, Object>>) new RandomMap().generateMap(fieldType, valueLength, fieldValuesList, size, Collections.emptyMap());
-    assertThat(result).containsExactly(expected.get(0));
+    Assertions.assertThat(result).containsExactly(expected.get(0));
   }
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapFixedKeyRandomValue")
-  void generateMapFixedKeyRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Integer size) {
-    String[] expectedKeys = fieldValuesList.toArray(new String[1]);
-    Map<String, Object> result =
+  void generateMapFixedKeyRandomValue(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Integer size) {
+    final String[] expectedKeys = fieldValuesList.toArray(new String[1]);
+    final Map<String, Object> result =
         (Map<String, Object>) new RandomMap().generateMap(fieldType, valueLength, fieldValuesList, size, Collections.emptyMap());
-    assertThat(result).containsKeys(expectedKeys).doesNotContainValue(null);
+    Assertions.assertThat(result).containsKeys(expectedKeys).doesNotContainValue(null);
   }
 }

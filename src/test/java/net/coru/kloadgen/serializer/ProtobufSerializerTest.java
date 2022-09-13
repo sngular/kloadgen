@@ -1,11 +1,8 @@
 package net.coru.kloadgen.serializer;
 
-import static java.util.Arrays.asList;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -16,6 +13,7 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.SchemaProcessor;
 import net.coru.kloadgen.testutil.FileHelper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,22 +29,22 @@ class ProtobufSerializerTest {
 
   @Test
   void serialize() throws IOException, DescriptorValidationException {
-    File testFile = new FileHelper().getFile("/proto-files/easyTest.proto");
-    var fieldValueMappings = asList(
+    final File testFile = new FileHelper().getFile("/proto-files/easyTest.proto");
+    final var fieldValueMappings = Arrays.asList(
         FieldValueMapping.builder().fieldName("street").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("number[]").fieldType("int-array").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(true).build());
 
-    ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(testFile, "Protobuf");
-    SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(testFile, "Protobuf");
+    final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
 
-    var record = protobufSchemaProcessor.next();
+    final var generatedRecord = protobufSchemaProcessor.next();
 
-    var message = protobufSerializer.serialize("the-topic", EnrichedRecord.builder()
-                                                                          .genericRecord(((EnrichedRecord) record).getGenericRecord())
-                                                                          .schemaMetadata(((EnrichedRecord) record).getSchemaMetadata())
+    final var message = protobufSerializer.serialize("the-topic", EnrichedRecord.builder()
+                                                                          .genericRecord(((EnrichedRecord) generatedRecord).getGenericRecord())
+                                                                          .schemaMetadata(((EnrichedRecord) generatedRecord).getSchemaMetadata())
                                                                           .build());
-    assertThat(message).isNotNull();
+    Assertions.assertThat(message).isNotNull();
   }
 }

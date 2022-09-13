@@ -6,26 +6,24 @@
 
 package net.coru.kloadgen.config.kafkaheaders;
 
-import static net.coru.kloadgen.util.ProducerKeysHelper.KAFKA_HEADERS;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collections;
 import java.util.List;
 
+import net.coru.kloadgen.util.ProducerKeysHelper;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class KafkaHeadersConfigElementTest {
 
   @Test
-  public void testIterateStart() {
-    KafkaHeadersConfigElement kafkaHeadersConfigElement = new KafkaHeadersConfigElement();
+  final void testIterateStart() {
+    final var kafkaHeadersConfigElement = new KafkaHeadersConfigElement();
     kafkaHeadersConfigElement.setKafkaHeaders(Collections.emptyList());
     kafkaHeadersConfigElement.iterationStart(null);
 
-    Object kafkaHeaders = JMeterContextService.getContext().getSamplerContext().get(KAFKA_HEADERS);
+    final Object kafkaHeaders = JMeterContextService.getContext().getSamplerContext().get(ProducerKeysHelper.KAFKA_HEADERS);
 
-    assertThat(kafkaHeaders).isNotNull();
-    assertThat(kafkaHeaders).isInstanceOf(List.class);
+    Assertions.assertThat(kafkaHeaders).isNotNull().isInstanceOf(List.class);
   }
 }

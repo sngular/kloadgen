@@ -6,10 +6,9 @@
 
 package net.coru.kloadgen.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -25,32 +24,32 @@ class FieldValueMappingTest {
         .fieldType("String")
         .valueLength(30)
         .fieldValueList(
-            "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}," +
-            "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}")
+            "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]},"
+            + "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}")
         .constraint(ConstraintTypeEnum.MAXIMUM_VALUE, "5")
         .build();
   }
 
   @Test
   void getFieldName() {
-    assertThat(fieldValueMapping).hasFieldOrPropertyWithValue("fieldName", "value");
+    Assertions.assertThat(fieldValueMapping).hasFieldOrPropertyWithValue("fieldName", "value");
   }
 
   @Test
   void getValueLength() {
-    assertThat(fieldValueMapping).hasFieldOrPropertyWithValue("valueLength", 30);
+    Assertions.assertThat(fieldValueMapping).hasFieldOrPropertyWithValue("valueLength", 30);
   }
 
   @Test
   void getFieldType() {
-    assertThat(fieldValueMapping).hasFieldOrPropertyWithValue("fieldType", "String");
+    Assertions.assertThat(fieldValueMapping).hasFieldOrPropertyWithValue("fieldType", "String");
   }
 
   @Test
   void getFieldValuesList() {
-    assertThat(fieldValueMapping.getFieldValuesList())
-        .hasSize(2)
-        .containsExactlyElementsOf(List.of(
+    Assertions.assertThat(fieldValueMapping.getFieldValuesList())
+              .hasSize(2)
+              .containsExactlyElementsOf(List.of(
             "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}",
             "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}"));
   }
@@ -59,9 +58,9 @@ class FieldValueMappingTest {
   void getFieldValuesListSingleJson() {
     fieldValueMapping.setFieldValuesList(
         "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"jj\",\"action\":\"kk\"}]}]}");
-    assertThat(fieldValueMapping.getFieldValuesList())
-        .hasSize(1)
-        .containsExactlyElementsOf(List.of(
+    Assertions.assertThat(fieldValueMapping.getFieldValuesList())
+              .hasSize(1)
+              .containsExactlyElementsOf(List.of(
             "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"jj\",\"action\":\"kk\"}]}]}"));
   }
 }

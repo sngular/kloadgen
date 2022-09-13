@@ -6,10 +6,6 @@
 
 package net.coru.kloadgen.property.editor;
 
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA_PROPERTIES;
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SUBJECT_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,10 +18,12 @@ import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import net.coru.kloadgen.config.valueserialized.ValueSerializedConfigElement;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.serializer.AvroSerializer;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,10 +69,10 @@ class SerialisedSubjectPropertyEditorTest {
 
   @BeforeEach
   public void setUp() {
-    File file = new File("src/test/resources");
-    String absolutePath = file.getAbsolutePath();
+    final File file = new File("src/test/resources");
+    final String absolutePath = file.getAbsolutePath();
     JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
-    JMeterContext jmcx = JMeterContextService.getContext();
+    final JMeterContext jmcx = JMeterContextService.getContext();
     jmcx.setVariables(new JMeterVariables());
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
@@ -83,26 +81,25 @@ class SerialisedSubjectPropertyEditorTest {
   @DisplayName("Should Serialised Subject Property")
   void iterationStart() {
 
-    ValueSerializedConfigElement
-        valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
+    final var valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
                                                                         AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
-    JMeterVariables variables = JMeterContextService.getContext().getVariables();
+    final var variables = JMeterContextService.getContext().getVariables();
     valueSerializedConfigElement.iterationStart(null);
 
-    assertThat(variables).isNotNull();
-    assertThat(variables.getObject(VALUE_SUBJECT_NAME)).isNotNull();
-    assertThat(variables.getObject(VALUE_SCHEMA_PROPERTIES)).isNotNull();
+    Assertions.assertThat(variables).isNotNull();
+    Assertions.assertThat(variables.getObject(PropsKeysHelper.VALUE_SUBJECT_NAME)).isNotNull();
+    Assertions.assertThat(variables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES)).isNotNull();
 
   }
 
   @ParameterizedTest
   @MethodSource("parametersForMergeValue")
   @DisplayName("Should Merge Schema Properties Property")
-  void mergeValueTest(List<FieldValueMapping> attributeListTable, List<FieldValueMapping> attributeList, List<FieldValueMapping> expected) {
+  void mergeValueTest(final List<FieldValueMapping> attributeListTable, final List<FieldValueMapping> attributeList, final List<FieldValueMapping> expected) {
 
     final List<FieldValueMapping> result = new SerialisedSubjectPropertyEditor().mergeValue(attributeListTable, attributeList);
 
-    assertThat(result).isEqualTo(expected);
+    Assertions.assertThat(result).isEqualTo(expected);
 
   }
 }

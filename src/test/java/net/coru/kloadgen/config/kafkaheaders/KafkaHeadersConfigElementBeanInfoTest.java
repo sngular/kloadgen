@@ -6,12 +6,11 @@
 
 package net.coru.kloadgen.config.kafkaheaders;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.beans.PropertyDescriptor;
 import java.util.Locale;
 
 import org.apache.jmeter.util.JMeterUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +27,9 @@ class KafkaHeadersConfigElementBeanInfoTest {
   }
 
   @Test
-  public void shouldGenerateElements() {
-    PropertyDescriptor[] propertyDescriptors = kafkaHeadersConfigElementBeanInfo.getPropertyDescriptors();
-    assertThat(propertyDescriptors).hasSize(1);
-    assertThat(propertyDescriptors[0].getName()).isEqualTo(KAFKA_HEADERS);
+  final void shouldGenerateElements() {
+    final PropertyDescriptor[] propertyDescriptors = kafkaHeadersConfigElementBeanInfo.getPropertyDescriptors();
+    Assertions.assertThat(propertyDescriptors).hasSize(1);
+    Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(KAFKA_HEADERS);
   }
 }

@@ -6,8 +6,6 @@
 
 package net.coru.kloadgen.randomtool.generator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +28,7 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.SchemaBuilder;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,8 +38,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 class AvroGeneratorToolTest {
 
   private static final LocalDateTime FIXED_TIMESTAMP = LocalDateTime.of(2019, 12, 6, 10, 15, 30);
-  private static final LocalDate FIXED_DATE = LocalDate.of(2019,12,6);
-  private static final LocalTime FIXED_TIME = LocalTime.of(10,15,30);
+  private static final LocalDate FIXED_DATE = LocalDate.of(2019, 12, 6);
+  private static final LocalTime FIXED_TIME = LocalTime.of(10, 15, 30);
   private static final String TIMESTAMP_STRING = "2019-12-06T10:15:30";
   private static final String DATE_STRING = "2019-12-06";
   private static final String TIME_STRING = "10:15:30";
@@ -77,12 +76,12 @@ class AvroGeneratorToolTest {
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValueForFieldLogicalTypes() {
-    Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
-    Schema decimalSchemaFixed = SchemaBuilder.builder().fixed("decimal").size(5);
-    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
-    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
+    final Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
+    final Schema decimalSchemaFixed = SchemaBuilder.builder().fixed("decimal").size(5);
+    LogicalTypes.decimal(5, 2).addToSchema(decimalSchemaBytes);
+    LogicalTypes.decimal(5, 2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    final Map<ConstraintTypeEnum, String> decimalConstraints = new HashMap<>();
     decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
     decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
@@ -93,16 +92,15 @@ class AvroGeneratorToolTest {
                                                                                              SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
         Arguments.of("long_time-micros", 1, Collections.singletonList(TIME_STRING), new Field("name",
                                                                                               SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
-        Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                                                                                                        SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-        Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                                                                                                        SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-        Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                                                                                                              SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-        Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name",
-                                                                                                              SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-        Arguments.of("string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"), new Field("name",
-                                                                                                                    SchemaBuilder.builder().stringType()),
+        Arguments.of("long_timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name", SchemaBuilder.builder().longType()),
+                     FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name", SchemaBuilder.builder().longType()),
+                     FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-millis", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name", SchemaBuilder.builder().longType()), FIXED_TIMESTAMP,
+                     Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-micros", 1, Collections.singletonList(TIMESTAMP_STRING), new Field("name", SchemaBuilder.builder().longType()), FIXED_TIMESTAMP,
+                     Collections.emptyMap()),
+        Arguments.of("string_uuid", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"), new Field("name", SchemaBuilder.builder().stringType()),
                      UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
         Arguments.of("bytes_decimal", 1, Collections.singletonList("44.444"), new Field(
             "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
@@ -114,8 +112,8 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @DisplayName("Testing Random Value for Field")
   @MethodSource("parametersForGenerateRandomValueForField")
-  void testGenerateRandomValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+  void testGenerateRandomValueForField(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field, final Object expected) {
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType(fieldType)
                                                            .valueLength(valueLength)
@@ -123,16 +121,16 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest
   @DisplayName("Testing Random Value for Field with Logical Types")
   @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
-  void testGenerateRandomValueForFieldLogicalTypes(String fieldType, Integer valueLength, List<String> fieldValuesList,
-      Field field, Object expected,
-      Map<ConstraintTypeEnum, String> constraints) {
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+  void testGenerateRandomValueForFieldLogicalTypes(final String fieldType, final Integer valueLength, final List<String> fieldValuesList,
+      final Field field, final Object expected,
+      final Map<ConstraintTypeEnum, String> constraints) {
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType(fieldType)
                                                            .valueLength(valueLength)
@@ -140,7 +138,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, constraints)).isEqualTo(expected);
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, constraints)).isEqualTo(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValue() {
@@ -151,12 +149,12 @@ class AvroGeneratorToolTest {
         Arguments.of("double", 6, Collections.emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
   }
 
-  @Disabled
+  @Disabled("Test failure sometimes")
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value")
   @MethodSource("parametersForGenerateRandomValue")
-  void testGenerateRandomValue(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field) {
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+  void testGenerateRandomValue(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field) {
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType(fieldType)
                                                            .valueLength(valueLength)
@@ -164,9 +162,9 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    Object number = new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap());
-    assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
-    assertThat(String.valueOf(number)).hasSize(valueLength);
+    final Object number = new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap());
+    Assertions.assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
+    Assertions.assertThat(String.valueOf(number)).hasSize(valueLength);
   }
 
   private static Stream<Arguments> parametersForGenerateFieldValuesListIterator() {
@@ -188,21 +186,21 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @DisplayName("Testing generate an iterator of a list of values")
   @MethodSource("parametersForGenerateFieldValuesListIterator")
-  void testGenerateFieldValuesListSequence(int size, List<String> fieldValuesList, String fieldType, List<Object> expected) {
-    var intList = new ArrayList<>();
-    Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
-    Field field = new Field("name", schema);
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+  void testGenerateFieldValuesListSequence(final int size, final List<String> fieldValuesList, final String fieldType, final List<Object> expected) {
+    final var intList = new ArrayList<>();
+    final Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
+    final Field field = new Field("name", schema);
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType("it")
                                                            .valueLength(0)
                                                            .fieldValueList(String.join(",", fieldValuesList))
                                                            .build();
-    AvroGeneratorTool avroGeneratorTool = new AvroGeneratorTool();
+    final var avroGeneratorTool = new AvroGeneratorTool();
     for (int i = 0; i <= size; i++) {
       intList.add(avroGeneratorTool.generateObject(field.schema(), fieldValueMapping, Collections.emptyMap()));
     }
-    assertThat(intList).containsExactlyElementsOf(expected);
+    Assertions.assertThat(intList).containsExactlyElementsOf(expected);
   }
 
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
@@ -214,8 +212,8 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value for Enums")
   @MethodSource("parametersForGenerateRandomValueForEnums")
-  void testGenerateRandomValueForEnums(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field, Object expected) {
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+  void testGenerateRandomValueForEnums(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field, final Object expected) {
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType(fieldType)
                                                            .valueLength(valueLength)
@@ -223,8 +221,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap()))
-        .hasFieldOrPropertyWithValue("symbol", expected);
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).hasFieldOrPropertyWithValue("symbol", expected);
   }
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
@@ -240,9 +237,9 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @DisplayName("Testing Generate a Random Value for Field")
   @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(String fieldType, Integer valueLength, List<String> fieldValuesList, Field field,
-      Object expectedTyped) {
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+  void testGenerateSequenceValueForField(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field,
+      final Object expectedTyped) {
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType(fieldType)
                                                            .valueLength(valueLength)
@@ -250,7 +247,7 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
@@ -273,12 +270,12 @@ class AvroGeneratorToolTest {
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContextLogicalTypes() {
-    Schema decimalSchemaBytes = SchemaBuilder.builder().bytesType();
-    Schema decimalSchemaFixed = SchemaBuilder.builder().fixed("decimal").size(5);
-    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaBytes);
-    LogicalTypes.decimal(5,2).addToSchema(decimalSchemaFixed);
+    final var decimalSchemaBytes = SchemaBuilder.builder().bytesType();
+    final var decimalSchemaFixed = SchemaBuilder.builder().fixed("decimal").size(5);
+    LogicalTypes.decimal(5, 2).addToSchema(decimalSchemaBytes);
+    LogicalTypes.decimal(5, 2).addToSchema(decimalSchemaFixed);
 
-    Map<ConstraintTypeEnum,String> decimalConstraints = new HashMap<>();
+    final Map<ConstraintTypeEnum, String> decimalConstraints = new HashMap<>();
     decimalConstraints.put(ConstraintTypeEnum.SCALE, "2");
     decimalConstraints.put(ConstraintTypeEnum.PRECISION, "5");
 
@@ -289,16 +286,13 @@ class AvroGeneratorToolTest {
                                                                   SchemaBuilder.builder().intType()), FIXED_TIME, Collections.emptyMap()),
         Arguments.of("long_time-micros", 1, TIME_STRING, new Field("name",
                                                                    SchemaBuilder.builder().longType()), FIXED_TIME, Collections.emptyMap()),
-        Arguments.of("long_timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
-                                                                             SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-        Arguments.of("long_timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
-                                                                             SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC), Collections.emptyMap()),
-        Arguments.of("long_local-timestamp-millis", 1, TIMESTAMP_STRING, new Field("name",
-                                                                                   SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-        Arguments.of("long_local-timestamp-micros", 1, TIMESTAMP_STRING, new Field("name",
-                                                                                   SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
-        Arguments.of("string_uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name",
-                                                                                         SchemaBuilder.builder().stringType()),
+        Arguments.of("long_timestamp-millis", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC),
+                     Collections.emptyMap()),
+        Arguments.of("long_timestamp-micros", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().longType()), FIXED_TIMESTAMP.toInstant(ZoneOffset.UTC),
+                     Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-millis", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of("long_local-timestamp-micros", 1, TIMESTAMP_STRING, new Field("name", SchemaBuilder.builder().longType()), FIXED_TIMESTAMP, Collections.emptyMap()),
+        Arguments.of("string_uuid", 1, "0177f035-e51c-4a46-8b82-5b157371c2a5", new Field("name", SchemaBuilder.builder().stringType()),
                      UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5").toString(), Collections.emptyMap()),
         Arguments.of("bytes_decimal", 1, "44.444", new Field(
             "name", decimalSchemaBytes), new BigDecimal("44.444"), decimalConstraints),
@@ -310,11 +304,11 @@ class AvroGeneratorToolTest {
   @ParameterizedTest
   @DisplayName("Testing Recover Variable from Context")
   @MethodSource("parametersForShouldRecoverVariableFromContext")
-  void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field, Object expected) {
-    JMeterVariables variables = new JMeterVariables();
+  void shouldRecoverVariableFromContext(final String fieldType, final Integer valueLength, final String value, final Field field, final Object expected) {
+    final var variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType(fieldType)
                                                            .valueLength(valueLength)
@@ -322,19 +316,18 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping,Collections.emptyMap()))
-        .isEqualTo(expected);
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest
   @DisplayName("Testing Recover Variable from Context Logical Types")
   @MethodSource("parametersForShouldRecoverVariableFromContextLogicalTypes")
-  void shouldRecoverVariableFromContext(String fieldType, Integer valueLength, String value, Field field,
-      Object expected, Map<ConstraintTypeEnum, String> constraints) {
-    JMeterVariables variables = new JMeterVariables();
+  void shouldRecoverVariableFromContext(final String fieldType, final Integer valueLength, final String value, final Field field,
+      final Object expected, final Map<ConstraintTypeEnum, String> constraints) {
+    final var variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
-    FieldValueMapping fieldValueMapping = FieldValueMapping.builder()
+    final var fieldValueMapping = FieldValueMapping.builder()
                                                            .fieldName(field.name())
                                                            .fieldType(fieldType)
                                                            .valueLength(valueLength)
@@ -342,7 +335,6 @@ class AvroGeneratorToolTest {
                                                            .required(true)
                                                            .isAncestorRequired(true)
                                                            .build();
-    assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping,constraints))
-        .isEqualTo(expected);
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, constraints)).isEqualTo(expected);
   }
 }

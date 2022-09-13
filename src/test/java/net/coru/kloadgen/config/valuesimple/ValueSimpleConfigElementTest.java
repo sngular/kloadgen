@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package net.coru.kloadgen.config.keysimple;
+package net.coru.kloadgen.config.valuesimple;
 
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class KeySimpleConfigElementTest {
+class ValueSimpleConfigElementTest {
 
   private JMeterContext jmcx;
 
@@ -34,25 +34,24 @@ class KeySimpleConfigElementTest {
   }
 
   @Test
-  @DisplayName("Should configure Key Simple Properties")
+  @DisplayName("Should configure Value Simple Properties")
   void iterationStart() {
 
-    final var keySimpleConfigElement = new KeySimpleConfigElement();
-    keySimpleConfigElement.setKeyType("string");
-    keySimpleConfigElement.setKeyValue("");
-    keySimpleConfigElement.setKeySerializerConfiguration("org.apache.kafka.common.serialization.StringSerializer");
+    final ValueSimpleConfigElement valueSimpleConfigElement = new ValueSimpleConfigElement();
+    valueSimpleConfigElement.setValueSchemaProperties("");
+    valueSimpleConfigElement.setValueSerializerConfiguration("org.apache.kafka.common.serialization.StringSerializer");
 
-    keySimpleConfigElement.iterationStart(null);
+    valueSimpleConfigElement.iterationStart(null);
 
     final var variables = jmcx.getVariables();
 
     Assertions.assertThat(variables).isNotNull();
     Assertions.assertThat(variables.entrySet())
-              .hasSize(4)
-              .containsExactlyInAnyOrder(new SimpleEntry<>("key.type", "string"),
-                                   new SimpleEntry<>("key.value", ""),
-                                   new SimpleEntry<>("key.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
-                                   new SimpleEntry<>("simple.keyed.message", true));
-
+              .hasSize(5)
+              .containsExactlyInAnyOrder(new SimpleEntry<>("value.schema.properties", ""),
+                                         new SimpleEntry<>("value.subject.name", ""),
+                                         new SimpleEntry<>("value.schema.type", "NoSchema"),
+                                   new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
+                                   new SimpleEntry<>("simple.valued.message", true));
   }
 }

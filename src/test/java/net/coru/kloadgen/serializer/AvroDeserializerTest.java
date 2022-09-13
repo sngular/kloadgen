@@ -1,14 +1,10 @@
 package net.coru.kloadgen.serializer;
 
-import static java.util.Arrays.asList;
-
-import static net.coru.kloadgen.util.PropsKeysHelper.VALUE_SCHEMA;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -21,13 +17,15 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.SchemaProcessor;
 import net.coru.kloadgen.testutil.FileHelper;
+import net.coru.kloadgen.util.PropsKeysHelper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
 class AvroDeserializerTest {
 
-  SchemaProcessor avroSchemaProcessor = new SchemaProcessor();
+  private static final SchemaProcessor AVRO_SCHEMA_PROCESSOR = new SchemaProcessor();
 
   private AvroDeserializer avroDeserializer;
 
@@ -41,9 +39,9 @@ class AvroDeserializerTest {
 
   @Test
   void deserialize() throws Exception {
-    var SCHEMA = new FileHelper().getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-    var SCHEMA_STR = readSchema(SCHEMA);
-    var fieldValueMappings = asList(
+    final var schemaFile = new FileHelper().getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+    final var schemaStr = readSchema(schemaFile);
+    final var fieldValueMappings = Arrays.asList(
         FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1,2]").required(true)
                          .isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityRecordArray[2].name").fieldType("string").valueLength(0).fieldValueList("[1,3]").required(true)
@@ -52,30 +50,30 @@ class AvroDeserializerTest {
                          .build(),
         FieldValueMapping.builder().fieldName("topLevelRecordArray[3].name").fieldType("string").valueLength(0).fieldValueList("[7,8,9]").required(true).isAncestorRequired(true)
                          .build());
-    var metadata = new SchemaMetadata(1, 1, SCHEMA_STR);
+    final var metadata = new SchemaMetadata(1, 1, schemaStr);
 
-    avroDeserializer.configure(Map.of(VALUE_SCHEMA, SCHEMA_STR), false);
+    avroDeserializer.configure(Map.of(PropsKeysHelper.VALUE_SCHEMA, schemaStr), false);
 
-    ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(SCHEMA, "AVRO");
-    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, metadata, fieldValueMappings);
-    var record = avroSchemaProcessor.next();
+    final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(schemaFile, "AVRO");
+    AVRO_SCHEMA_PROCESSOR.processSchema(SchemaTypeEnum.AVRO, parsedSchema, metadata, fieldValueMappings);
+    final var generatedRecord = AVRO_SCHEMA_PROCESSOR.next();
 
-    var message = avroSerializer.serialize("the-topic",
+    final var message = avroSerializer.serialize("the-topic",
                                            EnrichedRecord
                                                .builder()
-                                               .genericRecord(((EnrichedRecord) record).getGenericRecord())
-                                               .schemaMetadata(((EnrichedRecord) record).getSchemaMetadata())
+                                               .genericRecord(((EnrichedRecord) generatedRecord).getGenericRecord())
+                                               .schemaMetadata(((EnrichedRecord) generatedRecord).getSchemaMetadata())
                                                .build());
 
     log.info("[AvroDeserializer] to deserialize = {}", DatatypeConverter.printHexBinary(message));
 
-    var result = avroDeserializer.deserialize("the-topic", message);
+    final var result = avroDeserializer.deserialize("the-topic", message);
 
-    assertThat(result).isNotNull();
+    Assertions.assertThat(result).isNotNull();
   }
 
-  private static String readSchema(File file) throws IOException {
-    StringBuilder contentBuilder = new StringBuilder();
+  private static String readSchema(final File file) throws IOException {
+    final StringBuilder contentBuilder = new StringBuilder();
 
     try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
       stream.forEach(s -> contentBuilder.append(s).append("\n"));

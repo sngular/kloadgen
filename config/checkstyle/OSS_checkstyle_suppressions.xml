@@ -6,5 +6,15 @@
 
 <suppressions>
   <suppress checks="VisibilityModifier" files="[/\\].*model.*\.java"/>
+  <suppress checks="VisibilityModifier" files="[/\\].*EnrichedRecord\.java"/>
   <suppress checks="DesignForExtension" files="[/\\].*model.*\.java"/>
+  <suppress checks="AbstractClassName" files="[/\\].*Field\.java"/>
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*Sampler\.java"/>
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*PropertyEditor\.java"/>
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*ProcessorTest\.java"/>
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*Standalone\.java"/>
+  <suppress checks="ExecutableStatementCount" files="[/\\].*Standalone\.java"/>
+  <suppress checks="AnonInnerLength" files="[/\\].*AutoCompletion\.java"/>
+  <suppress checks="Indentation" files="[/\\].*ExtractorTest\.java"/>
+  <suppress checks="CyclomaticComplexity" files="[/\\].*\.java"/>
 </suppressions>

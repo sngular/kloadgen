@@ -1,3 +1,8 @@
+/* This work is hereby released into the Public Domain.
+ * To view a copy of the public domain dedication, visit
+ * http://creativecommons.org/licenses/publicdomain/
+ */
+
 package net.coru.kloadgen.util;
 
 import java.awt.event.FocusAdapter;
@@ -17,13 +22,9 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
-
 import net.coru.kloadgen.exception.KLoadGenException;
 
-/* This work is hereby released into the Public Domain.
- * To view a copy of the public domain dedication, visit
- * http://creativecommons.org/licenses/publicdomain/
- */
+
 public class AutoCompletion extends PlainDocument {
 
   private final JComboBox<String> comboBox;
@@ -61,6 +62,8 @@ public class AutoCompletion extends PlainDocument {
       }
     });
     editorKeyListener = new KeyAdapter() {
+
+      @Override
       public void keyPressed(final KeyEvent e) {
         if (comboBox.isDisplayable()) {
           comboBox.setPopupVisible(true);

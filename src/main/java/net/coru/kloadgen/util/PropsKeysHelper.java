@@ -20,11 +20,15 @@ public class PropsKeysHelper {
 
   public static final String SIMPLE_KEYED_MESSAGE_KEY = "simple.keyed.message";
 
+  public static final String SIMPLE_VALUED_MESSAGE_KEY = "simple.valued.message";
+
   public static final String KEYED_MESSAGE_DEFAULT = "NO";
 
   public static final String MESSAGE_KEY_KEY_TYPE = "message.key.type";
 
   public static final String MESSAGE_KEY_KEY_VALUE = "message.key.value";
+
+  public static final String MESSAGE_KEY_VALUE = "message.value";
 
   public static final String VALUE_SUBJECT_NAME = "value.subject.name";
 
@@ -43,6 +47,8 @@ public class PropsKeysHelper {
   public static final String KEY_SCHEMA_TYPE = "key.schema.type";
 
   public static final String KEY_VALUE = "key.value";
+
+  public static final String VALUE = "value";
 
   public static final String KEY_TYPE = "key.type";
 

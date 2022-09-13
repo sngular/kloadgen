@@ -44,32 +44,22 @@ import org.apache.kafka.common.KafkaException;
 public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
-
   private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
-
   private static final long serialVersionUID = 1L;
-
   private final transient StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
-
   private transient KafkaProducer<Object, Object> producer;
-
   private String topic;
-
   private String msgKeyType;
-
   private List<String> msgKeyValue;
-
   private boolean keyMessageFlag = false;
-
   private transient BaseLoadGenerator generator;
-
   private transient BaseLoadGenerator keyGenerator;
-
   private transient Properties props;
 
   @Override
   public void setupTest(final JavaSamplerContext context) {
     props = properties(context);
+
     generator = SamplerUtil.configureValueGenerator(props);
 
     configGenericData();
@@ -82,7 +72,7 @@ public final class KafkaSchemaSampler extends AbstractJavaSamplerClient implemen
       } else {
         msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
         msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
-            ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+                        ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
       }
     } else {
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
