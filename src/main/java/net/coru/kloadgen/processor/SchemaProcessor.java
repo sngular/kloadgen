@@ -182,7 +182,8 @@ public class SchemaProcessor {
     boolean shouldProcess = false;
     final boolean lastLevel = SchemaProcessorUtils.isLastLevel(fieldValueMapping, level);
     if (!fieldValueMapping.getRequired()
-        && this.objectCreatorFactory.isOptionalFieldAccordingToSchema(fieldValueMapping.getFieldName(), SchemaProcessorUtils.cleanUpPath(fieldValueMapping, level), level)) {
+        && this.objectCreatorFactory.isOptionalFieldAccordingToSchema(fieldValueMapping.getFieldName(),
+                                                                      SchemaProcessorUtils.getConcreteLevelField(fieldValueMapping, level), level)) {
       if (lastLevel) {
         shouldProcess = shouldProcessLastLevelNotRequiredSubField(fieldValueMapping, initialFieldExpMappingsQueue, level);
       } else if (!fieldValueMapping.getAncestorRequired()) {
