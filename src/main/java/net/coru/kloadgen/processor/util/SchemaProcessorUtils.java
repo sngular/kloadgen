@@ -127,7 +127,7 @@ public class SchemaProcessorUtils {
   public static String removeFieldPathFirstElement(final String fieldNamePath) {
     final String returnString;
     final String[] splitPath = fieldNamePath.split("\\.");
-    if (splitPath.length>0) {
+    if (splitPath.length > 0) {
       returnString = String.join(".", Arrays.copyOfRange(splitPath, 1, splitPath.length));
     } else {
       returnString = "";
