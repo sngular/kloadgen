@@ -18,14 +18,11 @@ import net.coru.kloadgen.randomtool.generator.StatelessGeneratorTool;
 public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final StatelessGeneratorTool STATELESS_GENERATOR_TOOL = new StatelessGeneratorTool();
-
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
   private final Map<String, ObjectNode> entity = new HashMap<>();
 
   @Override
-  public final Object createMap(
-      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+  public final Object createMap(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
     ObjectNode map = JsonNodeFactory.instance.objectNode();
     if (pojo.isLastFilterTypeOfLastElement()) {
       map = createFinalMap(pojo);
@@ -49,8 +46,8 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private ObjectNode createFinalMap(final SchemaProcessorPOJO pojo) {
     return OBJECT_MAPPER.convertValue(
-        STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
-                                             pojo.getFieldSize()), ObjectNode.class);
+      STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+                                           pojo.getFieldSize()), ObjectNode.class);
   }
 
   private String generateString(final Integer valueLength) {
@@ -58,8 +55,7 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createArray(
-      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+  public final Object createArray(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
     ArrayNode nodeArray = OBJECT_MAPPER.createArrayNode();
     if (pojo.isLastFilterTypeOfLastElement()) {
       nodeArray = createFinalArray(pojo);
@@ -121,8 +117,8 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private ArrayNode createFinalArray(final SchemaProcessorPOJO pojo) {
     return OBJECT_MAPPER.convertValue(
-        STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
-                                               pojo.getValueLength(), pojo.getFieldValuesList()), ArrayNode.class);
+      STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
+                                             pojo.getValueLength(), pojo.getFieldValuesList()), ArrayNode.class);
   }
 
 }

@@ -33,11 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
-
   private final Descriptors.Descriptor schema;
-
   private final SchemaMetadata metadata;
-
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
   public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
@@ -52,8 +49,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createMap(
-      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+  public final Object createMap(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
     final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
@@ -79,8 +75,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createArray(
-      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+  public final Object createArray(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
     final DynamicMessage.Builder messageBuilder = entity.get(pojo.getRootFieldName());
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
@@ -99,8 +94,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createValueObject(
-      final SchemaProcessorPOJO pojo) {
+  public final Object createValueObject(final SchemaProcessorPOJO pojo) {
 
     final var descriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(pojo.getCompleteFieldName()), this.schema, new AtomicBoolean(false));
     Object object;

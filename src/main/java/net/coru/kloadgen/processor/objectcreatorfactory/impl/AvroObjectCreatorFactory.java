@@ -21,7 +21,6 @@ import net.coru.kloadgen.processor.util.SchemaProcessorUtils;
 import net.coru.kloadgen.randomtool.generator.AvroGeneratorTool;
 import net.coru.kloadgen.serializer.EnrichedRecord;
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -30,13 +29,9 @@ import org.apache.commons.collections4.IteratorUtils;
 public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
-
   private static final Set<Type> TYPES_SET = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
-
   private final Schema schema;
-
   private final SchemaMetadata metadata;
-
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
   public AvroObjectCreatorFactory(final Object schema, final Object metadata) {
@@ -51,8 +46,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createMap(
-      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+  public final Object createMap(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
 
     Map<Object, Object> map = new HashMap<>();
     if (pojo.isLastFilterTypeOfLastElement()) {
@@ -81,8 +75,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createArray(
-      final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+  public final Object createArray(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
 
     List<Object> list = new ArrayList<>();
     if (pojo.isLastFilterTypeOfLastElement()) {
@@ -100,9 +93,8 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     return isInnerArray ? list : entity.get(pojo.getRootFieldName());
   }
 
-  public final Object createValueObject(
-      final SchemaProcessorPOJO pojo) {
-    final Schema fieldSchema = findSchema(pojo.getFieldNameSubEntity(), this.schema, new AtomicBoolean(false));
+  public final Object createValueObject(final SchemaProcessorPOJO pojo) {
+    final Schema fieldSchema = findSchema(pojo.getCompleteFieldName(), this.schema, new AtomicBoolean(false));
     final String valueType;
     final boolean logicalType = Objects.nonNull(fieldSchema.getLogicalType());
     if (!logicalType) {
@@ -129,7 +121,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     if ("root".equalsIgnoreCase(objectName)) {
       entity.put(objectName, new GenericData.Record(this.schema));
     } else {
-      Schema innerSchema = findSchema(objectName, this.schema, new AtomicBoolean(false));
+      Schema innerSchema = findSchema(completeFieldName, this.schema, new AtomicBoolean(false));
       if (innerSchema.getType().equals(Type.MAP)) {
         innerSchema = findRecursiveSchemaForRecord(innerSchema.getValueType());
       } else if (innerSchema.getType().equals(Type.ARRAY)) {
@@ -153,7 +145,8 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   @Override
   public final boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
-    var subSchema = findSchema(fieldName, this.schema, new AtomicBoolean(false));
+    var subSchema = findSchema(completeFieldName, this.schema, new AtomicBoolean(false));
+
     if (subSchema.getType().equals(Type.MAP)) {
       subSchema = findRecursiveSchemaForRecord(subSchema.getValueType());
     } else if (subSchema.getType().equals(Type.ARRAY)) {
@@ -191,29 +184,27 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     return isOptionalField;
   }
 
-  private Schema findSchema(final String objectName, final Schema fieldSchema, final AtomicBoolean found) {
+  private Schema findSchema(final String fieldNamePath, final Schema fieldSchema, final AtomicBoolean found) {
     Schema subSchema = fieldSchema;
-    found.set(subSchema.getName().equalsIgnoreCase(objectName));
+    final String[] arrNormalizedFieldNamePath = SchemaProcessorUtils.splitAndNormalizeFullFieldName(fieldNamePath);
+    final boolean isLastSubField = arrNormalizedFieldNamePath.length == 1;
+    final String normalizedFieldNamePath = arrNormalizedFieldNamePath[0];
+    found.set(subSchema.getName().equalsIgnoreCase(normalizedFieldNamePath));
     if (!found.get()) {
       if (Type.RECORD.equals(subSchema.getType())) {
-        final List<Field> fields = subSchema.getFields();
-        final var fieldListIt = fields.iterator();
-
-        while (fieldListIt.hasNext() && !found.get()) {
-          final Schema.Field field = fieldListIt.next();
-          found.set(field.name().equalsIgnoreCase(objectName));
-          if (found.get()) {
-            subSchema = field.schema();
-          } else {
-            subSchema = findSchema(objectName, field.schema(), found);
-          }
+        final Schema.Field field = subSchema.getField(normalizedFieldNamePath);
+        found.set(field.name().equalsIgnoreCase(normalizedFieldNamePath) && isLastSubField);
+        if (found.get()) {
+          subSchema = field.schema();
+        } else {
+          subSchema = findSchema(SchemaProcessorUtils.removeFieldPathFirstElement(fieldNamePath), subSchema.getField(normalizedFieldNamePath).schema(), found);
         }
       } else if (Type.ARRAY.equals(subSchema.getType())) {
-        subSchema = findSchema(objectName, subSchema.getElementType(), found);
+        subSchema = findSchema(fieldNamePath, subSchema.getElementType(), found);
       } else if (Type.MAP.equals(subSchema.getType())) {
-        subSchema = findSchema(objectName, subSchema.getValueType(), found);
+        subSchema = findSchema(fieldNamePath, subSchema.getValueType(), found);
       } else if (Type.UNION.equals(subSchema.getType())) {
-        subSchema = findSchema(objectName, getRecordUnion(subSchema.getTypes()), found);
+        subSchema = findSchema(fieldNamePath, getRecordUnion(subSchema.getTypes()), found);
       }
     }
     return subSchema;

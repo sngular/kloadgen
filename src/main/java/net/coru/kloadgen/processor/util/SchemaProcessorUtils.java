@@ -111,8 +111,28 @@ public class SchemaProcessorUtils {
   }
 
   public static String cleanUpPath(final FieldValueMapping fieldValueMapping, final int level) {
-    final String[] splitPath = fieldValueMapping.getFieldName().split("\\.");
+    return SchemaProcessorUtils.cleanUpPathStr(fieldValueMapping.getFieldName(), level);
+  }
+
+  public static String cleanUpPathStr(final String fieldNamePath, final int level) {
+    final String[] splitPath = fieldNamePath.split("\\.");
     return String.join(".", Arrays.copyOfRange(splitPath, level, splitPath.length));
+  }
+
+  public static String getConcreteLevelField(final FieldValueMapping fieldValueMapping, final int level) {
+    final String[] splitPath = splitAndNormalizeFullFieldName(fieldValueMapping.getFieldName());
+    return splitPath[level];
+  }
+
+  public static String removeFieldPathFirstElement(final String fieldNamePath) {
+    final String returnString;
+    final String[] splitPath = fieldNamePath.split("\\.");
+    if (splitPath.length > 0) {
+      returnString = String.join(".", Arrays.copyOfRange(splitPath, 1, splitPath.length));
+    } else {
+      returnString = "";
+    }
+    return returnString;
   }
 
   public static String[] splitAndNormalizeFullFieldName(final String fullFieldName) {
