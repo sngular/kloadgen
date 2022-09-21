@@ -2,6 +2,15 @@
 
 We're constantly improving KLoadGen. For release highlights and feature explanations, check the sections below. For a complete list of changes, fixes, and deprecations, see the [GitHub Releases](https://github.com/corunet/kloadgen/releases) page.
 
+## KLoadGen 5.0.0
+RELEASE DATE: 2022-08-26
+
+These are the main highlights for this release:
+
+- Improvements in our documentation
+- Creation of a new field Iterator
+- Some bugs have been fixed
+
 ## KLoadGen 4.0.0
 RELEASE DATE: 2022-03-24
 

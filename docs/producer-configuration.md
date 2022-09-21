@@ -131,6 +131,14 @@ This configuration element allows to define a simple key with primitive types.
 
 You need to provide values for **Key Value**, **Key Class Type** and **Serializer**.
 
+### Simple Value Config
+
+![Simple Value Config](images/value-plain-load-generator-config.png)
+
+This configuration element allows to define a simple value with no schema needed.
+
+You need to provide values for **Value** and **Serializer**.
+
 ### Kafka Headers Config
 
 ![Kafka Headers Config](images/kafka-header-config-element.png)

@@ -25,7 +25,9 @@ KLoadGen includes the following components:
   - **Key Schema File Serializer Config:** this JMeter config element allows to upload a key schema file instead of getting it from the Schema Registry server.
  
   - **Simple Key Config:** this JMeter config element allows to define a simple basic key to send into the message.
- 
+
+  - **Simple Value Config:** this JMeter config element allows to define a simple basic value to send into the message.
+
 > We will go through the details of setting up this sampler and its configuration elements in the [Producer configuration](producer-configuration.md) page.
  
 - **Kafka Consumer Sampler:** this JMeter Java sampler reads messages from Kafka. It uses the key and value configuration to deserialize the messages that it reads.
