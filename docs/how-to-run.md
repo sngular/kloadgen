@@ -8,7 +8,7 @@ Here you will see how to create and run a test plan that includes both the produ
 2. Under **Thread Group**, add a **Java Request** sampler.
 3. In **Name**, assign a descriptive name for  this sampler.
 4. (Optional) You may add any description for the sampler under **Comments**.
-5. In the dropdown box, choose **net.coru.kloadgen.sampler.KafkaSchemaSampler**. 
+5. In the dropdown box, choose **net.coru.kloadgen.sampler.KafkaProducerSampler**. 
 6. Provide the corresponding values for this sampler, as explained in [Kafka Producer Sampler configuration](producer-configuration.md#kafka-producer-sampler-configuration).
 7. Under **Thread Group**, add the configuration elements for this sampler, as seen in [Kafka producer configuration elements](producer-configuration.md#kafka-producer-configuration-elements).
 8. In the value and key schema (file) configuration elements, complete the table with the corresponding information regarding **Field Name**, **Field Type**, **Field Length**, and **Field Value List**.

@@ -48,9 +48,9 @@ These are the configuration elements corresponding to the Kafka consumer. See be
 
 KLoadGen includes a deserializer, apart from the ones from Kafka. [Make sure to choose the best option for you.](#custom-deserializer)
 
-### Value Schema Deserializer Config
+### KLG - Value Schema Deserializer Config
 
-![Value Schema Deserializer Config](images/value-schema-deserialization-config.png)
+![KLG - Value Schema Deserializer Config](images/value-schema-deserialization-config.png)
 
 This configuration element allows to get the correct schema from the Schema Registry and use it to deserialize the read messages.
 
@@ -58,9 +58,9 @@ You need to provide values for **Name Strategy** and **Deserializer**.
 
 **Note:** If you are using an AVRO schema, you need to choose **KafkaAvroDeserializer** (*io.confluent.kafka.serializers.KafkaAvroDeserializer*) in **Deserializer**.
 
-### Value Schema File Deserializer Config
+### KLG - Value Schema File Deserializer Config
 
-![Value Schema File Deserializer Config](images/value-schema-file-deserialization-config.png)
+![KLG - Value Schema File Deserializer Config](images/value-schema-file-deserialization-config.png)
 
 This configuration element allows to select a schema from a file (.avsc).
 
@@ -78,15 +78,15 @@ The AVRO structure will be flattened and shown in the table.
     - The maps show `[:]` at the end.  
 - **Field Type**: you can see the complete list in [Field types](schemas.md#field-types).
   
-### Key Schema Deserializer Config
+### KLG - Key Schema Deserializer Config
 
-This configuration element is similar to [Value Schema Deserializer Config](#value-schema-deserializer-config), except that it is focused in a key schema instead of a value schema.
+This configuration element is similar to [KLG - Value Schema Deserializer Config](#value-schema-deserializer-config), except that it is focused in a key schema instead of a value schema.
 
 Whatever schema you define and configure here will be used to deserialize the message key.
 
-### Key Schema File Deserializer Config
+### KLG - Key Schema File Deserializer Config
 
-This configuration element is similar to [Value Schema File Deserializer Config](#value-schema-file-deserializer-config), except that it is focused in a key schema instead of a value schema.
+This configuration element is similar to [KLG - Value Schema File Deserializer Config](#value-schema-file-deserializer-config), except that it is focused in a key schema instead of a value schema.
 
 Whatever schema you define and configure here will be used to deserialize the message key.
 
