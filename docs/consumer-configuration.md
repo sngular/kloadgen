@@ -50,7 +50,7 @@ KLoadGen includes a deserializer, apart from the ones from Kafka. [Make sure to 
 
 ### KLG - Value Schema Deserializer Config
 
-![KLG - Value Schema Deserializer Config](images/value-schema-deserialization-config.png)
+![KLG - Value Schema Deserializer Config](images/value-schema-deserializer-config.png)
 
 This configuration element allows to get the correct schema from the Schema Registry and use it to deserialize the read messages.
 
@@ -60,7 +60,7 @@ You need to provide values for **Name Strategy** and **Deserializer**.
 
 ### KLG - Value Schema File Deserializer Config
 
-![KLG - Value Schema File Deserializer Config](images/value-schema-file-deserialization-config.png)
+![KLG - Value Schema File Deserializer Config](images/value-schema-file-deserializer-config.png)
 
 This configuration element allows to select a schema from a file (.avsc).
 

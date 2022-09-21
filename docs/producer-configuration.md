@@ -78,7 +78,7 @@ KLoadGen includes four elements to configure the schema that will be used to ser
 
 #### KLG - Value Schema Serializer Config
 
-![KLG - Value Schema Serializer Config](images/value-schema-load-generator-config.png)
+![KLG - Value Schema Serializer Config](images/value-schema-serializer-config.png)
 
 This configuration element allows to choose a subject and download its schema.
 
@@ -86,7 +86,7 @@ You need to provide values for **Name Strategy** and **Serializer** to get the l
 
 #### KLG - Value Schema File Serializer Config
 
-![Value Scheme File Serializer Config](images/value-schema-file-load-generator-config.png)
+![Value Scheme File Serializer Config](images/value-schema-file-serializer-config.png)
 
 This configuration element allows to load a schema from a file (.avsc, .json or .proto).
 
@@ -125,7 +125,7 @@ The four previous configuration elements share the same table, which includes th
 
 ### KLG - Simple Key Config
 
-![KLG - Simple Key Config](images/key-plain-load-generator-config.png)
+![KLG - Simple Key Config](images/simple-key-config.png)
 
 This configuration element allows to define a simple key with primitive types.
 
@@ -133,7 +133,7 @@ You need to provide values for **Key Value**, **Key Class Type** and **Serialize
 
 ### KLG - Simple Value Config
 
-![KLG - Simple Value Config](images/value-plain-load-generator-config.png)
+![KLG - Simple Value Config](images/simple-value-config.png)
 
 This configuration element allows to define a simple value with no schema needed.
 
@@ -141,7 +141,7 @@ You need to provide values for **Value** and **Serializer**.
 
 ### KLG - Kafka Headers Config
 
-![KLG - Kafka Headers Config](images/kafka-header-config-element.png)
+![KLG - Kafka Headers Config](images/kafka-headers-config.png)
 
 This configuration element allows to specify a list of headers which will be included in the producer. 
 
