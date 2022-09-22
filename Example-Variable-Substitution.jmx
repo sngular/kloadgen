@@ -262,7 +262,7 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">net.coru.kloadgen.sampler.KafkaSchemaSampler</stringProp>
+          <stringProp name="classname">net.coru.kloadgen.sampler.KafkaProducerSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">

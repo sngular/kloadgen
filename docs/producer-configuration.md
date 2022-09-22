@@ -74,19 +74,19 @@ The subject list will be used when configuring the AVRO schema to download.
 
 KLoadGen includes five serializers, apart from the ones from Kafka. [Make sure to choose the best option for you.](#custom-serializers)
 
-KLoadGen includes four elements to configure the schema that will be used to serialize the data: [Value Schema Serializer Config](#value-schema-serializer-config), [Value Schema File Serializer Config](#value-schema-file-serializer-config), [Key Schema Serializer Config](#key-schema-serializer-config), and [Key Schema File Serializer Config](#key-schema-file-serializer-config).
+KLoadGen includes four elements to configure the schema that will be used to serialize the data: [KLG - Value Schema Serializer Config](#value-schema-serializer-config), [KLG - Value Schema File Serializer Config](#value-schema-file-serializer-config), [KLG - Key Schema Serializer Config](#key-schema-serializer-config), and [KLG - Key Schema File Serializer Config](#key-schema-file-serializer-config).
 
-#### Value Schema Serializer Config
+#### KLG - Value Schema Serializer Config
 
-![Value Schema Serializer Config](images/value-schema-load-generator-config.png)
+![KLG - Value Schema Serializer Config](images/value-schema-serializer-config.png)
 
 This configuration element allows to choose a subject and download its schema.
 
 You need to provide values for **Name Strategy** and **Serializer** to get the list of subjects. The **Load Subject** button loads the schema for the chosen subject.
 
-#### Value Schema File Serializer Config
+#### KLG - Value Schema File Serializer Config
 
-![Value Scheme File Serializer Config](images/value-schema-file-load-generator-config.png)
+![Value Scheme File Serializer Config](images/value-schema-file-serializer-config.png)
 
 This configuration element allows to load a schema from a file (.avsc, .json or .proto).
 
@@ -96,15 +96,15 @@ The **Open** button loads the file.
 
 **Note**: If the file includes embedded schemas, the last definition will be considered the main one, and the ones above will be considered as related to it. If there are unrelated schemas, they will be ignored.
 
-#### Key Schema Serializer Config
+#### KLG - Key Schema Serializer Config
 
-This configuration element is similar to [Value Schema Serializer Config](#value-schema-serializer-config), except that it is focused in a key schema instead of a value schema.
+This configuration element is similar to [KLG - Value Schema Serializer Config](#value-schema-serializer-config), except that it is focused in a key schema instead of a value schema.
 
 Whatever schema you define and configure here will be used as the message key.
 
-#### Key Schema File Serializer Config
+#### KLG - Key Schema File Serializer Config
 
-This configuration element is similar to [Value Schema File Serializer Config](#value-schema-file-serializer-config), except that it is focused in a key schema instead of a value schema.
+This configuration element is similar to [KLG - Value Schema File Serializer Config](#value-schema-file-serializer-config), except that it is focused in a key schema instead of a value schema.
 
 Whatever schema you define and configure here will be used as the message key.
 
@@ -123,25 +123,25 @@ The four previous configuration elements share the same table, which includes th
        - For reading context values by default in Jmeter, they must be in the way: ${name_of_variable}
        - If the field type is an array or a map, you can define a specific list of values  (*[1,2,3,4,5]* or *[key1:value1, key2:value2, key3:value3]*).
 
-### Simple Key Config
+### KLG - Simple Key Config
 
-![Simple Key Config](images/key-plain-load-generator-config.png)
+![KLG - Simple Key Config](images/simple-key-config.png)
 
 This configuration element allows to define a simple key with primitive types.
 
 You need to provide values for **Key Value**, **Key Class Type** and **Serializer**.
 
-### Simple Value Config
+### KLG - Simple Value Config
 
-![Simple Value Config](images/value-plain-load-generator-config.png)
+![KLG - Simple Value Config](images/simple-value-config.png)
 
 This configuration element allows to define a simple value with no schema needed.
 
 You need to provide values for **Value** and **Serializer**.
 
-### Kafka Headers Config
+### KLG - Kafka Headers Config
 
-![Kafka Headers Config](images/kafka-header-config-element.png)
+![KLG - Kafka Headers Config](images/kafka-headers-config.png)
 
 This configuration element allows to specify a list of headers which will be included in the producer. 
 
