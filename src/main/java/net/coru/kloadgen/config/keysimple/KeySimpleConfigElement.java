@@ -11,6 +11,7 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.util.JMeterHelper;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
@@ -26,6 +27,7 @@ public final class KeySimpleConfigElement extends ConfigTestElement implements T
 
   private String keyValue;
 
+  private String schema = "NoSchema";
   private String keyType;
 
   private String keySerializerConfiguration;
@@ -36,6 +38,7 @@ public final class KeySimpleConfigElement extends ConfigTestElement implements T
     final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(PropsKeysHelper.KEY_VALUE, getKeyValue());
     variables.putObject(PropsKeysHelper.KEY_TYPE, getKeyType());
+    variables.putObject(PropsKeysHelper.KEY_SCHEMA_TYPE,schema);
     variables.putObject(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY, getKeySerializerConfiguration());
     variables.putObject(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }
@@ -53,7 +56,7 @@ public final class KeySimpleConfigElement extends ConfigTestElement implements T
   }
 
   public void setKeyValue(final String keyValue) {
-    setProperty("keyValue", keyValue);
+    setProperty("keyValue", JMeterHelper.checkPropertyOrVariable(keyValue));
     this.keyValue = keyValue;
   }
 

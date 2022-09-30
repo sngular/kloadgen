@@ -11,6 +11,7 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coru.kloadgen.util.JMeterHelper;
 import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
@@ -52,7 +53,7 @@ public final class ValueSimpleConfigElement extends ConfigTestElement implements
   }
 
   public void setValueSchemaProperties(final String value) {
-    setProperty("valueSchemaProperties", value);
+    setProperty("valueSchemaProperties", JMeterHelper.checkPropertyOrVariable(value));
     this.valueSchemaProperties = value;
   }
 

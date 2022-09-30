@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.PropertyMapping;
+import net.coru.kloadgen.util.JMeterHelper;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +51,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
     final Map<String, String> schemaProperties = getProperties();
 
-    jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, checkPropertyOrVariable(getRegistryUrl()));
+    jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JMeterHelper.checkPropertyOrVariable(getRegistryUrl()));
     if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
       jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
       if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
@@ -77,7 +78,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     }
     return result;
   }
-
+/*
   private String checkPropertyOrVariable(final String textToCheck) {
     final String result;
     if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
@@ -89,6 +90,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     }
     return result;
   }
+ */
 
   private String getRegistryUrl() {
     String registryUrl = getPropertyAsString("schemaRegistryUrl");
@@ -102,7 +104,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     final Map<String, String> propertiesMap = new HashMap<>();
     for (TestElementProperty property : schemaProperties) {
       final PropertyMapping propertyMapping = (PropertyMapping) property.getObjectValue();
-      propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
+      propertiesMap.put(propertyMapping.getPropertyName(), JMeterHelper.checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
   }
@@ -110,7 +112,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   private Map<String, String> fromPropertyMappingToPropertiesMap(final List<PropertyMapping> schemaProperties) {
     final Map<String, String> propertiesMap = new HashMap<>();
     for (PropertyMapping propertyMapping : schemaProperties) {
-      propertiesMap.put(propertyMapping.getPropertyName(), checkPropertyOrVariable(propertyMapping.getPropertyValue()));
+      propertiesMap.put(propertyMapping.getPropertyName(), JMeterHelper.checkPropertyOrVariable(propertyMapping.getPropertyValue()));
     }
     return propertiesMap;
   }

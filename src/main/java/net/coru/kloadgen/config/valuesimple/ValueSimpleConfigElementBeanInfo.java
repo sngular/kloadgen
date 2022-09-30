@@ -26,7 +26,7 @@ public class ValueSimpleConfigElementBeanInfo extends BeanInfoSupport {
     final PropertyDescriptor keyValueProp = property(VALUE_SCHEMA_PROPERTIES);
     keyValueProp.setValue(DEFAULT, "");
     keyValueProp.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    keyValueProp.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    keyValueProp.setValue(NOT_EXPRESSION, Boolean.TRUE);
 
     final PropertyDescriptor schemaType = property(VALUE_SERIALIZER_PROPERTY);
     schemaType.setPropertyEditorClass(PlainValueSerializerPropertyEditor.class);
