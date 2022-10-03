@@ -78,19 +78,6 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     }
     return result;
   }
-/*
-  private String checkPropertyOrVariable(final String textToCheck) {
-    final String result;
-    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
-      result = JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
-    } else if (textToCheck.matches("\\$\\{\\w*}")) {
-      result = JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
-    } else {
-      result = textToCheck;
-    }
-    return result;
-  }
- */
 
   private String getRegistryUrl() {
     String registryUrl = getPropertyAsString("schemaRegistryUrl");

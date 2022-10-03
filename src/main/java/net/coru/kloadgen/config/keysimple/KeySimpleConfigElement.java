@@ -7,7 +7,6 @@
 package net.coru.kloadgen.config.keysimple;
 
 import java.util.Objects;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +25,8 @@ import org.apache.jmeter.threads.JMeterVariables;
 public final class KeySimpleConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String keyValue;
-
   private String schema = "NoSchema";
   private String keyType;
-
   private String keySerializerConfiguration;
 
   @Override
@@ -38,7 +35,7 @@ public final class KeySimpleConfigElement extends ConfigTestElement implements T
     final JMeterVariables variables = JMeterContextService.getContext().getVariables();
     variables.putObject(PropsKeysHelper.KEY_VALUE, getKeyValue());
     variables.putObject(PropsKeysHelper.KEY_TYPE, getKeyType());
-    variables.putObject(PropsKeysHelper.KEY_SCHEMA_TYPE,schema);
+    variables.putObject(PropsKeysHelper.KEY_SCHEMA_TYPE, schema);
     variables.putObject(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY, getKeySerializerConfiguration());
     variables.putObject(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY, Boolean.TRUE);
   }

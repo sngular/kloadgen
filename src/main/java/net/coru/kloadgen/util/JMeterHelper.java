@@ -65,7 +65,4 @@ public final class JMeterHelper {
     }
     return result;
   }
-
-
-
 }

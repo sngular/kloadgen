@@ -391,9 +391,9 @@ public final class SamplerUtil {
         generator = new AvroSRLoadGenerator();
       } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
         generator = new ProtobufLoadGenerator();
-      } else if(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
+      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
         generator = new PlainTextLoadGenerator();
-      }else {
+      } else {
         throw new KLoadGenException("Unsupported Serializer");
       }
     } else {
