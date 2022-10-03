@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+
 class ValueSimpleConfigElementTest {
 
   private JMeterContext jmcx;
@@ -38,8 +39,9 @@ class ValueSimpleConfigElementTest {
   void iterationStart() {
 
     final ValueSimpleConfigElement valueSimpleConfigElement = new ValueSimpleConfigElement();
-    valueSimpleConfigElement.setValueSchemaProperties("");
-    valueSimpleConfigElement.setValueSerializerConfiguration("org.apache.kafka.common.serialization.StringSerializer");
+    valueSimpleConfigElement.setMessageValue("data");
+    valueSimpleConfigElement.setMessageType("String");
+    valueSimpleConfigElement.setMessageSerializerProperty("org.apache.kafka.common.serialization.StringSerializer");
 
     valueSimpleConfigElement.iterationStart(null);
 
@@ -47,11 +49,10 @@ class ValueSimpleConfigElementTest {
 
     Assertions.assertThat(variables).isNotNull();
     Assertions.assertThat(variables.entrySet())
-              .hasSize(5)
-              .containsExactlyInAnyOrder(new SimpleEntry<>("value.schema.properties", ""),
-                                         new SimpleEntry<>("value.subject.name", ""),
+              .hasSize(4)
+              .containsExactlyInAnyOrder(new SimpleEntry<>("message.value", "data"),
+                                         new SimpleEntry<>("message.type", "String"),
                                          new SimpleEntry<>("value.schema.type", "NoSchema"),
-                                   new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
-                                   new SimpleEntry<>("simple.valued.message", true));
+                                   new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"));
   }
 }
