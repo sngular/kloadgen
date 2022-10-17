@@ -33,7 +33,7 @@ public final class PlainTextLoadGenerator implements SRLoadGenerator, BaseLoadGe
   }
 
   public EnrichedRecord nextMessage() {
-    var value = JMeterContextService.getContext().getVariables().get(PropsKeysHelper.MESSAGE_VALUE);
+    final var value = JMeterContextService.getContext().getVariables().get(PropsKeysHelper.MESSAGE_VALUE);
     return EnrichedRecord.builder().genericRecord(ValueUtils.replaceValueContext(value)).build();
   }
 
