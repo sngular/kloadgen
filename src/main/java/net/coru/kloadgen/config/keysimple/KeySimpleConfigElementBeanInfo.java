@@ -29,7 +29,7 @@ public class KeySimpleConfigElementBeanInfo extends BeanInfoSupport {
     final PropertyDescriptor keyValueProp = property(KEY_VALUE);
     keyValueProp.setValue(DEFAULT, "");
     keyValueProp.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    keyValueProp.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    keyValueProp.setValue(NOT_EXPRESSION, Boolean.TRUE);
 
     final PropertyDescriptor keyTypeProp = property(KEY_TYPE);
     keyTypeProp.setValue(DEFAULT, PropsKeysHelper.MSG_KEY_TYPE);

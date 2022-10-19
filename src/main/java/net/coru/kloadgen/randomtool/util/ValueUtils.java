@@ -33,6 +33,14 @@ public class ValueUtils {
     return parameterList;
   }
 
+  public static String replaceValueContext(final String fieldValue) {
+    String value = fieldValue;
+    if (fieldValue.matches("\\$\\{\\w*}")) {
+      value = JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1));
+    }
+    return value;
+  }
+
   public static Object castValue(final Object valueObject, final String type) {
     final Object castValue;
     final String value = valueObject.toString();

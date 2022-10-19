@@ -10,12 +10,9 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Locale;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import net.coru.kloadgen.serializer.AvroSerializer;
 import net.coru.kloadgen.util.PropsKeysHelper;
-import net.coru.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -25,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@WireMockTest
 class ValueSerializedConfigElementTest {
 
   @BeforeEach
@@ -40,11 +36,7 @@ class ValueSerializedConfigElementTest {
 
   @Test
   @DisplayName("Should configure Value Serialized Properties")
-  void iterationStart(final WireMockRuntimeInfo wmRuntimeInfo) {
-
-    JMeterContextService.getContext().getProperties().put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
-    JMeterContextService.getContext().getProperties().put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY, "foo");
-    JMeterContextService.getContext().getProperties().put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+  void iterationStart() {
 
     final var valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
                                                                         AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());

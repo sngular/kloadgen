@@ -17,6 +17,7 @@ import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientExcept
 import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaProvider;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class JMeterHelper {
@@ -53,4 +54,15 @@ public final class JMeterHelper {
     return schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
   }
 
+  public static String checkPropertyOrVariable(final String textToCheck) {
+    final String result;
+    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
+      result = JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
+    } else if (textToCheck.matches("\\$\\{\\w*}")) {
+      result = JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
+    } else {
+      result = textToCheck;
+    }
+    return result;
+  }
 }

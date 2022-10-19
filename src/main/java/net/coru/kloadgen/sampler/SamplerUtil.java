@@ -102,6 +102,9 @@ public final class SamplerUtil {
     } else if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
       props.put(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE, context.getJMeterVariables().get(PropsKeysHelper.KEY_TYPE));
       props.put(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE, context.getJMeterVariables().get(PropsKeysHelper.KEY_VALUE));
+      if (Objects.nonNull(context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
+        props.put(PropsKeysHelper.KEY_SCHEMA_TYPE, context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE));
+      }
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY, Boolean.FALSE);
@@ -358,11 +361,7 @@ public final class SamplerUtil {
           throw exc;
         }
       }
-    } else if (Objects.nonNull(jMeterVariables.getObject(PropsKeysHelper.SIMPLE_VALUED_MESSAGE_KEY))) {
-      generator.setUpGenerator(
-          jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
-          (List<FieldValueMapping>) props.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-    } else {
+    } else if (Objects.isNull(jMeterVariables.getObject(PropsKeysHelper.SIMPLE_VALUED_MESSAGE_KEY))) {
       generator.setUpGenerator(
           jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
           (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
@@ -390,6 +389,8 @@ public final class SamplerUtil {
         generator = new AvroSRLoadGenerator();
       } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
         generator = new ProtobufLoadGenerator();
+      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
+        generator = new PlainTextLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");
       }

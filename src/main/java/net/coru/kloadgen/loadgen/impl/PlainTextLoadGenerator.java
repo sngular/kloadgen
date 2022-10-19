@@ -6,34 +6,35 @@
 
 package net.coru.kloadgen.loadgen.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.loadgen.BaseLoadGenerator;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.randomtool.util.ValueUtils;
 import net.coru.kloadgen.serializer.EnrichedRecord;
+import net.coru.kloadgen.util.PropsKeysHelper;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class PlainTextLoadGenerator implements SRLoadGenerator, BaseLoadGenerator {
 
-  private List<FieldValueMapping> fieldExprMappings = new ArrayList<>();
-
   @Override
   public void setUpGenerator(final Map<String, String> originals, final String avroSchemaName, final List<FieldValueMapping> fieldExprMappings) {
-    this.fieldExprMappings = fieldExprMappings;
+    throw new NotImplementedException();
   }
 
   @Override
   public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
-    this.fieldExprMappings = fieldExprMappings;
+    throw new NotImplementedException();
   }
 
   public EnrichedRecord nextMessage() {
-    final FieldValueMapping fieldValueMapping = fieldExprMappings.get(0);
-    return EnrichedRecord.builder().genericRecord(fieldValueMapping.getFieldName()).build();
+    final var value = JMeterContextService.getContext().getVariables().get(PropsKeysHelper.MESSAGE_VALUE);
+    return EnrichedRecord.builder().genericRecord(ValueUtils.replaceValueContext(value)).build();
   }
 
 }
