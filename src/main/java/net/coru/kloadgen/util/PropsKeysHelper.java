@@ -20,8 +20,6 @@ public class PropsKeysHelper {
 
   public static final String SIMPLE_KEYED_MESSAGE_KEY = "simple.keyed.message";
 
-  public static final String SIMPLE_VALUED_MESSAGE_KEY = "simple.valued.message";
-
   public static final String MESSAGE_KEY_KEY_TYPE = "message.key.type";
 
   public static final String MESSAGE_KEY_KEY_VALUE = "message.key.value";
