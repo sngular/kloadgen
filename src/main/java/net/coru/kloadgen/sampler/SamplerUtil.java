@@ -113,12 +113,7 @@ public final class SamplerUtil {
     if (Objects.nonNull(context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG))) {
       props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
     }
-    if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_VALUED_MESSAGE_KEY))) {
-      props.put(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-      props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY));
-      props.put(PropsKeysHelper.VALUE_SCHEMA_TYPE, context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA_TYPE));
-      props.put(PropsKeysHelper.VALUE_SUBJECT_NAME, context.getJMeterVariables().get(PropsKeysHelper.VALUE_SUBJECT_NAME));
-    }
+
     props.put(ProducerConfig.ACKS_CONFIG, context.getParameter(ProducerConfig.ACKS_CONFIG));
     props.put(ProducerConfig.SEND_BUFFER_CONFIG, context.getParameter(ProducerConfig.SEND_BUFFER_CONFIG));
     props.put(ProducerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ProducerConfig.RECEIVE_BUFFER_CONFIG));
@@ -361,10 +356,6 @@ public final class SamplerUtil {
           throw exc;
         }
       }
-    } else if (Objects.isNull(jMeterVariables.getObject(PropsKeysHelper.SIMPLE_VALUED_MESSAGE_KEY))) {
-      generator.setUpGenerator(
-          jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
-          (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
     }
 
     return generator;

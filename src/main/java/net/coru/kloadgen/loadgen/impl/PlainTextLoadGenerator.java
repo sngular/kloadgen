@@ -24,12 +24,10 @@ public final class PlainTextLoadGenerator implements SRLoadGenerator, BaseLoadGe
 
   @Override
   public void setUpGenerator(final Map<String, String> originals, final String avroSchemaName, final List<FieldValueMapping> fieldExprMappings) {
-    throw new NotImplementedException();
   }
 
   @Override
   public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
-    throw new NotImplementedException();
   }
 
   public EnrichedRecord nextMessage() {
