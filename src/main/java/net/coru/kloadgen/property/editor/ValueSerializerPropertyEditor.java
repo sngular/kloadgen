@@ -62,9 +62,6 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
     final var reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Serializer.class))
-            .filterInputsBy(new FilterBuilder()
-                                .includePackage("net.coru.kloadgen.serializer")
-                                .includePackage("io.confluent.kafka.serializers"))
             .setScanners(Scanners.SubTypes));
 
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);
