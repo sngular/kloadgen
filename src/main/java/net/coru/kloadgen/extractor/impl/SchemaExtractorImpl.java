@@ -12,9 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.squareup.wire.schema.internal.parser.TypeElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
@@ -61,7 +63,8 @@ public class SchemaExtractorImpl implements SchemaExtractor {
       attributeList.addAll(jsonExtractor.processSchema(((JsonSchema) schema).toJsonNode()));
     } else if (SchemaTypeEnum.PROTOBUF.name().equalsIgnoreCase(schema.schemaType())) {
       final var protoFileElement = ((ProtobufSchema) schema).rawSchema();
-      protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false));
+      final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+      protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false, nestedTypes));
     } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schema.schemaType()));
     }
