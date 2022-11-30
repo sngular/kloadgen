@@ -221,7 +221,7 @@ public class SchemaProcessorUtils {
     return choppedField;
   }
 
-  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes, String packageName) {
+  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes, final String packageName) {
     fillNestedTypes(messageElement, nestedTypes);
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;
@@ -232,7 +232,7 @@ public class SchemaProcessorUtils {
     return msgDef.build();
   }
 
-  private static void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList, String packageName) {
+  private static void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList, final String packageName) {
     for (var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
       final var dotType = checkDotType(elementFieldType);
@@ -271,7 +271,7 @@ public class SchemaProcessorUtils {
     }
   }
 
-  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes, String packageName) {
+  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes, final String packageName) {
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
