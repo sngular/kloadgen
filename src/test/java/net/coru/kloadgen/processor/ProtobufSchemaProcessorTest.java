@@ -470,6 +470,41 @@ class ProtobufSchemaProcessorTest {
   }
 
   @Test
+  @DisplayName("Be able to process provided schema with not nested type")
+  void testProtoBufProvidedWithNotNestedTypeProcessor() throws IOException {
+    final File testFile = fileHelper.getFile("/proto-files/issue311Test.proto");
+    final List<FieldValueMapping> fieldValueMappingList = Arrays.asList(
+            FieldValueMapping.builder().fieldName("order_id").fieldType("int").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("order_number").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("customer_account.billing_party.party_id").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("customer_account.billing_party.address.address_line_one").fieldType("string").required(true).isAncestorRequired(true).build(),
+            FieldValueMapping.builder().fieldName("customer_account.billing_party.address.address_line_two").fieldType("string").required(true).isAncestorRequired(true).build());
+    final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schemaExtractor.schemaTypesList(testFile, "Protobuf"), new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+    final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
+    final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
+    final List<String> assertKeys = new ArrayList<>();
+    final List<Object> assertValues = new ArrayList<>();
+    final Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
+    map.forEach((key, value) -> {
+      assertKeys.add(key.getFullName());
+      assertValues.add(value);
+    });
+
+    Assertions.assertThat(message).isNotNull()
+            .isInstanceOf(EnrichedRecord.class)
+            .extracting(EnrichedRecord::getGenericRecord)
+            .isNotNull();
+    Assertions.assertThat(assertKeys).hasSize(3)
+            .containsExactlyInAnyOrder("company.Order.order_id",
+                    "company.Order.order_number",
+                    "company.Order.customer_account");
+    Assertions.assertThat(assertValues).hasSize(3).isNotNull();
+    Assertions.assertThat(assertValues.get(0)).isInstanceOf(Integer.class);
+    Assertions.assertThat(assertValues.get(1)).isInstanceOf(String.class);
+  }
+
+  @Test
   @DisplayName("Be able to process Date and TimeOfDay types")
   void testDateTimeTypes() throws IOException, DescriptorValidationException {
     final File testFile = fileHelper.getFile("/proto-files/dateTimeTest.proto");

@@ -160,7 +160,7 @@ public class SchemaProcessorUtils {
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     schemaBuilder.setPackage(schema.getPackageName());
-    schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, nestedTypes));
+    schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, nestedTypes, schema.getPackageName()));
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
@@ -221,27 +221,27 @@ public class SchemaProcessorUtils {
     return choppedField;
   }
 
-  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes) {
+  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes, String packageName) {
     fillNestedTypes(messageElement, nestedTypes);
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;
-    extracted(nestedTypes, msgDef, element.getFields());
+    extracted(nestedTypes, msgDef, element.getFields(), packageName);
     for (var optionalField : element.getOneOfs()) {
-      extracted(nestedTypes, msgDef, optionalField.getFields());
+      extracted(nestedTypes, msgDef, optionalField.getFields(), packageName);
     }
     return msgDef.build();
   }
 
-  private static void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList) {
+  private static void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList, String packageName) {
     for (var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
       final var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
-        addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes);
+        addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes, packageName);
       }
 
       if (nestedTypes.containsKey(dotType)) {
-        addDefinition(msgDef, dotType, nestedTypes.remove(dotType), nestedTypes);
+        addDefinition(msgDef, dotType, nestedTypes.remove(dotType), nestedTypes, packageName);
       }
 
       if (elementField.getType().startsWith("map")) {
@@ -249,11 +249,11 @@ public class SchemaProcessorUtils {
         final var mapDotType = checkDotType(realType);
 
         if (nestedTypes.containsKey(realType)) {
-          addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes);
+          addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes, packageName);
         }
 
         if (nestedTypes.containsKey(mapDotType)) {
-          addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes);
+          addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes, packageName);
         }
         msgDef.addField("repeated", "typemapnumber" + elementField.getName(), elementField.getName(), elementField.getTag());
 
@@ -262,12 +262,16 @@ public class SchemaProcessorUtils {
       } else if (Objects.nonNull(elementField.getLabel())) {
         msgDef.addField(elementField.getLabel().toString().toLowerCase(), elementField.getType(), elementField.getName(), elementField.getTag());
       } else {
-        msgDef.addField(OPTIONAL, elementField.getType(), elementField.getName(), elementField.getTag());
+        if (!dotType.isEmpty() && elementFieldType.contains(packageName) && elementFieldType.contains(dotType)) {
+          msgDef.addField(OPTIONAL, dotType, elementField.getName(), elementField.getTag());
+        } else {
+          msgDef.addField(OPTIONAL, elementField.getType(), elementField.getName(), elementField.getTag());
+        }
       }
     }
   }
 
-  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes) {
+  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes, String packageName) {
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
@@ -277,7 +281,7 @@ public class SchemaProcessorUtils {
       msgDef.addEnumDefinition(builder.build());
     } else {
       if (!typeName.contains(".")) {
-        msgDef.addMessageDefinition(buildProtoMessageDefinition(typeName, typeElement, nestedTypes));
+        msgDef.addMessageDefinition(buildProtoMessageDefinition(typeName, typeElement, nestedTypes, packageName));
       }
     }
   }
