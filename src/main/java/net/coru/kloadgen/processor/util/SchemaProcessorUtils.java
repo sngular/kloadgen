@@ -260,7 +260,10 @@ public class SchemaProcessorUtils {
         msgDef.addField("repeated", "typemapnumber" + elementField.getName(), elementField.getName(), elementField.getTag());
 
         msgDef.addMessageDefinition(
-            MessageDefinition.newBuilder("typemapnumber" + elementField.getName()).addField(OPTIONAL, "string", "key", 1).addField(OPTIONAL, realType, "value", 2).build());
+            MessageDefinition.newBuilder("typemapnumber" + elementField.getName())
+                    .addField(OPTIONAL, "string", "key", 1)
+                    .addField(OPTIONAL, realType, "value", 2)
+                    .build());
       } else if (Objects.nonNull(elementField.getLabel())) {
         msgDef.addField(elementField.getLabel().toString().toLowerCase(), elementField.getType(), elementField.getName(), elementField.getTag());
       } else {
@@ -273,7 +276,8 @@ public class SchemaProcessorUtils {
     }
   }
 
-  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes, final String packageName) {
+  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
+                                    final HashMap<String, TypeElement> nestedTypes, final String packageName) {
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
