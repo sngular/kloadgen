@@ -221,7 +221,9 @@ public class SchemaProcessorUtils {
     return choppedField;
   }
 
-  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes, final String packageName) {
+  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement,
+                                                               final HashMap<String, TypeElement> nestedTypes,
+                                                               final String packageName) {
     fillNestedTypes(messageElement, nestedTypes);
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;

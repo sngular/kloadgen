@@ -39,7 +39,9 @@ public class ProtoBufExtractor {
     return attributeList;
   }
 
-  public final void processField(final TypeElement field, final List<FieldValueMapping> completeFieldList, final List<String> imports, final boolean isAncestorRequired, HashMap<String, TypeElement> nestedTypes) {
+  public final void processField(final TypeElement field, final List<FieldValueMapping> completeFieldList,
+                                 final List<String> imports, final boolean isAncestorRequired,
+                                 final HashMap<String, TypeElement> nestedTypes) {
     fillNestedTypes(field, nestedTypes);
     if (field instanceof MessageElement) {
       final var messageField = (MessageElement) field;
