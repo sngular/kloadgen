@@ -24,7 +24,7 @@ public class GenericAvroRecordBinarySerializer<T extends GenericRecord> implemen
 
   @Override
   public final byte[] serialize(final String s, final T data) {
-    DatumWriter<T> writer;
+    final DatumWriter<T> writer;
     if (data instanceof SpecificRecord) {
       writer = new SpecificDatumWriter<>(data.getSchema());
     } else {
