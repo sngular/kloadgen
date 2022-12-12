@@ -268,7 +268,7 @@ public class SchemaProcessorUtils {
       } else if (Objects.nonNull(elementField.getLabel())) {
         msgDef.addField(elementField.getLabel().toString().toLowerCase(), msgDefFieldType, elementField.getName(), elementField.getTag());
       } else {
-          msgDef.addField(OPTIONAL, msgDefFieldType, elementField.getName(), elementField.getTag());
+        msgDef.addField(OPTIONAL, msgDefFieldType, elementField.getName(), elementField.getTag());
       }
     }
   }
@@ -305,10 +305,13 @@ public class SchemaProcessorUtils {
   }
 
   private static String getFieldTypeToAddToDefinition(final String dotType, final String elementFieldType, final String packageName) {
+    final String type;
     if (!dotType.isEmpty() && elementFieldType.contains(packageName) && elementFieldType.contains(dotType)) {
-      return dotType;
+      type = dotType;
+    } else {
+      type = elementFieldType;
     }
-    return elementFieldType;
+    return type;
   }
 
   public static String getOneDimensionValueType(final String completeValueType) {
