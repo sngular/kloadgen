@@ -238,6 +238,7 @@ public class SchemaProcessorUtils {
     for (var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
       final var dotType = checkDotType(elementFieldType);
+      final var msgDefFieldType = getFieldTypeToAddToDefinition(dotType, elementFieldType, packageName);
       if (nestedTypes.containsKey(elementFieldType)) {
         addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes, packageName);
       }
@@ -265,13 +266,9 @@ public class SchemaProcessorUtils {
                     .addField(OPTIONAL, realType, "value", 2)
                     .build());
       } else if (Objects.nonNull(elementField.getLabel())) {
-        msgDef.addField(elementField.getLabel().toString().toLowerCase(), elementField.getType(), elementField.getName(), elementField.getTag());
+        msgDef.addField(elementField.getLabel().toString().toLowerCase(), msgDefFieldType, elementField.getName(), elementField.getTag());
       } else {
-        if (!dotType.isEmpty() && elementFieldType.contains(packageName) && elementFieldType.contains(dotType)) {
-          msgDef.addField(OPTIONAL, dotType, elementField.getName(), elementField.getTag());
-        } else {
-          msgDef.addField(OPTIONAL, elementField.getType(), elementField.getName(), elementField.getTag());
-        }
+          msgDef.addField(OPTIONAL, msgDefFieldType, elementField.getName(), elementField.getTag());
       }
     }
   }
@@ -305,6 +302,13 @@ public class SchemaProcessorUtils {
       dotType = typeSplit[typeSplit.length - 1];
     }
     return dotType;
+  }
+
+  private static String getFieldTypeToAddToDefinition(final String dotType, final String elementFieldType, final String packageName) {
+    if (!dotType.isEmpty() && elementFieldType.contains(packageName) && elementFieldType.contains(dotType)) {
+      return dotType;
+    }
+    return elementFieldType;
   }
 
   public static String getOneDimensionValueType(final String completeValueType) {
