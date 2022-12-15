@@ -14,13 +14,9 @@ import net.coru.kloadgen.extractor.impl.SchemaExtractorImpl;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.processor.SchemaProcessor;
 import net.coru.kloadgen.testutil.FileHelper;
-import org.apache.avro.Conversions;
-import org.apache.avro.data.TimeConversions;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.common.serialization.Serializer;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -36,49 +32,22 @@ public class AvroSerializersTest {
     );
   }
 
-  @BeforeEach
-  void setUp() {
-    final var genericData = GenericData.get();
-
-    genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimeMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
-    genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
-    genericData.addLogicalTypeConversion(new Conversions.UUIDConversion());
-  }
-
   @ParameterizedTest
   @MethodSource("getSerializers")
   void recordSerializersTestLogicalTypes(final Serializer<GenericRecord> serializer) throws Exception {
     final var schemaFile = new FileHelper().getFile("/avro-files/testLogicalTypes.avsc");
     final var schemaStr = readSchema(schemaFile);
     final var fieldValueMappings = Arrays.asList(
-        FieldValueMapping.builder().fieldName("Date").fieldType("int_date").valueLength(0).fieldValueList("[]").required(true)
-                         .isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("TimeMillis").fieldType("int_time-millis").valueLength(0).fieldValueList("[]").required(true)
-                         .isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("TimeMicros").fieldType("long_time-micros").valueLength(0).fieldValueList("[]").required(true).isAncestorRequired(true)
-                         .build(),
-        FieldValueMapping.builder().fieldName("TimestampMillis").fieldType("long_timestamp-millis").valueLength(0).fieldValueList("[]").required(true).isAncestorRequired(true)
-                         .build(),
-        FieldValueMapping.builder().fieldName("TimestampMicros").fieldType("long_timestamp-micros").valueLength(0).fieldValueList("[]").required(true).isAncestorRequired(true)
-                         .build(),
-        FieldValueMapping.builder().fieldName("LocalTimestampMillis").fieldType("long_local-timestamp-millis").valueLength(0).fieldValueList("[]").required(true)
-                         .isAncestorRequired(true)
-                         .build(),
-        FieldValueMapping.builder().fieldName("LocalTimestampMicros").fieldType("long_local-timestamp-micros").valueLength(0).fieldValueList("[]").required(true)
-                         .isAncestorRequired(true)
-                         .build(),
-        FieldValueMapping.builder().fieldName("UUID").fieldType("string_uuid").valueLength(0).fieldValueList("[]").required(true).isAncestorRequired(true)
-                         .build(),
-        FieldValueMapping.builder().fieldName("Decimal").fieldType("bytes_decimal").valueLength(0).fieldValueList("[]").required(true).isAncestorRequired(true)
-                         .build(),
-        FieldValueMapping.builder().fieldName("DecimalFixed").fieldType("fixed_decimal").valueLength(0).fieldValueList("[]").required(true).isAncestorRequired(true)
-                         .build());
+        createFieldValueMapping("Date", "int_date"),
+        createFieldValueMapping("TimeMillis", "int_time-millis"),
+        createFieldValueMapping("TimeMicros", "long_time-micros"),
+        createFieldValueMapping("TimestampMillis", "long_timestamp-millis"),
+        createFieldValueMapping("TimestampMicros", "long_timestamp-micros"),
+        createFieldValueMapping("LocalTimestampMillis", "long_local-timestamp-millis"),
+        createFieldValueMapping("LocalTimestampMicros", "long_local-timestamp-micros"),
+        createFieldValueMapping("UUID", "string_uuid"),
+        createFieldValueMapping("Decimal", "bytes_decimal"),
+        createFieldValueMapping("DecimalFixed", "fixed_decimal"));
     final var metadata = new SchemaMetadata(1, 1, schemaStr);
 
     final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(schemaFile, "AVRO");
@@ -98,5 +67,10 @@ public class AvroSerializersTest {
     }
 
     return contentBuilder.toString();
+  }
+
+  private FieldValueMapping createFieldValueMapping(String name, String fieldType) {
+    return FieldValueMapping.builder().fieldName(name).fieldType(fieldType).valueLength(0).fieldValueList("[]").required(true)
+                            .isAncestorRequired(true).build();
   }
 }

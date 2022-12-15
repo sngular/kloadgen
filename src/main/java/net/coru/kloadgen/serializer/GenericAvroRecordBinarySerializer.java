@@ -20,6 +20,10 @@ import org.apache.kafka.common.serialization.Serializer;
 @Slf4j
 public class GenericAvroRecordBinarySerializer<T extends GenericRecord> implements Serializer<T> {
 
+  public GenericAvroRecordBinarySerializer() {
+    AvroSerializersUtil.setupLogicalTypesConversion();
+  }
+
   @Override
   public final byte[] serialize(final String s, final T data) {
     final DatumWriter<T> writer = new GenericDatumWriter<>(data.getSchema());
