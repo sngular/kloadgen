@@ -69,7 +69,7 @@ public class AvroSerializersTest {
     return contentBuilder.toString();
   }
 
-  private FieldValueMapping createFieldValueMapping(String name, String fieldType) {
+  private FieldValueMapping createFieldValueMapping(final String name, final String fieldType) {
     return FieldValueMapping.builder().fieldName(name).fieldType(fieldType).valueLength(0).fieldValueList("[]").required(true)
                             .isAncestorRequired(true).build();
   }

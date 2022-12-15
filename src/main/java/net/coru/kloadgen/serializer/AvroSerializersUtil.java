@@ -4,7 +4,10 @@ import org.apache.avro.Conversions;
 import org.apache.avro.data.TimeConversions;
 import org.apache.avro.generic.GenericData;
 
-public class AvroSerializersUtil {
+public final class AvroSerializersUtil {
+
+  private AvroSerializersUtil() {
+  }
 
   public static void setupLogicalTypesConversion() {
     final var genericData = GenericData.get();
