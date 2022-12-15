@@ -167,6 +167,17 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>mseijasm</id>
+      <name>Miguel Seijas Morató</name>
+      <email>miguel.seijas@sngular.com</email>
+      <organization>Corunet</organization>
+      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <roles>
+        <role>Senior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
 
   <scm>
@@ -297,6 +308,12 @@
       <groupId>io.confluent</groupId>
       <artifactId>kafka-json-schema-provider</artifactId>
       <version>${kafka-schema-registry-client.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.github.everit-org.json-schema</groupId>
+          <artifactId>org.everit.json.schema</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.confluent</groupId>
@@ -343,6 +360,11 @@
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <version>0.10.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.everit-org.json-schema</groupId>
+      <artifactId>org.everit.json.schema</artifactId>
+      <version>1.14.0</version>
     </dependency>
     <!-- Options -->
     <dependency>
