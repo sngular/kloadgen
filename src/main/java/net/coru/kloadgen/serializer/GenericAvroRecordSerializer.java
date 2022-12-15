@@ -25,13 +25,7 @@ public class GenericAvroRecordSerializer<T extends GenericRecord> implements Ser
 
   @Override
   public final byte[] serialize(final String topic, final T data) {
-
-    final DatumWriter<T> writer;
-    if (data instanceof SpecificRecord) {
-      writer = new SpecificDatumWriter<>(data.getSchema());
-    } else {
-      writer = new GenericDatumWriter<>(data.getSchema());
-    }
+    final DatumWriter<T> writer = new GenericDatumWriter<>(data.getSchema());
 
     byte[] dataBytes = new byte[0];
     final var stream = new ByteArrayOutputStream();

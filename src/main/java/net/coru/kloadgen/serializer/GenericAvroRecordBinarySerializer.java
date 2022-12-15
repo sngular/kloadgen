@@ -24,12 +24,8 @@ public class GenericAvroRecordBinarySerializer<T extends GenericRecord> implemen
 
   @Override
   public final byte[] serialize(final String s, final T data) {
-    final DatumWriter<T> writer;
-    if (data instanceof SpecificRecord) {
-      writer = new SpecificDatumWriter<>(data.getSchema());
-    } else {
-      writer = new GenericDatumWriter<>(data.getSchema());
-    }
+    final DatumWriter<T> writer = new GenericDatumWriter<>(data.getSchema());
+
     var result = new byte[]{};
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       final var encoder = EncoderFactory.get().binaryEncoder(baos, null);
