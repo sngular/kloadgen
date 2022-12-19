@@ -371,8 +371,6 @@ public class SchemaProcessorUtils {
     if (messageNestedTypes == null) {
       messageNestedTypes = new HashMap<>();
     }
-    //   messageNestedTypes.put(messageElement.getName(), nestedTypes);
-    // globalNestedTypes.put(deepLevel, messageNestedTypes);
 
     messageElement.getNestedTypes().forEach(nestedType -> nestedTypes.put(nestedType.getName(), nestedType));
 
