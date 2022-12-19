@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,18 +29,23 @@ import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
+import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.ProtobufHelper;
+import org.jetbrains.annotations.NotNull;
+import scala.annotation.meta.field;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
+@Slf4j
 public class SchemaProcessorUtils {
 
   private static final String OPTIONAL = "optional";
 
-  private SchemaProcessorUtils() {}
+  private SchemaProcessorUtils() {
+  }
 
   public static String getTypeFilter(final String fieldName, final String cleanPath) {
     final String tmpCleanPath = cleanPath.replaceAll(fieldName, "");
@@ -158,9 +164,17 @@ public class SchemaProcessorUtils {
       }
     }
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
-    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     schemaBuilder.setPackage(schema.getPackageName());
-    schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, nestedTypes));
+
+    // PFGG - TEST
+    int deepLevel = -1;
+    /*
+        The variable 'globalNestedTypes' records the required 'TypeElements', first by depth level, and then by Message.
+     */
+    final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes = new HashMap<>();
+
+    schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, globalNestedTypes, deepLevel));
+
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
@@ -221,27 +235,47 @@ public class SchemaProcessorUtils {
     return choppedField;
   }
 
-  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes) {
-    fillNestedTypes(messageElement, nestedTypes);
+  private static MessageDefinition buildProtoMessageDefinition(
+      final String fieldName, final TypeElement messageElement, HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
+
+    deepLevel++;
+    log.info("Processing deep level {} with fieldName {}...", deepLevel, fieldName);
+
+    fillNestedTypes(messageElement, globalNestedTypes, deepLevel);
+
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;
-    extracted(nestedTypes, msgDef, element.getFields());
+    extracted(globalNestedTypes, msgDef, element.getFields(), deepLevel, fieldName);
     for (var optionalField : element.getOneOfs()) {
-      extracted(nestedTypes, msgDef, optionalField.getFields());
+      extracted(globalNestedTypes, msgDef, optionalField.getFields(), deepLevel, fieldName);
     }
     return msgDef.build();
   }
 
-  private static void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList) {
+  private static void extracted(
+      HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList, int deepLevel,
+      String messageName) {
+
+    HashMap<String, TypeElement> nestedTypes = processLevelTypes(globalNestedTypes, msgDef, fieldElementList, deepLevel,
+                                                                 messageName);
+
     for (var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
       final var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
-        addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes);
+
+        TypeElement removed = nestedTypes.remove(dotType);
+        globalNestedTypes.get(deepLevel).put(messageName, nestedTypes);
+
+        addDefinition(msgDef, elementFieldType, removed, globalNestedTypes, deepLevel);
       }
 
       if (nestedTypes.containsKey(dotType)) {
-        addDefinition(msgDef, dotType, nestedTypes.remove(dotType), nestedTypes);
+
+        TypeElement removed = nestedTypes.remove(dotType);
+        globalNestedTypes.get(deepLevel).put(messageName, nestedTypes);
+
+        addDefinition(msgDef, dotType, removed, globalNestedTypes, deepLevel);
       }
 
       if (elementField.getType().startsWith("map")) {
@@ -249,11 +283,19 @@ public class SchemaProcessorUtils {
         final var mapDotType = checkDotType(realType);
 
         if (nestedTypes.containsKey(realType)) {
-          addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes);
+
+          TypeElement removed = nestedTypes.remove(dotType);
+          globalNestedTypes.get(deepLevel).put(messageName, nestedTypes);
+
+          addDefinition(msgDef, realType, removed, globalNestedTypes, deepLevel);
         }
 
         if (nestedTypes.containsKey(mapDotType)) {
-          addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes);
+
+          TypeElement removed = nestedTypes.remove(dotType);
+          globalNestedTypes.get(deepLevel).put(messageName, nestedTypes);
+
+          addDefinition(msgDef, mapDotType, removed, globalNestedTypes, deepLevel);
         }
         msgDef.addField("repeated", "typemapnumber" + elementField.getName(), elementField.getName(), elementField.getTag());
 
@@ -267,7 +309,46 @@ public class SchemaProcessorUtils {
     }
   }
 
-  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes) {
+  @NotNull
+  private static HashMap<String, TypeElement> processLevelTypes(
+      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList, final int deepLevel,
+      final String messageName) {
+
+    List<String> typesWithSimpleNames = new ArrayList<>();
+    for (FieldElement fieldElement : fieldElementList) {
+
+      final String typeCompletePath = fieldElement.getType();
+      final String typeSimple = checkDotType(typeCompletePath);
+
+      if (typeSimple != null && !typeSimple.isEmpty()) {
+        typesWithSimpleNames.add(typeSimple);
+      }
+    }
+
+    List<String> nestedTypesToDelete = new ArrayList<>();
+    HashMap<String, TypeElement> nestedTypes = globalNestedTypes.get(deepLevel).get(messageName);
+
+    for (Map.Entry<String, TypeElement> entry : nestedTypes.entrySet()) {
+      final String fieldName = entry.getKey();
+      final TypeElement typeElement = entry.getValue();
+
+      if (!typesWithSimpleNames.contains(fieldName)) {
+        log.info("{} not contains the nestedType [{}]", typesWithSimpleNames.toString(), fieldName);
+        nestedTypesToDelete.add(fieldName);
+        addDefinition(msgDef, fieldName, typeElement, globalNestedTypes, deepLevel);
+      }
+    }
+
+    // Delete all the nestedSubTypes processed from de global Map collection.
+    nestedTypesToDelete.forEach(nestedTypes::remove);
+
+    globalNestedTypes.get(deepLevel).put(messageName, nestedTypes);
+    return nestedTypes;
+  }
+
+  private static void addDefinition(
+      final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
+      HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
@@ -277,15 +358,26 @@ public class SchemaProcessorUtils {
       msgDef.addEnumDefinition(builder.build());
     } else {
       if (!typeName.contains(".")) {
-        msgDef.addMessageDefinition(buildProtoMessageDefinition(typeName, typeElement, nestedTypes));
+        msgDef.addMessageDefinition(buildProtoMessageDefinition(typeName, typeElement, globalNestedTypes, deepLevel));
       }
     }
   }
 
-  private static void fillNestedTypes(final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes) {
-    if (!CollectionUtils.isEmpty(messageElement.getNestedTypes())) {
-      messageElement.getNestedTypes().forEach(nestedType -> nestedTypes.put(nestedType.getName(), nestedType));
+  private static void fillNestedTypes(final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
+
+    HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+
+    HashMap<String, HashMap<String, TypeElement>> messageNestedTypes = globalNestedTypes.get(deepLevel);
+    if (messageNestedTypes == null) {
+      messageNestedTypes = new HashMap<>();
     }
+    //   messageNestedTypes.put(messageElement.getName(), nestedTypes);
+    // globalNestedTypes.put(deepLevel, messageNestedTypes);
+
+    messageElement.getNestedTypes().forEach(nestedType -> nestedTypes.put(nestedType.getName(), nestedType));
+
+    messageNestedTypes.put(messageElement.getName(), nestedTypes);
+    globalNestedTypes.put(deepLevel, messageNestedTypes);
   }
 
   private static String checkDotType(final String subfieldType) {
