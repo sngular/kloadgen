@@ -5,16 +5,18 @@
   "https://checkstyle.org/dtds/suppressions_1_2_xpath_experimental.dtd">
 
 <suppressions>
-  <suppress checks="VisibilityModifier" files="[/\\].*model.*\.java"/>
-  <suppress checks="VisibilityModifier" files="[/\\].*EnrichedRecord\.java"/>
-  <suppress checks="DesignForExtension" files="[/\\].*model.*\.java"/>
-  <suppress checks="AbstractClassName" files="[/\\].*Field\.java"/>
-  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*Sampler\.java"/>
-  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*PropertyEditor\.java"/>
-  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*ProcessorTest\.java"/>
-  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*Standalone\.java"/>
-  <suppress checks="ExecutableStatementCount" files="[/\\].*Standalone\.java"/>
-  <suppress checks="AnonInnerLength" files="[/\\].*AutoCompletion\.java"/>
-  <suppress checks="Indentation" files="[/\\].*ExtractorTest\.java"/>
-  <suppress checks="CyclomaticComplexity" files="[/\\].*\.java"/>
+  <suppress checks="VisibilityModifier" files="[/\\].*model.*\.java" />
+  <suppress checks="VisibilityModifier" files="[/\\].*EnrichedRecord\.java" />
+  <suppress checks="DesignForExtension" files="[/\\].*model.*\.java" />
+  <suppress checks="DesignForExtension" files="[/\\].*AvroSerializersTest\.java" />
+  <suppress checks="AbstractClassName" files="[/\\].*Field\.java" />
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*Sampler\.java" />
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*PropertyEditor\.java" />
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*ProcessorTest\.java" />
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*Standalone\.java" />
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*AvroSerializersUtil\.java" />
+  <suppress checks="ExecutableStatementCount" files="[/\\].*Standalone\.java" />
+  <suppress checks="AnonInnerLength" files="[/\\].*AutoCompletion\.java" />
+  <suppress checks="Indentation" files="[/\\].*ExtractorTest\.java" />
+  <suppress checks="CyclomaticComplexity" files="[/\\].*\.java" />
 </suppressions>

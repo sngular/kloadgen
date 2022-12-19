@@ -25,9 +25,6 @@ import net.coru.kloadgen.serializer.EnrichedRecord;
 import net.coru.kloadgen.serializer.ProtobufSerializer;
 import net.coru.kloadgen.util.ProducerKeysHelper;
 import net.coru.kloadgen.util.PropsKeysHelper;
-import org.apache.avro.Conversions;
-import org.apache.avro.data.TimeConversions;
-import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -44,16 +41,27 @@ import org.apache.kafka.common.KafkaException;
 public final class KafkaProducerSampler extends AbstractJavaSamplerClient implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
+
   private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
+
   private static final long serialVersionUID = 1L;
+
   private final transient StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
+
   private transient KafkaProducer<Object, Object> producer;
+
   private String topic;
+
   private String msgKeyType;
+
   private List<String> msgKeyValue;
+
   private boolean keyMessageFlag = false;
+
   private transient BaseLoadGenerator generator;
+
   private transient BaseLoadGenerator keyGenerator;
+
   private transient Properties props;
 
   @Override
@@ -61,8 +69,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     props = properties(context);
 
     generator = SamplerUtil.configureValueGenerator(props);
-
-    configGenericData();
 
     if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
         || "true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
@@ -72,7 +78,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       } else {
         msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
         msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
-                        ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+                          ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
       }
     } else {
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
@@ -92,20 +98,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY));
     }
     return commonProps;
-  }
-
-  private void configGenericData() {
-    final var genericData = GenericData.get();
-
-    genericData.addLogicalTypeConversion(new TimeConversions.DateConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.LocalTimestampMillisConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimeMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimeMillisConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMicrosConversion());
-    genericData.addLogicalTypeConversion(new TimeConversions.TimestampMillisConversion());
-    genericData.addLogicalTypeConversion(new Conversions.DecimalConversion());
-    genericData.addLogicalTypeConversion(new Conversions.UUIDConversion());
   }
 
   @Override

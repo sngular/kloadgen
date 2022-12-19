@@ -10,20 +10,25 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.apache.avro.io.EncoderFactory;
-import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
 public class GenericAvroRecordSerializer<T extends GenericRecord> implements Serializer<T> {
 
+  public GenericAvroRecordSerializer() {
+    AvroSerializersUtil.setupLogicalTypesConversion();
+  }
+
   @Override
   public final byte[] serialize(final String topic, final T data) {
+    final DatumWriter<T> writer = new GenericDatumWriter<>(data.getSchema());
 
-    final var writer = new SpecificDatumWriter<>(data.getSchema());
     byte[] dataBytes = new byte[0];
     final var stream = new ByteArrayOutputStream();
     final Encoder jsonEncoder;
