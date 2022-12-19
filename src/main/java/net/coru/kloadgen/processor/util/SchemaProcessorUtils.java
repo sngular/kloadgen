@@ -166,7 +166,6 @@ public class SchemaProcessorUtils {
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
     schemaBuilder.setPackage(schema.getPackageName());
 
-    // PFGG - TEST
     int deepLevel = -1;
     /*
         The variable 'globalNestedTypes' records the required 'TypeElements', first by depth level, and then by Message.
@@ -314,6 +313,9 @@ public class SchemaProcessorUtils {
       final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList, final int deepLevel,
       final String messageName) {
 
+    /*
+    We store in a list, all the types instantiated by the attributes.
+     */
     List<String> typesWithSimpleNames = new ArrayList<>();
     for (FieldElement fieldElement : fieldElementList) {
 
@@ -328,12 +330,18 @@ public class SchemaProcessorUtils {
     List<String> nestedTypesToDelete = new ArrayList<>();
     HashMap<String, TypeElement> nestedTypes = globalNestedTypes.get(deepLevel).get(messageName);
 
+    /*
+    Loop through the set of types declared at the current depth level.
+     */
     for (Map.Entry<String, TypeElement> entry : nestedTypes.entrySet()) {
       final String fieldName = entry.getKey();
       final TypeElement typeElement = entry.getValue();
 
       if (!typesWithSimpleNames.contains(fieldName)) {
-        log.info("{} not contains the nestedType [{}]", typesWithSimpleNames.toString(), fieldName);
+        /*
+        Just in case a type declared at this level of depth is not used by any attribute, we add it to the definition.
+         */
+        log.info("{} not contains the nestedType [{}]. We proceed to add it to the definition.", typesWithSimpleNames.toString(), fieldName);
         nestedTypesToDelete.add(fieldName);
         addDefinition(msgDef, fieldName, typeElement, globalNestedTypes, deepLevel);
       }
@@ -349,6 +357,7 @@ public class SchemaProcessorUtils {
   private static void addDefinition(
       final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
       HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
+
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
@@ -365,13 +374,12 @@ public class SchemaProcessorUtils {
 
   private static void fillNestedTypes(final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
 
-    HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-
     HashMap<String, HashMap<String, TypeElement>> messageNestedTypes = globalNestedTypes.get(deepLevel);
     if (messageNestedTypes == null) {
       messageNestedTypes = new HashMap<>();
     }
 
+    HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     messageElement.getNestedTypes().forEach(nestedType -> nestedTypes.put(nestedType.getName(), nestedType));
 
     messageNestedTypes.put(messageElement.getName(), nestedTypes);
