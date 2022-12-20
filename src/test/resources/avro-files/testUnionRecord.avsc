@@ -82,6 +82,6 @@
       }
    ],
    "name":"ProductInnerObject",
-   "namespace":"net.coru",
+   "namespace":"com.sngular",
    "type":"record"
 }

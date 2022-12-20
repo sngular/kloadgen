@@ -3,20 +3,20 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>net.coru</groupId>
+  <groupId>com.sngular</groupId>
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.1.6</version>
+  <version>5.2.6</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial data base on Data specification</description>
-  <url>https://corunet.github.io/kloadgen/</url>
+  <url>https://sngular.github.io/kloadgen/</url>
 
   <licenses>
     <license>
       <name>Mozilla Public License 2.0</name>
-      <url>https://github.com/corunet/kloadgen/blob/master/LICENSE</url>
+      <url>https://github.com/sngular/kloadgen/blob/master/LICENSE</url>
       <distribution>repo</distribution>
       <comments></comments>
     </license>
@@ -27,8 +27,8 @@
       <id>jegarcia</id>
       <name>Jose Enrique Garcia Maciñeiras</name>
       <email>joseenrique.garcia@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Principal Engineer</role>
         <role>Team Leader</role>
@@ -39,8 +39,8 @@
       <id>cmunozgomez</id>
       <name>Cesar Munoz Gomez</name>
       <email>cmunoz@corunet.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
@@ -50,8 +50,8 @@
       <id>vtorres</id>
       <name>Vanessa Torres Barca</name>
       <email>vtorres@corunet.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -61,8 +61,8 @@
       <id>rivarsal</id>
       <name>Pablo José López Rivadulla</name>
       <email>pablo.lopezr@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -72,8 +72,8 @@
       <id>fcampostato</id>
       <name>Fernando Campos Tato</name>
       <email>fernando.campos@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -83,8 +83,8 @@
       <id>jmejutovazquez</id>
       <name>Javier Mejuto Vázquez</name>
       <email>javier.mejuto@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -94,8 +94,8 @@
       <id>mcabezasp</id>
       <name>Miguel Cabezas Puerto</name>
       <email>miguel.cabezas@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -105,8 +105,8 @@
       <id>irodigl</id>
       <name>Isabel Rodríguez Iglesias</name>
       <email>isabel.rodriguez@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
@@ -116,8 +116,8 @@
       <id>IsaUlloa</id>
       <name>Isabel López Ulloa</name>
       <email>isabel.lopez@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -127,8 +127,8 @@
       <id>pedror19</id>
       <name>Pedro Rodríguez Iglesias</name>
       <email>prodriguezi@corunet.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -138,8 +138,8 @@
       <id>jgbriz</id>
       <name>Juan García Briz</name>
       <email>juan.garcia@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
@@ -149,8 +149,8 @@
       <id>Mike Ortiz</id>
       <name>Miguel Ángel Ortiz Amores</name>
       <email>miguel.ortiz@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Senior Developer</role>
       </roles>
@@ -160,8 +160,8 @@
       <id>dianaGomezGar</id>
       <name>Diana Gómez García</name>
       <email>diana.gomez@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -182,8 +182,8 @@
       <id>davidgarciago</id>
       <name>David García Gondell</name>
       <email>david.garciag@sngular.com</email>
-      <organization>Corunet</organization>
-      <organizationUrl>https://corunet.github.io/</organizationUrl>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
       </roles>
@@ -203,9 +203,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:corunet/kloadgen.git</connection>
-    <developerConnection>scm:git:git@github.com:corunet/kloadgen.git</developerConnection>
-    <url>scm:git:git@github.com:corunet/kloadgen.git</url>
+    <connection>scm:git:git@github.com:sngular/kloadgen.git</connection>
+    <developerConnection>scm:git:git@github.com:sngular/kloadgen.git</developerConnection>
+    <url>scm:git:git@github.com:sngular/kloadgen.git</url>
   </scm>
 
   <distributionManagement>
@@ -796,7 +796,7 @@
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                      <mainClass>net.coru.kloadgen.KLoadGenStandalone</mainClass>
+                      <mainClass>com.sngular.kloadgen.KLoadGenStandalone</mainClass>
                     </transformer>
                   </transformers>
                 </configuration>
