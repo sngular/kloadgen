@@ -159,8 +159,10 @@ public class SchemaProcessorUtils {
     }
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+    final HashMap<String, TypeElement> rootNestedTypes = new HashMap<>();
     schemaBuilder.setPackage(schema.getPackageName());
-    schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, nestedTypes));
+    fillNestedTypes(messageElement, rootNestedTypes);
+    schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, nestedTypes, schema.getPackageName(), rootNestedTypes));
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
@@ -221,27 +223,34 @@ public class SchemaProcessorUtils {
     return choppedField;
   }
 
-  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes) {
+  private static MessageDefinition buildProtoMessageDefinition(final String fieldName, final TypeElement messageElement, final HashMap<String, TypeElement> nestedTypes,
+                                                               final String packageName, final HashMap<String, TypeElement> rootNestedTypes) {
     fillNestedTypes(messageElement, nestedTypes);
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;
-    extracted(nestedTypes, msgDef, element.getFields());
+    extracted(nestedTypes, msgDef, element.getFields(), packageName, rootNestedTypes);
     for (var optionalField : element.getOneOfs()) {
-      extracted(nestedTypes, msgDef, optionalField.getFields());
+      extracted(nestedTypes, msgDef, optionalField.getFields(), packageName, rootNestedTypes);
     }
     return msgDef.build();
   }
 
-  private static void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList) {
+  private static void extracted(final HashMap<String, TypeElement> nestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList,
+                                final String packageName, final HashMap<String, TypeElement> rootNestedTypes) {
+    TypeElement elementRemovedFromNested = null;
     for (var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
       final var dotType = checkDotType(elementFieldType);
+      final var msgDefFieldType = getFieldTypeToAddToDefinition(dotType, elementFieldType, packageName);
       if (nestedTypes.containsKey(elementFieldType)) {
-        addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes);
+        addDefinition(msgDef, elementFieldType, nestedTypes.remove(elementFieldType), nestedTypes, packageName, rootNestedTypes);
       }
 
       if (nestedTypes.containsKey(dotType)) {
-        addDefinition(msgDef, dotType, nestedTypes.remove(dotType), nestedTypes);
+        elementRemovedFromNested = nestedTypes.remove(dotType);
+        addDefinition(msgDef, dotType, elementRemovedFromNested, nestedTypes, packageName, rootNestedTypes);
+      } else if (Objects.isNull(elementRemovedFromNested) && rootNestedTypes.containsKey(dotType)) {
+        addDefinition(msgDef, dotType, rootNestedTypes.get(dotType), nestedTypes, packageName, rootNestedTypes);
       }
 
       if (elementField.getType().startsWith("map")) {
@@ -249,25 +258,29 @@ public class SchemaProcessorUtils {
         final var mapDotType = checkDotType(realType);
 
         if (nestedTypes.containsKey(realType)) {
-          addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes);
+          addDefinition(msgDef, realType, nestedTypes.remove(realType), nestedTypes, packageName, rootNestedTypes);
         }
 
         if (nestedTypes.containsKey(mapDotType)) {
-          addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes);
+          addDefinition(msgDef, mapDotType, nestedTypes.remove(mapDotType), nestedTypes, packageName, rootNestedTypes);
         }
         msgDef.addField("repeated", "typemapnumber" + elementField.getName(), elementField.getName(), elementField.getTag());
 
         msgDef.addMessageDefinition(
-            MessageDefinition.newBuilder("typemapnumber" + elementField.getName()).addField(OPTIONAL, "string", "key", 1).addField(OPTIONAL, realType, "value", 2).build());
+            MessageDefinition.newBuilder("typemapnumber" + elementField.getName())
+                    .addField(OPTIONAL, "string", "key", 1)
+                    .addField(OPTIONAL, realType, "value", 2)
+                    .build());
       } else if (Objects.nonNull(elementField.getLabel())) {
-        msgDef.addField(elementField.getLabel().toString().toLowerCase(), elementField.getType(), elementField.getName(), elementField.getTag());
+        msgDef.addField(elementField.getLabel().toString().toLowerCase(), msgDefFieldType, elementField.getName(), elementField.getTag());
       } else {
-        msgDef.addField(OPTIONAL, elementField.getType(), elementField.getName(), elementField.getTag());
+        msgDef.addField(OPTIONAL, msgDefFieldType, elementField.getName(), elementField.getTag());
       }
     }
   }
 
-  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes) {
+  private static void addDefinition(final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement, final HashMap<String, TypeElement> nestedTypes,
+                                    final String packageName, final HashMap<String, TypeElement> rootNestedTypes) {
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
@@ -277,7 +290,7 @@ public class SchemaProcessorUtils {
       msgDef.addEnumDefinition(builder.build());
     } else {
       if (!typeName.contains(".")) {
-        msgDef.addMessageDefinition(buildProtoMessageDefinition(typeName, typeElement, nestedTypes));
+        msgDef.addMessageDefinition(buildProtoMessageDefinition(typeName, typeElement, nestedTypes, packageName, rootNestedTypes));
       }
     }
   }
@@ -295,6 +308,16 @@ public class SchemaProcessorUtils {
       dotType = typeSplit[typeSplit.length - 1];
     }
     return dotType;
+  }
+
+  private static String getFieldTypeToAddToDefinition(final String dotType, final String elementFieldType, final String packageName) {
+    final String type;
+    if (!dotType.isEmpty() && elementFieldType.contains(packageName) && elementFieldType.contains(dotType)) {
+      type = dotType;
+    } else {
+      type = elementFieldType;
+    }
+    return type;
   }
 
   public static String getOneDimensionValueType(final String completeValueType) {

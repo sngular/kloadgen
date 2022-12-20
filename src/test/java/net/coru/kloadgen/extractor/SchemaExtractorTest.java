@@ -115,10 +115,10 @@ class SchemaExtractorTest {
     try (MockedStatic<JMeterHelper> jMeterHelper = Mockito.mockStatic(JMeterHelper.class)) {
 
       jMeterHelper.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
-      Mockito.doNothing().when(protoBufExtractor).processField(Mockito.any(MessageElement.class), Mockito.anyList(), Mockito.anyList(), ArgumentMatchers.eq(false));
+      Mockito.doNothing().when(protoBufExtractor).processField(Mockito.any(MessageElement.class), Mockito.anyList(), Mockito.anyList(), ArgumentMatchers.eq(false), Mockito.any());
 
       schemaExtractor.flatPropertiesList("protobufSubject");
-      Mockito.verify(protoBufExtractor).processField(Mockito.any(), Mockito.anyList(), Mockito.anyList(), ArgumentMatchers.eq(false));
+      Mockito.verify(protoBufExtractor).processField(Mockito.any(), Mockito.anyList(), Mockito.anyList(), ArgumentMatchers.eq(false), Mockito.any());
     }
 
 
