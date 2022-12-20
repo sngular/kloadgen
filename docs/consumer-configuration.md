@@ -66,7 +66,7 @@ This configuration element allows to select a schema from a file (.avsc).
 
 You need to provide values for **Deserializer** and **Schema Type**.
 
-Make sure that you choose our custom deserializer (*net.coru.kloadgen.serializer.AvroDeserializer*) in **Deserializer**. 
+Make sure that you choose our custom deserializer (*serializer.com.sngular.kloadgen.AvroDeserializer*) in **Deserializer**. 
 
 The **Open** button allows to load the corresponding file. 
 

@@ -17,9 +17,9 @@ jobs:
         echo "REPO_DEST=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}').wiki" >> $GITHUB_ENV
       shell: bash
     - name: Checkout KLoadgen Repository
-      run: git clone https://github.com/corunet/kloadgen.git kloadgen
+      run: git clone https://github.com/sngular/kloadgen.git kloadgen
     - name: Checkout KLoadgen Wiki Repository
-      run: git clone https://github.com/corunet/kloadgen.wiki.git wiki
+      run: git clone https://github.com/sngular/kloadgen.wiki.git wiki
     - name: Copy docs and consolidate links
       run: |
         cp -rf kloadgen/docs/* wiki/
@@ -45,5 +45,5 @@ jobs:
         git status
         git add .
         git commit -m "kloadgen documentation | GitHub Actions $GITHUB_WORKFLOW $GITHUB_RUN_NUMBER"
-        git remote add origin-wiki "https://${{secrets.GITBOT_TOKEN}}@github.com/corunet/kloadgen.wiki.git"
+        git remote add origin-wiki "https://${{secrets.GITBOT_TOKEN}}@github.com/sngular/kloadgen.wiki.git"
         git push origin-wiki master

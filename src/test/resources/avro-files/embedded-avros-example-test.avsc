@@ -1,7 +1,7 @@
 [
   {
     "name": "EmbeddedSchema",
-    "namespace": "com.corunet.test",
+    "namespace": "com.sngular.test",
     "type": "record",
     "fields": [
       {
@@ -20,7 +20,7 @@
   },
   {
     "name": "PrincipalSchema",
-    "namespace": "com.corunet.test",
+    "namespace": "com.sngular.test",
     "type": "record",
     "fields": [
       {

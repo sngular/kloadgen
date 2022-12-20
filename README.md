@@ -1,6 +1,11 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85c9817742944668b5cc75e3fa1cdb23)](https://app.codacy.com/gh/corunet/kloadgen?utm_source=github.com&utm_medium=referral&utm_content=corunet/kloadgen&utm_campaign=Badge_Grade_Dashboard)
-[![Build Status](https://api.travis-ci.org/corunet/kloadgen.svg?branch=master)](https://travis-ci.org/corunet/kloadgen)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.coru/kloadgen/badge.svg)](https://maven-badges.herokuapp.com/maven-central/net.coru/kloadgen)
+## ❗❗ We have moved
+
+We have migrated to a new domain: https://github.com/sngular/kloadgen  
+You can find it and keep using it as usual from there.
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85c9817742944668b5cc75e3fa1cdb23)](https://app.codacy.com/gh/sngular/kloadgen?utm_source=github.com&utm_medium=referral&utm_content=sngular/kloadgen&utm_campaign=Badge_Grade_Dashboard)
+[![Build Status](https://api.travis-ci.org/sngular/kloadgen.svg?branch=master)](https://travis-ci.org/sngular/kloadgen)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.sngular/kloadgen/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.sngular/kloadgen)
 
 <p align="center">
 <a href="#-summary">Summary</a> · 
@@ -15,23 +20,23 @@
 
 KLoadGen is a Kafka load generator plugin for JMeter designed to work with AVRO, JSON Schema, and PROTOBUF structures for sending Kafka messages. It connects to the Schema Registry server, retrieves the subject to send, and generates a random message every time.
 
-Check our [wiki](https://github.com/corunet/kloadgen/wiki) for more details on KLoadGen. 
+Check our [wiki](https://github.com/sngular/kloadgen/wiki) for more details on KLoadGen. 
 
 ## 🚀 Getting Started
 
-Take a look at the [prerequisites](https://github.com/corunet/kloadgen/wiki/getting-started#prerequisites) for KLoadGen. 
+Take a look at the [prerequisites](https://github.com/sngular/kloadgen/wiki/getting-started#prerequisites) for KLoadGen. 
 
-If you want to start right away with your load tests, follow the [quickstart](https://github.com/corunet/kloadgen/wiki/getting-started#quickstart) and see [how to run a test plan](https://github.com/corunet/kloadgen/wiki/run-test-plan).
+If you want to start right away with your load tests, follow the [quickstart](https://github.com/sngular/kloadgen/wiki/getting-started#quickstart) and see [how to run a test plan](https://github.com/sngular/kloadgen/wiki/how-to-run#how-to-run-a-test-plan).
 
 ### Installation
 
-Check how to install KLoadGen as a JMeter library, how to download a prebuilt version from Maven, and how to install the plugin as a dependency in the [Installation](https://github.com/corunet/kloadgen/wiki/installation) page.
+Check how to install KLoadGen as a JMeter library, how to download a prebuilt version from Maven, and how to install the plugin as a dependency in the [Installation](https://github.com/sngular/kloadgen/wiki/installation) page.
 
 ## 🧑🏻‍💻 Usage
 
 ### Configuration
 
-See the [Producer configuration](https://github.com/corunet/kloadgen/wiki/producer-configuration) and [Consumer configuration](https://github.com/corunet/kloadgen/wiki/consumer-configuration) pages on our wiki for details on how to set up both ends of the message, producer and consumer, for this plugin.
+See the [Producer configuration](https://github.com/sngular/kloadgen/wiki/producer-configuration) and [Consumer configuration](https://github.com/sngular/kloadgen/wiki/consumer-configuration) pages on our wiki for details on how to set up both ends of the message, producer and consumer, for this plugin.
 
 ### Schemas
 
@@ -39,17 +44,17 @@ KLoadGen supports schemas with both primitive and complex data types, including 
 
 It also allows creating custom sequences of values and supports null values.
 
-You can find more details in [Schemas](https://github.com/corunet/kloadgen/wiki/schemas).
+You can find more details in [Schemas](https://github.com/sngular/kloadgen/wiki/schemas).
 
 ## 📊 Technical design
 
-See the architecture and project structure of KLoadGen in the [Architecture](https://github.com/corunet/kloadgen/wiki/architecture) page.
+See the architecture and project structure of KLoadGen in the [Architecture](https://github.com/sngular/kloadgen/wiki/architecture) page.
 
 ## 🧰 Support
 
 We’ll be glad to talk and discuss how KLoadGen can help you 😊
 
-Reach us through [GitHub issues](https://github.com/corunet/kloadgen/issues), [GitHub discussions](https://github.com/corunet/kloadgen/discussions), [email](mailto:info@corunet.com) or [Twitter](https://twitter.com/corunet).
+Reach us through [GitHub issues](https://github.com/sngular/kloadgen/issues), [GitHub discussions](https://github.com/sngular/kloadgen/discussions), [email](mailto:os3@sngular.com) or [Twitter](https://twitter.com/sngular).
 
 ## 💜 Special thanks
 

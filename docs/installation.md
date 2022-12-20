@@ -22,7 +22,7 @@ You are now ready to create a new test plan in JMeter. See the specific sections
 
 ## Download a prebuilt version from Maven
 
-You can also download a prebuilt version of this plugin from [Maven Central](https://mvnrepository.com/artifact/net.coru/kloadgen).
+You can also download a prebuilt version of this plugin from [Maven Central](https://mvnrepository.com/artifact/com.sngular/kloadgen).
 
 1. Choose the version you want to install.
 2. Choose the build tool you want to use.
@@ -35,7 +35,7 @@ This plugin can also be used automatically as a dependency. Include this code in
 
 ```
 <dependency>
-    <groupId>net.coru</groupId>
+    <groupId>com.sngular</groupId>
     <artifactId>kloadgen</artifactId>
     <version>_VERSION_NUMBER_</version>
 </dependency>

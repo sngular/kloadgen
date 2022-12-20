@@ -4,11 +4,11 @@ Here you will find the most up-to-date information regarding KLoadGen. Visit thi
 
 ## Changelog
 
-Check [GitHub Releases](https://github.com/corunet/kloadgen/releases) for a complete list of the additions, changes, and bug fixes.
+Check [GitHub Releases](https://github.com/sngular/kloadgen/releases) for a complete list of the additions, changes, and bug fixes.
 
 ## Contact and support
 
 This is the list of channels where you can find us for contact, support, and suggestions:
 
-- [GitHub issues](https://github.com/corunet/kloadgen/issues/new). For incidents, queries, and suggestions.
-- [Email](oss@corunet.com) and [Twitter](https://twitter.com/corunet). For general comments and requests.
+- [GitHub issues](https://github.com/sngular/kloadgen/issues/new). For incidents, queries, and suggestions.
+- [Email](os3@sngular.com) and [Twitter](https://twitter.com/sngular). For general comments and requests.

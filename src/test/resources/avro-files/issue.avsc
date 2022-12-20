@@ -1,7 +1,7 @@
 {
   "type": "record",
   "name": "OptionalArrayEvent",
-  "namespace": "net.coru",
+  "namespace": "com.sngular",
   "fields": [
     {
       "name": "mainObject",
