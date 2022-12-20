@@ -16,20 +16,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.sngular.kloadgen.exception.KLoadGenException;
-import com.squareup.wire.schema.internal.parser.TypeElement;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.avro.AvroSchema;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import io.confluent.kafka.schemaregistry.json.JsonSchema;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
+import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.extractors.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.ProtoBufExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.util.JMeterHelper;
+import com.squareup.wire.schema.internal.parser.TypeElement;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
 

@@ -4,9 +4,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
+import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
-import com.sngular.kloadgen.model.FieldValueMapping;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;

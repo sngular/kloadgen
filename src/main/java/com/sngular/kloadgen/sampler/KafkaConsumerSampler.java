@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Properties;
 
+import com.sngular.kloadgen.util.ProducerKeysHelper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.sngular.kloadgen.util.ProducerKeysHelper;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;

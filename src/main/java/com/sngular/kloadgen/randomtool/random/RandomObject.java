@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
 import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.randomtool.util.ValidTypeConstants;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
+import com.sngular.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;

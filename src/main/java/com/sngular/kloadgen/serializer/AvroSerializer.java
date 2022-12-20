@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.xml.bind.DatatypeConverter;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;

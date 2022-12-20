@@ -11,8 +11,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import com.sngular.kloadgen.util.PropsKeysHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.io.Decoder;

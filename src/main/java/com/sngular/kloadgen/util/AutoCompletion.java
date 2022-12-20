@@ -25,7 +25,6 @@ import javax.swing.text.PlainDocument;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 
-
 public class AutoCompletion extends PlainDocument {
 
   private final JComboBox<String> comboBox;

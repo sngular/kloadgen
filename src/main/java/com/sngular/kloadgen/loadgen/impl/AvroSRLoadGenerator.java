@@ -10,15 +10,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import lombok.extern.slf4j.Slf4j;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 
 @Slf4j

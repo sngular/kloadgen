@@ -4,9 +4,9 @@ import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Builder;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import lombok.Builder;
 
 @Builder
 public class SchemaProcessorPOJO implements Cloneable {

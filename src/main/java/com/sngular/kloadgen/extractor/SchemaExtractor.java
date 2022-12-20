@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.sngular.kloadgen.model.FieldValueMapping;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import com.sngular.kloadgen.model.FieldValueMapping;
 import org.apache.commons.lang3.tuple.Pair;
 
 public interface SchemaExtractor {

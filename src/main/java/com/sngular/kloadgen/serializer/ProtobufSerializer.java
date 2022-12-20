@@ -10,11 +10,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import javax.xml.bind.DatatypeConverter;
+
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.schemaregistry.protobuf.MessageIndexes;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
-import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;

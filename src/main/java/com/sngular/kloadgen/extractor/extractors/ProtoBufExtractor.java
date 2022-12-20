@@ -10,6 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.util.ProtobufHelper;
 import com.squareup.wire.schema.Field;
 import com.squareup.wire.schema.internal.parser.EnumConstantElement;
 import com.squareup.wire.schema.internal.parser.EnumElement;
@@ -18,8 +20,6 @@ import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.OneOfElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.util.ProtobufHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;

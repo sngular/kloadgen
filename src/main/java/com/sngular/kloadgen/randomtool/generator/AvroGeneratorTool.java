@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.sngular.kloadgen.model.ConstraintTypeEnum;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.randomtool.random.RandomArray;
 import com.sngular.kloadgen.randomtool.random.RandomIterator;
 import com.sngular.kloadgen.randomtool.random.RandomMap;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
 import com.sngular.kloadgen.randomtool.random.RandomSequence;
 import com.sngular.kloadgen.randomtool.util.ValueUtils;
-import com.sngular.kloadgen.model.ConstraintTypeEnum;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.randomtool.random.RandomArray;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;

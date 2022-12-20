@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.randomtool.util.ValidTypeConstants;
-import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;

@@ -23,11 +23,11 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
+import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
+import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
-import com.sngular.kloadgen.serializer.EnrichedRecord;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {

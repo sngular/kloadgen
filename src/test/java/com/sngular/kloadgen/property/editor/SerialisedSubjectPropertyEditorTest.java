@@ -15,10 +15,10 @@ import java.util.Locale;
 import java.util.stream.Stream;
 
 import com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement;
-import com.sngular.kloadgen.serializer.AvroSerializer;
-import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.serializer.AvroSerializer;
 import com.sngular.kloadgen.util.PropsKeysHelper;
+import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;

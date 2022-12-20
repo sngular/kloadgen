@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
-import lombok.extern.slf4j.Slf4j;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.randomtool.util.ValueUtils;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.PropsKeysHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j

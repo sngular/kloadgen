@@ -3,12 +3,12 @@ package com.sngular.kloadgen.processor.objectcreatorfactory;
 import java.io.IOException;
 
 import com.google.protobuf.Descriptors.DescriptorValidationException;
-import com.sngular.kloadgen.exception.KLoadGenException;
-import lombok.extern.slf4j.Slf4j;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
+import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.AvroObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.JsonObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.ProtobufObjectCreatorFactory;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ObjectCreatorFactoryHelper {

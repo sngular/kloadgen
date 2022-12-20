@@ -24,14 +24,14 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import lombok.extern.slf4j.Slf4j;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.util.AutoCompletion;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.jmeter.gui.ClearGui;

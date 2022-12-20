@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.Locale;
 
 import com.sngular.kloadgen.serializer.AvroSerializer;
-import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import com.sngular.kloadgen.util.PropsKeysHelper;
+import io.confluent.kafka.serializers.subject.TopicNameStrategy;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;

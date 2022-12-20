@@ -12,14 +12,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;

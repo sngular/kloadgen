@@ -3,14 +3,14 @@ package com.sngular.kloadgen.extractor.parser;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
-import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.extractor.parser.fixture.JsonSchemaFixturesConstants;
+import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.json.Field;
 import com.sngular.kloadgen.model.json.NumberField;
 import com.sngular.kloadgen.model.json.Schema;
 import com.sngular.kloadgen.model.json.StringField;
 import com.sngular.kloadgen.model.json.UUIDField;
+import com.sngular.kloadgen.testutil.FileHelper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

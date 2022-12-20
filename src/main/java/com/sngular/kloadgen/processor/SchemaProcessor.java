@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import lombok.SneakyThrows;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactoryHelper;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomUtils;
 
 public class SchemaProcessor {

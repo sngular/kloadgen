@@ -2,9 +2,9 @@ package com.sngular.kloadgen.extractor.extractors;
 
 import java.util.List;
 
+import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import com.sngular.kloadgen.model.FieldValueMapping;
 import org.apache.avro.Schema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

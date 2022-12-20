@@ -9,11 +9,11 @@ import java.util.Objects;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.FieldDescriptor;
+import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.randomtool.random.RandomArray;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
 import com.sngular.kloadgen.randomtool.random.RandomSequence;
 import com.sngular.kloadgen.randomtool.util.ValueUtils;
-import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 

@@ -12,13 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sngular.kloadgen.randomtool.util.ValidTypeConstants;
-import com.sngular.kloadgen.randomtool.util.ValueUtils;
 import com.sngular.kloadgen.randomtool.random.RandomArray;
 import com.sngular.kloadgen.randomtool.random.RandomIterator;
 import com.sngular.kloadgen.randomtool.random.RandomMap;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
 import com.sngular.kloadgen.randomtool.random.RandomSequence;
+import com.sngular.kloadgen.randomtool.util.ValidTypeConstants;
+import com.sngular.kloadgen.randomtool.util.ValueUtils;
 
 public class StatelessGeneratorTool {
 
