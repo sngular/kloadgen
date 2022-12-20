@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import javax.xml.bind.DatatypeConverter;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
@@ -26,6 +25,10 @@ public class AvroSerializer<T extends EnrichedRecord> implements Serializer<T> {
   private static final byte MAGIC_BYTE = 0x0;
 
   private static final int ID_SIZE = 4;
+
+  public AvroSerializer() {
+    AvroSerializersUtil.setupLogicalTypesConversion();
+  }
 
   @Override
   public final byte[] serialize(final String topic, final T data) {
