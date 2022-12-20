@@ -231,18 +231,19 @@ public class SchemaProcessorUtils {
   }
 
   private static MessageDefinition buildProtoMessageDefinition(
-      final String fieldName, final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, int deepLevel) {
+      final String fieldName, final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage,
+      final int previousDeepLevel) {
 
-    deepLevel++;
-    log.info("Processing deep level {} with fieldName {}...", deepLevel, fieldName);
+    final int nextDeepLevel = previousDeepLevel + 1;
+    log.info("Processing deep level {} with fieldName {}...", nextDeepLevel, fieldName);
 
-    fillNestedTypes(messageElement, globalNestedTypesByLevelAndMessage, deepLevel);
+    fillNestedTypes(messageElement, globalNestedTypesByLevelAndMessage, nextDeepLevel);
 
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;
-    extracted(globalNestedTypesByLevelAndMessage, msgDef, element.getFields(), deepLevel, fieldName);
+    extracted(globalNestedTypesByLevelAndMessage, msgDef, element.getFields(), nextDeepLevel, fieldName);
     for (var optionalField : element.getOneOfs()) {
-      extracted(globalNestedTypesByLevelAndMessage, msgDef, optionalField.getFields(), deepLevel, fieldName);
+      extracted(globalNestedTypesByLevelAndMessage, msgDef, optionalField.getFields(), nextDeepLevel, fieldName);
     }
     return msgDef.build();
   }
@@ -252,7 +253,7 @@ public class SchemaProcessorUtils {
       final int deepLevel, final String messageName) {
 
     final HashMap<String, TypeElement> nestedTypes = processLevelTypes(globalNestedTypesByLevelAndMessage, msgDef, fieldElementList, deepLevel,
-                                                                 messageName);
+                                                                       messageName);
 
     for (var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
@@ -305,7 +306,8 @@ public class SchemaProcessorUtils {
   }
 
   private static HashMap<String, TypeElement> processLevelTypes(
-      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final Builder msgDef, final List<FieldElement> fieldElementList, final int deepLevel,
+      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final Builder msgDef, final List<FieldElement> fieldElementList,
+      final int deepLevel,
       final String messageName) {
 
     List<String> allTypesInstantiatedByAttributesWithSimpleNames = new ArrayList<>();
