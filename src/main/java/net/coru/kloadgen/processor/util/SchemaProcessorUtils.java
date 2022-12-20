@@ -306,8 +306,8 @@ public class SchemaProcessorUtils {
       final int deepLevel,
       final String messageName) {
 
-    List<String> allTypesInstantiatedByAttributesWithSimpleNames = new ArrayList<>();
-    for (FieldElement fieldElement : fieldElementList) {
+    final List<String> allTypesInstantiatedByAttributesWithSimpleNames = new ArrayList<>();
+    for (final FieldElement fieldElement : fieldElementList) {
 
       final String typeCompletePath = fieldElement.getType();
       final String typeSimple = checkDotType(typeCompletePath);
@@ -317,10 +317,10 @@ public class SchemaProcessorUtils {
       }
     }
 
-    List<String> nestedTypesToDelete = new ArrayList<>();
-    HashMap<String, TypeElement> nestedTypes = globalNestedTypesByLevelAndMessage.get(deepLevel).get(messageName);
+    final List<String> nestedTypesToDelete = new ArrayList<>();
+    final HashMap<String, TypeElement> nestedTypes = globalNestedTypesByLevelAndMessage.get(deepLevel).get(messageName);
 
-    for (Map.Entry<String, TypeElement> entry : nestedTypes.entrySet()) {
+    for (final Map.Entry<String, TypeElement> entry : nestedTypes.entrySet()) {
       final String fieldName = entry.getKey();
       final TypeElement typeElement = entry.getValue();
 
@@ -363,7 +363,7 @@ public class SchemaProcessorUtils {
       messageNestedTypes = new HashMap<>();
     }
 
-    HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     messageElement.getNestedTypes().forEach(nestedType -> nestedTypes.put(nestedType.getName(), nestedType));
 
     messageNestedTypes.put(messageElement.getName(), nestedTypes);
