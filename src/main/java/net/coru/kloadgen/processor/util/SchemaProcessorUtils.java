@@ -32,12 +32,11 @@ import com.squareup.wire.schema.internal.parser.TypeElement;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.FieldValueMapping;
 import net.coru.kloadgen.util.ProtobufHelper;
-import org.jetbrains.annotations.NotNull;
-import scala.annotation.meta.field;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 @Slf4j
 public class SchemaProcessorUtils {
@@ -166,7 +165,7 @@ public class SchemaProcessorUtils {
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
     schemaBuilder.setPackage(schema.getPackageName());
 
-    int deepLevel = -1;
+    final int deepLevel = -1;
     /*
         The variable 'globalNestedTypes' records the required 'TypeElements', first by depth level, and then by Message.
      */
@@ -235,7 +234,7 @@ public class SchemaProcessorUtils {
   }
 
   private static MessageDefinition buildProtoMessageDefinition(
-      final String fieldName, final TypeElement messageElement, HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
+      final String fieldName, final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
 
     deepLevel++;
     log.info("Processing deep level {} with fieldName {}...", deepLevel, fieldName);
@@ -252,10 +251,10 @@ public class SchemaProcessorUtils {
   }
 
   private static void extracted(
-      HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList, int deepLevel,
-      String messageName) {
+      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, final Builder msgDef, final List<FieldElement> fieldElementList,
+      final int deepLevel, final String messageName) {
 
-    HashMap<String, TypeElement> nestedTypes = processLevelTypes(globalNestedTypes, msgDef, fieldElementList, deepLevel,
+    final HashMap<String, TypeElement> nestedTypes = processLevelTypes(globalNestedTypes, msgDef, fieldElementList, deepLevel,
                                                                  messageName);
 
     for (var elementField : fieldElementList) {
@@ -356,7 +355,7 @@ public class SchemaProcessorUtils {
 
   private static void addDefinition(
       final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
-      HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
+      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, final int deepLevel) {
 
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
@@ -372,7 +371,9 @@ public class SchemaProcessorUtils {
     }
   }
 
-  private static void fillNestedTypes(final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes, int deepLevel) {
+  private static void fillNestedTypes(
+      final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypes,
+      final int deepLevel) {
 
     HashMap<String, HashMap<String, TypeElement>> messageNestedTypes = globalNestedTypes.get(deepLevel);
     if (messageNestedTypes == null) {
