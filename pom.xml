@@ -168,6 +168,17 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
+      <id>mseijasm</id>
+      <name>Miguel Seijas Morató</name>
+      <email>miguel.seijas@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Senior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
       <id>davidgarciago</id>
       <name>David García Gondell</name>
       <email>david.garciag@sngular.com</email>
@@ -319,6 +330,12 @@
       <groupId>io.confluent</groupId>
       <artifactId>kafka-json-schema-provider</artifactId>
       <version>${kafka-schema-registry-client.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.github.everit-org.json-schema</groupId>
+          <artifactId>org.everit.json.schema</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.confluent</groupId>

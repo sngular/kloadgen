@@ -1,0 +1,48 @@
+syntax = "proto3";
+package demo;
+
+option java_package = "com.demo.order.proto";
+option java_outer_classname = "DemoOrder";
+option java_multiple_files = true;
+
+message Order {
+  int32 order_id = 1;
+  string order_number = 2;
+  .demo.Order.CustomerAccount customer_account = 3;
+  .demo.Order.Details details = 4;
+
+  message CustomerAccount {
+    .demo.Order.CustomerAccount.BillingParty billing_party = 1;
+
+    message BillingParty {
+      string party_id = 1;
+      .demo.Order.Address address = 2;
+      repeated .demo.Order.Contact party_contact = 3;
+    }
+  }
+  message Address {
+    string address_line_one = 1;
+    string address_line_two = 2;
+  }
+  message Contact {
+    int32 contact_id = 1;
+    string contact_name = 2;
+  }
+  message Details {
+    .demo.Order.Details.InDetails in_details = 1;
+
+    message InDetails {
+      .demo.Order.Details.InDetails.CustomsDetails customs_details = 1;
+
+      message CustomsDetails {
+        .demo.Order.Details.InDetails.CustomsDetails.Party party = 1;
+
+        message Party {
+          .demo.Order.Address party_address = 1;
+          repeated .demo.Order.Contact party_contact = 2;
+          repeated .demo.Order.Contact p_contact = 3;
+        }
+      }
+    }
+  }
+}
