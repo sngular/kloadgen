@@ -496,9 +496,9 @@ class ProtobufSchemaProcessorTest {
             .extracting(EnrichedRecord::getGenericRecord)
             .isNotNull();
     Assertions.assertThat(assertKeys).hasSize(3)
-            .containsExactlyInAnyOrder("company.Order.order_id",
-                    "company.Order.order_number",
-                    "company.Order.customer_account");
+            .containsExactlyInAnyOrder("demo.Order.order_id",
+                    "demo.Order.order_number",
+                    "demo.Order.customer_account");
     Assertions.assertThat(assertValues).hasSize(3).isNotNull();
     Assertions.assertThat(assertValues.get(0)).isInstanceOf(Integer.class);
     Assertions.assertThat(assertValues.get(1)).isInstanceOf(String.class);
