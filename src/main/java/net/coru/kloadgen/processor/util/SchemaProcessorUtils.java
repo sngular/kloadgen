@@ -38,7 +38,6 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-@Slf4j
 public class SchemaProcessorUtils {
 
   private static final String OPTIONAL = "optional";
@@ -235,7 +234,6 @@ public class SchemaProcessorUtils {
       final int previousDeepLevel) {
 
     final int nextDeepLevel = previousDeepLevel + 1;
-    log.info("Processing deep level {} with fieldName {}...", nextDeepLevel, fieldName);
 
     fillNestedTypes(messageElement, globalNestedTypesByLevelAndMessage, nextDeepLevel);
 
@@ -329,7 +327,6 @@ public class SchemaProcessorUtils {
       final TypeElement typeElement = entry.getValue();
 
       if (!allTypesInstantiatedByAttributesWithSimpleNames.contains(fieldName)) {
-        log.info("{} not contains the nestedType [{}]. We proceed to add it to the definition.", allTypesInstantiatedByAttributesWithSimpleNames.toString(), fieldName);
         nestedTypesToDelete.add(fieldName);
         addDefinition(msgDef, fieldName, typeElement, globalNestedTypesByLevelAndMessage, deepLevel);
       }
