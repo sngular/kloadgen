@@ -304,7 +304,6 @@ public class SchemaProcessorUtils {
     }
   }
 
-  @NotNull
   private static HashMap<String, TypeElement> processLevelTypes(
       final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final Builder msgDef, final List<FieldElement> fieldElementList, final int deepLevel,
       final String messageName) {
