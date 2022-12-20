@@ -256,7 +256,7 @@ public class SchemaProcessorUtils {
       final var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
 
-        TypeElement removed = nestedTypes.remove(dotType);
+        final TypeElement removed = nestedTypes.remove(dotType);
         globalNestedTypesByLevelAndMessage.get(deepLevel).put(messageName, nestedTypes);
 
         addDefinition(msgDef, elementFieldType, removed, globalNestedTypesByLevelAndMessage, deepLevel);
@@ -264,7 +264,7 @@ public class SchemaProcessorUtils {
 
       if (nestedTypes.containsKey(dotType)) {
 
-        TypeElement removed = nestedTypes.remove(dotType);
+        final TypeElement removed = nestedTypes.remove(dotType);
         globalNestedTypesByLevelAndMessage.get(deepLevel).put(messageName, nestedTypes);
 
         addDefinition(msgDef, dotType, removed, globalNestedTypesByLevelAndMessage, deepLevel);
@@ -276,7 +276,7 @@ public class SchemaProcessorUtils {
 
         if (nestedTypes.containsKey(realType)) {
 
-          TypeElement removed = nestedTypes.remove(dotType);
+          final TypeElement removed = nestedTypes.remove(dotType);
           globalNestedTypesByLevelAndMessage.get(deepLevel).put(messageName, nestedTypes);
 
           addDefinition(msgDef, realType, removed, globalNestedTypesByLevelAndMessage, deepLevel);
@@ -284,7 +284,7 @@ public class SchemaProcessorUtils {
 
         if (nestedTypes.containsKey(mapDotType)) {
 
-          TypeElement removed = nestedTypes.remove(dotType);
+          final TypeElement removed = nestedTypes.remove(dotType);
           globalNestedTypesByLevelAndMessage.get(deepLevel).put(messageName, nestedTypes);
 
           addDefinition(msgDef, mapDotType, removed, globalNestedTypesByLevelAndMessage, deepLevel);
