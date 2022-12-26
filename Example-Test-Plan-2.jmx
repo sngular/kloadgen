@@ -196,136 +196,136 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">sampler.com.sngular.kloadgen.KafkaProducerSampler</stringProp>
+          <stringProp name="classname">com.sngular.kloadgen.sampler.KafkaProducerSampler</stringProp>
         </JavaSampler>
         <hashTree/>
-        <valuefileserialized.config.com.sngular.kloadgen.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="valuefileserialized.config.com.sngular.kloadgen.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
+        <com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
           <stringProp name="valueSchemaType">AVRO</stringProp>
           <stringProp name="valueNameStrategy">io.confluent.kafka.serializers.subject.RecordNameStrategy</stringProp>
           <stringProp name="valueSerializerConfiguration">io.confluent.kafka.serializers.KafkaAvroSerializer</stringProp>
           <stringProp name="valueSubjectName">com.example.avro.User</stringProp>
           <collectionProp name="valueSchemaProperties">
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">id</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">int</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">username</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">passwordHash</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">signupDate</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">emailAddresses[].address</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">emailAddresses[].verified</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">boolean</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">emailAddresses[].dateAdded</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">emailAddresses[].dateBounced</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">twitterAccounts[].status</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">enum</stringProp>
               <stringProp name="fieldValuesList">PENDING,ACTIVE,DENIED,EXPIRED,REVOKED</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">twitterAccounts[].userId</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">twitterAccounts[].screenName</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">twitterAccounts[].oauthToken</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">twitterAccounts[].oauthTokenSecret</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">twitterAccounts[].dateAuthorized</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">toDoItems[].status</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">enum</stringProp>
               <stringProp name="fieldValuesList">HIDDEN,ACTIONABLE,DONE,ARCHIVED,DELETED</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">toDoItems[].title</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">toDoItems[].description</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">toDoItems[].snoozeDate</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
           </collectionProp>
           <stringProp name="valueSchemaDefinition">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;User&quot;,&quot;namespace&quot;:&quot;com.example.avro&quot;,&quot;doc&quot;:&quot;This is a user record in a fictitious to-do-list management app. It supports arbitrary grouping and nesting of items, and allows you to add items by email or by tweeting.\n\nNote this app doesn&apos;t actually exist. The schema is just a demo for [Avrodoc](https://github.com/ept/avrodoc)!&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;id&quot;,&quot;type&quot;:&quot;int&quot;,&quot;doc&quot;:&quot;System-assigned numeric user ID. Cannot be changed by the user.&quot;},{&quot;name&quot;:&quot;username&quot;,&quot;type&quot;:&quot;string&quot;,&quot;doc&quot;:&quot;The username chosen by the user. Can be changed by the user.&quot;},{&quot;name&quot;:&quot;passwordHash&quot;,&quot;type&quot;:&quot;string&quot;,&quot;doc&quot;:&quot;The user&apos;s password, hashed using [scrypt](http://www.tarsnap.com/scrypt.html).&quot;},{&quot;name&quot;:&quot;signupDate&quot;,&quot;type&quot;:&quot;long&quot;,&quot;doc&quot;:&quot;Timestamp (milliseconds since epoch) when the user signed up&quot;},{&quot;name&quot;:&quot;emailAddresses&quot;,&quot;type&quot;:{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;EmailAddress&quot;,&quot;doc&quot;:&quot;Stores details about an email address that a user has associated with their account.&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;address&quot;,&quot;type&quot;:&quot;string&quot;,&quot;doc&quot;:&quot;The email address, e.g. `foo@example.com`&quot;},{&quot;name&quot;:&quot;verified&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;doc&quot;:&quot;true if the user has clicked the link in a confirmation email to this address.&quot;,&quot;default&quot;:false},{&quot;name&quot;:&quot;dateAdded&quot;,&quot;type&quot;:&quot;long&quot;,&quot;doc&quot;:&quot;Timestamp (milliseconds since epoch) when the email address was added to the account.&quot;},{&quot;name&quot;:&quot;dateBounced&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;long&quot;],&quot;doc&quot;:&quot;Timestamp (milliseconds since epoch) when an email sent to this address last bounced. Reset to null when the address no longer bounces.&quot;}]}},&quot;doc&quot;:&quot;All email addresses on the user&apos;s account&quot;},{&quot;name&quot;:&quot;twitterAccounts&quot;,&quot;type&quot;:{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;TwitterAccount&quot;,&quot;doc&quot;:&quot;Stores access credentials for one Twitter account, as granted to us by the user by OAuth.&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;status&quot;,&quot;type&quot;:{&quot;type&quot;:&quot;enum&quot;,&quot;name&quot;:&quot;OAuthStatus&quot;,&quot;doc&quot;:&quot;* `PENDING`: the user has started authorizing, but not yet finished\n* `ACTIVE`: the token should work\n* `DENIED`: the user declined the authorization\n* `EXPIRED`: the token used to work, but now it doesn&apos;t\n* `REVOKED`: the user has explicitly revoked the token&quot;,&quot;symbols&quot;:[&quot;PENDING&quot;,&quot;ACTIVE&quot;,&quot;DENIED&quot;,&quot;EXPIRED&quot;,&quot;REVOKED&quot;]},&quot;doc&quot;:&quot;Indicator of whether this authorization is currently active, or has been revoked&quot;},{&quot;name&quot;:&quot;userId&quot;,&quot;type&quot;:&quot;long&quot;,&quot;doc&quot;:&quot;Twitter&apos;s numeric ID for this user&quot;},{&quot;name&quot;:&quot;screenName&quot;,&quot;type&quot;:&quot;string&quot;,&quot;doc&quot;:&quot;The twitter username for this account (can be changed by the user)&quot;},{&quot;name&quot;:&quot;oauthToken&quot;,&quot;type&quot;:&quot;string&quot;,&quot;doc&quot;:&quot;The OAuth token for this Twitter account&quot;},{&quot;name&quot;:&quot;oauthTokenSecret&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;doc&quot;:&quot;The OAuth secret, used for signing requests on behalf of this Twitter account. `null` whilst the OAuth flow is not yet complete.&quot;},{&quot;name&quot;:&quot;dateAuthorized&quot;,&quot;type&quot;:&quot;long&quot;,&quot;doc&quot;:&quot;Timestamp (milliseconds since epoch) when the user last authorized this Twitter account&quot;}]}},&quot;doc&quot;:&quot;All Twitter accounts that the user has OAuthed&quot;},{&quot;name&quot;:&quot;toDoItems&quot;,&quot;type&quot;:{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;ToDoItem&quot;,&quot;doc&quot;:&quot;A record is one node in a To-Do item tree (every record can contain nested sub-records).&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;status&quot;,&quot;type&quot;:{&quot;type&quot;:&quot;enum&quot;,&quot;name&quot;:&quot;ToDoStatus&quot;,&quot;doc&quot;:&quot;* `HIDDEN`: not currently visible, e.g. because it becomes actionable in future\n* `ACTIONABLE`: appears in the current to-do list\n* `DONE`: marked as done, but still appears in the list\n* `ARCHIVED`: marked as done and no longer visible\n* `DELETED`: not done and removed from list (preserved for undo purposes)&quot;,&quot;symbols&quot;:[&quot;HIDDEN&quot;,&quot;ACTIONABLE&quot;,&quot;DONE&quot;,&quot;ARCHIVED&quot;,&quot;DELETED&quot;]},&quot;doc&quot;:&quot;User-selected state for this item (e.g. whether or not it is marked as done)&quot;},{&quot;name&quot;:&quot;title&quot;,&quot;type&quot;:&quot;string&quot;,&quot;doc&quot;:&quot;One-line summary of the item&quot;},{&quot;name&quot;:&quot;description&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;string&quot;],&quot;doc&quot;:&quot;Detailed description (may contain HTML markup)&quot;},{&quot;name&quot;:&quot;snoozeDate&quot;,&quot;type&quot;:[&quot;null&quot;,&quot;long&quot;],&quot;doc&quot;:&quot;Timestamp (milliseconds since epoch) at which the item should go from `HIDDEN` to `ACTIONABLE` status&quot;}]}},&quot;doc&quot;:&quot;The top-level items in the user&apos;s to-do list&quot;}]}</stringProp>
-        </valuefileserialized.config.com.sngular.kloadgen.ValueFileSerializedConfigElement>
+        </com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement>
         <hashTree/>
-        <schemaregistry.config.com.sngular.kloadgen.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="schemaregistry.config.com.sngular.kloadgen.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
+        <com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
           <collectionProp name="schemaRegistryProperties">
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>
               <stringProp name="propertyValue">NO</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.auth.method</stringProp>
               <stringProp name="propertyValue">BASIC</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.username</stringProp>
               <stringProp name="propertyValue">&lt;username&gt;</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.password</stringProp>
               <stringProp name="propertyValue">&lt;password&gt;</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.bearer</stringProp>
               <stringProp name="propertyValue">&lt;bearer&gt;</stringProp>
             </elementProp>
           </collectionProp>
           <stringProp name="schemaRegistryUrl">http://localhost:8081</stringProp>
-        </schemaregistry.config.com.sngular.kloadgen.SchemaRegistryConfigElement>
+        </com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
         <hashTree/>
       </hashTree>
     </hashTree>
