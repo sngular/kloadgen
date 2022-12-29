@@ -25,7 +25,7 @@ public class GenericJsonRecordSerializer<T extends ObjectNode> implements Serial
     try {
       final var mapper = new ObjectMapper();
       mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
-      dataBytes = mapper.writeValueAsString(data).getBytes(StandardCharsets.UTF_8);
+      dataBytes = mapper.writeValueAsString(data).getBytes(StandardCharsets.US_ASCII);
     } catch (final IOException ex) {
       log.error("Serialization error:" + ex.getMessage());
     }
