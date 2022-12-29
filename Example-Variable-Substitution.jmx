@@ -36,23 +36,23 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
           <stringProp name="scriptLanguage">groovy</stringProp>
         </JSR223PreProcessor>
         <hashTree/>
-        <valuefileserialized.config.com.sngular.kloadgen.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="valuefileserialized.config.com.sngular.kloadgen.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
+        <com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
           <stringProp name="avroSchema">{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;test10&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;mapOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfString&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:&quot;string&quot;}],&quot;default&quot;:null},{&quot;name&quot;:&quot;arrayOfMap&quot;,&quot;type&quot;:[&quot;null&quot;,{&quot;type&quot;:&quot;array&quot;,&quot;items&quot;:{&quot;type&quot;:&quot;map&quot;,&quot;values&quot;:[&quot;null&quot;,&quot;string&quot;]}}],&quot;default&quot;:null}]}</stringProp>
           <stringProp name="avroSubject">test10</stringProp>
           <collectionProp name="schemaProperties">
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">mapOfString[2]</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string-map</stringProp>
               <stringProp name="fieldValuesList">${valueToReplace}</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">arrayOfString[1]</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string-array</stringProp>
               <stringProp name="fieldValuesList">a,b,c,t,h</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">arrayOfMap[2]</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string-map-array</stringProp>
@@ -60,7 +60,7 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
             </elementProp>
           </collectionProp>
           <stringProp name="valueSchemaType">AVRO</stringProp>
-        </valuefileserialized.config.com.sngular.kloadgen.ValueFileSerializedConfigElement>
+        </com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Java Request" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
@@ -257,12 +257,12 @@ vars.put(&quot;valueToReplace&quot;, valueToReplace);</stringProp>
               </elementProp>
               <elementProp name="value.serializer" elementType="Argument">
                 <stringProp name="Argument.name">value.serializer</stringProp>
-                <stringProp name="Argument.value">serializer.com.sngular.kloadgen.GenericAvroRecordBinarySerializer</stringProp>
+                <stringProp name="Argument.value">com.sngular.kloadgen.serializer.GenericAvroRecordBinarySerializer</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">sampler.com.sngular.kloadgen.KafkaProducerSampler</stringProp>
+          <stringProp name="classname">com.sngular.kloadgen.sampler.KafkaProducerSampler</stringProp>
         </JavaSampler>
         <hashTree/>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
