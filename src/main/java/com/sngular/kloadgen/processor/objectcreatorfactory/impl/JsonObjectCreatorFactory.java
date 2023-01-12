@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
@@ -18,8 +19,14 @@ import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
 public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final StatelessGeneratorTool STATELESS_GENERATOR_TOOL = new StatelessGeneratorTool();
+
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
   private final Map<String, ObjectNode> entity = new HashMap<>();
+
+  public JsonObjectCreatorFactory() {
+    OBJECT_MAPPER.registerModule(new JavaTimeModule());
+  }
 
   @Override
   public final Object createMap(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
@@ -46,8 +53,8 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private ObjectNode createFinalMap(final SchemaProcessorPOJO pojo) {
     return OBJECT_MAPPER.convertValue(
-      STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
-                                           pojo.getFieldSize()), ObjectNode.class);
+        STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+                                             pojo.getFieldSize()), ObjectNode.class);
   }
 
   private String generateString(final Integer valueLength) {
@@ -117,8 +124,8 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private ArrayNode createFinalArray(final SchemaProcessorPOJO pojo) {
     return OBJECT_MAPPER.convertValue(
-      STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
-                                             pojo.getValueLength(), pojo.getFieldValuesList()), ArrayNode.class);
+        STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
+                                               pojo.getValueLength(), pojo.getFieldValuesList()), ArrayNode.class);
   }
 
 }

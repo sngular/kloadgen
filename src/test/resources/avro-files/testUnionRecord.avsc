@@ -27,38 +27,30 @@
          "name":"products",
          "type":{
             "items":{
+               "name":"Product",
+               "type":"record",
                "fields":[
                   {
                      "name":"Price",
                      "type":{
+                        "name":"InnerPrice",
+                        "type":"record",
                         "fields":[
                            {
                               "name":"price",
-                              "type":{
-                                 "avro.java.string":"String",
-                                 "type":"string"
-                              }
+                              "type":"string"
                            },
                            {
                               "name":"priceType",
-                              "type":{
-                                 "avro.java.string":"String",
-                                 "type":"string"
-                              }
+                              "type":"string"
                            },
                            {
                               "name":"currency",
-                              "type":{
-                                 "avro.java.string":"String",
-                                 "type":"string"
-                              }
+                              "type":"string"
                            },
                            {
                               "name":"discount",
-                              "type":{
-                                 "avro.java.string":"String",
-                                 "type":"string"
-                              }
+                              "type":"string"
                            },
                            {
                               "name":"validateInnerObject",
@@ -68,14 +60,10 @@
                               ],
                               "default": null
                            }
-                        ],
-                        "name":"InnerPrice",
-                        "type":"record"
+                        ]
                      }
                   }
-               ],
-               "name":"Product",
-               "type":"record"
+               ]
             },
             "type":"array"
          }
