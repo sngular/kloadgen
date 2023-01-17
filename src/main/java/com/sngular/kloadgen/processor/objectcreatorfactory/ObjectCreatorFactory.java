@@ -7,7 +7,7 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 public interface ObjectCreatorFactory {
 
   Object createMap(
-          SchemaProcessorPOJO pojo, Function<SchemaProcessorPOJO, Object> generateFunction, boolean isInnerMap);
+      SchemaProcessorPOJO pojo, Function<SchemaProcessorPOJO, Object> generateFunction, boolean isInnerMap);
 
   Object createArray(
       SchemaProcessorPOJO pojo, Function<SchemaProcessorPOJO, Object> generateFunction, boolean isInnerArray);
@@ -24,4 +24,6 @@ public interface ObjectCreatorFactory {
   Object generateSubEntityRecord(Object objectRecord);
 
   boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level);
+
+  Object getRootNode(final String rootNode);
 }

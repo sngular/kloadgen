@@ -29,9 +29,13 @@ import org.apache.commons.collections4.IteratorUtils;
 public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
+
   private static final Set<Type> TYPES_SET = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
+
   private final Schema schema;
+
   private final SchemaMetadata metadata;
+
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
   public AvroObjectCreatorFactory(final Object schema, final Object metadata) {
@@ -93,6 +97,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     return isInnerArray ? list : entity.get(pojo.getRootFieldName());
   }
 
+  @Override
   public final Object createValueObject(final SchemaProcessorPOJO pojo) {
     final Schema fieldSchema = findSchema(pojo.getCompleteFieldName(), this.schema, new AtomicBoolean(false));
     final String valueType;
@@ -113,7 +118,6 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
-    entity.get(pojo.getRootFieldName());
   }
 
   @Override
@@ -155,6 +159,11 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     return isOptionalField(subSchema);
   }
 
+  @Override
+  public Object getRootNode(final String rootNode) {
+    return entity.get(rootNode);
+  }
+
   private List<Object> createFinalArray(final SchemaProcessorPOJO pojo) {
     return (ArrayList) AVRO_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(),
                                                          pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
@@ -168,7 +177,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private Schema getRecordUnion(final List<Schema> types) {
     Schema isRecord = null;
-    for (Schema innerSchema : types) {
+    for (final Schema innerSchema : types) {
       if (Type.RECORD == innerSchema.getType() || Type.ARRAY == innerSchema.getType() || Type.MAP == innerSchema.getType() || TYPES_SET.contains(innerSchema.getType())) {
         isRecord = innerSchema;
       }

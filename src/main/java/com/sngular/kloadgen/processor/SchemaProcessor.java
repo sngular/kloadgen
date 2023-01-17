@@ -97,8 +97,9 @@ public class SchemaProcessor {
       objectRecord = this.objectCreatorFactory.createArray(pojo, this::processTypeFilterAfterComplexType, false);
       removeFieldFromListIfNeededAfterProcessComplexType(fieldExpMappingsQueue, fieldValueMapping.getFieldValuesList(), lastTypeFilterOfLastElement);
     } else if (SchemaProcessorUtils.isTypeFilterRecord(singleTypeFilter)) {
-      objectRecord = createObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldExpMappingsQueue, pojo.getLevel());
+      createObject(fieldNameSubEntity, fieldValueMapping.getFieldName(), fieldExpMappingsQueue, pojo.getLevel());
       this.objectCreatorFactory.assignRecord(pojo);
+      objectRecord = this.objectCreatorFactory.getRootNode(pojo.getRootFieldName());
     } else {
       fieldExpMappingsQueue.remove();
       objectRecord = this.objectCreatorFactory.createValueObject(pojo);

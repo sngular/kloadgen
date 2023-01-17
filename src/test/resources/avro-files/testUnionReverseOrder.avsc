@@ -1,0 +1,63 @@
+{
+  "fields": [
+    {
+      "name": "validateInnerObject",
+      "type": {
+        "fields": [
+          {
+            "name": "attribute1",
+            "type": {
+              "avro.java.string": "String",
+              "type": "string"
+            }
+          },
+          {
+            "name": "attribute2",
+            "type": {
+              "avro.java.string": "String",
+              "type": "string"
+            }
+          }
+        ],
+        "name": "ValidateInnerObject",
+        "type": "record"
+      }
+    },
+    {
+      "name": "products",
+      "type": {
+        "items": {
+          "name": "Product",
+          "type": "record",
+          "fields": [
+            {
+              "name": "Price",
+              "type": {
+                "name": "InnerPrice",
+                "type": "record",
+                "fields": [
+                  {
+                    "name": "validateInnerObject",
+                    "type": [
+                      "null",
+                      "ValidateInnerObject"
+                    ],
+                    "default": null
+                  },
+                  {
+                    "name": "price",
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "type": "array"
+      }
+    }
+  ],
+  "name": "ProductInnerObject",
+  "namespace": "com.sngular",
+  "type": "record"
+}
