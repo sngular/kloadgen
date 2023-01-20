@@ -18,7 +18,9 @@ import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
 public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final StatelessGeneratorTool STATELESS_GENERATOR_TOOL = new StatelessGeneratorTool();
+
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
   private final Map<String, ObjectNode> entity = new HashMap<>();
 
   @Override
@@ -46,8 +48,8 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
 
   private ObjectNode createFinalMap(final SchemaProcessorPOJO pojo) {
     return OBJECT_MAPPER.convertValue(
-      STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
-                                           pojo.getFieldSize()), ObjectNode.class);
+        STATELESS_GENERATOR_TOOL.generateMap(SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getValueLength(), pojo.getFieldValuesList(),
+                                             pojo.getFieldSize()), ObjectNode.class);
   }
 
   private String generateString(final Integer valueLength) {
@@ -115,10 +117,15 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
     return true;
   }
 
+  @Override
+  public Object getRootNode(final String rootNode) {
+    return entity.get(rootNode);
+  }
+
   private ArrayNode createFinalArray(final SchemaProcessorPOJO pojo) {
     return OBJECT_MAPPER.convertValue(
-      STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
-                                             pojo.getValueLength(), pojo.getFieldValuesList()), ArrayNode.class);
+        STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
+                                               pojo.getValueLength(), pojo.getFieldValuesList()), ArrayNode.class);
   }
 
 }

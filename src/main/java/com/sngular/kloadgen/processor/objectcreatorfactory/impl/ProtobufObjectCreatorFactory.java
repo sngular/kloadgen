@@ -33,8 +33,11 @@ import org.apache.commons.lang3.StringUtils;
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
+
   private final Descriptors.Descriptor schema;
+
   private final SchemaMetadata metadata;
+
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
   public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
@@ -155,13 +158,18 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     return Type.MESSAGE.equals(fieldDescriptor.getType()) || fieldDescriptor.isRepeated() || fieldDescriptor.isMapField() && fieldDescriptor.isOptional();
   }
 
+  @Override
+  public Object getRootNode(final String rootNode) {
+    return entity.get(rootNode);
+  }
+
   private boolean isDescriptorOfMap(final Descriptor descriptor) {
     return descriptor.getName().startsWith("typemap");
   }
 
   private Object createFieldObject(final Descriptors.Descriptor descriptor, final SchemaProcessorPOJO pojo) {
     final DynamicMessage.Builder messageBuilder = DynamicMessage.newBuilder(descriptor);
-    for (var field : descriptor.getFields()) {
+    for (final var field : descriptor.getFields()) {
       messageBuilder.setField(field, PROTOBUF_GENERATOR_TOOL.generateRawObject(getFieldType(field), pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));
     }
 
@@ -253,7 +261,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     final Descriptors.FieldDescriptor valueFieldDescriptor = descriptor.getMessageType().findFieldByName("value");
     if (valueFieldDescriptor.getType().equals(FieldDescriptor.Type.ENUM)) {
       final List<String> fieldValueMappings = new ArrayList<>();
-      for (Descriptors.EnumValueDescriptor value : valueFieldDescriptor.getEnumType().getValues()) {
+      for (final Descriptors.EnumValueDescriptor value : valueFieldDescriptor.getEnumType().getValues()) {
         fieldValueMappings.add(value.getName());
       }
       builder.setField(valueFieldDescriptor,
