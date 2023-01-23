@@ -122,6 +122,11 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
     return true;
   }
 
+  @Override
+  public Object getRootNode(final String rootNode) {
+    return entity.get(rootNode);
+  }
+
   private ArrayNode createFinalArray(final SchemaProcessorPOJO pojo) {
     return OBJECT_MAPPER.convertValue(
         STATELESS_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), SchemaProcessorUtils.getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),

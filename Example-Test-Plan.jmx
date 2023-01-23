@@ -26,173 +26,173 @@
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
       <hashTree>
-        <kafkaheaders.config.com.sngular.kloadgen.KafkaHeadersConfigElement guiclass="TestBeanGUI" testclass="kafkaheaders.config.com.sngular.kloadgen.KafkaHeadersConfigElement" testname="KLG - Kafka Headers Config" enabled="true">
+        <com.sngular.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement" testname="KLG - Kafka Headers Config" enabled="true">
           <collectionProp name="kafkaHeaders">
-            <elementProp name="" elementType="model.com.sngular.kloadgen.HeaderMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
               <stringProp name="headerName">message_id</stringProp>
               <stringProp name="headerValue">uuid</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.HeaderMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
               <stringProp name="headerName">publication_timestamp</stringProp>
               <stringProp name="headerValue">stringTimestamp</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.HeaderMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
               <stringProp name="headerName">producer_id</stringProp>
               <stringProp name="headerValue">producer_id_1</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.HeaderMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
               <stringProp name="headerName">topic</stringProp>
               <stringProp name="headerValue">test-topic</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.HeaderMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
               <stringProp name="headerName">envelope_id</stringProp>
               <stringProp name="headerValue">envelope-id</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.HeaderMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
               <stringProp name="headerName">contentType</stringProp>
               <stringProp name="headerValue">application/*+avro</stringProp>
             </elementProp>
           </collectionProp>
-        </kafkaheaders.config.com.sngular.kloadgen.KafkaHeadersConfigElement>
+        </com.sngular.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
-        <valueserialized.config.com.sngular.kloadgen.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="valueserialized.config.com.sngular.kloadgen.ValueSerializedConfigElement" testname="KLG - Value Schema Serializer Config" enabled="true">
+        <com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="KLG - Value Schema Serializer Config" enabled="true">
           <stringProp name="avroSubject"></stringProp>
           <collectionProp name="valueSchemaProperties">
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.name</stringProp>
               <intProp name="valueLength">7</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.domain</stringProp>
               <intProp name="valueLength">7</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.version</stringProp>
               <intProp name="valueLength">2</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.id</stringProp>
               <intProp name="valueLength">5</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.timestamp</stringProp>
               <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">0</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.action</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
               <stringProp name="fieldValuesList">created</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.name</stringProp>
               <intProp name="valueLength">2</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.envelope.version</stringProp>
               <intProp name="valueLength">2</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.classifiers[1].name</stringProp>
               <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.classifiers[].values</stringProp>
               <stringProp name="fieldType">string-array</stringProp>
               <intProp name="valueLength">4</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">metadata.context</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.id</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">int</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.code</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
               <stringProp name="fieldValuesList">COD1,COD2,COD3</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.type</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.brand_id</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">int</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.address</stringProp>
               <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">20</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.city</stringProp>
               <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">10</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.zip_code</stringProp>
               <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.state</stringProp>
               <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.latitude</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.longitude</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">long</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.time_zone_id</stringProp>
               <stringProp name="fieldType">int</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.address.country_iso</stringProp>
               <stringProp name="fieldType">string</stringProp>
               <intProp name="valueLength">3</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.location_ids</stringProp>
               <stringProp name="fieldType">int-array</stringProp>
               <intProp name="valueLength">2</intProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.entity_version</stringProp>
               <stringProp name="fieldType">int</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.last_updated_date_time</stringProp>
               <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.entity.status</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">enum</stringProp>
             </elementProp>
-            <elementProp name="" elementType="model.com.sngular.kloadgen.FieldValueMapping">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">payload.timestamp</stringProp>
               <stringProp name="fieldType">longTimestamp</stringProp>
             </elementProp>
@@ -200,8 +200,8 @@
           <stringProp name="valueSubjectName">test</stringProp>
           <stringProp name="valueSchemaType">AVRO</stringProp>
           <stringProp name="valueNameStrategy">io.confluent.kafka.serializers.subject.RecordNameStrategy</stringProp>
-          <stringProp name="valueSerializerConfiguration">serializer.com.sngular.kloadgen.AvroSerializer</stringProp>
-        </valueserialized.config.com.sngular.kloadgen.ValueSerializedConfigElement>
+          <stringProp name="valueSerializerConfiguration">com.sngular.kloadgen.serializer.AvroSerializer</stringProp>
+        </com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Producer Properties" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
@@ -368,40 +368,40 @@
               </elementProp>
             </collectionProp>
           </elementProp>
-          <stringProp name="classname">sampler.com.sngular.kloadgen.KafkaProducerSampler</stringProp>
+          <stringProp name="classname">com.sngular.kloadgen.sampler.KafkaProducerSampler</stringProp>
         </JavaSampler>
         <hashTree/>
-        <schemaregistry.config.com.sngular.kloadgen.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="schemaregistry.config.com.sngular.kloadgen.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
+        <com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
           <stringProp name="schemaRegistryUrl">http://localhost:8081</stringProp>
           <collectionProp name="schemaRegistryProperties">
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>
               <stringProp name="propertyValue">NO</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.auth.method</stringProp>
               <stringProp name="propertyValue">BASIC</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.username</stringProp>
               <stringProp name="propertyValue">&lt;username&gt;</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.password</stringProp>
               <stringProp name="propertyValue">&lt;password&gt;</stringProp>
             </elementProp>
-            <elementProp name="Config properties" elementType="model.com.sngular.kloadgen.PropertyMapping" testname="Config properties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
               <stringProp name="propertyName">schema.registry.bearer</stringProp>
               <stringProp name="propertyValue">&lt;bearer&gt;</stringProp>
             </elementProp>
           </collectionProp>
-        </schemaregistry.config.com.sngular.kloadgen.SchemaRegistryConfigElement>
+        </com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
         <hashTree/>
-        <keysimple.config.com.sngular.kloadgen.KeySimpleConfigElement guiclass="TestBeanGUI" testclass="keysimple.config.com.sngular.kloadgen.KeySimpleConfigElement" testname="KLG - Simple Key Config" enabled="true">
+        <com.sngular.kloadgen.config.keysimple.KeySimpleConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.keysimple.KeySimpleConfigElement" testname="KLG - Simple Key Config" enabled="true">
           <stringProp name="keySerializerConfiguration">org.apache.kafka.common.serialization.StringSerializer</stringProp>
           <stringProp name="keyType">string</stringProp>
           <stringProp name="keyValue">${__RandomString(5,,)}</stringProp>
-        </keysimple.config.com.sngular.kloadgen.KeySimpleConfigElement>
+        </com.sngular.kloadgen.config.keysimple.KeySimpleConfigElement>
         <hashTree/>
       </hashTree>
     </hashTree>

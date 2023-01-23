@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.2.8</version>
+  <version>5.2.9</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial data based on Data specification</description>
@@ -200,6 +200,17 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>AdrianLagarteraSngular</id>
+      <name>Adrian Lagartera</name>
+      <email>adrian.lagartera@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://www.sngular.com</organizationUrl>
+      <roles>
+        <role>Senior Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
 
   <scm>
@@ -232,7 +243,7 @@
     <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
     <jdk.version>11</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.4.3</jmeter.version>
+    <jmeter.version>5.5</jmeter.version>
     <json-path.version>2.6.0</json-path.version>
     <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
