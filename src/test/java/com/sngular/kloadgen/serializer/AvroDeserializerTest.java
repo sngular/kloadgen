@@ -49,14 +49,6 @@ class AvroDeserializerTest {
     avroSerializer = new AvroSerializer();
   }
 
-  /*TODO Add new test case for embedded-avros-example-test.avsc file.
-
-     That file produces an ArrayIndexOutOfBoundsException because the deserializer takes Index from the wrong position in the array of bytes. It always takes the int of the
-     field testInt_id instead of the real index. This only happens in this test and works perfectly on a real test made in Jmeter.
-
-     File testEmbededAvrosExampleFile = TEST_EMBEDED_AVROS_EXAMPLE.getFirst();
-     builder.add(Arguments.arguments(serializerArgument, Named.of(testEmbededAvrosExampleFile.getName(), testEmbededAvrosExampleFile), TEST_EMBEDED_AVROS_EXAMPLE.getSecond()));
-  */
   private static Stream<Arguments> getSchemaToTest() {
 
     Builder<Arguments> builder = Stream.builder();
