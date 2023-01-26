@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
@@ -22,6 +23,10 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final Map<String, ObjectNode> entity = new HashMap<>();
+
+  public JsonObjectCreatorFactory() {
+    OBJECT_MAPPER.registerModule(new JavaTimeModule());
+  }
 
   @Override
   public final Object createMap(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {

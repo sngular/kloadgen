@@ -83,7 +83,10 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
-      messageBuilder.setField(fieldDescriptor, createFinalArray(fieldDescriptor, pojo));
+      final var finalArray = createFinalArray(fieldDescriptor, pojo);
+      for (var item : finalArray) {
+        messageBuilder.addRepeatedField(fieldDescriptor, item);
+      }
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         try {
@@ -105,7 +108,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     if (Type.MESSAGE.equals(descriptor.getType())) {
       object = createFieldObject(descriptor.getMessageType(), pojo);
     } else if (Type.ENUM.equals(descriptor.getType())) {
-      object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor.getEnumType(), pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList());
+      object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor.getEnumType(), pojo.getValueType(), pojo.getFieldValuesList());
     } else {
       object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor, pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints());
     }
@@ -204,11 +207,12 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     return type;
   }
 
-  private Object createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
-    final Object objectReturn;
+  private List<Object> createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
+    final List<Object> objectReturn;
     if (Objects.nonNull(fieldDescriptor) && FieldDescriptor.Type.ENUM.equals(fieldDescriptor.getType())) {
       final var enumDescriptor = fieldDescriptor.getEnumType();
-      objectReturn = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(), pojo.getFieldValuesList());
+      objectReturn = List.of(PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()),
+                                                                      pojo.getFieldValuesList()));
     } else {
       objectReturn = PROTOBUF_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(),
                                                            pojo.getFieldValuesList());
@@ -265,7 +269,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
         fieldValueMappings.add(value.getName());
       }
       builder.setField(valueFieldDescriptor,
-                       PROTOBUF_GENERATOR_TOOL.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
+                       PROTOBUF_GENERATOR_TOOL.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), fieldValueMappings));
     } else {
       builder.setField(valueFieldDescriptor,
                        PROTOBUF_GENERATOR_TOOL.generateRawObject(fieldValueMappingCleanType, pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));

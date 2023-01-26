@@ -7,13 +7,12 @@
 package com.sngular.kloadgen.serializer;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.CharSet;
-import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
@@ -26,15 +25,11 @@ public class GenericJsonRecordSerializer<T extends ObjectNode> implements Serial
     try {
       final var mapper = new ObjectMapper();
       mapper.getFactory().configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true);
-      dataBytes = mapper.writeValueAsString(data).getBytes(CharSet.ASCII_ALPHA.toString());
+      dataBytes = mapper.writeValueAsString(data).getBytes(StandardCharsets.US_ASCII);
     } catch (final IOException ex) {
       log.error("Serialization error:" + ex.getMessage());
     }
     return dataBytes;
   }
 
-  @Override
-  public final byte[] serialize(final String topic, final Headers headers, final T data) {
-    return new byte[0];
-  }
 }
