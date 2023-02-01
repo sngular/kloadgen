@@ -356,6 +356,10 @@ public final class SamplerUtil {
           throw exc;
         }
       }
+    } else {
+      generator.setUpGenerator(
+        jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
+        (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
     }
 
     return generator;
