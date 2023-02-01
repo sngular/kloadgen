@@ -17,6 +17,7 @@ import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.loadgen.impl.AvroSRLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -72,7 +73,7 @@ class SamplerUtilTest {
 
     props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, jmeterProps);
 
-    var result = SamplerUtil.configureValueGenerator(props);
-    Assertions.assertThat(result).isInstanceOf(AvroSRLoadGenerator.class);
+    var generator = SamplerUtil.configureValueGenerator(props);
+    generator.nextMessage();
   }
 }
