@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.loadgen.impl.AvroSRLoadGenerator;
+import com.sngular.kloadgen.loadgen.impl.SRLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -74,6 +75,6 @@ class SamplerUtilTest {
     props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, jmeterProps);
 
     var generator = SamplerUtil.configureValueGenerator(props);
-    generator.nextMessage();
+    Assertions.assertThat(generator.nextMessage()).isNotNull();
   }
 }
