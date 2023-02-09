@@ -211,6 +211,17 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>nuriaricorf</id>
+      <name>Nuria Rico Freire</name>
+      <email>nuria.rico@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
 
   <scm>
