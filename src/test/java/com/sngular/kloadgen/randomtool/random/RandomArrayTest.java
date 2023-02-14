@@ -6,6 +6,7 @@
 
 package com.sngular.kloadgen.randomtool.random;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -31,10 +32,23 @@ class RandomArrayTest {
     );
   }
 
+  private static Stream<Arguments> parametersForGenerateArrayRandomValueZero() {
+    return Stream.of(
+
+            Arguments.of("float-array", 0, Collections.emptyList()));
+  }
+
   @ParameterizedTest
   @MethodSource("parametersForGenerateArrayRandomValue")
   void generateArrayRandomValue(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Object expected) {
     Assertions.assertThat((List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap()))
-              .allMatch(value -> value.equals(expected));
+            .allMatch(value -> value.equals(expected));
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateArrayRandomValueZero")
+  void generateArrayRandomValueZero(final String fieldType, final Integer valueLength, final List<String> fieldValuesList){
+    Assertions.assertThat((List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap()))
+            .isNotNull();
   }
 }
