@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 
 public final class RandomObject {
 
+    private Random rand= new Random();
+    
     public boolean isTypeValid(final String type) {
         return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
     }
@@ -140,7 +142,7 @@ public final class RandomObject {
 
     private BigInteger getIntegerValueOrRandom(final Integer valueLength, final List<String> fieldValueList, final Map<ConstraintTypeEnum, String> constraints) {
         final BigInteger value;
-        Random random = new Random();
+
         if (!fieldValueList.isEmpty()) {
             value = new BigInteger(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
         } else {
@@ -148,7 +150,7 @@ public final class RandomObject {
             Number maximum;
             if (valueLength == 0) {
                 maximum= 1000;
-                int  num= random.nextInt((Integer) maximum);
+                int  num= rand.nextInt((Integer) maximum);
                 value = BigInteger.valueOf(num);
             } else {
                 maximum = calculateMaximum(valueLength, constraints);
