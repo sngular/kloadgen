@@ -53,8 +53,8 @@ class RandomArrayTest {
         Object number2 = new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
         List<Object> number3 = (List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
         Assertions.assertThat(number1).isNotNull();
-        Assertions.assertThat(number1).isNotNull();
-        Assertions.assertThat(number1).isNotNull();
+        Assertions.assertThat(number2).isNotNull();
+        Assertions.assertThat(number3).isNotNull();
         Assertions.assertThat(number1).isNotEqualTo(number2);
         Assertions.assertThat(number1).isNotEqualTo(number3);
         Assertions.assertThat(number3).isNotEqualTo(number2);

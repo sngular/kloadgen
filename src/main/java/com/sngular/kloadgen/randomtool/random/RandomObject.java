@@ -6,22 +6,6 @@
 
 package com.sngular.kloadgen.randomtool.random;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.github.curiousoddman.rgxgen.RgxGen;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
@@ -29,6 +13,14 @@ import com.sngular.kloadgen.randomtool.util.ValidTypeConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class RandomObject {
 
@@ -148,17 +140,19 @@ public final class RandomObject {
 
     private BigInteger getIntegerValueOrRandom(final Integer valueLength, final List<String> fieldValueList, final Map<ConstraintTypeEnum, String> constraints) {
         final BigInteger value;
-
+        Random random = new Random();
         if (!fieldValueList.isEmpty()) {
             value = new BigInteger(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
         } else {
                 final Number minimum = calculateMinimum(valueLength, constraints);
             Number maximum;
             if (valueLength == 0) {
-               maximum = Integer.MAX_VALUE;
+                maximum= 1000;
+                int  num= random.nextInt((Integer) maximum);
+                value = BigInteger.valueOf(num);
             } else {
                 maximum = calculateMaximum(valueLength, constraints);
-            }
+
                 if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
                     final int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
                     maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
@@ -166,7 +160,7 @@ public final class RandomObject {
                 } else {
                     value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
                 }
-            }
+            } }
         return value;
     }
 
