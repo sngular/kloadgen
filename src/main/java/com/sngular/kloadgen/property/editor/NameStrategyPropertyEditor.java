@@ -55,13 +55,21 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     nameStrategyComboBox.addActionListener(this);
   }
 
-  private void fillSerializer(final JComboBox<String> objectJComboBox) {
+    private void fillSerializer(final JComboBox<String> objectJComboBox) {
+    objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.RecordIdStrategy");
+    objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy");
+    objectJComboBox.addItem("io.apicurio.registry.serde.strategy.TopicIdStrategy");
+    objectJComboBox.addItem("io.apicurio.registry.serde.strategy.SimpleTopicIdStrategy");
+    nameStrategyComboBox = objectJComboBox;
+    /*
+    // todo: refactorizar esto para obtener las estrategias tanto de Confluent como de Apicurio
     nameStrategyComboBox = objectJComboBox;
     final Reflections reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
             .setScanners(Scanners.SubTypes));
     ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
+     */
   }
 
   @Override
