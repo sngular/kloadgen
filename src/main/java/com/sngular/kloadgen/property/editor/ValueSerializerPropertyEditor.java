@@ -64,7 +64,10 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
             .addUrls(ClasspathHelper.forClass(Serializer.class))
             .filterInputsBy(new FilterBuilder()
                                 .includePackage("com.sngular.kloadgen.serializer")
-                                .includePackage("io.confluent.kafka.serializers"))
+                                .includePackage("io.confluent.kafka.serializers")
+                                .includePackage("io.apicurio.registry.serde.avro.AvroKafkaSerializer")
+                                .includePackage("io.apicurio.registry.serde.jsonschema.JsonSchemaKafkaSerializer")
+                                .includePackage("io.apicurio.registry.serde.protobuf.ProtobufKafkaSerializer"))
             .setScanners(Scanners.SubTypes));
 
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);

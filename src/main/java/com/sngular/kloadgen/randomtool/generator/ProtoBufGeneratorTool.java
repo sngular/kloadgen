@@ -47,9 +47,15 @@ public class ProtoBufGeneratorTool {
     return value;
   }
 
-  public final Object generateObject(final Descriptors.EnumDescriptor descriptor, final String fieldType, final List<String> fieldValuesList) {
+  public final Object generateObject(final Descriptors.EnumDescriptor descriptor, final String fieldType, final int arraySize, final List<String> fieldValuesList) {
     final List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-    return getEnumOrGenerate(descriptor, fieldType, parameterList);
+    Object value = new Object();
+    if ("enum".equalsIgnoreCase(fieldType)) {
+      value = getEnumOrGenerate(descriptor, fieldType, parameterList);
+    } else if ("enum-array".equalsIgnoreCase(fieldType)) {
+      value = getArrayEnumOrGenerate(descriptor, fieldType, arraySize, parameterList);
+    }
+    return value;
   }
 
   private Object getEnumOrGenerate(final Descriptors.EnumDescriptor descriptor, final String fieldType, final List<String> parameterList) {

@@ -64,7 +64,10 @@ public class ValueDeserializerPropertyEditor extends PropertyEditorSupport imple
             .addUrls(ClasspathHelper.forClass(Deserializer.class))
             .filterInputsBy(new FilterBuilder()
                                 .includePackage("com.sngular.kloadgen.serializer")
-                                .includePackage("io.confluent.kafka.serializers"))
+                                .includePackage("io.confluent.kafka.serializers")
+                                .includePackage("io.apicurio.registry.serde.avro.AvroKafkaDeserializer")
+                                .includePackage("io.apicurio.registry.serde.jsonschema.JsonSchemaKafkaDeserializer")
+                                .includePackage("io.apicurio.registry.serde.protobuf.ProtobufKafkaDeserializer"))
             .setScanners(Scanners.SubTypes));
 
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);

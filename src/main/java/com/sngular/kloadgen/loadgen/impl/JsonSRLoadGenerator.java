@@ -17,11 +17,11 @@ import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
 import lombok.extern.slf4j.Slf4j;
+import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
@@ -30,7 +30,7 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
 
   private final SchemaProcessor jsonSchemaProcessor;
 
-  private Pair<SchemaMetadata, ParsedSchema> metadata;
+  private Pair<?, ?> metadata;
 
   public JsonSRLoadGenerator() {
     jsonSchemaProcessor = new SchemaProcessor();
@@ -53,7 +53,7 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
   }
 
   public EnrichedRecord nextMessage() {
-    return EnrichedRecord.builder().schemaMetadata(metadata.getLeft()).genericRecord(jsonSchemaProcessor.next()).build();
+    return EnrichedRecord.builder().schemaMetadata((KloadSchemaMetadata) metadata.getLeft()).genericRecord(jsonSchemaProcessor.next()).build();
   }
 
 }
