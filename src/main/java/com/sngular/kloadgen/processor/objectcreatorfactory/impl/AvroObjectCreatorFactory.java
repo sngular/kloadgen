@@ -20,6 +20,8 @@ import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
+import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
@@ -29,12 +31,10 @@ import org.apache.commons.collections4.IteratorUtils;
 public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
-
   private static final Set<Type> TYPES_SET = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
-
   private final Schema schema;
 
-  private final SchemaMetadata metadata;
+  private final KloadSchemaMetadata kloadSchemaMetadata;
 
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
@@ -46,7 +46,16 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }
-    this.metadata = (SchemaMetadata) metadata;
+
+    if (metadata instanceof SchemaMetadata) {
+      SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
+      this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
+    } else if (metadata instanceof ArtifactMetaData) {
+      ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
+      this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
+    } else {
+      throw new KLoadGenException("Unsupported metadata type");
+    }
   }
 
   @Override
@@ -118,6 +127,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
+    entity.get(pojo.getRootFieldName());
   }
 
   @Override
@@ -139,7 +149,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   @Override
   public final Object generateRecord() {
-    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(this.entity.get("root")).build();
+    return EnrichedRecord.builder().schemaMetadata(kloadSchemaMetadata).genericRecord(this.entity.get("root")).build();
   }
 
   @Override

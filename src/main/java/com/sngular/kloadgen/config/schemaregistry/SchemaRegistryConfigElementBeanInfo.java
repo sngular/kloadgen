@@ -11,11 +11,14 @@ import java.beans.PropertyDescriptor;
 import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.property.editor.SchemaRegistryConfigPropertyEditor;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import com.sngular.kloadgen.property.editor.SchemaRegistryNamePropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
+
+  private static final String SCHEMA_REGISTRY_NAME = "schemaRegistryName";
 
   private static final String SCHEMA_REGISTRY_URL = "schemaRegistryUrl";
 
@@ -25,7 +28,13 @@ public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
 
     super(SchemaRegistryConfigElement.class);
 
-    createPropertyGroup("schema_registry_config", new String[]{SCHEMA_REGISTRY_URL, SCHEMA_REGISTRY_PROPERTIES});
+    createPropertyGroup("schema_registry_config", new String[]{SCHEMA_REGISTRY_NAME, SCHEMA_REGISTRY_URL, SCHEMA_REGISTRY_PROPERTIES});
+
+    final PropertyDescriptor schemaRegistryName = property(SCHEMA_REGISTRY_NAME);
+    schemaRegistryName.setPropertyEditorClass(SchemaRegistryNamePropertyEditor.class);
+    schemaRegistryName.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    schemaRegistryName.setValue(DEFAULT, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME_DEFAULT);
+    schemaRegistryName.setValue(NOT_EXPRESSION, Boolean.FALSE);
 
     final PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_URL);
     schemaRegistryUrl.setPropertyEditorClass(SchemaRegistryConfigPropertyEditor.class);

@@ -75,7 +75,9 @@ public final class ProducerKeysHelper {
 
   public static final String KEY_NAME_STRATEGY = "key.subject.name.strategy";
 
-  public static final String TOPIC_NAME_STRATEGY = "io.confluent.kafka.serializers.subject.TopicRecordNameStrategy";
+  public static final String TOPIC_NAME_STRATEGY_CONFLUENT = "io.confluent.kafka.serializers.subject.TopicRecordNameStrategy";
+
+  public static final String TOPIC_NAME_STRATEGY_APICURIO = "io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy";
 
   private ProducerKeysHelper() {
   }

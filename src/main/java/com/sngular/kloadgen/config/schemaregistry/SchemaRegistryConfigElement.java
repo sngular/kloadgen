@@ -21,12 +21,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testelement.property.TestElementProperty;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
 @Getter
@@ -36,6 +39,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 @NoArgsConstructor
 public class SchemaRegistryConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
+  private String schemaRegistryName;
   private String schemaRegistryUrl;
 
   private List<PropertyMapping> schemaRegistryProperties;
@@ -49,8 +53,12 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     final JMeterVariables jMeterVariables = getThreadContext().getVariables();
 
     final Map<String, String> schemaProperties = getProperties();
+    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(getRegistryName());
 
-    jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JMeterHelper.checkPropertyOrVariable(getRegistryUrl()));
+    JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, getRegistryName());
+    jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, JMeterHelper.checkPropertyOrVariable(getRegistryName()));
+
+    jMeterVariables.put(schemaRegistryManager.getSchemaRegistryUrlKey(), JMeterHelper.checkPropertyOrVariable(getRegistryUrl()));
     if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
       jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
       if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
@@ -76,6 +84,14 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
       result.putAll(fromPropertyMappingToPropertiesMap(this.schemaRegistryProperties));
     }
     return result;
+  }
+
+  private String getRegistryName() {
+    String registryName = getPropertyAsString("schemaRegistryName");
+    if (StringUtils.isBlank(registryName)) {
+      registryName = this.schemaRegistryName;
+    }
+    return registryName;
   }
 
   private String getRegistryUrl() {

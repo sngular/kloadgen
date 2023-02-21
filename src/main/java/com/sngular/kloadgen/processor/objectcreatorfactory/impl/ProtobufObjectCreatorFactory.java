@@ -24,8 +24,10 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
+import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
+import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.commons.lang3.StringUtils;
@@ -33,11 +35,8 @@ import org.apache.commons.lang3.StringUtils;
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
-
   private final Descriptors.Descriptor schema;
-
-  private final SchemaMetadata metadata;
-
+  private final KloadSchemaMetadata kloadSchemaMetadata;
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
   public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
@@ -48,7 +47,16 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }
-    this.metadata = (SchemaMetadata) metadata;
+
+    if (metadata instanceof SchemaMetadata) {
+      SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
+      this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
+    } else if (metadata instanceof ArtifactMetaData) {
+      ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
+      this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
+    } else {
+      throw new KLoadGenException("Unsupported metadata type");
+    }
   }
 
   @Override
@@ -83,10 +91,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
-      final var finalArray = createFinalArray(fieldDescriptor, pojo);
-      for (var item : finalArray) {
-        messageBuilder.addRepeatedField(fieldDescriptor, item);
-      }
+      messageBuilder.setField(fieldDescriptor, createFinalArray(fieldDescriptor, pojo));
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         try {
@@ -108,7 +113,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     if (Type.MESSAGE.equals(descriptor.getType())) {
       object = createFieldObject(descriptor.getMessageType(), pojo);
     } else if (Type.ENUM.equals(descriptor.getType())) {
-      object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor.getEnumType(), pojo.getValueType(), pojo.getFieldValuesList());
+      object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor.getEnumType(), pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList());
     } else {
       object = PROTOBUF_GENERATOR_TOOL.generateObject(descriptor, pojo.getValueType(), pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints());
     }
@@ -142,7 +147,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   @Override
   public final Object generateRecord() {
-    return EnrichedRecord.builder().schemaMetadata(metadata).genericRecord(entity.get("root").build()).build();
+    return EnrichedRecord.builder().schemaMetadata(kloadSchemaMetadata).genericRecord(entity.get("root").build()).build();
   }
 
   @Override
@@ -207,12 +212,11 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     return type;
   }
 
-  private List<Object> createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
-    final List<Object> objectReturn;
+  private Object createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
+    final Object objectReturn;
     if (Objects.nonNull(fieldDescriptor) && FieldDescriptor.Type.ENUM.equals(fieldDescriptor.getType())) {
       final var enumDescriptor = fieldDescriptor.getEnumType();
-      objectReturn = List.of(PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()),
-                                                                      pojo.getFieldValuesList()));
+      objectReturn = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(), pojo.getFieldValuesList());
     } else {
       objectReturn = PROTOBUF_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(),
                                                            pojo.getFieldValuesList());
@@ -269,7 +273,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
         fieldValueMappings.add(value.getName());
       }
       builder.setField(valueFieldDescriptor,
-                       PROTOBUF_GENERATOR_TOOL.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), fieldValueMappings));
+                       PROTOBUF_GENERATOR_TOOL.generateObject(valueFieldDescriptor.getEnumType(), valueFieldDescriptor.getType().name(), 0, fieldValueMappings));
     } else {
       builder.setField(valueFieldDescriptor,
                        PROTOBUF_GENERATOR_TOOL.generateRawObject(fieldValueMappingCleanType, pojo.getValueLength(), pojo.getFieldValuesList(), pojo.getConstraints()));

@@ -48,6 +48,7 @@ public class KafkaConsumerSampler extends AbstractJavaSamplerClient implements S
 
   public final Properties properties(final JavaSamplerContext context) {
     final var props = SamplerUtil.setupCommonConsumerProperties(context);
+    //todo: obtener unas properties u otras en funcion de si el schema registry es de Confluent o de Apicurio
     props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");
     props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
     props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "10000");
