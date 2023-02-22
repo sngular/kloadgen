@@ -146,7 +146,7 @@ public class SchemaProcessorUtils {
 
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
     final List<String> imports = schema.getImports();
-    for (String importedClass : imports) {
+    for (final String importedClass : imports) {
       try (final InputStream resourceStream = SchemaProcessorUtils.class.getClassLoader().getResourceAsStream(importedClass)) {
         if (null != resourceStream) {
           final String schemaToString = new String(resourceStream.readAllBytes());
@@ -181,7 +181,7 @@ public class SchemaProcessorUtils {
     String packageName = "";
     final var linesIterator = importedLines.listIterator();
     while (linesIterator.hasNext()) {
-      final var fileLine = linesIterator.next();
+      final var fileLine = linesIterator.next().trim();
 
       if (fileLine.startsWith("package")) {
         packageName = StringUtils.chop(fileLine.substring(7).trim());
@@ -238,7 +238,7 @@ public class SchemaProcessorUtils {
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;
     extracted(globalNestedTypesByLevelAndMessage, msgDef, element.getFields(), nextDeepLevel, fieldName);
-    for (var optionalField : element.getOneOfs()) {
+    for (final var optionalField : element.getOneOfs()) {
       extracted(globalNestedTypesByLevelAndMessage, msgDef, optionalField.getFields(), nextDeepLevel, fieldName);
     }
     return msgDef.build();
@@ -251,7 +251,7 @@ public class SchemaProcessorUtils {
     final HashMap<String, TypeElement> nestedTypes = processLevelTypes(globalNestedTypesByLevelAndMessage, msgDef, fieldElementList, deepLevel,
                                                                        messageName);
 
-    for (var elementField : fieldElementList) {
+    for (final var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
       final var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
@@ -343,7 +343,7 @@ public class SchemaProcessorUtils {
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
-      for (var constant : enumElement.getConstants()) {
+      for (final var constant : enumElement.getConstants()) {
         builder.addValue(constant.getName(), constant.getTag());
       }
       msgDef.addEnumDefinition(builder.build());

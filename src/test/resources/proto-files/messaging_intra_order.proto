@@ -1,0 +1,218 @@
+syntax = "proto3";
+
+package demo;
+
+option java_package = "com.demo.unmanaged.order.proto";
+option java_outer_classname = "IntraOrder";
+option java_multiple_files = true;
+
+message Order {
+
+  message Address {
+    int32 address_id = 1;
+    string address_line_one = 2;
+  }
+
+  message Contact {
+    int32 contact_id = 1;
+    string first_name = 2;
+    string last_name = 3;
+  }
+
+  message Dimension {
+    string unit_of_measure = 1;
+    int32 value = 2;
+  }
+
+  message CustomerAccount {
+    demo.Order.CustomerAccount.BillingParty billing_party = 1;
+    string name = 2;
+
+    message BillingParty {
+      string p_name = 1;
+      repeated demo.Order.Contact p_contact = 2;
+    }
+  }
+
+  message LogisticsProviderDetails {
+    demo.Order.LogisticsProviderDetails.ManagedBy managed_by = 1;
+
+    message ManagedBy {
+      string organization_name = 1;
+      string organization_id = 2;
+    }
+  }
+
+  message MarketingAreaDetails {
+    string origin_marketing_area = 1;
+    string origin_area_name = 2;
+  }
+
+  message ServiceOfferingDetails {
+    string business_unit_code = 1;
+    string service_offering = 2;
+  }
+
+  message Currency {
+    string currency_code = 1;
+    double value = 2;
+  }
+
+  message OperationalRequirements {
+    string code = 1;
+    string type = 2;
+    demo.Order.OperationalRequirements.IntendedCarrier carrier = 3;
+
+    message IntendedCarrier {
+      string id = 4;
+    }
+  }
+
+  message RatingDetails {
+    string terms = 1;
+    string status = 2;
+    demo.Order.RatingDetails.RateSheets sheets = 3;
+
+    message RateSheets {
+      repeated demo.Order.RatingDetails.RateSheets.RateSheet in_sheet = 1;
+      repeated demo.Order.RatingDetails.RateSheets.RateSheet es_sheet = 2;
+
+      message RateSheet {
+        int32 id = 4;
+      }
+    }
+  }
+
+  message OrderDetails {
+    repeated demo.Order.OrderDetails.OrderRequirements order_requirements = 1;
+    demo.Order.OrderDetails.InternationalDetails international_details = 2;
+
+    message OrderRequirements {
+      string requirement = 1;
+    }
+    message InternationalDetails {
+      demo.Order.OrderDetails.InternationalDetails.CustomsDetails customs_details = 1;
+      repeated demo.Order.OrderDetails.InternationalDetails.InternationalServices international_services = 2;
+      demo.Order.OrderDetails.InternationalDetails.InbondDetails inbond_details = 3;
+      demo.Order.OrderDetails.InternationalDetails.PortDetails port_of_exit_location = 4;
+      demo.Order.OrderDetails.InternationalDetails.PortDetails port_of_entry_location = 5;
+
+      message InternationalServices {
+        string service = 1;
+      }
+
+      message PortDetails {
+        string location_id = 1;
+        string location_name = 2;
+        demo.Order.Address location_address = 3;
+      }
+
+      message CustomsDetails {
+        demo.Order.OrderDetails.InternationalDetails.CustomsDetails.CustomsBroker customs_broker = 1;
+        string clearing_customs_country = 2;
+
+        message CustomsBroker {
+          string party_name = 1;
+          demo.Order.Address party_address = 2;
+          repeated demo.Order.Contact party_contact = 3;
+        }
+      }
+
+      message InbondDetails {
+        string bond_holder_role = 1;
+        demo.Order.OrderDetails.InternationalDetails.InbondDetails.BondHolderParty bond_holder_party = 2;
+
+        message BondHolderParty {
+          string party_name = 3;
+          demo.Order.Address party_address = 4;
+          repeated demo.Order.Contact party_contact = 5;
+        }
+      }
+    }
+  }
+
+  message RequestedOperationalServices {
+    string service_type = 1;
+  }
+
+  message ReferenceNumbers {
+    int32 reference_number_id = 1;
+    string reference_number = 2;
+  }
+
+  message Appointments {
+    int32 appointment_id = 1;
+    string appointment_type_code = 2;
+    repeated demo.Order.Appointments.AppointmentRequirements appointment_requirements = 3;
+    repeated demo.Order.Appointments.AppointmentNumbers appointment_numbers = 4;
+
+    message AppointmentRequirements {
+      string requirement = 5;
+    }
+
+    message AppointmentNumbers {
+      string appointment_number = 6;
+    }
+  }
+
+  message AdditionalInstructions {
+    string instruction_type = 1;
+    string instruction_text = 2;
+  }
+
+  message Comments {
+    string comment_type = 1;
+    string comment = 2;
+  }
+
+  message Stops {
+    demo.Order.Stops.StopLocation stop_location = 1;
+    repeated demo.Order.Stops.ItemHandlingDetails item_handling_details = 2;
+
+    message StopLocation {
+      string location_id = 1;
+      demo.Order.Address address = 2;
+    }
+    message ItemHandlingDetails {
+      int32 item_handling_detail_id = 3;
+      demo.Order.ItemUnit item_handling_unit = 4;
+      demo.Order.Dimension item_handling_unit_height = 5;
+      repeated demo.Order.Stops.ItemHandlingDetails.ItemDetails item_details = 6;
+
+      message ItemDetails {
+        int32 stop_item_id = 7;        
+        demo.Order.ItemUnit packaging_unit = 8;
+        demo.Order.Dimension item_density = 9;
+        demo.Order.Dimension item_height = 10;
+        repeated demo.Order.ReferenceNumbers reference_numbers = 11;
+      }
+    }
+  }
+
+  message EquipmentRequirements {
+    demo.Order.EquipmentRequirements.EquipmentCharacteristics characteristics = 1;
+
+    message EquipmentCharacteristics {
+      repeated demo.Order.EquipmentRequirements.EquipmentCharacteristics.EquipmentOptions e_options = 2;
+
+      message EquipmentOptions {
+        string option = 3;
+      }
+    }
+  }
+
+  message ItemUnit {
+    int32 quantity = 1;
+    string type = 2;
+  }
+
+  message UserDetails {
+    string person_id = 1;
+    string first_name = 2;
+  }
+
+  message SystemDetails {
+    string order_system = 1;
+    demo.Order.UserDetails created_by = 2;
+  }
+}
