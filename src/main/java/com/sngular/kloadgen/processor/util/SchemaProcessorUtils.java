@@ -25,16 +25,20 @@ import com.github.os72.protobuf.dynamic.MessageDefinition.Builder;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProtobufHelper;
 import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaProcessorUtils {
 
@@ -156,7 +160,15 @@ public class SchemaProcessorUtils {
             schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
             schemaBuilder.addSchema(importedSchema);
           }
+        } else {
+          final var importSchema = JMeterHelper.getParsedSchema(importedClass.substring(0, importedClass.length() - 6), JMeterContextService.getContext().getProperties());
+          if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
+            schemaBuilder.addDependency(((ProtobufSchema) importSchema).toDescriptor().getFullName());
+            schemaBuilder.addSchema(convertDynamicSchema((ProtobufSchema) importSchema));
+          }
         }
+      } catch (RestClientException e) {
+        throw new RuntimeException(e);
       }
     }
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
@@ -168,6 +180,10 @@ public class SchemaProcessorUtils {
     schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, globalNestedTypesByLevelAndMessage, deepLevel));
 
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
+  }
+
+  private static DynamicSchema convertDynamicSchema(final ProtobufSchema importSchema) throws DescriptorValidationException {
+    return processImported(Arrays.asList(importSchema.rawSchema().toSchema().split("\\n")));
   }
 
   private static Predicate<String> isValid() {
@@ -208,9 +224,11 @@ public class SchemaProcessorUtils {
     while (messageLines.hasNext() && !exit) {
       final var field = messageLines.next().trim().split("\\s");
       if (ProtobufHelper.isValidType(field[0])) {
-        messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
+        messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfGreppable(field[3])));
       } else if (ProtobufHelper.LABEL.contains(field[0])) {
-        messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
+        messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfGreppable(field[4])));
+      } else if ("message".equalsIgnoreCase(field[0])) {
+        messageDefinition.addMessageDefinition(buildMessage(field[1], messageLines));
       } else if ("}".equalsIgnoreCase(field[0])) {
         exit = true;
       }
@@ -219,7 +237,7 @@ public class SchemaProcessorUtils {
     return messageDefinition.build();
   }
 
-  private static String checkIfChoppable(final String field) {
+  private static String checkIfGreppable(final String field) {
     String choppedField = field;
     if (field.endsWith(";")) {
       choppedField = StringUtils.chop(field);
