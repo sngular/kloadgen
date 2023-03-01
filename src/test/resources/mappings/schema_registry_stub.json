@@ -112,6 +112,86 @@
       "priority": 10,
       "request": {
         "method": "GET",
+        "urlPattern": "/subjects/protobuf_subject/versions/latest"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "subject": "ProtobufSubject",
+          "version": 1,
+          "id": 74,
+          "schemaType": "PROTOBUF",
+          "schema": "syntax = \"proto3\";\r\npackage sngular;\r\n\r\noption java_package = \"com.sngular.external.proto\";\r\noption java_outer_classname = \"ExternalMessage\";\r\noption java_multiple_files = true;\r\n\r\nmessage ExternalEntity{\r\n string parentPropertyOne = 1;\r\n int32 parentPropertyTwo = 2;\r\n \r\n  message EntityOne {\r\n    int32 entityNumberOne = 1;\r\n    string entityNumberTwo = 2;\r\n    \r\n    message NestingEntity {\r\n      string nestedProperty = 1;\r\n      \r\n      }\r\n    \r\n  }\r\n  \r\n  message EntityTwo {\r\n    int32 propertyNumberOne = 1;\r\n    string propertyNumberTwo = 2; \r\n  }\r\n\r\n}"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/schemas/ids/74\\?fetchMaxId=false&subject=protobuf_subject"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "schemaType": "PROTOBUF",
+          "schema": "syntax = \"proto3\";\r\npackage sngular;\r\n\r\noption java_package = \"com.sngular.external.proto\";\r\noption java_outer_classname = \"ExternalMessage\";\r\noption java_multiple_files = true;\r\n\r\nmessage ExternalEntity{\r\n string parentPropertyOne = 1;\r\n int32 parentPropertyTwo = 2;\r\n \r\n  message EntityOne {\r\n    int32 entityNumberOne = 1;\r\n    string entityNumberTwo = 2;\r\n    \r\n    message NestingEntity {\r\n      string nestedProperty = 1;\r\n      \r\n      }\r\n    \r\n  }\r\n  \r\n  message EntityTwo {\r\n    int32 propertyNumberOne = 1;\r\n    string propertyNumberTwo = 2; \r\n  }\r\n\r\n}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority":  10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/subjects/protobufSubjectWithImport/versions/latest"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "subject": "ProtobufSubjectWithImport",
+          "version": 1,
+          "id": 75,
+          "schemaType": "PROTOBUF",
+          "schema": "syntax = \"proto3\";\r\npackage sngular;\r\n\r\nimport \"protobuf_subject.proto\";\r\n\r\noption java_package = \"com.sngular.internal.proto\";\r\noption java_outer_classname = \"InternalMessage\";\r\noption java_multiple_files = true;\r\n\r\nmessage InternalMessage{\r\n\r\n  InternalEntityOne propertyTest1 = 1;\r\n  EntityTwo propertyTest2 = 2;\r\n  \r\n  message InternalEntityOne {\r\n    ExternalEntity.EntityOne.NestingEntity importedProperty = 1;\r\n    string entityNumberTwo = 2;\r\n  }\r\n  \r\n  message EntityTwo {\r\n    int32 propertyNumberOne = 1;\r\n    string propertyNumberTwo = 2; \r\n  }\r\n\r\n}",
+          "references" : [{
+              "name": "protobuf_subject.proto",
+              "subject": "protobuf_subject",
+              "version": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/schemas/ids/75\\?fetchMaxId=false&subject=protobufSubjectWithImport"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "schemaType": "PROTOBUF",
+          "schema": "syntax = \"proto3\";\r\npackage sngular;\r\n\r\nimport \"protobuf_subject.proto\";\r\n\r\noption java_package = \"com.sngular.internal.proto\";\r\noption java_outer_classname = \"InternalMessage\";\r\noption java_multiple_files = true;\r\n\r\nmessage InternalMessage{\r\n\r\n  InternalEntityOne propertyTest1 = 1;\r\n  EntityTwo propertyTest2 = 2;\r\n  \r\n  message InternalEntityOne {\r\n    ExternalEntity.EntityOne.NestingEntity importedProperty = 1;\r\n    string entityNumberTwo = 2;\r\n  }\r\n  \r\n  message EntityTwo {\r\n    int32 propertyNumberOne = 1;\r\n    string propertyNumberTwo = 2; \r\n  }\r\n\r\n}",
+          "references" : [{
+            "name": "protobuf_subject.proto",
+            "subject": "protobuf_subject",
+            "version": 1
+          }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
         "urlPattern": "/subjects"
       },
       "response": {
@@ -119,12 +199,36 @@
         "jsonBody": [
           "avrosubject",
           "users",
-          "arrayMap"
+          "arrayMap",
+          "protobuf_subject",
+          "protobufSubjectWithImport"
         ],
         "headers": {
           "Content-Type": "application/vnd.schemaregistry.v1+json"
         }
       }
+    },
+    {
+     "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern" : "/subjects/protobuf_subject/versions/1\\?deleted=true"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "subject": "protobuf_subject",
+          "version": 1,
+          "id": 74,
+          "schemaType": "PROTOBUF",
+          "schema": "syntax = \"proto3\";\npackage sngular;\n\noption java_package = \"com.sngular.external.proto\";\noption java_outer_classname = \"ExternalMessage\";\noption java_multiple_files = true;\n\nmessage ExternalEntity{\n string parentPropertyOne = 1;\n int32 parentPropertyTwo = 2;\n \n  message EntityOne {\n    int32 entityNumberOne = 1;\n    string entityNumberTwo = 2;\n    \n    message NestingEntity {\n      string nestedProperty = 1;\n      \n      }\n    \n  }\n  \n  message EntityTwo {\n    int32 propertyNumberOne = 1;\n    string propertyNumberTwo = 2; \n  }\n\n}"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+
+
     }
   ]
 }
