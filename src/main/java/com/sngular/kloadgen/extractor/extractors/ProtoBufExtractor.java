@@ -20,11 +20,13 @@ import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.OneOfElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class ProtoBufExtractor {
+public class ProtoBufExtractor implements Extractor {
 
   public static final String ARRAY_POSTFIX = "-array";
 
@@ -32,11 +34,33 @@ public class ProtoBufExtractor {
 
   public static final String UNSUPPORTED_TYPE_OF_VALUE = "Something Odd Just Happened: Unsupported type of value";
 
-  public final List<FieldValueMapping> processSchema(final ProtoFileElement schema) {
+  public final List<FieldValueMapping> processSchema(final Object schema) {
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-    schema.getTypes().forEach(field -> processField(field, attributeList, schema.getImports(), true, nestedTypes));
+    ProtoFileElement protoFileElement = ((ProtobufSchema) schema).rawSchema();
+    protoFileElement.getTypes().forEach(field -> processField(field, attributeList, protoFileElement.getImports(), true, nestedTypes));
     return attributeList;
+  }
+  @Override
+  public List<FieldValueMapping> processApicurioParsedSchema(Object schema) {
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    final var protoFileElement = ((io.apicurio.registry.utils.protobuf.schema.ProtobufSchema) schema).getProtoFileElement();
+    // todo: en vez de null comprobar si hay que crear un HashMap con field.getNestedTypes()
+    protoFileElement.getTypes().forEach(field -> processField(field, attributeList, protoFileElement.getImports(), false, null));
+    return attributeList;
+  }
+
+  @Override
+  public List<FieldValueMapping> processConfluentParsedSchema(Object schema) {
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    final var protoFileElement = ((ProtobufSchema) schema).rawSchema();
+    // todo: en vez de null comprobar si hay que crear un HashMap con field.getNestedTypes()
+    protoFileElement.getTypes().forEach(field -> processField(field, attributeList, protoFileElement.getImports(), false, null));
+    return attributeList;
+  }
+
+  public final ParsedSchema getParsedSchema(final String schema) {
+    return new ProtobufSchema(schema);
   }
 
   public final void processField(final TypeElement field, final List<FieldValueMapping> completeFieldList,

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
@@ -19,16 +18,28 @@ import com.sngular.kloadgen.model.json.NumberField;
 import com.sngular.kloadgen.model.json.ObjectField;
 import com.sngular.kloadgen.model.json.Schema;
 import com.sngular.kloadgen.model.json.StringField;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 
-public class JsonExtractor {
+public class JsonExtractor implements Extractor {
 
   private final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
 
-  public final List<FieldValueMapping> processSchema(final JsonNode jsonNode) {
-    return processSchema(jsonSchemaParser.parse(jsonNode));
+  public final List<FieldValueMapping> processSchema(final Object schema) {
+    return processSchema(jsonSchemaParser.parse(((JsonSchema) schema).toJsonNode()));
+  }
+
+  @Override
+  public final List<FieldValueMapping> processApicurioParsedSchema(Object schema) {
+    return processSchema(((io.apicurio.registry.serde.jsonschema.JsonSchema) schema).toJsonNode());
+  }
+
+  @Override
+  public List<FieldValueMapping> processConfluentParsedSchema(Object schema) {
+    return processSchema(((JsonSchema) schema).toJsonNode());
   }
 
   public final List<FieldValueMapping> processSchema(final Schema schema) {
@@ -44,6 +55,10 @@ public class JsonExtractor {
       }
     }
     return attributeList;
+  }
+
+  public final ParsedSchema getParsedSchema(final String schema) {
+    return new JsonSchema(schema);
   }
 
   private List<FieldValueMapping> extractInternalFields(final ObjectField field, final Boolean isAncestorRequired) {
