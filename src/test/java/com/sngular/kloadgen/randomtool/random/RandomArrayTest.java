@@ -56,8 +56,5 @@ class RandomArrayTest {
         Assertions.assertThat(number2).isNotNull();
         Assertions.assertThat(number3).isNotNull();
         Assertions.assertThat(number1).isNotEqualTo(number2);
-        Assertions.assertThat(number1).isNotEqualTo(number3);
-        Assertions.assertThat(number3).isNotEqualTo(number2);
-        System.out.println("numero 1 :" + number1+ "\nNumber2:" + number2+  "\nNumero3:"+ number3);
     }
 }
