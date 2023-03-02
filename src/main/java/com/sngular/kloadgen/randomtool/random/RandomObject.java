@@ -192,15 +192,7 @@ public final class RandomObject {
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
         value = BigDecimal.valueOf(RandomUtils.nextDouble(minimum.doubleValue(), maximum.doubleValue()) * multipleOf);
       } else {
-/*                if (valueLength < 3) {
-                    value = new BigDecimal(getIntegerValueOrRandom(valueLength, fieldValueList, constraints));
-                } else {
-                    final BigDecimal aux = BigDecimal.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
-                    final int decLength = RandomUtils.nextInt(1, valueLength / 2);
-                    value = aux.multiply(BigDecimal.valueOf(0.1).pow(decLength));
-              //  */
         value = new BigDecimal(BigInteger.valueOf(new Random().nextInt(100001)), 2);
-
       }
     }
     return value;
