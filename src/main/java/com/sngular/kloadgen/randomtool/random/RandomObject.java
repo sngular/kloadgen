@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 
 public final class RandomObject {
 
-    private Random rand= new Random();
-    
+    private Random rand = new Random();
+
     public boolean isTypeValid(final String type) {
         return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
     }
@@ -146,12 +146,12 @@ public final class RandomObject {
         if (!fieldValueList.isEmpty()) {
             value = new BigInteger(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
         } else {
-                final Number minimum = calculateMinimum(valueLength, constraints);
+            final Number minimum = calculateMinimum(valueLength, constraints);
             Number maximum;
             if (valueLength == 0) {
-                maximum= 1000;
-                int  num= rand.nextInt((Integer) maximum);
-                value = BigInteger.valueOf(num);
+                maximum = 1000;
+                int num = rand.nextInt((Integer) maximum);
+                value = new BigInteger(String.valueOf(num));
             } else {
                 maximum = calculateMaximum(valueLength, constraints);
 
@@ -162,7 +162,8 @@ public final class RandomObject {
                 } else {
                     value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
                 }
-            } }
+            }
+        }
         return value;
     }
 
@@ -175,27 +176,24 @@ public final class RandomObject {
             final Number minimum = calculateMinimum(valueLength - 1, constraints);
 
             Number maximum;
-            if (valueLength == 0) {
-                maximum = new BigDecimal(Integer.MAX_VALUE);
-            }
-            else{
-                maximum = calculateMaximum(valueLength - 1, constraints);
-                }
-                if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+            maximum = calculateMaximum(valueLength - 1, constraints);
+
+            if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
                 final int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
                 maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
                 value = BigDecimal.valueOf(RandomUtils.nextDouble(minimum.doubleValue(), maximum.doubleValue()) * multipleOf);
             } else {
-                if (valueLength < 3) {
+/*                if (valueLength < 3) {
                     value = new BigDecimal(getIntegerValueOrRandom(valueLength, fieldValueList, constraints));
                 } else {
                     final BigDecimal aux = BigDecimal.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
                     final int decLength = RandomUtils.nextInt(1, valueLength / 2);
                     value = aux.multiply(BigDecimal.valueOf(0.1).pow(decLength));
-                }
+              //  */
+                value = new BigDecimal(BigInteger.valueOf(new Random().nextInt(100001)), 2);
+
             }
         }
-
         return value;
     }
 
@@ -266,9 +264,9 @@ public final class RandomObject {
             value = LocalDateTime.now();
         }
         Object resultValue = value;
-        if ("longTimestamp".equalsIgnoreCase(type)) {
+        if ("longTimestamp" .equalsIgnoreCase(type)) {
             resultValue = value.toInstant(ZoneOffset.UTC).toEpochMilli();
-        } else if ("stringTimestamp".equalsIgnoreCase(type)) {
+        } else if ("stringTimestamp" .equalsIgnoreCase(type)) {
             resultValue = value.toString();
         }
         return resultValue;
@@ -333,11 +331,11 @@ public final class RandomObject {
         final LocalDate localDate = getDateValueOrRandom(fieldValueList);
         final int result;
 
-        if ("int_year".equalsIgnoreCase(fieldType)) {
+        if ("int_year" .equalsIgnoreCase(fieldType)) {
             result = localDate.getYear();
-        } else if ("int_month".equalsIgnoreCase(fieldType)) {
+        } else if ("int_month" .equalsIgnoreCase(fieldType)) {
             result = localDate.getMonthValue();
-        } else if ("int_day".equalsIgnoreCase(fieldType)) {
+        } else if ("int_day" .equalsIgnoreCase(fieldType)) {
             result = localDate.getDayOfMonth();
         } else {
             throw new KLoadGenException("FieldType wrong or not supported");
@@ -362,13 +360,13 @@ public final class RandomObject {
         final LocalTime localTime = getRandomLocalTime(fieldValueList);
         final int result;
 
-        if ("int_hours".equalsIgnoreCase(fieldType)) {
+        if ("int_hours" .equalsIgnoreCase(fieldType)) {
             result = localTime.getHour();
-        } else if ("int_minutes".equalsIgnoreCase(fieldType)) {
+        } else if ("int_minutes" .equalsIgnoreCase(fieldType)) {
             result = localTime.getMinute();
-        } else if ("int_seconds".equalsIgnoreCase(fieldType)) {
+        } else if ("int_seconds" .equalsIgnoreCase(fieldType)) {
             result = localTime.getSecond();
-        } else if ("int_nanos".equalsIgnoreCase(fieldType)) {
+        } else if ("int_nanos" .equalsIgnoreCase(fieldType)) {
             result = localTime.getNano();
         } else {
             throw new KLoadGenException("FieldType wrong or not supported");
