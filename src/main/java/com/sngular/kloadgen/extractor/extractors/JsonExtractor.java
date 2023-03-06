@@ -28,18 +28,23 @@ public class JsonExtractor implements Extractor {
 
   private final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
 
-  public final List<FieldValueMapping> processSchema(final Object schema) {
-    return processSchema(jsonSchemaParser.parse(((JsonSchema) schema).toJsonNode()));
-  }
-
   @Override
-  public final List<FieldValueMapping> processApicurioParsedSchema(Object schema) {
+  public final List<FieldValueMapping> processApicurioParsedSchema(final Object schema) {
     return processSchema(((io.apicurio.registry.serde.jsonschema.JsonSchema) schema).toJsonNode());
   }
 
   @Override
-  public List<FieldValueMapping> processConfluentParsedSchema(Object schema) {
+  public final List<FieldValueMapping> processConfluentParsedSchema(final Object schema) {
     return processSchema(((JsonSchema) schema).toJsonNode());
+  }
+
+  @Override
+  public final ParsedSchema getParsedSchema(final String schema) {
+    return new JsonSchema(schema);
+  }
+
+  public final List<FieldValueMapping> processSchema(final Object schema) {
+    return processSchema(jsonSchemaParser.parse(((JsonSchema) schema).toJsonNode()));
   }
 
   public final List<FieldValueMapping> processSchema(final Schema schema) {
@@ -55,10 +60,6 @@ public class JsonExtractor implements Extractor {
       }
     }
     return attributeList;
-  }
-
-  public final ParsedSchema getParsedSchema(final String schema) {
-    return new JsonSchema(schema);
   }
 
   private List<FieldValueMapping> extractInternalFields(final ObjectField field, final Boolean isAncestorRequired) {
@@ -109,9 +110,9 @@ public class JsonExtractor implements Extractor {
                                    checkRequiredElement(isRootElement, isAncestorRequired, ((MapField) innerField).isFieldRequired()), ""));
     } else if (innerField instanceof NumberField) {
       final FieldValueMapping.FieldValueMappingBuilder builder = FieldValueMapping
-          .builder()
-          .fieldName(innerField.getName())
-          .fieldType(innerField.getType());
+                                                                     .builder()
+                                                                     .fieldName(innerField.getName())
+                                                                     .fieldType(innerField.getType());
 
       addConstraint(builder, ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getExclusiveMaximum()));
       addConstraint(builder, ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getExclusiveMinimum()));
@@ -122,9 +123,9 @@ public class JsonExtractor implements Extractor {
       completeFieldList.add(builder.build());
     } else if (innerField instanceof StringField) {
       final FieldValueMapping.FieldValueMappingBuilder builder = FieldValueMapping
-          .builder()
-          .fieldName(innerField.getName())
-          .fieldType(innerField.getType());
+                                                                     .builder()
+                                                                     .fieldName(innerField.getName())
+                                                                     .fieldType(innerField.getType());
 
       addConstraint(builder, ConstraintTypeEnum.REGEX, ((StringField) innerField).getRegex());
       addConstraint(builder, ConstraintTypeEnum.MAXIMUM_VALUE, getSafeNumberAsString(((StringField) innerField).getMaxlength()));
@@ -152,7 +153,8 @@ public class JsonExtractor implements Extractor {
     return result;
   }
 
-  private List<FieldValueMapping> extractObjectInternalFields(final ObjectField value, final String innerFieldName, final Boolean isAncestorRequired, final String breadCrumb,
+  private List<FieldValueMapping> extractObjectInternalFields(
+      final ObjectField value, final String innerFieldName, final Boolean isAncestorRequired, final String breadCrumb,
       final String endValue) {
     final List<FieldValueMapping> completeFieldList = new ArrayList<>();
     final List<String> requiredInternalFields = value.getRequired();
@@ -190,7 +192,11 @@ public class JsonExtractor implements Extractor {
             FieldValueMapping.builder()
                              .fieldName(name)
                              .fieldType(value.getType() + "-array" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? "-array" :
-                                 (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" : breadCrumb))
+                                                                                                                                                       (StringUtils.isNotEmpty(
+                                                                                                                                                           breadCrumb)
+                                                                                                                                                        &&
+                                                                                                                                                        breadCrumb.endsWith("[:]"))
+                                                                                                                                                           ? "-map" : breadCrumb))
                              .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
                              .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
                              .build());
@@ -219,7 +225,10 @@ public class JsonExtractor implements Extractor {
           FieldValueMapping.builder()
                            .fieldName(name)
                            .fieldType(value.getType() + "-map" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" :
-                               (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? "-array" : breadCrumb))
+                                                                                                                                                  (StringUtils.isNotEmpty(
+                                                                                                                                                      breadCrumb)
+                                                                                                                                                   && breadCrumb.endsWith("[]"))
+                                                                                                                                                      ? "-array" : breadCrumb))
                            .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
                            .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
                            .build());

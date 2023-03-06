@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
@@ -25,12 +26,11 @@ import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.ProtoBufExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
 import com.sngular.kloadgen.util.JMeterHelper;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import com.sngular.kloadgen.common.SchemaRegistryEnum;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -55,19 +55,24 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     this.protoBufExtractor = protoBufExtractor;
   }
 
-  private Extractor getExtractor(String schemaType) {
-    if(schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
+  private Extractor getExtractor(final String schemaType) {
+    if (schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
+      final Extractor response;
       switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
         case JSON:
-          return jsonExtractor;
+          response = jsonExtractor;
+          break;
         case AVRO:
-          return avroExtractor;
+          response = avroExtractor;
+          break;
         case PROTOBUF:
-          return protoBufExtractor;
+          response = protoBufExtractor;
+          break;
         default:
           throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
       }
-    } else{
+      return response;
+    } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
     }
   }
@@ -75,20 +80,20 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   @Override
   public final Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) throws IOException, RestClientException {
     String schemaType = null;
-    Properties properties = JMeterContextService.getContext().getProperties();
+    final Properties properties = JMeterContextService.getContext().getProperties();
 
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     List<FieldValueMapping> attributeList = new ArrayList<>();
 
-    String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+    final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     if (Objects.nonNull(registryName) && registryName.equalsIgnoreCase(SchemaRegistryEnum.APICURIO.toString())) {
-      ApicurioParsedSchema apicurioParsedSchema = (ApicurioParsedSchema) schemaParsed;
-      Object schema = apicurioParsedSchema.getSchema();
+      final ApicurioParsedSchema apicurioParsedSchema = (ApicurioParsedSchema) schemaParsed;
+      final Object schema = apicurioParsedSchema.getSchema();
 
       schemaType = apicurioParsedSchema.getType();
       attributeList = getExtractor(schemaType).processApicurioParsedSchema(schema);
     } else if (Objects.nonNull(registryName) && registryName.equalsIgnoreCase(SchemaRegistryEnum.CONFLUENT.toString())) {
-      ParsedSchema confluentParsedSchema = (ParsedSchema) schemaParsed;
+      final ParsedSchema confluentParsedSchema = (ParsedSchema) schemaParsed;
 
       schemaType = confluentParsedSchema.schemaType();
       attributeList = getExtractor(schemaType).processConfluentParsedSchema(confluentParsedSchema);

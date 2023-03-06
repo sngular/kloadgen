@@ -37,12 +37,13 @@ public class ProtoBufExtractor implements Extractor {
   public final List<FieldValueMapping> processSchema(final Object schema) {
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-    ProtoFileElement protoFileElement = ((ProtobufSchema) schema).rawSchema();
+    final ProtoFileElement protoFileElement = ((ProtobufSchema) schema).rawSchema();
     protoFileElement.getTypes().forEach(field -> processField(field, attributeList, protoFileElement.getImports(), true, nestedTypes));
     return attributeList;
   }
+
   @Override
-  public List<FieldValueMapping> processApicurioParsedSchema(Object schema) {
+  public final List<FieldValueMapping> processApicurioParsedSchema(final Object schema) {
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final var protoFileElement = ((io.apicurio.registry.utils.protobuf.schema.ProtobufSchema) schema).getProtoFileElement();
     // todo: en vez de null comprobar si hay que crear un HashMap con field.getNestedTypes()
@@ -51,7 +52,7 @@ public class ProtoBufExtractor implements Extractor {
   }
 
   @Override
-  public List<FieldValueMapping> processConfluentParsedSchema(Object schema) {
+  public final List<FieldValueMapping> processConfluentParsedSchema(final Object schema) {
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final var protoFileElement = ((ProtobufSchema) schema).rawSchema();
     // todo: en vez de null comprobar si hay que crear un HashMap con field.getNestedTypes()

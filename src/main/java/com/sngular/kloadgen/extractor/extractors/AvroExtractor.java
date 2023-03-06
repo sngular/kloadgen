@@ -28,14 +28,14 @@ public class AvroExtractor implements Extractor {
   }
 
   @Override
-  public List<FieldValueMapping> processApicurioParsedSchema(Object schema) {
+  public final List<FieldValueMapping> processApicurioParsedSchema(final Object schema) {
     final var attributeList = new ArrayList<FieldValueMapping>();
     ((Schema) schema).getFields().forEach(field -> processField(field, attributeList, true, false));
     return attributeList;
   }
 
   @Override
-  public List<FieldValueMapping> processConfluentParsedSchema(Object schema) {
+  public final List<FieldValueMapping> processConfluentParsedSchema(final Object schema) {
     final var attributeList = new ArrayList<FieldValueMapping>();
     (((AvroSchema) schema).rawSchema()).getFields().forEach(field -> processField(field, attributeList, true, false));
     return attributeList;
