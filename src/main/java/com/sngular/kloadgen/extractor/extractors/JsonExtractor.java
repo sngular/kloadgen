@@ -236,23 +236,26 @@ public class JsonExtractor implements Extractor {
     return completeFieldList;
   }
 
+  private void processInternalField(final FieldValueMapping internalField, final String fieldName, final String splitter,
+      final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired) {
+    if (Objects.nonNull(internalField.getFieldName())) {
+      internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
+    } else {
+      internalField.setFieldName(fieldName);
+    }
+    final String[] splittedName = internalField.getFieldName().split("\\.");
+    String parentName = splittedName[splittedName.length - 2].replace("[]", "");
+    parentName = parentName.replace("[]", "");
+    if (fieldName.equals(splittedName[splittedName.length - 2].replace("[]", ""))) {
+      internalField.setAncestorRequired(isAncestorRequired);
+    }
+    completeFieldList.add(internalField);
+  }
+
   private void processRecordFieldList(
       final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
       final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired) {
-    internalFields.forEach(internalField -> {
-      if (Objects.nonNull(internalField.getFieldName())) {
-        internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
-      } else {
-        internalField.setFieldName(fieldName);
-      }
-      final String[] splittedName = internalField.getFieldName().split("\\.");
-      String parentName = splittedName[splittedName.length - 2];
-      parentName = parentName.replace("[]", "");
-      if (fieldName.equals(parentName)) {
-        internalField.setAncestorRequired(isAncestorRequired);
-      }
-      completeFieldList.add(internalField);
-    });
+    internalFields.forEach(internalField -> processInternalField(internalField, fieldName, splitter, completeFieldList, isAncestorRequired));
   }
 
   private Boolean checkRequiredByType(
