@@ -53,7 +53,6 @@ public class AvroExtractor implements Extractor {
   }
 
   public final void processField(final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
-    System.out.println("++++++++" + innerField);
     if (checkIfRecord(innerField.schema())) {
       processRecordFieldList(innerField.name(), ".", processFieldList(innerField.schema().getFields(), isAncestorRequired), completeFieldList);
     } else if (checkIfArray(innerField.schema())) {

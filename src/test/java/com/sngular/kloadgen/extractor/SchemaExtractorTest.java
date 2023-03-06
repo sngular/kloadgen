@@ -25,10 +25,11 @@ import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.testutil.ParsedSchemaUtil;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import com.squareup.wire.schema.internal.parser.MessageElement;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import org.apache.avro.Schema.Field;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -39,7 +40,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -99,10 +99,10 @@ class SchemaExtractorTest {
 
     jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
     jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
-    Mockito.doNothing().when(avroExtractor).processField(Mockito.any(Field.class), Mockito.anyList(), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false));
+    Mockito.when(avroExtractor.processConfluentParsedSchema(Mockito.any(AvroSchema.class))).thenReturn(new ArrayList<>());
     schemaExtractor.flatPropertiesList("avroSubject");
 
-    Mockito.verify(avroExtractor, Mockito.times(2)).processField(Mockito.any(Field.class), Mockito.anyList(), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false));
+    Mockito.verify(avroExtractor, Mockito.times(1)).processConfluentParsedSchema(Mockito.any(AvroSchema.class));
 
   }
 
@@ -111,16 +111,18 @@ class SchemaExtractorTest {
   void testFlatPropertiesListWithJson() throws IOException, RestClientException {
 
     final File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
-    final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "JSON");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
-    jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
+    Mockito.when(jsonExtractor.getParsedSchema(Mockito.anyString())).thenCallRealMethod();
+    final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "JSON");
+
     jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
-    Mockito.when(jsonExtractor.processSchema(Mockito.any(JsonNode.class))).thenReturn(new ArrayList<>());
+    jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
+    Mockito.when(jsonExtractor.processConfluentParsedSchema(Mockito.any(JsonSchema.class))).thenReturn(new ArrayList<>());
 
     schemaExtractor.flatPropertiesList("jsonSubject");
 
-    Mockito.verify(jsonExtractor).processSchema(Mockito.any(JsonNode.class));
+    Mockito.verify(jsonExtractor, Mockito.times(1)).processConfluentParsedSchema(Mockito.any(JsonSchema.class));
 
   }
 
@@ -129,15 +131,17 @@ class SchemaExtractorTest {
   void testFlatPropertiesListWithProtobuf() throws RestClientException, IOException {
 
     final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
-    final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "PROTOBUF");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
+
+    Mockito.when(protoBufExtractor.getParsedSchema(Mockito.anyString())).thenCallRealMethod();
+    final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "PROTOBUF");
 
     jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
     jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
-    Mockito.doNothing().when(protoBufExtractor).processField(Mockito.any(MessageElement.class), Mockito.anyList(), Mockito.anyList(), ArgumentMatchers.eq(false), Mockito.any());
+    Mockito.when(protoBufExtractor.processConfluentParsedSchema(Mockito.any(ProtobufSchema.class))).thenReturn(new ArrayList<>());
 
     schemaExtractor.flatPropertiesList("protobufSubject");
-    Mockito.verify(protoBufExtractor).processField(Mockito.any(), Mockito.anyList(), Mockito.anyList(), ArgumentMatchers.eq(false), Mockito.any());
+    Mockito.verify(protoBufExtractor, Mockito.times(1)).processConfluentParsedSchema(Mockito.any(ProtobufSchema.class));
 
 
   }
