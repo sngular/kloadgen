@@ -125,6 +125,55 @@
           "Content-Type": "application/vnd.schemaregistry.v1+json"
         }
       }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/groups/default/artifacts/simple-schema/meta"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": "Test",
+          "version": 1,
+          "globalId": 72,
+          "id": "356f7e88-920e-46cd-a64c-e1e76a3e7b3a",
+          "type": "AVRO"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/ids/globalIds/72\\?dereference=false"
+      },
+      "response": {
+        "status": 200,
+          "jsonBody": {
+            "name": "test",
+            "type": "record",
+            "fields": [
+              {
+                "name": "Name",
+                "type": "string"
+              },
+              {
+                "name": "Age",
+                "type": "int"
+              }
+            ]
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
     }
   ]
 }
+
+
