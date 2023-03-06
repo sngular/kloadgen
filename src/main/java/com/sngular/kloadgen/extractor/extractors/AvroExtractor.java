@@ -14,7 +14,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.commons.collections4.IteratorUtils;
 
-public class AvroExtractor implements Extractor{
+public class AvroExtractor implements Extractor {
 
   private final Set<Schema.Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
 
@@ -53,6 +53,7 @@ public class AvroExtractor implements Extractor{
   }
 
   public final void processField(final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
+    System.out.println("++++++++" + innerField);
     if (checkIfRecord(innerField.schema())) {
       processRecordFieldList(innerField.name(), ".", processFieldList(innerField.schema().getFields(), isAncestorRequired), completeFieldList);
     } else if (checkIfArray(innerField.schema())) {
@@ -100,7 +101,8 @@ public class AvroExtractor implements Extractor{
     }
   }
 
-  private void processRecordFieldList(final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
+  private void processRecordFieldList(
+      final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
       final List<FieldValueMapping> completeFieldList) {
     internalFields.forEach(internalField -> {
       if (internalField.getFieldName().startsWith(fieldName + ".")) {
