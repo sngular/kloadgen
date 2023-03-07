@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,6 +32,8 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public final class RandomObject {
+
+  private Random rand = new Random();
 
   public boolean isTypeValid(final String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
@@ -153,17 +156,23 @@ public final class RandomObject {
       value = new BigInteger(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
       final Number minimum = calculateMinimum(valueLength, constraints);
-      Number maximum = calculateMaximum(valueLength, constraints);
-
-      if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
-        final int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
-        maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
-        value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()) * multipleOf);
+      Number maximum;
+      if (valueLength == 0) {
+        maximum = 1000;
+        int num = rand.nextInt((Integer) maximum);
+        value = new BigInteger(String.valueOf(num));
       } else {
-        value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
+        maximum = calculateMaximum(valueLength, constraints);
+
+        if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
+          final int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
+          maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
+          value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()) * multipleOf);
+        } else {
+          value = BigInteger.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
+        }
       }
     }
-
     return value;
   }
 
@@ -174,23 +183,18 @@ public final class RandomObject {
       value = new BigDecimal(fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim());
     } else {
       final Number minimum = calculateMinimum(valueLength - 1, constraints);
-      Number maximum = calculateMaximum(valueLength - 1, constraints);
+
+      Number maximum;
+      maximum = calculateMaximum(valueLength - 1, constraints);
 
       if (constraints.containsKey(ConstraintTypeEnum.MULTIPLE_OF)) {
         final int multipleOf = Integer.parseInt(constraints.get(ConstraintTypeEnum.MULTIPLE_OF));
         maximum = maximum.intValue() > multipleOf ? maximum.intValue() / multipleOf : maximum;
         value = BigDecimal.valueOf(RandomUtils.nextDouble(minimum.doubleValue(), maximum.doubleValue()) * multipleOf);
       } else {
-        if (valueLength < 3) {
-          value = new BigDecimal(getIntegerValueOrRandom(valueLength, fieldValueList, constraints));
-        } else {
-          final BigDecimal aux = BigDecimal.valueOf(RandomUtils.nextLong(minimum.longValue(), maximum.longValue()));
-          final int decLength = RandomUtils.nextInt(1, valueLength / 2);
-          value = aux.multiply(BigDecimal.valueOf(0.1).pow(decLength));
-        }
+        value = new BigDecimal(BigInteger.valueOf(new Random().nextInt(100001)), 2);
       }
     }
-
     return value;
   }
 
@@ -204,7 +208,7 @@ public final class RandomObject {
     if (Objects.nonNull(constraints.get(ConstraintTypeEnum.PRECISION))) {
       precision = Integer.parseInt(constraints.get(ConstraintTypeEnum.PRECISION));
       scale = Objects.nonNull(constraints.get(ConstraintTypeEnum.SCALE))
-          ? Integer.parseInt(constraints.get(ConstraintTypeEnum.SCALE)) : 0;
+                  ? Integer.parseInt(constraints.get(ConstraintTypeEnum.SCALE)) : 0;
 
       if (precision <= 0) {
         throw new KLoadGenException("Decimal precision must be greater dan 0");
