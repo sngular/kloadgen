@@ -16,15 +16,7 @@ class AvroExtractorTest {
 
   private final AvroExtractor avroExtractor = new AvroExtractor();
 
-  @Test
-  @DisplayName("Should extract Embedded Record")
-  void testFlatPropertiesEmbeddedAvros() throws Exception {
-
-    final String testFile = fileHelper.getContent("/avro-files/embedded-avros-example-test.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
-
+  private void testFlatPropertiesEmbeddedAvrosAssertions(List<FieldValueMapping> fieldValueMappingList) {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(4)
               .containsExactlyInAnyOrder(
@@ -37,16 +29,30 @@ class AvroExtractorTest {
                   FieldValueMapping.builder().fieldName("timestamp").fieldType("long").fieldValueList("").required(true).isAncestorRequired(true).build()
               );
   }
-
   @Test
-  @DisplayName("Should extract Optional Enum")
-  void testOptionalEnum() throws Exception {
+  @DisplayName("Should extract Embedded Record")
+  void testFlatPropertiesEmbeddedAvros() throws Exception {
 
-    final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
+    final String testFile = fileHelper.getContent("/avro-files/embedded-avros-example-test.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    testFlatPropertiesEmbeddedAvrosAssertions(fieldValueMappingList);
+  }
 
+  @Test
+  @DisplayName("Should extract Embedded Record for confluent")
+  void testFlatPropertiesEmbeddedAvrosConfluent() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/embedded-avros-example-test.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+
+    testFlatPropertiesEmbeddedAvrosAssertions(fieldValueMappingList);
+  }
+
+  private void testOptionalEnumAssertions(List<FieldValueMapping> fieldValueMappingList) {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(1)
               .containsExactlyInAnyOrder(
@@ -61,6 +67,52 @@ class AvroExtractorTest {
                       .build()
               );
   }
+  @Test
+  @DisplayName("Should extract Optional Enum")
+  void testOptionalEnum() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+
+    testOptionalEnumAssertions(fieldValueMappingList);
+  }
+
+  @Test
+  @DisplayName("Should extract Optional Enum for confluent")
+  void testOptionalEnumConfluent() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+
+    testOptionalEnumAssertions(fieldValueMappingList);
+  }
+
+  private void testFlatPropertiesOptionalMapArrayAssertions(List<FieldValueMapping> fieldValueMappingList, boolean isAncestorRequired) {
+    Assertions.assertThat(fieldValueMappingList)
+              .hasSize(8)
+              .containsExactlyInAnyOrder(
+                  FieldValueMapping.builder().fieldName("mapOfString[:]").fieldType("string-map").fieldValueList("").valueLength(0).required(false).isAncestorRequired(!isAncestorRequired)
+                                   .build(),
+                  FieldValueMapping.builder().fieldName("arrayOfString[]").fieldType("string-array").fieldValueList("").valueLength(0).required(false).isAncestorRequired(!isAncestorRequired)
+                                   .build(),
+                  FieldValueMapping.builder().fieldName("arrayOfMap[][:]").fieldType("string-map-array").fieldValueList("").valueLength(0).required(!isAncestorRequired).isAncestorRequired(!isAncestorRequired)
+                                   .build(),
+                  FieldValueMapping.builder().fieldName("mapOfArray[:][]").fieldType("int-array-map").fieldValueList("").valueLength(0).required(!isAncestorRequired).isAncestorRequired(!isAncestorRequired)
+                                   .build(),
+                  FieldValueMapping.builder().fieldName("mapOfArrayOfRecord[:][].name").fieldType("string").fieldValueList("").valueLength(0).required(false)
+                                   .isAncestorRequired(!isAncestorRequired).build(),
+                  FieldValueMapping.builder().fieldName("mapOfArrayOfRecord[:][].age").fieldType("int").fieldValueList("").valueLength(0).required(true).isAncestorRequired(!isAncestorRequired)
+                                   .build(),
+                  FieldValueMapping.builder().fieldName("arrayOfMapOfRecord[][:].name").fieldType("string").fieldValueList("").valueLength(0).required(false)
+                                   .isAncestorRequired(!isAncestorRequired).build(),
+                  FieldValueMapping.builder().fieldName("arrayOfMapOfRecord[][:].age").fieldType("int").fieldValueList("").valueLength(0).required(true).isAncestorRequired(!isAncestorRequired)
+                                   .build()
+              );
+  }
 
   @Test
   @DisplayName("Should extract Optional Map with Array/Record")
@@ -70,37 +122,21 @@ class AvroExtractorTest {
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
-
-    Assertions.assertThat(fieldValueMappingList)
-              .hasSize(8)
-              .containsExactlyInAnyOrder(
-                  FieldValueMapping.builder().fieldName("mapOfString[:]").fieldType("string-map").fieldValueList("").valueLength(0).required(false).isAncestorRequired(false)
-                                   .build(),
-                  FieldValueMapping.builder().fieldName("arrayOfString[]").fieldType("string-array").fieldValueList("").valueLength(0).required(false).isAncestorRequired(false)
-                                   .build(),
-                  FieldValueMapping.builder().fieldName("arrayOfMap[][:]").fieldType("string-map-array").fieldValueList("").valueLength(0).required(false).isAncestorRequired(false)
-                                   .build(),
-                  FieldValueMapping.builder().fieldName("mapOfArray[:][]").fieldType("int-array-map").fieldValueList("").valueLength(0).required(false).isAncestorRequired(false)
-                                   .build(),
-                  FieldValueMapping.builder().fieldName("mapOfArrayOfRecord[:][].name").fieldType("string").fieldValueList("").valueLength(0).required(false)
-                                   .isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("mapOfArrayOfRecord[:][].age").fieldType("int").fieldValueList("").valueLength(0).required(true).isAncestorRequired(false)
-                                   .build(),
-                  FieldValueMapping.builder().fieldName("arrayOfMapOfRecord[][:].name").fieldType("string").fieldValueList("").valueLength(0).required(false)
-                                   .isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("arrayOfMapOfRecord[][:].age").fieldType("int").fieldValueList("").valueLength(0).required(true).isAncestorRequired(false)
-                                   .build()
-              );
+    testFlatPropertiesOptionalMapArrayAssertions(fieldValueMappingList, true);
   }
 
   @Test
-  @DisplayName("Should extract Map of Record")
-  void testFlatPropertiesMap() throws Exception {
-    final String testFile = fileHelper.getContent("/avro-files/testMap.avsc");
+  @DisplayName("Should extract Optional Map with Array/Record for confluent")
+  void testFlatPropertiesOptionalMapArrayConfluent() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/testOptionalMap.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+    testFlatPropertiesOptionalMapArrayAssertions(fieldValueMappingList, false);
+  }
 
+  private void testFlatPropertiesMapAssertions(List<FieldValueMapping> fieldValueMappingList) {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(9)
               .containsExactlyInAnyOrder(
@@ -124,16 +160,29 @@ class AvroExtractorTest {
                                    .isAncestorRequired(true).build()
               );
   }
-
   @Test
-  @DisplayName("Should extract Logical times")
-  void testFlatPropertiesLogicalTypes() throws Exception {
-
-    final String testFile = fileHelper.getContent("/avro-files/testLogicalTypes.avsc");
+  @DisplayName("Should extract Map of Record")
+  void testFlatPropertiesMap() throws Exception {
+    final String testFile = fileHelper.getContent("/avro-files/testMap.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
+    testFlatPropertiesMapAssertions(fieldValueMappingList);
+  }
+
+  @Test
+  @DisplayName("Should extract Map of Record for confluent")
+  void testFlatPropertiesMapConfluent() throws Exception {
+    final String testFile = fileHelper.getContent("/avro-files/testMap.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+
+    testFlatPropertiesMapAssertions(fieldValueMappingList);
+  }
+
+  private void testFlatPropertiesLogicalTypesAssertions(List<FieldValueMapping> fieldValueMappingList) {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(10)
               .containsExactlyInAnyOrder(
@@ -155,16 +204,29 @@ class AvroExtractorTest {
                   FieldValueMapping.builder().fieldName("DecimalFixed").fieldType("fixed_decimal").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true).build()
               );
   }
-
   @Test
-  @DisplayName("Should extract Optional Array")
-  void testFlatPropertiesOptionalArray() throws Exception {
+  @DisplayName("Should extract Logical times")
+  void testFlatPropertiesLogicalTypes() throws Exception {
 
-    final String testFile = fileHelper.getContent("/avro-files/issue.avsc");
+    final String testFile = fileHelper.getContent("/avro-files/testLogicalTypes.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    testFlatPropertiesLogicalTypesAssertions(fieldValueMappingList);
+  }
 
+  @Test
+  @DisplayName("Should extract Logical times for confluent")
+  void testFlatPropertiesLogicalTypesConfluent() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/testLogicalTypes.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+    testFlatPropertiesLogicalTypesAssertions(fieldValueMappingList);
+  }
+
+  private void testFlatPropertiesOptionalArrayAssertions(List<FieldValueMapping> fieldValueMappingList) {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
               .containsExactlyInAnyOrder(
@@ -178,14 +240,30 @@ class AvroExtractorTest {
   }
 
   @Test
-  @DisplayName("Should extract Union Record")
-  void testFlatPropertiesUnionRecordAvros() throws Exception {
+  @DisplayName("Should extract Optional Array")
+  void testFlatPropertiesOptionalArray() throws Exception {
 
-    final String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
+    final String testFile = fileHelper.getContent("/avro-files/issue.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
+    testFlatPropertiesOptionalArrayAssertions(fieldValueMappingList);
+  }
+
+  @Test
+  @DisplayName("Should extract Optional Array for confluent")
+  void testFlatPropertiesOptionalArrayConfluent() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/issue.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+
+    testFlatPropertiesOptionalArrayAssertions(fieldValueMappingList);
+  }
+
+  private void testFlatPropertiesUnionRecordAvrosAssertions(List<FieldValueMapping> fieldValueMappingList) {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
               .containsExactlyInAnyOrder(
@@ -209,14 +287,28 @@ class AvroExtractorTest {
   }
 
   @Test
-  @DisplayName("Should Extract Union Record At Any Order In The Inner Array")
-  void testFlatPropertiesRecordUnionReverseOrder() throws Exception {
+  @DisplayName("Should extract Union Record")
+  void testFlatPropertiesUnionRecordAvros() throws Exception {
 
-    final String testFile = fileHelper.getContent("/avro-files/testUnionReverseOrder.avsc");
+    final String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    testFlatPropertiesUnionRecordAvrosAssertions(fieldValueMappingList);
+  }
 
+  @Test
+  @DisplayName("Should extract Union Record for confluent")
+  void testFlatPropertiesUnionRecordAvrosConfluent() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+    testFlatPropertiesUnionRecordAvrosAssertions(fieldValueMappingList);
+  }
+
+  private void testFlatPropertiesRecordUnionReverseOrderAssertions(List<FieldValueMapping> fieldValueMappingList) {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(5)
               .containsExactlyInAnyOrder(
@@ -230,6 +322,30 @@ class AvroExtractorTest {
                                    .isAncestorRequired(true).build(),
                   FieldValueMapping.builder().fieldName("products[].Price.price").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true)
                                    .build());
+  }
+
+  @Test
+  @DisplayName("Should Extract Union Record At Any Order In The Inner Array")
+  void testFlatPropertiesRecordUnionReverseOrder() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/testUnionReverseOrder.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    testFlatPropertiesRecordUnionReverseOrderAssertions(fieldValueMappingList);
+
+  }
+
+  @Test
+  @DisplayName("Should Extract Union Record At Any Order In The Inner Array for confluent")
+  void testFlatPropertiesRecordUnionReverseOrderConfluent() throws Exception {
+
+    final String testFile = fileHelper.getContent("/avro-files/testUnionReverseOrder.avsc");
+    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processConfluentParsedSchema(parsedSchema);
+    testFlatPropertiesRecordUnionReverseOrderAssertions(fieldValueMappingList);
+
   }
 
 }

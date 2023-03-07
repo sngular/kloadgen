@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Properties;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.extractors.AvroExtractor;
@@ -50,7 +49,7 @@ class SchemaExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private Properties properties = new Properties();
+  private final Properties properties = new Properties();
 
   private SchemaExtractorImpl schemaExtractor;
 
@@ -88,8 +87,8 @@ class SchemaExtractorTest {
   }
 
   @Test
-  @DisplayName("Test flatPropertiesList with AVRO")
-  void testFlatPropertiesListWithAVRO() throws IOException, RestClientException {
+  @DisplayName("Test flatPropertiesList with AVRO confluent")
+  void testFlatPropertiesListWithAVROConfluent() throws IOException, RestClientException {
 
     final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
@@ -107,8 +106,27 @@ class SchemaExtractorTest {
   }
 
   @Test
-  @DisplayName("Test flatPropertiesList with Json")
-  void testFlatPropertiesListWithJson() throws IOException, RestClientException {
+  @DisplayName("Test flatPropertiesList with AVRO apicurio")
+  void testFlatPropertiesListWithAVROApicurio() throws IOException, RestClientException {
+
+    final File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
+    properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.APICURIO.toString());
+
+    Mockito.when(avroExtractor.getParsedSchema(Mockito.anyString())).thenCallRealMethod();
+    final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
+
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
+    jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
+    Mockito.when(avroExtractor.processApicurioParsedSchema(Mockito.any(AvroSchema.class))).thenReturn(new ArrayList<>());
+    schemaExtractor.flatPropertiesList("avroSubject");
+
+    Mockito.verify(avroExtractor, Mockito.times(1)).processApicurioParsedSchema(Mockito.any(AvroSchema.class));
+
+  }
+
+  @Test
+  @DisplayName("Test flatPropertiesList with Json confluent")
+  void testFlatPropertiesListWithJsonConfluent() throws IOException, RestClientException {
 
     final File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
@@ -127,8 +145,28 @@ class SchemaExtractorTest {
   }
 
   @Test
-  @DisplayName("Test flatPropertiesList with Protobuf")
-  void testFlatPropertiesListWithProtobuf() throws RestClientException, IOException {
+  @DisplayName("Test flatPropertiesList with Json apicurio")
+  void testFlatPropertiesListWithJsonApicurio() throws IOException, RestClientException {
+
+    final File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
+    properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.APICURIO.toString());
+
+    Mockito.when(jsonExtractor.getParsedSchema(Mockito.anyString())).thenCallRealMethod();
+    final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "JSON");
+
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
+    jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
+    Mockito.when(jsonExtractor.processApicurioParsedSchema(Mockito.any(JsonSchema.class))).thenReturn(new ArrayList<>());
+
+    schemaExtractor.flatPropertiesList("jsonSubject");
+
+    Mockito.verify(jsonExtractor, Mockito.times(1)).processApicurioParsedSchema(Mockito.any(JsonSchema.class));
+
+  }
+
+  @Test
+  @DisplayName("Test flatPropertiesList with Protobuf confluent")
+  void testFlatPropertiesListWithProtobufConfluent() throws RestClientException, IOException {
 
     final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
@@ -143,6 +181,24 @@ class SchemaExtractorTest {
     schemaExtractor.flatPropertiesList("protobufSubject");
     Mockito.verify(protoBufExtractor, Mockito.times(1)).processConfluentParsedSchema(Mockito.any(ProtobufSchema.class));
 
+  }
+
+  @Test
+  @DisplayName("Test flatPropertiesList with Protobuf apicurio")
+  void testFlatPropertiesListWithProtobufApicurio() throws RestClientException, IOException {
+
+    final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
+    properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.APICURIO.toString());
+
+    Mockito.when(protoBufExtractor.getParsedSchema(Mockito.anyString())).thenCallRealMethod();
+    final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "PROTOBUF");
+
+    jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
+    Mockito.when(protoBufExtractor.processApicurioParsedSchema(Mockito.any(ProtobufSchema.class))).thenReturn(new ArrayList<>());
+
+    schemaExtractor.flatPropertiesList("protobufSubject");
+    Mockito.verify(protoBufExtractor, Mockito.times(1)).processApicurioParsedSchema(Mockito.any(ProtobufSchema.class));
 
   }
 

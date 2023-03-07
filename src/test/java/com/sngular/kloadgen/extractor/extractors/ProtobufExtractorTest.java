@@ -33,19 +33,31 @@ class ProtobufExtractorTest {
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
+  private void testFlatPropertiesAssertions(List<FieldValueMapping> fieldValueMappingList, boolean isAncestorRequired) {
+    Assertions.assertThat(fieldValueMappingList)
+              .hasSize(3)
+              .containsExactlyInAnyOrder(
+                  FieldValueMapping.builder().fieldName("street").fieldType("string").required(true).isAncestorRequired(isAncestorRequired).build(),
+                  FieldValueMapping.builder().fieldName("number[]").fieldType("int-array").required(true).isAncestorRequired(isAncestorRequired).build(),
+                  FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(isAncestorRequired).build()
+              );
+  }
   @Test
   @DisplayName("Test Extractor with simple proto file")
   void testFlatProperties() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/easyTest.proto");
     final ParsedSchema parsedSchema = protoBufExtractor.getParsedSchema(testFile);
     final List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processSchema(parsedSchema);
-    Assertions.assertThat(fieldValueMappingList)
-              .hasSize(3)
-              .containsExactlyInAnyOrder(
-                  FieldValueMapping.builder().fieldName("street").fieldType("string").required(true).isAncestorRequired(true).build(),
-                  FieldValueMapping.builder().fieldName("number[]").fieldType("int-array").required(true).isAncestorRequired(true).build(),
-                  FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(true).build()
-              );
+    testFlatPropertiesAssertions(fieldValueMappingList, true);
+  }
+
+  @Test
+  @DisplayName("Test Extractor with simple proto file for confluent")
+  void testFlatPropertiesConfluent() throws Exception {
+    final String testFile = fileHelper.getContent("/proto-files/easyTest.proto");
+    final ParsedSchema parsedSchema = protoBufExtractor.getParsedSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufExtractor.processConfluentParsedSchema(parsedSchema);
+    testFlatPropertiesAssertions(fieldValueMappingList, false);
   }
 
   @Test
