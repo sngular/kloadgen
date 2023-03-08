@@ -31,10 +31,30 @@ class RandomArrayTest {
     );
   }
 
+  private static Stream<Arguments> parametersForGenerateArrayRandomValueZero() {
+    return Stream.of(
+        Arguments.of("float-array", 0, Collections.emptyList()),
+        Arguments.of("int-array", 0, Collections.emptyList()));
+  }
+
   @ParameterizedTest
   @MethodSource("parametersForGenerateArrayRandomValue")
   void generateArrayRandomValue(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Object expected) {
     Assertions.assertThat((List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap()))
               .allMatch(value -> value.equals(expected));
+  }
+
+  @ParameterizedTest
+  @MethodSource("parametersForGenerateArrayRandomValueZero")
+  void generateArrayRandomValueZero(final String fieldType, final Integer valueLength, final List<String> fieldValuesList) {
+    Assertions.assertThat((List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap()))
+              .isNotNull();
+    Object number1 = new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
+    Object number2 = new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
+    List<Object> number3 = (List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
+    Assertions.assertThat(number1).isNotNull();
+    Assertions.assertThat(number2).isNotNull();
+    Assertions.assertThat(number3).isNotNull();
+    Assertions.assertThat(number1).isNotEqualTo(number2);
   }
 }

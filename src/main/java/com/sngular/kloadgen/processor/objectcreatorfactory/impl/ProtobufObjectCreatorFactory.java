@@ -49,10 +49,10 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     }
 
     if (metadata instanceof SchemaMetadata) {
-      SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
+      final SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
       this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
     } else if (metadata instanceof ArtifactMetaData) {
-      ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
+      final ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
       this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
     } else {
       throw new KLoadGenException("Unsupported metadata type");
@@ -91,7 +91,10 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
-      messageBuilder.setField(fieldDescriptor, createFinalArray(fieldDescriptor, pojo));
+      final var finalArray = createFinalArray(fieldDescriptor, pojo);
+      for (var item : finalArray) {
+        messageBuilder.addRepeatedField(fieldDescriptor, item);
+      }
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         try {
@@ -212,11 +215,14 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     return type;
   }
 
-  private Object createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
-    final Object objectReturn;
+  @SuppressWarnings("checkstyle:SingleSpaceSeparator")
+  private List<Object> createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
+    final List<Object> objectReturn;
     if (Objects.nonNull(fieldDescriptor) && FieldDescriptor.Type.ENUM.equals(fieldDescriptor.getType())) {
       final var enumDescriptor = fieldDescriptor.getEnumType();
-      objectReturn = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(), pojo.getFieldValuesList());
+      final Object generatedObject = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
+                                                        pojo.getFieldValuesList());
+      objectReturn = generatedObject instanceof List<?> ? (List<Object>) generatedObject : List.of(generatedObject);
     } else {
       objectReturn = PROTOBUF_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(),
                                                            pojo.getFieldValuesList());
