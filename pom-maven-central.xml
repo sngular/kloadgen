@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.3.3</version>
+  <version>5.3.4</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial data based on Data specification</description>
@@ -219,6 +219,17 @@
       <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Junior Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>dhergon</id>
+      <name>David Hernández González</name>
+      <email>david.hernandez@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Fullstack Senior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
