@@ -27,6 +27,7 @@ import com.sngular.kloadgen.loadgen.impl.ProtobufLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.HeaderMapping;
 import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
+import com.sngular.kloadgen.util.NamingStrategyKeyHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -123,6 +124,7 @@ public final class SamplerUtil {
     props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(ProducerKeysHelper.SASL_MECHANISM, context.getParameter(ProducerKeysHelper.SASL_MECHANISM));
+    props.put(ProducerKeysHelper.KAFKA_TOPIC_CONFIG, context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG));
 
     if (Objects.nonNull(context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
@@ -134,6 +136,8 @@ public final class SamplerUtil {
         props.put(parameter.substring(1), context.getParameter(parameter));
       }
     });
+
+    // Todo: Add kafk topic name
 
     verifySecurity(context, props);
 
@@ -343,10 +347,16 @@ public final class SamplerUtil {
       props.putAll(originals);
 
       try {
-        generator.setUpGenerator(
-            originals,
-            jMeterVariables.get(PropsKeysHelper.VALUE_SUBJECT_NAME),
-            (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+        if (props.getProperty(ProducerKeysHelper.VALUE_NAME_STRATEGY).equals(NamingStrategyKeyHelper.TOPIC_NAME_STRATEGY)) {
+          generator.setUpGenerator(originals, props.getProperty(ProducerKeysHelper.KAFKA_TOPIC_CONFIG),
+                                   (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+        } else {
+          generator.setUpGenerator(
+              originals,
+              jMeterVariables.get(PropsKeysHelper.VALUE_SUBJECT_NAME),
+              (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+        }
+
       } catch (final KLoadGenException exc) {
         if (Objects.nonNull(props.get(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
           generator.setUpGenerator(
@@ -358,8 +368,8 @@ public final class SamplerUtil {
       }
     } else {
       generator.setUpGenerator(
-        jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
-        (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+          jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
+          (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
     }
 
     return generator;
@@ -427,10 +437,10 @@ public final class SamplerUtil {
 
   public static List<String> populateHeaders(final List<HeaderMapping> kafkaHeaders, final ProducerRecord<Object, Object> producerRecord) {
     final List<String> headersSB = new ArrayList<>();
-    for (HeaderMapping kafkaHeader : kafkaHeaders) {
+    for (final HeaderMapping kafkaHeader : kafkaHeaders) {
       final String headerValue = STATELESS_GENERATOR_TOOL.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
-                                                                   10,
-                                                                   Collections.emptyList()).toString();
+                                                                         10,
+                                                                         Collections.emptyList()).toString();
       headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
       producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
     }
