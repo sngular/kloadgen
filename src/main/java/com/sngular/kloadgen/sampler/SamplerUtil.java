@@ -27,14 +27,13 @@ import com.sngular.kloadgen.loadgen.impl.ProtobufLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.HeaderMapping;
 import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import io.apicurio.registry.serde.SerdeConfig;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
-
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -91,7 +90,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
-
+    defaultParameters.addArgument(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
 
     return defaultParameters;
   }
@@ -366,8 +365,8 @@ public final class SamplerUtil {
       }
     } else {
       generator.setUpGenerator(
-        jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
-        (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+          jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
+          (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
     }
 
     return generator;
@@ -441,8 +440,8 @@ public final class SamplerUtil {
     final List<String> headersSB = new ArrayList<>();
     for (HeaderMapping kafkaHeader : kafkaHeaders) {
       final String headerValue = STATELESS_GENERATOR_TOOL.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
-                                                                   10,
-                                                                   Collections.emptyList()).toString();
+                                                                         10,
+                                                                         Collections.emptyList()).toString();
       headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
       producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
     }
