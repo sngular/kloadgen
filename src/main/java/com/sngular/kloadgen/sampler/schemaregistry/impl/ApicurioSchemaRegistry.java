@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
@@ -85,15 +86,7 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
   @Override
   public Object getLatestSchemaMetadata(String subjectName) throws KLoadGenException {
     try {
-      SearchedArtifact searchedArtifact = this.schemaRegistryClient.searchArtifacts(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_DEFAULT_GROUP, null, null, null, null, null, null, null,
-                                                                                    null,
-                                                                                    null, null).getArtifacts().stream()
-                                                                   .filter(artifact -> artifact.getName().equals(subjectName) && artifact.getState().equals(ArtifactState.ENABLED))
-                                                                   .max(Comparator.comparing(SearchedArtifact::getModifiedOn))
-                                                                   .orElseThrow(() -> new KLoadGenException(String.format("Does not exist any enabled" +
-                                                                                                                          "artifact " +
-                                                                                                                          "registered with name %s",
-                                                                                                                          subjectName)));
+      final SearchedArtifact searchedArtifact = getLastestSearchedArtifact(subjectName);
       return this.schemaRegistryClient.getArtifactMetaData(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_DEFAULT_GROUP, searchedArtifact.getId());
     } catch (RestClientException e) {
       throw new KLoadGenException(e.getMessage());
@@ -161,5 +154,27 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
       throw new RuntimeException(e);
     }
     return schema;
+  }
+
+  private SearchedArtifact getLastestSearchedArtifact(final String subjectName) {
+    boolean found = false;
+    SearchedArtifact best = null;
+    final Comparator<SearchedArtifact> comparator = Comparator.comparing(SearchedArtifact::getModifiedOn);
+    for (SearchedArtifact artifact : this.schemaRegistryClient.searchArtifacts(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_DEFAULT_GROUP, null, null, null, null, null, null, null,
+                                                                               null,
+                                                                               null, null).getArtifacts()) {
+      if (artifact.getName().equals(subjectName) && artifact.getState().equals(ArtifactState.ENABLED)) {
+        if (!found || comparator.compare(artifact, best) > 0) {
+          found = true;
+          best = artifact
+        }
+      }
+    }
+    SearchedArtifact searchedArtifact = (found ? Optional.of(best) : Optional.<SearchedArtifact>empty())
+        .orElseThrow(() -> new KLoadGenException(String.format("Does not exist any enabled" +
+                                                               "artifact " +
+                                                               "registered with name %s",
+                                                               subjectName)));
+    return searchedArtifact;
   }
 }

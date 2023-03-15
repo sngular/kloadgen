@@ -102,7 +102,7 @@
             </elementProp>
           </collectionProp>
           <stringProp name="valueSchemaType">AVRO</stringProp>
-          <stringProp name="valueSerializerConfiguration">com.sngular.kloadgen.serializer.AvroSerializer</stringProp>
+          <stringProp name="valueSerializerConfiguration">io.apicurio.registry.serde.avro.AvroKafkaSerializer</stringProp>
           <stringProp name="valueSubjectName">User</stringProp>
         </com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement>
         <hashTree/>
