@@ -166,7 +166,7 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
       if (artifact.getName().equals(subjectName) && artifact.getState().equals(ArtifactState.ENABLED)) {
         if (!found || comparator.compare(artifact, best) > 0) {
           found = true;
-          best = artifact
+          best = artifact;
         }
       }
     }
