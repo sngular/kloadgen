@@ -45,8 +45,6 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
   @Override
   public String getSchemaRegistryUrlKey() {
     return SerdeConfig.REGISTRY_URL;
-    // todo: si al final usamos el map deproperties tambien se podria devolver lo siguiente
-    //return this.getPropertiesMap().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL_KEY);
   }
 
   @Override
@@ -56,8 +54,6 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
 
   @Override
   public void setSchemaRegistryClient(Map<String, ?> properties) {
-    // todo: revisar si usar SchemaRegistryConstants
-    //String url = properties.get(SchemaRegistryConstants.SCHEMA_REGISTRY_URL).toString();
     String url = properties.get(this.getSchemaRegistryUrlKey()).toString();
     this.schemaRegistryClient = RegistryClientFactory.create(url);
   }
@@ -100,10 +96,8 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
       List<SearchedArtifact> artifacts = this.schemaRegistryClient.searchArtifacts(null, subjectName, null,
                                                                                    null, null, null, null, null, null).getArtifacts();
       if (artifacts.isEmpty()) {
-        // todo: devolver error
         throw new KLoadGenException(String.format("Schema %s not found", subjectName));
       } else {
-        // todo: se busca la última versión del schema
         SearchedArtifact searchedArtifact = artifacts.get(0);
         InputStream inputStream = this.schemaRegistryClient.getLatestArtifact(searchedArtifact.getGroupId(), searchedArtifact.getId());
         String result = IOUtils.toString(inputStream, String.valueOf(StandardCharsets.UTF_8));

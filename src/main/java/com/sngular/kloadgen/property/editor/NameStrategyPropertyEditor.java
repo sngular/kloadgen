@@ -16,15 +16,9 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-
-import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 @Slf4j
 public class NameStrategyPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -55,21 +49,12 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     nameStrategyComboBox.addActionListener(this);
   }
 
-    private void fillSerializer(final JComboBox<String> objectJComboBox) {
+  private void fillSerializer(final JComboBox<String> objectJComboBox) {
     objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.RecordIdStrategy");
     objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy");
     objectJComboBox.addItem("io.apicurio.registry.serde.strategy.TopicIdStrategy");
     objectJComboBox.addItem("io.apicurio.registry.serde.strategy.SimpleTopicIdStrategy");
     nameStrategyComboBox = objectJComboBox;
-    /*
-    // todo: refactorizar esto para obtener las estrategias tanto de Confluent como de Apicurio
-    nameStrategyComboBox = objectJComboBox;
-    final Reflections reflections = new Reflections(
-        new ConfigurationBuilder()
-            .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
-            .setScanners(Scanners.SubTypes));
-    ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
-     */
   }
 
   @Override

@@ -9,9 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ApicurioParsedSchema {
 
-    private String type;
-    private Object schema;
+  private String type;
 
-    // todo: ver si es necesario o no añadir el campo rawSchema
-    private String rawSchema;
+  private Object schema;
+
+  private String rawSchema;
 }
