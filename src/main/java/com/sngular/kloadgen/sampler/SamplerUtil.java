@@ -126,11 +126,14 @@ public final class SamplerUtil {
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(ProducerKeysHelper.SASL_MECHANISM, context.getParameter(ProducerKeysHelper.SASL_MECHANISM));
 
-    if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(SerdeConfig.AUTO_REGISTER_ARTIFACT, context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
-    } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+    String schemaRegistryNameValue = context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+    String enableSchemaRegistrationValue = context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG);
+    if (schemaRegistryNameValue.equalsIgnoreCase(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO)) {
+      props.put(SerdeConfig.AUTO_REGISTER_ARTIFACT, enableSchemaRegistrationValue);
+    } else {
+      props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, enableSchemaRegistrationValue);
     }
+
     final Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
       if (parameter.startsWith("_")) {
@@ -376,15 +379,17 @@ public final class SamplerUtil {
     final JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     final BaseLoadGenerator generator;
 
-    final String keyNameStrategy = jMeterVariables.get(ProducerKeysHelper.KEY_NAME_STRATEGY);
-    if (Objects.isNull(keyNameStrategy)) {
-      if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-        props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
-      } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-        props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
+    final String keyNameStrategy = ProducerKeysHelper.KEY_NAME_STRATEGY;
+    final String keyNameStrategyValue = jMeterVariables.get(keyNameStrategy);
+    if (Objects.isNull(keyNameStrategyValue)) {
+      final String schemaRegistryNameValue = jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+      if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(schemaRegistryNameValue)) {
+        props.put(keyNameStrategy, ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
+      } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(schemaRegistryNameValue)) {
+        props.put(keyNameStrategy, ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
       }
     } else {
-      props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, keyNameStrategy);
+      props.put(keyNameStrategy, keyNameStrategyValue);
     }
 
     if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {

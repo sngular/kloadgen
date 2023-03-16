@@ -17,10 +17,10 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.serializer.EnrichedRecord;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.serializer.EnrichedRecord;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -41,7 +41,6 @@ class AvroSRLoadGeneratorTest {
     jmcx.setVariables(new JMeterVariables());
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
-
 
   @Test
   void testAvroLoadGenerator(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {

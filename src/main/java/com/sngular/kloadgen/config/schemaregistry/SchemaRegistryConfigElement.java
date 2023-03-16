@@ -6,12 +6,18 @@
 
 package com.sngular.kloadgen.config.schemaregistry;
 
+import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME;
+import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES;
+import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import com.sngular.kloadgen.model.PropertyMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -21,13 +27,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.testelement.property.TestElementProperty;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -40,6 +45,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 public class SchemaRegistryConfigElement extends ConfigTestElement implements TestBean, LoopIterationListener {
 
   private String schemaRegistryName;
+
   private String schemaRegistryUrl;
 
   private List<PropertyMapping> schemaRegistryProperties;
@@ -77,9 +83,10 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
   private Map<String, String> getProperties() {
     final Map<String, String> result = new HashMap<>();
-    if (Objects.nonNull(getProperty("schemaRegistryProperties"))) {
+    final JMeterProperty property = getProperty(SCHEMA_REGISTRY_PROPERTIES);
+    if (Objects.nonNull(property)) {
       result.putAll(
-          this.fromTestElementToPropertiesMap((List<TestElementProperty>) getProperty("schemaRegistryProperties").getObjectValue()));
+          this.fromTestElementToPropertiesMap((List<TestElementProperty>) property.getObjectValue()));
     } else {
       result.putAll(fromPropertyMappingToPropertiesMap(this.schemaRegistryProperties));
     }
@@ -87,7 +94,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   }
 
   private String getRegistryName() {
-    String registryName = getPropertyAsString("schemaRegistryName");
+    String registryName = getPropertyAsString(SCHEMA_REGISTRY_NAME);
     if (StringUtils.isBlank(registryName)) {
       registryName = this.schemaRegistryName;
     }
@@ -95,7 +102,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   }
 
   private String getRegistryUrl() {
-    String registryUrl = getPropertyAsString("schemaRegistryUrl");
+    String registryUrl = getPropertyAsString(SCHEMA_REGISTRY_URL);
     if (StringUtils.isBlank(registryUrl)) {
       registryUrl = this.schemaRegistryUrl;
     }

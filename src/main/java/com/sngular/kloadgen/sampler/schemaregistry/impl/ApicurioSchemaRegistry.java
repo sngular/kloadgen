@@ -37,9 +37,8 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
   private Map<String, String> propertiesMap;
 
   public ApicurioSchemaRegistry() {
-    this.propertiesMap = new HashMap<>();
-    this.propertiesMap.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryConstants.SCHEMA_REGISTRY_APICURIO);
-    this.propertiesMap.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL_KEY, SerdeConfig.REGISTRY_URL);
+    this.propertiesMap = Map.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryConstants.SCHEMA_REGISTRY_APICURIO,
+                                SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL_KEY, SerdeConfig.REGISTRY_URL);
   }
 
   @Override
@@ -157,11 +156,9 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
     for (SearchedArtifact artifact : this.schemaRegistryClient.searchArtifacts(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_DEFAULT_GROUP, null, null, null, null, null, null, null,
                                                                                null,
                                                                                null, null).getArtifacts()) {
-      if (artifact.getName().equals(subjectName) && artifact.getState().equals(ArtifactState.ENABLED)) {
-        if (!found || comparator.compare(artifact, best) > 0) {
-          found = true;
-          best = artifact;
-        }
+      if (artifact.getName().equals(subjectName) && ArtifactState.ENABLED.equals(artifact.getState()) && !found || comparator.compare(artifact, best) > 0) {
+        found = true;
+        best = artifact;
       }
     }
     SearchedArtifact searchedArtifact = (found ? Optional.of(best) : Optional.<SearchedArtifact>empty())
