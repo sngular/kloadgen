@@ -7,10 +7,12 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.3.3</version>
+  <version>5.4.0</version>
 
   <name>KLoadGen</name>
-  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial data based on Data specification</description>
+  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
+    data based on Data specification
+  </description>
   <url>https://sngular.github.io/kloadgen/</url>
 
   <licenses>

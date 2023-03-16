@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Plan de Pruebas" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
-      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Variables definidas por el Usuario" enabled="true">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
       <stringProp name="TestPlan.user_define_classpath"></stringProp>
     </TestPlan>
     <hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupo de Hilos" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Controlador Bucle" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
@@ -27,183 +27,86 @@
       </ThreadGroup>
       <hashTree>
         <com.sngular.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement" testname="KLG - Kafka Headers Config" enabled="true">
-          <collectionProp name="kafkaHeaders">
-            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
-              <stringProp name="headerName">message_id</stringProp>
-              <stringProp name="headerValue">uuid</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
-              <stringProp name="headerName">publication_timestamp</stringProp>
-              <stringProp name="headerValue">stringTimestamp</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
-              <stringProp name="headerName">producer_id</stringProp>
-              <stringProp name="headerValue">producer_id_1</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
-              <stringProp name="headerName">topic</stringProp>
-              <stringProp name="headerValue">test-topic</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
-              <stringProp name="headerName">envelope_id</stringProp>
-              <stringProp name="headerValue">envelope-id</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.HeaderMapping">
-              <stringProp name="headerName">contentType</stringProp>
-              <stringProp name="headerValue">application/*+avro</stringProp>
-            </elementProp>
-          </collectionProp>
+          <collectionProp name="kafkaHeaders"/>
         </com.sngular.kloadgen.config.kafkaheaders.KafkaHeadersConfigElement>
         <hashTree/>
-        <com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="KLG - Value Schema Serializer Config" enabled="true">
-          <stringProp name="avroSubject"></stringProp>
-          <collectionProp name="valueSchemaProperties">
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.name</stringProp>
-              <intProp name="valueLength">7</intProp>
-              <stringProp name="fieldType">string</stringProp>
+        <com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
+          <stringProp name="schemaRegistryName">Apicurio</stringProp>
+          <collectionProp name="schemaRegistryProperties">
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>
+              <stringProp name="propertyValue">NO</stringProp>
             </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.domain</stringProp>
-              <intProp name="valueLength">7</intProp>
-              <stringProp name="fieldType">string</stringProp>
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.auth.method</stringProp>
+              <stringProp name="propertyValue">BASIC</stringProp>
             </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.version</stringProp>
-              <intProp name="valueLength">2</intProp>
-              <stringProp name="fieldType">string</stringProp>
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.username</stringProp>
+              <stringProp name="propertyValue">&lt;username&gt;</stringProp>
             </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.id</stringProp>
-              <intProp name="valueLength">5</intProp>
-              <stringProp name="fieldType">string</stringProp>
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.password</stringProp>
+              <stringProp name="propertyValue">&lt;password&gt;</stringProp>
             </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.timestamp</stringProp>
-              <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">0</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.action</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">string</stringProp>
-              <stringProp name="fieldValuesList">created</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.envelope.name</stringProp>
-              <intProp name="valueLength">2</intProp>
-              <stringProp name="fieldType">string</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.envelope.version</stringProp>
-              <intProp name="valueLength">2</intProp>
-              <stringProp name="fieldType">string</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.classifiers[1].name</stringProp>
-              <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">3</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.classifiers[].values</stringProp>
-              <stringProp name="fieldType">string-array</stringProp>
-              <intProp name="valueLength">4</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">metadata.context</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">string</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.id</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">int</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.code</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">string</stringProp>
-              <stringProp name="fieldValuesList">COD1,COD2,COD3</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.type</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">string</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.brand_id</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">int</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.address</stringProp>
-              <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">20</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.city</stringProp>
-              <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">10</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.zip_code</stringProp>
-              <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">3</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.state</stringProp>
-              <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">3</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.latitude</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">long</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.longitude</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">long</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.time_zone_id</stringProp>
-              <stringProp name="fieldType">int</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.address.country_iso</stringProp>
-              <stringProp name="fieldType">string</stringProp>
-              <intProp name="valueLength">3</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.location_ids</stringProp>
-              <stringProp name="fieldType">int-array</stringProp>
-              <intProp name="valueLength">2</intProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.entity_version</stringProp>
-              <stringProp name="fieldType">int</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.last_updated_date_time</stringProp>
-              <stringProp name="fieldType">longTimestamp</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.entity.status</stringProp>
-              <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">enum</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">payload.timestamp</stringProp>
-              <stringProp name="fieldType">longTimestamp</stringProp>
+            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
+              <stringProp name="propertyName">schema.registry.bearer</stringProp>
+              <stringProp name="propertyValue">&lt;bearer&gt;</stringProp>
             </elementProp>
           </collectionProp>
-          <stringProp name="valueSubjectName">test</stringProp>
-          <stringProp name="valueSchemaType">AVRO</stringProp>
+          <stringProp name="schemaRegistryUrl">http://localhost:8080</stringProp>
+        </com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
+        <hashTree/>
+        <com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="KLG - Value Schema Serializer Config" enabled="true">
           <stringProp name="valueNameStrategy">io.apicurio.registry.serde.avro.strategy.RecordIdStrategy</stringProp>
-          <stringProp name="valueSerializerConfiguration">com.sngular.kloadgen.serializer.AvroSerializer</stringProp>
+          <collectionProp name="valueSchemaProperties">
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">id</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">int</stringProp>
+              <stringProp name="fieldValuesList"></stringProp>
+              <boolProp name="required">true</boolProp>
+              <boolProp name="ancestorRequired">true</boolProp>
+            </elementProp>
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">twitterAccounts[].status</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">enum</stringProp>
+              <stringProp name="fieldValuesList">PENDING,ACTIVE,DENIED,EXPIRED,REVOKED</stringProp>
+              <boolProp name="required">true</boolProp>
+              <boolProp name="ancestorRequired">true</boolProp>
+            </elementProp>
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">twitterAccounts[].status2</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">enum</stringProp>
+              <stringProp name="fieldValuesList">TEST1,TEST2,TEST3,TEST4</stringProp>
+              <boolProp name="required">true</boolProp>
+              <boolProp name="ancestorRequired">true</boolProp>
+            </elementProp>
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">toDoItems[].status3</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">enum</stringProp>
+              <stringProp name="fieldValuesList">HIDDEN,ACTIONABLE,DONE,ARCHIVED,DELETED</stringProp>
+              <boolProp name="required">true</boolProp>
+              <boolProp name="ancestorRequired">true</boolProp>
+            </elementProp>
+            <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
+              <stringProp name="fieldName">toDoItems[].status4</stringProp>
+              <intProp name="valueLength">0</intProp>
+              <stringProp name="fieldType">enum</stringProp>
+              <stringProp name="fieldValuesList">HIDDEN,ACTIONABLE,DONE,ARCHIVED,DELETED</stringProp>
+              <boolProp name="required">true</boolProp>
+              <boolProp name="ancestorRequired">true</boolProp>
+            </elementProp>
+          </collectionProp>
+          <stringProp name="valueSchemaType">AVRO</stringProp>
+          <stringProp name="valueSerializerConfiguration">io.apicurio.registry.serde.avro.AvroKafkaSerializer</stringProp>
+          <stringProp name="valueSubjectName">User</stringProp>
         </com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement>
         <hashTree/>
-        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Producer Properties" enabled="true">
+        <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Petición Java" enabled="true">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="bootstrap.servers" elementType="Argument">
@@ -213,7 +116,7 @@
               </elementProp>
               <elementProp name="zookeeper.servers" elementType="Argument">
                 <stringProp name="Argument.name">zookeeper.servers</stringProp>
-                <stringProp name="Argument.value">&lt;Zookeeper List&gt;</stringProp>
+                <stringProp name="Argument.value">localhost:2181</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="kafka.topic.name" elementType="Argument">
@@ -338,7 +241,7 @@
               </elementProp>
               <elementProp name="ssl.endpoint.identification.algorithm" elementType="Argument">
                 <stringProp name="Argument.name">ssl.endpoint.identification.algorithm</stringProp>
-                <stringProp name="Argument.value">&lt;Ssl identification algorithm&gt;</stringProp>
+                <stringProp name="Argument.value">https</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="ssl.keymanager.algorithm" elementType="Argument">
@@ -361,43 +264,15 @@
                 <stringProp name="Argument.value">TLSv1.3</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="auto.register.schemas" elementType="Argument">
+                <stringProp name="Argument.name">auto.register.schemas</stringProp>
+                <stringProp name="Argument.value">false</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
             </collectionProp>
           </elementProp>
           <stringProp name="classname">com.sngular.kloadgen.sampler.KafkaProducerSampler</stringProp>
         </JavaSampler>
-        <hashTree/>
-        <com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement" testname="Schema Registry Config Element" enabled="true">
-          <stringProp name="schemaRegistryUrl">http://localhost:8081</stringProp>
-          <collectionProp name="schemaRegistryProperties">
-            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
-              <stringProp name="propertyName">schema.registry.auth.enabled</stringProp>
-              <stringProp name="propertyValue">NO</stringProp>
-            </elementProp>
-            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
-              <stringProp name="propertyName">schema.registry.auth.method</stringProp>
-              <stringProp name="propertyValue">BASIC</stringProp>
-            </elementProp>
-            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
-              <stringProp name="propertyName">schema.registry.username</stringProp>
-              <stringProp name="propertyValue">&lt;username&gt;</stringProp>
-            </elementProp>
-            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
-              <stringProp name="propertyName">schema.registry.password</stringProp>
-              <stringProp name="propertyValue">&lt;password&gt;</stringProp>
-            </elementProp>
-            <elementProp name="Config properties" elementType="com.sngular.kloadgen.model.PropertyMapping" testname="Config properties">
-              <stringProp name="propertyName">schema.registry.bearer</stringProp>
-              <stringProp name="propertyValue">&lt;bearer&gt;</stringProp>
-            </elementProp>
-          </collectionProp>
-          <stringProp name="schemaRegistryName">Confluent</stringProp>
-        </com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
-        <hashTree/>
-        <com.sngular.kloadgen.config.keysimple.KeySimpleConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.keysimple.KeySimpleConfigElement" testname="KLG - Simple Key Config" enabled="true">
-          <stringProp name="keySerializerConfiguration">org.apache.kafka.common.serialization.StringSerializer</stringProp>
-          <stringProp name="keyType">string</stringProp>
-          <stringProp name="keyValue">${__RandomString(5,,)}</stringProp>
-        </com.sngular.kloadgen.config.keysimple.KeySimpleConfigElement>
         <hashTree/>
       </hashTree>
     </hashTree>

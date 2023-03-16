@@ -125,6 +125,115 @@
           "Content-Type": "application/vnd.schemaregistry.v1+json"
         }
       }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/groups/default/artifacts/simple-schema/meta"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": "Test",
+          "version": 1,
+          "globalId": 72,
+          "id": "356f7e88-920e-46cd-a64c-e1e76a3e7b3a",
+          "type": "AVRO"
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/search/artifacts\\?group=default"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "artifacts": [
+            {
+              "id": "147fc92d-d8e6-44a9-89a4-bf9bb8246735",
+              "name": "simple-schema",
+              "createdOn": "2022-12-31T23:59:59Z",
+              "type": "AVRO",
+              "state": "ENABLED",
+              "modifiedOn": "2022-12-31T23:59:59Z"
+            },
+            {
+              "id": "dad37185-782b-4bed-9cf6-678d1d4587d9",
+              "name": "simple-schema",
+              "createdOn": "2023-01-01T00:00:00Z",
+              "createdBy": "",
+              "type": "AVRO",
+              "state": "ENABLED",
+              "modifiedOn": "2023-01-01T00:00:00Z"
+            }
+          ],
+          "count": 2
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/groups/default/artifacts/dad37185-782b-4bed-9cf6-678d1d4587d9/meta"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": "simple-schema",
+          "createdOn": "2023-01-01T00:00:00Z",
+          "modifiedOn": "2023-01-01T00:00:00Z",
+          "id": "dad37185-782b-4bed-9cf6-678d1d4587d9",
+          "version": "1",
+          "type": "AVRO",
+          "globalId": 72,
+          "state": "ENABLED",
+          "contentId": 1,
+          "references": []
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/ids/globalIds/72\\?dereference=false"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": "test",
+          "type": "record",
+          "fields": [
+            {
+              "name": "Name",
+              "type": "string"
+            },
+            {
+              "name": "Age",
+              "type": "int"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
     }
   ]
 }
+
+

@@ -6,15 +6,15 @@
 
 package com.sngular.kloadgen.serializer;
 
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import lombok.Builder;
 import lombok.Value;
+import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
 
 @Value
 @Builder
 public class EnrichedRecord {
 
-  SchemaMetadata schemaMetadata;
+  KloadSchemaMetadata schemaMetadata;
 
   Object genericRecord;
 }

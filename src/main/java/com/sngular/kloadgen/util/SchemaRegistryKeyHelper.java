@@ -8,6 +8,14 @@ package com.sngular.kloadgen.util;
 
 public final class SchemaRegistryKeyHelper {
 
+  public static final String SCHEMA_REGISTRY_DEFAULT_GROUP = "default";
+
+  public static final String SCHEMA_REGISTRY_NAME = "schema.registry.name";
+
+  public static final String SCHEMA_REGISTRY_CONFLUENT = "CONFLUENT";
+
+  public static final String SCHEMA_REGISTRY_APICURIO = "APICURIO";
+
   public static final String SCHEMA_REGISTRY_USERNAME_KEY = "schema.registry.username";
 
   public static final String SCHEMA_REGISTRY_USERNAME_DEFAULT = "<username>";
@@ -16,7 +24,13 @@ public final class SchemaRegistryKeyHelper {
 
   public static final String SCHEMA_REGISTRY_PASSWORD_DEFAULT = "<password>";
 
+  public static final String SCHEMA_REGISTRY_URL_KEY = "SCHEMA_REGISTRY_URL_KEY";
+
+  public static final String SCHEMA_REGISTRY_URL_VALUE = "SCHEMA_REGISTRY_URL_VALUE";
+
   public static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
+
+  public static final String SCHEMA_REGISTRY_NAME_DEFAULT = "Confluent";
 
   public static final String SCHEMA_REGISTRY_URL_DEFAULT = "http://localhost:8081";
 
