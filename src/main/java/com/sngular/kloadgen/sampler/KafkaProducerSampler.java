@@ -158,8 +158,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
           }
         });
 
-        super.getNewLogger().info("Send message with key: {} and body: {} and headers: {}",
-                                  producerRecord.key(), producerRecord.value(), producerRecord.headers());
         fillSampleResult(sampleResult, prettyPrint(result.get()), true);
       } catch (KLoadGenException | InterruptedException | ExecutionException e) {
         super.getNewLogger().error("Failed to send message", e);
