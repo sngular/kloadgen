@@ -42,9 +42,9 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
     if (schema instanceof ParsedSchema) {
-      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema());
+      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema(), metadata);
     } else if (schema instanceof ProtoFileElement) {
-      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schema);
+      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schema, metadata);
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }

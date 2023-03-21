@@ -32,6 +32,8 @@ import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.collections4.CollectionUtils;
@@ -146,7 +148,7 @@ public class SchemaProcessorUtils {
     return Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).toArray(String[]::new);
   }
 
-  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
+  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, Object metadata) throws Descriptors.DescriptorValidationException, IOException {
 
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
     final List<String> imports = schema.getImports();
@@ -161,7 +163,7 @@ public class SchemaProcessorUtils {
             schemaBuilder.addSchema(importedSchema);
           }
         } else {
-          final var importSchema = JMeterHelper.getParsedSchema(importedClass.substring(0, importedClass.length() - 6), JMeterContextService.getContext().getProperties());
+          final var importSchema = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata), JMeterContextService.getContext().getProperties());
           if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
             schemaBuilder.addDependency(((ProtobufSchema) importSchema).toDescriptor().getFullName());
             schemaBuilder.addSchema(convertDynamicSchema((ProtobufSchema) importSchema));
@@ -181,7 +183,17 @@ public class SchemaProcessorUtils {
 
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
+  private static String getSubjectName(String importedClass, Object metadata) {
+    List<SchemaReference> references = ((SchemaMetadata) metadata).getReferences();
 
+    for(final SchemaReference schemaReference: references){
+      if(schemaReference.getName().equals(importedClass)){
+        return schemaReference.getSubject();
+      }
+    }
+
+    return importedClass;
+  }
   private static DynamicSchema convertDynamicSchema(final ProtobufSchema importSchema) throws DescriptorValidationException {
     return processImported(Arrays.asList(importSchema.rawSchema().toSchema().split("\\n")));
   }
