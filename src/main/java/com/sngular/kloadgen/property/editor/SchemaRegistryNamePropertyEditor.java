@@ -6,95 +6,93 @@
 
 package com.sngular.kloadgen.property.editor;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.jmeter.gui.ClearGui;
-import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.jmeter.gui.ClearGui;
+import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
+
 @Slf4j
 public class SchemaRegistryNamePropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
-    private final JPanel panel = new JPanel();
+  private final JPanel panel = new JPanel();
 
-    private JComboBox<String> schemaRegistryName;
+  private JComboBox<String> schemaRegistryName;
 
-    public SchemaRegistryNamePropertyEditor() {
-        this.init();
-    }
+  public SchemaRegistryNamePropertyEditor() {
+    this.init();
+  }
 
-    public SchemaRegistryNamePropertyEditor(final Object source) {
-        super(source);
-        this.init();
-        this.setValue(source);
-    }
+  public SchemaRegistryNamePropertyEditor(final Object source) {
+    super(source);
+    this.init();
+    this.setValue(source);
+  }
 
-    public SchemaRegistryNamePropertyEditor(final PropertyDescriptor propertyDescriptor) {
-        super(propertyDescriptor);
-        this.init();
-    }
+  public SchemaRegistryNamePropertyEditor(final PropertyDescriptor propertyDescriptor) {
+    super(propertyDescriptor);
+    this.init();
+  }
 
-    private void init() {
-        fillSerializer(new JComboBox<>());
-        panel.setLayout(new BorderLayout());
-        panel.add(schemaRegistryName);
-        schemaRegistryName.addActionListener(this);
-    }
+  private void init() {
+    this.schemaRegistryName = new JComboBox<>();
+    this.schemaRegistryName.addItem("Apicurio");
+    this.schemaRegistryName.addItem("Confluent");
+    panel.setLayout(new BorderLayout());
+    panel.add(schemaRegistryName);
+    schemaRegistryName.addActionListener(this);
+  }
 
-    private void fillSerializer(final JComboBox<String> objectJComboBox) {
-        objectJComboBox.addItem("Apicurio");
-        objectJComboBox.addItem("Confluent");
-        this.schemaRegistryName = objectJComboBox;
-    }
+  @Override
+  public void actionPerformed(final ActionEvent event) {
+    // Not implementation required
+  }
 
-    @Override
-    public void actionPerformed(final ActionEvent event) {
-        // Not implementation required
-    }
+  @Override
+  public void clearGui() {
+    // Not implementation required
+  }
 
-    @Override
-    public void clearGui() {
-        // Not implementation required
-    }
+  @Override
+  public final void setDescriptor(final PropertyDescriptor descriptor) {
+    super.setSource(descriptor);
+  }
 
-    @Override
-    public final void setDescriptor(final PropertyDescriptor descriptor) {
-        super.setSource(descriptor);
-    }
+  @Override
+  public final String getAsText() {
+    return Objects.requireNonNull(this.schemaRegistryName.getSelectedItem()).toString();
+  }
 
-    @Override
-    public final String getAsText() {
-        return Objects.requireNonNull(this.schemaRegistryName.getSelectedItem()).toString();
-    }
+  @Override
+  public final Component getCustomEditor() {
+    return this.panel;
+  }
 
-    @Override
-    public final Component getCustomEditor() {
-        return this.panel;
-    }
+  @Override
+  public final void setAsText(final String text) throws IllegalArgumentException {
+    this.schemaRegistryName.setSelectedItem(text);
+  }
 
-    @Override
-    public final void setAsText(final String text) throws IllegalArgumentException {
-        this.schemaRegistryName.setSelectedItem(text);
-    }
+  @Override
+  public final void setValue(final Object value) {
+    this.schemaRegistryName.setSelectedItem(Objects.requireNonNullElse(value, 0));
+  }
 
-    @Override
-    public final void setValue(final Object value) {
-        this.schemaRegistryName.setSelectedItem(Objects.requireNonNullElse(value, 0));
-    }
+  @Override
+  public final Object getValue() {
+    return this.schemaRegistryName.getSelectedItem();
+  }
 
-    @Override
-    public final Object getValue() {
-        return this.schemaRegistryName.getSelectedItem();
-    }
-
-    @Override
-    public final boolean supportsCustomEditor() {
-        return true;
-    }
+  @Override
+  public final boolean supportsCustomEditor() {
+    return true;
+  }
 }

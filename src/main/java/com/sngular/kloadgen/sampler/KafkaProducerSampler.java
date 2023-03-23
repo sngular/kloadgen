@@ -25,7 +25,7 @@ import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.serializer.ProtobufSerializer;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.apicurio.registry.serde.SerdeConfig;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
@@ -100,7 +100,8 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props2.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
 
       // Configure Service Registry location
-      props2.putIfAbsent(SerdeConfig.REGISTRY_URL, "http://localhost:8080");
+      props2.putIfAbsent(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, props.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
+      props2.putIfAbsent(PropsKeysHelper.VALUE_SUBJECT_NAME_STRATEGY, props.get(PropsKeysHelper.VALUE_SUBJECT_NAME_STRATEGY));
 
       // Register the artifact if not found in the registry.
       // props2.putIfAbsent(SerdeConfig.AUTO_REGISTER_ARTIFACT, Boolean.TRUE);
@@ -228,6 +229,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private Object getObject(final EnrichedRecord messageVal, final boolean valueFlag) {
-    return valueFlag ? messageVal : messageVal.getGenericRecord();
+    return messageVal.getGenericRecord();
   }
 }

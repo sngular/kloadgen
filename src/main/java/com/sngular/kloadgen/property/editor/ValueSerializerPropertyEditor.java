@@ -16,7 +16,6 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
@@ -63,11 +62,11 @@ public class ValueSerializerPropertyEditor extends PropertyEditorSupport impleme
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(Serializer.class))
             .filterInputsBy(new FilterBuilder()
-                                .includePackage("com.sngular.kloadgen.serializer")
-                                .includePackage("io.confluent.kafka.serializers")
-                                .includePackage("io.apicurio.registry.serde.avro.AvroKafkaSerializer")
-                                .includePackage("io.apicurio.registry.serde.jsonschema.JsonSchemaKafkaSerializer")
-                                .includePackage("io.apicurio.registry.serde.protobuf.ProtobufKafkaSerializer"))
+                                .includePackage(SerDesPackageValue.COM_SNGULAR_KLOADGEN_SERIALIZER)
+                                .includePackage(SerDesPackageValue.IO_CONFLUENT_KAFKA_SERIALIZERS)
+                                .includePackage(SerDesPackageValue.IO_APICURIO_REGISTRY_SERDE_AVRO_AVRO_KAFKA_DESERIALIZER)
+                                .includePackage(SerDesPackageValue.IO_APICURIO_REGISTRY_SERDE_JSONSCHEMA_JSON_SCHEMA_KAFKA_DESERIALIZER)
+                                .includePackage(SerDesPackageValue.IO_APICURIO_REGISTRY_SERDE_PROTOBUF_PROTOBUF_KAFKA_DESERIALIZER))
             .setScanners(Scanners.SubTypes));
 
     ReflectionUtils.extractSerializers(serializerComboBox, reflections, Serializer.class);

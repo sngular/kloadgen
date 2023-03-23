@@ -196,7 +196,7 @@
         <hashTree/>
         <com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.valuefileserialized.ValueFileSerializedConfigElement" testname="Schema File Load Generator Config" enabled="true">
           <stringProp name="valueSchemaType">AVRO</stringProp>
-          <stringProp name="valueNameStrategy">io.confluent.kafka.serializers.subject.RecordNameStrategy</stringProp>
+          <stringProp name="valueNameStrategy">io.apicurio.registry.serde.avro.strategy.RecordIdStrategy</stringProp>
           <stringProp name="valueSerializerConfiguration">io.confluent.kafka.serializers.KafkaAvroSerializer</stringProp>
           <stringProp name="valueSubjectName">com.example.avro.User</stringProp>
           <collectionProp name="valueSchemaProperties">
@@ -372,6 +372,7 @@
             </elementProp>
           </collectionProp>
           <stringProp name="schemaRegistryUrl">http://localhost:8081</stringProp>
+          <stringProp name="schemaRegistryName">Confluent</stringProp>
         </com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
         <hashTree/>
         <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">

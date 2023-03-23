@@ -24,22 +24,24 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
+
   private final Descriptors.Descriptor schema;
-  private final KloadSchemaMetadata kloadSchemaMetadata;
+
+  private final SchemaMetadataAdapter schemaMetadataAdapter;
+
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
-  public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
+  public ProtobufObjectCreatorFactory(final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) throws DescriptorValidationException, IOException {
     if (schema instanceof ParsedSchema) {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema());
     } else if (schema instanceof ProtoFileElement) {
@@ -48,15 +50,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
       throw new KLoadGenException("Unsupported schema type");
     }
 
-    if (metadata instanceof SchemaMetadata) {
-      SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
-    } else if (metadata instanceof ArtifactMetaData) {
-      ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
-    } else {
-      throw new KLoadGenException("Unsupported metadata type");
-    }
+    this.schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
   }
 
   @Override
@@ -91,7 +85,10 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     final String subPathName = SchemaProcessorUtils.getPathUpToFieldName(pojo.getCompleteFieldName(), pojo.getLevel() + 1);
     final FieldDescriptor fieldDescriptor = findFieldDescriptor(SchemaProcessorUtils.splitAndNormalizeFullFieldName(subPathName), this.schema, new AtomicBoolean(false));
     if (pojo.isLastFilterTypeOfLastElement()) {
-      messageBuilder.setField(fieldDescriptor, createFinalArray(fieldDescriptor, pojo));
+      final var finalArray = createFinalArray(fieldDescriptor, pojo);
+      for (var item : finalArray) {
+        messageBuilder.addRepeatedField(fieldDescriptor, item);
+      }
     } else {
       for (int i = 0; i < pojo.getFieldSize(); i++) {
         try {
@@ -147,7 +144,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   @Override
   public final Object generateRecord() {
-    return EnrichedRecord.builder().schemaMetadata(kloadSchemaMetadata).genericRecord(entity.get("root").build()).build();
+    return EnrichedRecord.builder().schemaMetadata(schemaMetadataAdapter).genericRecord(entity.get("root").build()).build();
   }
 
   @Override
@@ -212,11 +209,14 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     return type;
   }
 
-  private Object createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
-    final Object objectReturn;
+  @SuppressWarnings("checkstyle:SingleSpaceSeparator")
+  private List<Object> createFinalArray(final FieldDescriptor fieldDescriptor, final SchemaProcessorPOJO pojo) {
+    final List<Object> objectReturn;
     if (Objects.nonNull(fieldDescriptor) && FieldDescriptor.Type.ENUM.equals(fieldDescriptor.getType())) {
       final var enumDescriptor = fieldDescriptor.getEnumType();
-      objectReturn = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(), pojo.getFieldValuesList());
+      final Object generatedObject = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
+                                                                            pojo.getFieldValuesList());
+      objectReturn = generatedObject instanceof List<?> ? (List<Object>) generatedObject : List.of(generatedObject);
     } else {
       objectReturn = PROTOBUF_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(),
                                                            pojo.getFieldValuesList());

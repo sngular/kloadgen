@@ -14,10 +14,9 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
+import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-
-import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
@@ -55,21 +54,17 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
     nameStrategyComboBox.addActionListener(this);
   }
 
-    private void fillSerializer(final JComboBox<String> objectJComboBox) {
-    objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.RecordIdStrategy");
-    objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy");
-    objectJComboBox.addItem("io.apicurio.registry.serde.strategy.TopicIdStrategy");
-    objectJComboBox.addItem("io.apicurio.registry.serde.strategy.SimpleTopicIdStrategy");
-    nameStrategyComboBox = objectJComboBox;
-    /*
-    // todo: refactorizar esto para obtener las estrategias tanto de Confluent como de Apicurio
+  private void fillSerializer(final JComboBox<String> objectJComboBox) {
     nameStrategyComboBox = objectJComboBox;
     final Reflections reflections = new Reflections(
         new ConfigurationBuilder()
             .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
             .setScanners(Scanners.SubTypes));
     ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
-     */
+    nameStrategyComboBox.addItem("io.apicurio.registry.serde.avro.strategy.RecordIdStrategy");
+    nameStrategyComboBox.addItem("io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy");
+    nameStrategyComboBox.addItem("io.apicurio.registry.serde.strategy.TopicIdStrategy");
+    nameStrategyComboBox.addItem("io.apicurio.registry.serde.strategy.SimpleTopicIdStrategy");
   }
 
   @Override

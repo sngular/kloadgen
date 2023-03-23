@@ -79,6 +79,8 @@ public final class ProducerKeysHelper {
 
   public static final String TOPIC_NAME_STRATEGY_APICURIO = "io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy";
 
+  public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT = "false";
+
   private ProducerKeysHelper() {
   }
 }

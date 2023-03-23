@@ -2,14 +2,42 @@ package com.sngular.kloadgen.sampler.schemaregistry.adapter.impl;
 
 import java.util.List;
 
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
+import lombok.Getter;
 
-public class ConfluentSchemaMetadata extends SchemaMetadata{
+@Getter
+public class ConfluentSchemaMetadata extends SchemaMetadataAdapter {
+
+  private Integer id;
+
+  private Integer version;
+
+  private String schemaType;
 
   private String schema;
+
   private List<SchemaReference> references;
 
-  ConfluentSchemaMetadata(final String id, final String version, final String schemaType) {
-    super(id, version, schemaType);
+  private ConfluentSchemaMetadata(SchemaMetadata schemaMetadata) {
+    this.id = schemaMetadata.getId();
+    this.version = schemaMetadata.getVersion();
+    this.schemaType = schemaMetadata.getSchemaType();
+    this.schema = schemaMetadata.getSchema();
+    this.references = schemaMetadata.getReferences();
+  }
+
+  public static ConfluentSchemaMetadata parse(SchemaMetadata schemaMetadata) {
+    return new ConfluentSchemaMetadata(schemaMetadata);
+  }
+
+  @Override
+  public Integer getGlobalId() {
+    return this.getId();
+  }
+
+  @Override
+  public String getType() {
+    return this.schemaType;
   }
 }

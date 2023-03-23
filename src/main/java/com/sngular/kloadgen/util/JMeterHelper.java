@@ -1,16 +1,14 @@
 package com.sngular.kloadgen.util;
 
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryConstants;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jmeter.threads.JMeterContextService;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
+
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class JMeterHelper {
@@ -22,7 +20,7 @@ public final class JMeterHelper {
     final Map<String, String> originals = new HashMap<>();
 
     String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
+    final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
 
     if (StringUtils.isNotEmpty(schemaRegistryName)) {
       originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), properties.getProperty(schemaRegistryManager.getSchemaRegistryUrlKey()));
@@ -41,10 +39,8 @@ public final class JMeterHelper {
         }
       }
     }
-    // todo: no se puede devolver ParsedSchema porque es una clase de Confluent
-    // todo: tengo que crear una nueva clase ParsedSchema generica que sirva para Confluent, Apicurio y más Schema Registries que puedan venir en el futuro
     return schemaRegistryManager.getSchemaBySubject(subjectName);
-}
+  }
 
   public static String checkPropertyOrVariable(final String textToCheck) {
     final String result;

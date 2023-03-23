@@ -15,6 +15,7 @@ public final class SchemaRegistryKeyHelper {
   public static final String SCHEMA_REGISTRY_CONFLUENT = "CONFLUENT";
 
   public static final String SCHEMA_REGISTRY_APICURIO = "APICURIO";
+
   public static final String SCHEMA_REGISTRY_USERNAME_KEY = "schema.registry.username";
 
   public static final String SCHEMA_REGISTRY_USERNAME_DEFAULT = "<username>";

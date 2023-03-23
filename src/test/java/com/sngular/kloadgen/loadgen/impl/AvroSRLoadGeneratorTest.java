@@ -17,10 +17,10 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -42,7 +42,6 @@ class AvroSRLoadGeneratorTest {
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
-
   @Test
   void testAvroLoadGenerator(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
@@ -51,12 +50,10 @@ class AvroSRLoadGeneratorTest {
         FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
 
     final Map<String, String> originals = new HashMap<>();
-    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("apicurio");
+    final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("apicurio");
 
     originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, "apicurio");
     originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), wmRuntimeInfo.getHttpBaseUrl());
-    //originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY, "foo");
-    //originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     final AvroSRLoadGenerator avroLoadGenerator = new AvroSRLoadGenerator();
     avroLoadGenerator.setUpGenerator(originals, "simple-schema", fieldValueMappingList);

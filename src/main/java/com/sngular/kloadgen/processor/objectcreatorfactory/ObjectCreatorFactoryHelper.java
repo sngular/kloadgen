@@ -8,6 +8,8 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.AvroObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.JsonObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.ProtobufObjectCreatorFactory;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -15,7 +17,7 @@ public class ObjectCreatorFactoryHelper {
 
   private ObjectCreatorFactoryHelper() {}
 
-  public static ObjectCreatorFactory getInstance(final SchemaTypeEnum schemaType, final Object schema, final Object metadata) {
+  public static ObjectCreatorFactory getInstance(final SchemaTypeEnum schemaType, final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     final ObjectCreatorFactory objectCreatorFactory;
     try {
       switch (schemaType) {

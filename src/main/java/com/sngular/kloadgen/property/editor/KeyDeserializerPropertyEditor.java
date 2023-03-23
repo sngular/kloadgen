@@ -16,7 +16,6 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
@@ -60,7 +59,8 @@ public class KeyDeserializerPropertyEditor extends PropertyEditorSupport impleme
   private void fillDeserializer(final JComboBox<String> objectJComboBox) {
     deserializerComboBox = objectJComboBox;
     final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClass(Deserializer.class)).filterInputsBy(
-        new FilterBuilder().includePackage("com.sngular.kloadgen.serializer").includePackage("io.confluent.kafka.serializers")).setScanners(Scanners.SubTypes));
+                                                                                  new FilterBuilder().includePackage(SerDesPackageValue.COM_SNGULAR_KLOADGEN_SERIALIZER).includePackage(SerDesPackageValue.IO_CONFLUENT_KAFKA_SERIALIZERS))
+                                                                              .setScanners(Scanners.SubTypes));
     ReflectionUtils.extractDeserializers(deserializerComboBox, reflections, Deserializer.class);
   }
 
