@@ -151,6 +151,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
       String schemaRegistryName = schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
       JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, schemaRegistryName);
+      //JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, schemaRegistryUrl.getText());
+
       final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
 
       originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), checkPropertyOrVariable(schemaRegistryUrl.getText()));

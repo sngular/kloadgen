@@ -259,10 +259,10 @@
               <boolProp name="ancestorRequired">true</boolProp>
             </elementProp>
           </collectionProp>
-          <stringProp name="valueSubjectName">test-subject</stringProp>
+          <stringProp name="valueSubjectName">test-plan-subject</stringProp>
           <stringProp name="valueSchemaType">AVRO</stringProp>
           <stringProp name="valueNameStrategy">io.confluent.kafka.serializers.subject.RecordNameStrategy</stringProp>
-          <stringProp name="valueSerializerConfiguration">com.sngular.kloadgen.serializer.AvroSerializer</stringProp>
+          <stringProp name="valueSerializerConfiguration">io.confluent.kafka.serializers.KafkaAvroSerializer</stringProp>
         </com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement>
         <hashTree/>
         <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="Kafka Producer Properties" enabled="true">

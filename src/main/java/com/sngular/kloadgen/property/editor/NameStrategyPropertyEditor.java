@@ -14,6 +14,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
+import io.apicurio.registry.resolver.strategy.ArtifactReferenceResolverStrategy;
 import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -56,15 +57,16 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
 
   private void fillSerializer(final JComboBox<String> objectJComboBox) {
     nameStrategyComboBox = objectJComboBox;
+    getComboItemValues(SubjectNameStrategy.class);
+    getComboItemValues(ArtifactReferenceResolverStrategy.class);
+  }
+
+  private void getComboItemValues(Class<?> targetClass) {
     final Reflections reflections = new Reflections(
         new ConfigurationBuilder()
-            .addUrls(ClasspathHelper.forClass(SubjectNameStrategy.class))
+            .addUrls(ClasspathHelper.forClass(targetClass))
             .setScanners(Scanners.SubTypes));
-    ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, SubjectNameStrategy.class);
-    nameStrategyComboBox.addItem("io.apicurio.registry.serde.avro.strategy.RecordIdStrategy");
-    nameStrategyComboBox.addItem("io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy");
-    nameStrategyComboBox.addItem("io.apicurio.registry.serde.strategy.TopicIdStrategy");
-    nameStrategyComboBox.addItem("io.apicurio.registry.serde.strategy.SimpleTopicIdStrategy");
+    ReflectionUtils.extractSerializers(nameStrategyComboBox, reflections, targetClass);
   }
 
   @Override

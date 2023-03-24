@@ -58,7 +58,7 @@
         </com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement>
         <hashTree/>
         <com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement guiclass="TestBeanGUI" testclass="com.sngular.kloadgen.config.valueserialized.ValueSerializedConfigElement" testname="KLG - Value Schema Serializer Config" enabled="true">
-          <stringProp name="valueNameStrategy">io.apicurio.registry.serde.avro.strategy.RecordIdStrategy</stringProp>
+          <stringProp name="valueNameStrategy">com.sngular.kloadgen.strategy.RecordSubjectNameStrategy</stringProp>
           <collectionProp name="valueSchemaProperties">
             <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
               <stringProp name="fieldName">id</stringProp>
