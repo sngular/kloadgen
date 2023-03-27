@@ -128,7 +128,7 @@ public final class SamplerUtil {
 
     if (Objects.nonNull(context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
-                context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
+        context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
     }
     final Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
@@ -178,7 +178,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ConsumerConfig.SECURITY_PROVIDERS_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, SslConfigs.DEFAULT_SSL_ENABLED_PROTOCOLS);
     defaultParameters.addArgument(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-                                  SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
+      SslConfigs.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM);
     defaultParameters.addArgument(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, SslConfigs.DEFAULT_SSL_KEYMANGER_ALGORITHM);
     defaultParameters.addArgument(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, SslConfigs.DEFAULT_SSL_KEYSTORE_TYPE);
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
@@ -300,9 +300,9 @@ public final class SamplerUtil {
     props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
 
     props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
-                                ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
-                                ""));
+      propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
+        ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
+        ""));
 
     props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
     props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
@@ -338,7 +338,7 @@ public final class SamplerUtil {
     }
 
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-              Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
+      Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
       final Map<String, String> originals = new HashMap<>();
@@ -347,29 +347,19 @@ public final class SamplerUtil {
       props.putAll(originals);
 
       try {
-        if (props.getProperty(ProducerKeysHelper.VALUE_NAME_STRATEGY).equals(NamingStrategyKeyHelper.TOPIC_NAME_STRATEGY)) {
-          generator.setUpGenerator(originals, props.getProperty(ProducerKeysHelper.KAFKA_TOPIC_CONFIG),
-                                   (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-        } else {
-          generator.setUpGenerator(
-              originals,
-              jMeterVariables.get(PropsKeysHelper.VALUE_SUBJECT_NAME),
-              (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-        }
-
+        generator.setUpGenerator(originals, jMeterVariables.get(PropsKeysHelper.VALUE_SUBJECT_NAME),
+          (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
       } catch (final KLoadGenException exc) {
         if (Objects.nonNull(props.get(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
-          generator.setUpGenerator(
-              jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
-              (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+          generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
+            (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
         } else {
           throw exc;
         }
       }
     } else {
-      generator.setUpGenerator(
-          jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
-          (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA),
+        (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
     }
 
     return generator;
@@ -404,7 +394,7 @@ public final class SamplerUtil {
     }
 
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-              Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
+      Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
       final Map<String, String> originals = new HashMap<>();
@@ -423,13 +413,13 @@ public final class SamplerUtil {
       props.putAll(originals);
 
       generator.setUpGenerator(
-          originals,
-          jMeterVariables.get(PropsKeysHelper.KEY_SUBJECT_NAME),
-          (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
+        originals,
+        jMeterVariables.get(PropsKeysHelper.KEY_SUBJECT_NAME),
+        (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
     } else {
       generator.setUpGenerator(
-          jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA),
-          (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
+        jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA),
+        (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
     }
 
     return generator;
@@ -439,8 +429,8 @@ public final class SamplerUtil {
     final List<String> headersSB = new ArrayList<>();
     for (final HeaderMapping kafkaHeader : kafkaHeaders) {
       final String headerValue = STATELESS_GENERATOR_TOOL.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(),
-                                                                         10,
-                                                                         Collections.emptyList()).toString();
+        10,
+        Collections.emptyList()).toString();
       headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
       producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
     }
