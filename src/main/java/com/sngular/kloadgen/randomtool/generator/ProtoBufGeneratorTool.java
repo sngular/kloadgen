@@ -23,13 +23,17 @@ public class ProtoBufGeneratorTool {
 
   private static final RandomArray RANDOM_ARRAY = new RandomArray();
 
+  private static final String ENUM_TYPE = "enum";
+
+  private static final String ENUM_ARRAY_TYPE = "enum-array";
+
   private final Map<String, Object> context = new HashMap<>();
 
   public final List generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
     final List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(
-      fieldValue -> fieldValue.matches("\\$\\{\\w*}") ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
+        fieldValue -> fieldValue.matches("\\$\\{\\w*}") ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
 
     final List value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
@@ -47,15 +51,21 @@ public class ProtoBufGeneratorTool {
     return value;
   }
 
-  public final Object generateObject(final Descriptors.EnumDescriptor descriptor, final String fieldType, final List<String> fieldValuesList) {
+  public final Object generateObject(final Descriptors.EnumDescriptor descriptor, final String fieldType, final int arraySize, final List<String> fieldValuesList) {
     final List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
-    return getEnumOrGenerate(descriptor, fieldType, parameterList);
+    Object value = new Object();
+    if (ENUM_TYPE.equalsIgnoreCase(fieldType)) {
+      value = getEnumOrGenerate(descriptor, fieldType, parameterList);
+    } else if (ENUM_ARRAY_TYPE.equalsIgnoreCase(fieldType)) {
+      value = getArrayEnumOrGenerate(descriptor, fieldType, arraySize, parameterList);
+    }
+    return value;
   }
 
   private Object getEnumOrGenerate(final Descriptors.EnumDescriptor descriptor, final String fieldType, final List<String> parameterList) {
     Object value = null;
 
-    if ("enum".equalsIgnoreCase(fieldType) || "enum-array".equalsIgnoreCase(fieldType)) {
+    if (ENUM_TYPE.equalsIgnoreCase(fieldType) || ENUM_ARRAY_TYPE.equalsIgnoreCase(fieldType)) {
       if (parameterList.isEmpty()) {
         value = descriptor.getValues().get(RandomUtils.nextInt(0, descriptor.getValues().size()));
       } else {
@@ -70,7 +80,7 @@ public class ProtoBufGeneratorTool {
   }
 
   public final Object generateObject(
-    final FieldDescriptor descriptor, final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
+      final FieldDescriptor descriptor, final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
     Object result = null;
     if (Objects.nonNull(descriptor.getJavaType())) {
       result = generateRawObject(fieldType, valueLength, fieldValuesList, constraints);
@@ -79,7 +89,7 @@ public class ProtoBufGeneratorTool {
   }
 
   public final Object generateRawObject(
-    final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
+      final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
     return RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
   }
 
