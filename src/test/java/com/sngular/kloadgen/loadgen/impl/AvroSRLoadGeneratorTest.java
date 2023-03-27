@@ -17,6 +17,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.jmeter.threads.JMeterContext;
@@ -48,12 +50,15 @@ class AvroSRLoadGeneratorTest {
         FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
 
     final Map<String, String> originals = new HashMap<>();
-    originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
-    originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY, "foo");
-    originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
+    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("apicurio");
+
+    originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, "apicurio");
+    originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), wmRuntimeInfo.getHttpBaseUrl());
+    //originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY, "foo");
+    //originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     final AvroSRLoadGenerator avroLoadGenerator = new AvroSRLoadGenerator();
-    avroLoadGenerator.setUpGenerator(originals, "avroSubject", fieldValueMappingList);
+    avroLoadGenerator.setUpGenerator(originals, "simple-schema", fieldValueMappingList);
     final Object message = avroLoadGenerator.nextMessage();
     Assertions.assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
 

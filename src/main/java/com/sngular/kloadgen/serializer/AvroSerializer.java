@@ -41,7 +41,7 @@ public class AvroSerializer<T extends EnrichedRecord> implements Serializer<T> {
 
         final var byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
-        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).putInt(data.getSchemaMetadata().getId()).array());
+        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).put(data.getSchemaMetadata().getId().getBytes()).array());
         final var binaryEncoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
         final var datumWriter = new GenericDatumWriter<>(((GenericRecord) data.getGenericRecord()).getSchema());
         datumWriter.write(data.getGenericRecord(), binaryEncoder);
