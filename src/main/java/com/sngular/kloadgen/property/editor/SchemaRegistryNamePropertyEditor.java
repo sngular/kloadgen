@@ -21,40 +21,34 @@ import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 
 @Slf4j
-public class NameStrategyPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
+public class SchemaRegistryNamePropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
   private final JPanel panel = new JPanel();
 
-  private JComboBox<String> nameStrategyComboBox;
+  private JComboBox<String> schemaRegistryName;
 
-  public NameStrategyPropertyEditor() {
+  public SchemaRegistryNamePropertyEditor() {
     this.init();
   }
 
-  public NameStrategyPropertyEditor(final Object source) {
+  public SchemaRegistryNamePropertyEditor(final Object source) {
     super(source);
     this.init();
     this.setValue(source);
   }
 
-  public NameStrategyPropertyEditor(final PropertyDescriptor propertyDescriptor) {
+  public SchemaRegistryNamePropertyEditor(final PropertyDescriptor propertyDescriptor) {
     super(propertyDescriptor);
     this.init();
   }
 
   private void init() {
-    fillSerializer(new JComboBox<>());
+    this.schemaRegistryName = new JComboBox<>();
+    this.schemaRegistryName.addItem("Apicurio");
+    this.schemaRegistryName.addItem("Confluent");
     panel.setLayout(new BorderLayout());
-    panel.add(nameStrategyComboBox);
-    nameStrategyComboBox.addActionListener(this);
-  }
-
-  private void fillSerializer(final JComboBox<String> objectJComboBox) {
-    objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.RecordIdStrategy");
-    objectJComboBox.addItem("io.apicurio.registry.serde.avro.strategy.TopicRecordIdStrategy");
-    objectJComboBox.addItem("io.apicurio.registry.serde.strategy.TopicIdStrategy");
-    objectJComboBox.addItem("io.apicurio.registry.serde.strategy.SimpleTopicIdStrategy");
-    nameStrategyComboBox = objectJComboBox;
+    panel.add(schemaRegistryName);
+    schemaRegistryName.addActionListener(this);
   }
 
   @Override
@@ -74,7 +68,7 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
 
   @Override
   public final String getAsText() {
-    return Objects.requireNonNull(this.nameStrategyComboBox.getSelectedItem()).toString();
+    return Objects.requireNonNull(this.schemaRegistryName.getSelectedItem()).toString();
   }
 
   @Override
@@ -84,17 +78,17 @@ public class NameStrategyPropertyEditor extends PropertyEditorSupport implements
 
   @Override
   public final void setAsText(final String text) throws IllegalArgumentException {
-    this.nameStrategyComboBox.setSelectedItem(text);
+    this.schemaRegistryName.setSelectedItem(text);
   }
 
   @Override
   public final void setValue(final Object value) {
-    this.nameStrategyComboBox.setSelectedItem(Objects.requireNonNullElse(value, 0));
+    this.schemaRegistryName.setSelectedItem(Objects.requireNonNullElse(value, 0));
   }
 
   @Override
   public final Object getValue() {
-    return this.nameStrategyComboBox.getSelectedItem();
+    return this.schemaRegistryName.getSelectedItem();
   }
 
   @Override

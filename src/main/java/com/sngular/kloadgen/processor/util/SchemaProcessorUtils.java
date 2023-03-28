@@ -174,7 +174,10 @@ public class SchemaProcessorUtils {
       }
     }
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
-    schemaBuilder.setPackage(schema.getPackageName());
+
+    if (schema.getPackageName() != null) {
+      schemaBuilder.setPackage(schema.getPackageName());
+    }
 
     final int deepLevel = -1;
     final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage = new HashMap<>();

@@ -13,28 +13,23 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.model.PropertyMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.util.ProducerKeysHelper;
+import com.sngular.kloadgen.util.PropsKeysHelper;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import com.sngular.kloadgen.model.PropertyMapping;
-import com.sngular.kloadgen.util.ProducerKeysHelper;
-import com.sngular.kloadgen.util.PropsKeysHelper;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import io.confluent.kafka.schemaregistry.avro.AvroSchemaProvider;
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaProvider;
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.gui.ClearGui;
@@ -147,27 +142,34 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
           //noinspection unchecked
-          schemaProperties = fromListToPropertiesMap((List<PropertyMapping>) propertyEditor.getValue());
+          schemaProperties.putAll(fromListToPropertiesMap((List<PropertyMapping>) propertyEditor.getValue()));
+        } else if (propertyEditor instanceof SchemaRegistryNamePropertyEditor) {
+          schemaProperties.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, checkPropertyOrVariable(propertyEditor.getAsText()));
         }
       }
       final Map<String, String> originals = new HashMap<>();
 
-      originals.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, checkPropertyOrVariable(schemaRegistryUrl.getText()));
+      String schemaRegistryName = schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+      JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, schemaRegistryName);
+      final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
+
+      originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), checkPropertyOrVariable(schemaRegistryUrl.getText()));
+
       if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
         JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
         if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
           JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
 
           originals.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":"
-                                                                         + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
+          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":" +
+                                                                         schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
         }
       }
-      final var schemaRegistryClient = new CachedSchemaRegistryClient(List.of(getAsText()), 1000,
-                                                                      List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), originals);
 
-      final var subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());
-      JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, checkPropertyOrVariable(schemaRegistryUrl.getText()));
+      schemaRegistryManager.setSchemaRegistryClient(getAsText(), originals);
+      final var subjects = schemaRegistryManager.getAllSubjects();
+
+      JMeterContextService.getContext().getProperties().setProperty(schemaRegistryManager.getSchemaRegistryUrlKey(), checkPropertyOrVariable(schemaRegistryUrl.getText()));
       JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
       if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
         JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
@@ -187,7 +189,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
       JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + checkPropertyOrVariable(schemaRegistryUrl.getText())
                                           + "\n Number of subjects in the Registry : " + subjects.size(), "Successful connection to Schema Registry",
                                     JOptionPane.INFORMATION_MESSAGE);
-    } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException | NullPointerException e) {
+    } catch (NoSuchFieldException | IllegalAccessException | NullPointerException | KLoadGenException e) {
       JOptionPane.showMessageDialog(null, "Failed retrieve schema properties: " + e.getMessage(), "ERROR: Failed to retrieve properties!", JOptionPane.ERROR_MESSAGE);
       log.error(e.getMessage(), e);
     }
