@@ -34,7 +34,6 @@ import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -148,7 +147,7 @@ public class SchemaProcessorUtils {
     return Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).toArray(String[]::new);
   }
 
-  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, Object metadata) throws Descriptors.DescriptorValidationException, IOException {
+  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, final Object metadata) throws Descriptors.DescriptorValidationException, IOException {
 
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
     final List<String> imports = schema.getImports();
@@ -169,8 +168,6 @@ public class SchemaProcessorUtils {
             schemaBuilder.addSchema(convertDynamicSchema((ProtobufSchema) importSchema));
           }
         }
-      } catch (RestClientException e) {
-        throw new RuntimeException(e);
       }
     }
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);

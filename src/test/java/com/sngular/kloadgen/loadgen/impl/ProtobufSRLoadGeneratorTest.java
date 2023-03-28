@@ -18,6 +18,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -40,10 +42,11 @@ class ProtobufSRLoadGeneratorTest {
     final String kloadPath = absolutePath + "/kloadgen.properties";
     final Map<String, String> properties = new HashMap<>();
     properties.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
+    properties.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, "confluent");
     properties.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
     properties.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
     properties.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "foo");
-    properties.put(SchemaRegistryClientConfig.USER_INFO_CONFIG,"foo");
+    properties.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, "foo");
     JMeterUtils.loadJMeterProperties(kloadPath);
     final JMeterContext jmcx = JMeterContextService.getContext();
     jmcx.getProperties().putAll(properties);
@@ -52,34 +55,36 @@ class ProtobufSRLoadGeneratorTest {
   }
 
   @Test
-  void testAvroLoadGenerator(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
+  void testProtobufLoadGenerator(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     final List<FieldValueMapping> fieldValueMappingList = Arrays.asList(
-        FieldValueMapping.builder().fieldName("propertyTest1.importedProperty.nestedProperty").fieldType("string").valueLength(0).fieldValueList("").required(true)
-                         .isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("propertyTest1.entityNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
-                         .isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberOne").fieldType("int").valueLength(0).fieldValueList("").required(true)
-                         .isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
-                         .isAncestorRequired(true).build()
+      FieldValueMapping.builder().fieldName("propertyTest1.importedProperty.nestedProperty").fieldType("string").valueLength(0).fieldValueList("").required(true)
+        .isAncestorRequired(true).build(),
+      FieldValueMapping.builder().fieldName("propertyTest1.entityNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
+        .isAncestorRequired(true).build(),
+      FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberOne").fieldType("int").valueLength(0).fieldValueList("").required(true)
+        .isAncestorRequired(true).build(),
+      FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
+        .isAncestorRequired(true).build()
     );
 
+    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("confluent");
     final Map<String, String> originals = new HashMap<>();
-    originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, wmRuntimeInfo.getHttpBaseUrl());
+
+    originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), wmRuntimeInfo.getHttpBaseUrl());
+    originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, "confluent");
     originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     final ProtobufLoadGenerator protobufLoadGenerator = new ProtobufLoadGenerator();
     protobufLoadGenerator.setUpGenerator(originals, "protobufSubjectWithImport", fieldValueMappingList);
-    final Object message = protobufLoadGenerator.nextMessage();
+    final EnrichedRecord message = protobufLoadGenerator.nextMessage();
     Assertions.assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
 
-    final EnrichedRecord enrichedRecord = (EnrichedRecord) message;
-    Assertions.assertThat(enrichedRecord.getGenericRecord()).isNotNull();
-    Assertions.assertThat(enrichedRecord.getGenericRecord().toString()).contains("propertyTest1");
-    Assertions.assertThat(enrichedRecord.getGenericRecord().toString()).contains("entityNumberTwo");
-    Assertions.assertThat(enrichedRecord.getGenericRecord().toString()).contains("propertyNumberOne");
-    Assertions.assertThat(enrichedRecord.getGenericRecord().toString()).contains("propertyNumberTwo");
+    Assertions.assertThat(message.getGenericRecord()).isNotNull();
+    Assertions.assertThat(message.getGenericRecord().toString()).contains("propertyTest1");
+    Assertions.assertThat(message.getGenericRecord().toString()).contains("entityNumberTwo");
+    Assertions.assertThat(message.getGenericRecord().toString()).contains("propertyNumberOne");
+    Assertions.assertThat(message.getGenericRecord().toString()).contains("propertyNumberTwo");
   }
 }
