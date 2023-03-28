@@ -27,7 +27,6 @@ import com.sngular.kloadgen.loadgen.impl.ProtobufLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.HeaderMapping;
 import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
-import com.sngular.kloadgen.util.NamingStrategyKeyHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -124,7 +123,6 @@ public final class SamplerUtil {
     props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(ProducerKeysHelper.SASL_MECHANISM, context.getParameter(ProducerKeysHelper.SASL_MECHANISM));
-    props.put(ProducerKeysHelper.KAFKA_TOPIC_CONFIG, context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG));
 
     if (Objects.nonNull(context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
       props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG,
@@ -136,8 +134,6 @@ public final class SamplerUtil {
         props.put(parameter.substring(1), context.getParameter(parameter));
       }
     });
-
-    // Todo: Add kafk topic name
 
     verifySecurity(context, props);
 
