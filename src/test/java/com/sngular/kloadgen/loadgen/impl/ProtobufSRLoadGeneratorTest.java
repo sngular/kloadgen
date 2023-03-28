@@ -18,7 +18,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
@@ -68,7 +67,7 @@ class ProtobufSRLoadGeneratorTest {
         .isAncestorRequired(true).build()
     );
 
-    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("confluent");
+    final var schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("confluent");
     final Map<String, String> originals = new HashMap<>();
 
     originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), wmRuntimeInfo.getHttpBaseUrl());
@@ -76,9 +75,9 @@ class ProtobufSRLoadGeneratorTest {
     originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    final ProtobufLoadGenerator protobufLoadGenerator = new ProtobufLoadGenerator();
+    final var protobufLoadGenerator = new ProtobufLoadGenerator();
     protobufLoadGenerator.setUpGenerator(originals, "protobufSubjectWithImport", fieldValueMappingList);
-    final EnrichedRecord message = protobufLoadGenerator.nextMessage();
+    final var message = protobufLoadGenerator.nextMessage();
     Assertions.assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
 
     Assertions.assertThat(message.getGenericRecord()).isNotNull();
