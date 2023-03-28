@@ -37,11 +37,11 @@ services:
     environment:
       AUTH_ENABLED: false
   kafka-manager:
-    image: kafkamanager/kafka-manager
+    image: iunera/cmak
     depends_on:
     - kafka
     - zookeeper
     ports:
     - 9000:9000
     environment:
-      ZK_HOSTS: http://zookeper:2181
+      ZK_HOSTS: zookeeper:2181
