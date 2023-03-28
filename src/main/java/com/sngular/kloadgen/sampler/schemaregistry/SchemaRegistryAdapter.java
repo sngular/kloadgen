@@ -3,6 +3,7 @@ package com.sngular.kloadgen.sampler.schemaregistry;
 import java.util.Collection;
 import java.util.Map;
 
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 
@@ -18,7 +19,7 @@ public interface SchemaRegistryAdapter {
 
   BaseSchemaMetadata getLatestSchemaMetadata(String subjectName);
 
-  Object getSchemaBySubject(String subjectName);
+  BaseParsedSchema getSchemaBySubject(String subjectName);
 
-  Object getSchemaBySubjectAndId(String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata);
+  BaseParsedSchema getSchemaBySubjectAndId(String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata);
 }
