@@ -45,6 +45,8 @@ public class SchemaProcessorUtils {
 
   private static final String OPTIONAL = "optional";
 
+  private static final String TYPE_MAP_NUMBER = "typemapnumber";
+
   private SchemaProcessorUtils() {
   }
 
@@ -262,8 +264,8 @@ public class SchemaProcessorUtils {
   }
 
   private static MessageDefinition buildProtoMessageDefinition(
-    final String fieldName, final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage,
-    final int previousDeepLevel) {
+      final String fieldName, final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage,
+      final int previousDeepLevel) {
 
     final int nextDeepLevel = previousDeepLevel + 1;
 
@@ -279,11 +281,11 @@ public class SchemaProcessorUtils {
   }
 
   private static void extracted(
-    final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final Builder msgDef, final List<FieldElement> fieldElementList,
-    final int deepLevel, final String messageName) {
+      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final Builder msgDef, final List<FieldElement> fieldElementList,
+      final int deepLevel, final String messageName) {
 
     final HashMap<String, TypeElement> nestedTypes = processLevelTypes(globalNestedTypesByLevelAndMessage, msgDef, fieldElementList, deepLevel,
-      messageName);
+                                                                       messageName);
 
     for (final var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
@@ -323,10 +325,10 @@ public class SchemaProcessorUtils {
 
           addDefinition(msgDef, mapDotType, removed, globalNestedTypesByLevelAndMessage, deepLevel);
         }
-        msgDef.addField("repeated", "typemapnumber" + elementField.getName(), elementField.getName(), elementField.getTag());
+        msgDef.addField("repeated", TYPE_MAP_NUMBER + elementField.getName(), elementField.getName(), elementField.getTag());
 
         msgDef.addMessageDefinition(
-          MessageDefinition.newBuilder("typemapnumber" + elementField.getName()).addField(OPTIONAL, "string", "key", 1).addField(OPTIONAL, realType, "value", 2).build());
+            MessageDefinition.newBuilder(TYPE_MAP_NUMBER + elementField.getName()).addField(OPTIONAL, "string", "key", 1).addField(OPTIONAL, realType, "value", 2).build());
       } else if (Objects.nonNull(elementField.getLabel())) {
         msgDef.addField(elementField.getLabel().toString().toLowerCase(), elementField.getType(), elementField.getName(), elementField.getTag());
       } else {
@@ -336,9 +338,9 @@ public class SchemaProcessorUtils {
   }
 
   private static HashMap<String, TypeElement> processLevelTypes(
-    final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final Builder msgDef, final List<FieldElement> fieldElementList,
-    final int deepLevel,
-    final String messageName) {
+      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final Builder msgDef, final List<FieldElement> fieldElementList,
+      final int deepLevel,
+      final String messageName) {
 
     final List<String> allTypesInstantiatedByAttributesWithSimpleNames = new ArrayList<>();
     for (final FieldElement fieldElement : fieldElementList) {
@@ -371,8 +373,8 @@ public class SchemaProcessorUtils {
   }
 
   private static void addDefinition(
-    final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
-    final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final int deepLevel) {
+      final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
+      final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final int deepLevel) {
 
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
@@ -389,8 +391,8 @@ public class SchemaProcessorUtils {
   }
 
   private static void fillNestedTypes(
-    final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage,
-    final int deepLevel) {
+      final TypeElement messageElement, final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage,
+      final int deepLevel) {
 
     HashMap<String, HashMap<String, TypeElement>> messageNestedTypes = globalNestedTypesByLevelAndMessage.get(deepLevel);
     if (messageNestedTypes == null) {

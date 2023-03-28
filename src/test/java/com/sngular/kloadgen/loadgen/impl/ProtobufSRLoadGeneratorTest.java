@@ -57,14 +57,14 @@ class ProtobufSRLoadGeneratorTest {
   void testProtobufLoadGenerator(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     final List<FieldValueMapping> fieldValueMappingList = Arrays.asList(
-      FieldValueMapping.builder().fieldName("propertyTest1.importedProperty.nestedProperty").fieldType("string").valueLength(0).fieldValueList("").required(true)
-        .isAncestorRequired(true).build(),
-      FieldValueMapping.builder().fieldName("propertyTest1.entityNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
-        .isAncestorRequired(true).build(),
-      FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberOne").fieldType("int").valueLength(0).fieldValueList("").required(true)
-        .isAncestorRequired(true).build(),
-      FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
-        .isAncestorRequired(true).build()
+        FieldValueMapping.builder().fieldName("propertyTest1.importedProperty.nestedProperty").fieldType("string").valueLength(0).fieldValueList("").required(true)
+                         .isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("propertyTest1.entityNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
+                         .isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberOne").fieldType("int").valueLength(0).fieldValueList("").required(true)
+                         .isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("propertyTest2.propertyNumberTwo").fieldType("string").valueLength(0).fieldValueList("").required(true)
+                         .isAncestorRequired(true).build()
     );
 
     final var schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("confluent");
