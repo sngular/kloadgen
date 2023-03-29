@@ -16,7 +16,7 @@
   - [Consumer configuration](consumer-configuration.md)
   - [Schemas](schemas.md)
 
-# Knowledge content
+# Knowledge center
   - [How to run a test plan](how-to-run.md)
   - [Test plan example](example-test-plan.md)
  
