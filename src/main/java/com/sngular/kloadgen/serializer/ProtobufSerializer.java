@@ -10,12 +10,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.xml.bind.DatatypeConverter;
-
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.schemaregistry.protobuf.MessageIndexes;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
+import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
@@ -38,7 +37,7 @@ public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<
 
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
-        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).put(data.getSchemaMetadata().getId().getBytes()).array());
+        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).put(data.getSchemaMetadata().getId().toString().getBytes()).array());
         final Descriptor descriptor = ((DynamicMessage) data.getGenericRecord()).getDescriptorForType();
         final ProtobufSchema schema = new ProtobufSchema(descriptor);
         final MessageIndexes indexes = schema.toMessageIndexes(descriptor.getFullName());

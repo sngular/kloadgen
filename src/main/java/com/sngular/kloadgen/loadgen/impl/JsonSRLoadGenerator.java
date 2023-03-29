@@ -16,7 +16,8 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
@@ -30,7 +31,7 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
 
   private final SchemaProcessor jsonSchemaProcessor;
 
-  private Pair<?, ?> metadata;
+  private Pair<BaseSchemaMetadata, ?> metadata;
 
   public JsonSRLoadGenerator() {
     jsonSchemaProcessor = new SchemaProcessor();
@@ -48,18 +49,17 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
 
   public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final var parsedSchema = new JsonSchemaProvider().parseSchema(schema, Collections.emptyList(), true);
-    metadata = parsedSchema.map(parsSchema -> Pair.of(new SchemaMetadata(1, 1, "JSON", Collections.emptyList(), schema), parsSchema)).orElse(null);
+    metadata =
+        parsedSchema.map(parsSchema -> Pair.of(new BaseSchemaMetadata(ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.JSON.name(), Collections.emptyList(),
+                                                                                                                       schema))),
+                                               parsSchema)).orElse(null);
     this.jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, fieldExprMappings);
   }
 
   public EnrichedRecord nextMessage() {
-    final SchemaMetadata schemaMetadata = (SchemaMetadata) metadata.getLeft();
     return EnrichedRecord.builder().schemaMetadata(
-        new KloadSchemaMetadata(
-          String.valueOf(schemaMetadata.getId()),
-          String.valueOf(schemaMetadata.getVersion()),
-          schemaMetadata.getSchemaType())
-      ).genericRecord(jsonSchemaProcessor.next()).build();
+        metadata.getLeft().getSchemaMetadataAdapter()
+    ).genericRecord(jsonSchemaProcessor.next()).build();
   }
 
 }

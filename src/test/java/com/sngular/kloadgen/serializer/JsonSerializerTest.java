@@ -23,8 +23,9 @@ import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -39,7 +40,7 @@ public class JsonSerializerTest {
 
   private static Stream<Arguments> getSchemaToTest() {
     Builder<Arguments> builder = Stream.builder();
-    
+
     File testBasicFile = TEST_BASIC.getFirst();
     builder.add(Arguments.arguments(Named.of(testBasicFile.getName(), testBasicFile), TEST_BASIC.getSecond()));
     File testBasicArraysFile = TEST_BASIC_ARRAY.getFirst();
@@ -70,10 +71,13 @@ public class JsonSerializerTest {
   @MethodSource("getSchemaToTest")
   void recordSerializersTestLogicalTypes(File schemaFile, List<FieldValueMapping> fieldValueMappings) throws Exception {
     final var schemaStr = readSchema(schemaFile);
-    final var metadata = new SchemaMetadata(1, 1, schemaStr);
+    final BaseSchemaMetadata confluentBaseSchemaMetadata =
+        new BaseSchemaMetadata<>(
+            ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1,
+                                                                                                      schemaStr)));
 
     final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(schemaFile, "JSON");
-    JSON_SCHEMA_PROCESSOR.processSchema(SchemaTypeEnum.JSON, parsedSchema, metadata, fieldValueMappings);
+    JSON_SCHEMA_PROCESSOR.processSchema(SchemaTypeEnum.JSON, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var objectNode = JSON_SCHEMA_PROCESSOR.next();
 
     final var message = serializer.serialize("the-topic", (ObjectNode) objectNode);

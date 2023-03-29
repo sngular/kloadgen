@@ -25,6 +25,8 @@ import com.github.os72.protobuf.dynamic.MessageDefinition.Builder;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProtobufHelper;
 import com.squareup.wire.schema.internal.parser.EnumElement;
@@ -32,7 +34,6 @@ import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.collections4.CollectionUtils;
@@ -149,7 +150,8 @@ public class SchemaProcessorUtils {
     return Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).toArray(String[]::new);
   }
 
-  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, final Object metadata) throws Descriptors.DescriptorValidationException, IOException {
+  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata)
+      throws Descriptors.DescriptorValidationException, IOException {
 
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
     final List<String> imports = schema.getImports();
@@ -187,8 +189,8 @@ public class SchemaProcessorUtils {
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
-  private static String getSubjectName(final String importedClass, final Object metadata) {
-    final List<SchemaReference> references = ((SchemaMetadata) metadata).getReferences();
+  private static String getSubjectName(final String importedClass, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
+    final List<SchemaReference> references = metadata.getSchemaMetadataAdapter().getReferences();
     String subjectName = null;
 
     for (final SchemaReference schemaReference : references) {

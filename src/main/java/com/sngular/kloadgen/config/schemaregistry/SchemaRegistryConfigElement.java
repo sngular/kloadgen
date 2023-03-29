@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.sngular.kloadgen.model.PropertyMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
@@ -59,7 +59,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     final JMeterVariables jMeterVariables = getThreadContext().getVariables();
 
     final Map<String, String> schemaProperties = getProperties();
-    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(getRegistryName());
+    final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(getRegistryName());
 
     JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, getRegistryName());
     jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, JMeterHelper.checkPropertyOrVariable(getRegistryName()));

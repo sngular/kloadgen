@@ -254,7 +254,7 @@
       "priority": 10,
       "request": {
         "method": "GET",
-        "urlPattern": "/apis/registry/v2/search/artifacts\\?group=default"
+        "urlPattern": "/apis/registry/v2/search/artifacts"
       },
       "response": {
         "status": 200,

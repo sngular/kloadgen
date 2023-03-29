@@ -18,11 +18,10 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
@@ -37,11 +36,11 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private final Schema schema;
 
-  private final KloadSchemaMetadata kloadSchemaMetadata;
+  private final SchemaMetadataAdapter schemaMetadataAdapter;
 
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
-  public AvroObjectCreatorFactory(final Object schema, final Object metadata) {
+  public AvroObjectCreatorFactory(final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     if (schema instanceof ParsedSchema) {
       this.schema = (Schema) ((ParsedSchema) schema).rawSchema();
     } else if (schema instanceof Schema) {
@@ -50,15 +49,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
       throw new KLoadGenException("Unsupported schema type");
     }
 
-    if (metadata instanceof SchemaMetadata) {
-      SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
-    } else if (metadata instanceof ArtifactMetaData) {
-      ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
-    } else {
-      throw new KLoadGenException("Unsupported metadata type");
-    }
+    this.schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
   }
 
   @Override
@@ -130,6 +121,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
+    entity.get(pojo.getRootFieldName());
   }
 
   @Override
@@ -151,7 +143,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   @Override
   public final Object generateRecord() {
-    return EnrichedRecord.builder().schemaMetadata(kloadSchemaMetadata).genericRecord(this.entity.get("root")).build();
+    return EnrichedRecord.builder().schemaMetadata(schemaMetadataAdapter).genericRecord(this.entity.get("root")).build();
   }
 
   @Override

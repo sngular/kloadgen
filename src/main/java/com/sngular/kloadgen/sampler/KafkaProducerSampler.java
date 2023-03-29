@@ -25,7 +25,7 @@ import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.serializer.ProtobufSerializer;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.apicurio.registry.serde.SerdeConfig;
+import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
@@ -96,18 +96,8 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props2.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
       props2.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
       props2.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-      // Use the Apicurio Registry provided Kafka Serializer for Avro
       props2.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
-
-      // Configure Service Registry location
-      props2.putIfAbsent(SerdeConfig.REGISTRY_URL, "http://localhost:8080");
-
-      // Register the artifact if not found in the registry.
-      // props2.putIfAbsent(SerdeConfig.AUTO_REGISTER_ARTIFACT, Boolean.TRUE);
-
-      props2.putIfAbsent("apicurio.registry.artifact-resolver-strategy", props.get(ProducerKeysHelper.VALUE_NAME_STRATEGY));
-
-      producer = new KafkaProducer<>(props2);
+      producer = new KafkaProducer<>(props);
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
     }
@@ -115,8 +105,13 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   private Properties properties(final JavaSamplerContext context) {
     final var commonProps = SamplerUtil.setupCommonProperties(context);
-    if (Objects.nonNull(context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
-      commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY));
+
+    String artifactResolverStrategy = context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY);
+    if (Objects.nonNull(artifactResolverStrategy)) {
+      commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, artifactResolverStrategy);
+    }
+    if (Objects.nonNull(context.getParameter(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY))) {
+      commonProps.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, artifactResolverStrategy);
     }
     return commonProps;
   }
@@ -222,7 +217,8 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     return String.format(TEMPLATE, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
   }
 
-  private Object getObject(final EnrichedRecord messageVal, final boolean valueFlag) {
-    return valueFlag ? messageVal : messageVal.getGenericRecord();
+  private Object getObject(final EnrichedRecord messageVal, final boolean isKloadSerializer) {
+    return isKloadSerializer ? messageVal : messageVal.getGenericRecord();
   }
 }
+
