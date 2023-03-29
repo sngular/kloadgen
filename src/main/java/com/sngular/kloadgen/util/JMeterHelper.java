@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +20,7 @@ public final class JMeterHelper {
     final Map<String, String> originals = new HashMap<>();
 
     String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
+    final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
 
     if (StringUtils.isNotEmpty(schemaRegistryName)) {
       originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), properties.getProperty(schemaRegistryManager.getSchemaRegistryUrlKey()));

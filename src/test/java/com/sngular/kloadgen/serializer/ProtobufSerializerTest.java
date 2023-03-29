@@ -23,8 +23,9 @@ import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,7 +71,7 @@ class ProtobufSerializerTest {
     builder.add(Arguments.arguments(Named.of(testOneOfFile.getName(), testOneOfFile), TEST_ONE_OF.getSecond()));
     File testProvidedFile = TEST_PROVIDED.getFirst();
     builder.add(Arguments.arguments(Named.of(testProvidedFile.getName(), testProvidedFile), TEST_PROVIDED.getSecond()));
-    
+
     return builder.build();
   }
 
@@ -79,7 +80,10 @@ class ProtobufSerializerTest {
   void serialize(File schemaFile, List<FieldValueMapping> fieldValueMappings) throws IOException {
     final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(schemaFile, "Protobuf");
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    final BaseSchemaMetadata confluentBaseSchemaMetadata =
+        new BaseSchemaMetadata<>(
+            ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1, "")));
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
 
     final var generatedRecord = protobufSchemaProcessor.next();
 

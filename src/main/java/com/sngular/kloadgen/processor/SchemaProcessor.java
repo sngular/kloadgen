@@ -18,6 +18,8 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactoryHelper;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomUtils;
 
@@ -27,7 +29,9 @@ public class SchemaProcessor {
 
   private ObjectCreatorFactory objectCreatorFactory;
 
-  public final void processSchema(final SchemaTypeEnum schemaType, final Object schema, final Object metadata, final List<FieldValueMapping> fieldExprMappings) {
+  public final void processSchema(
+      final SchemaTypeEnum schemaType, final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata,
+      final List<FieldValueMapping> fieldExprMappings) {
     this.objectCreatorFactory = ObjectCreatorFactoryHelper.getInstance(schemaType, schema, metadata);
     this.fieldExprMappings = fieldExprMappings;
   }

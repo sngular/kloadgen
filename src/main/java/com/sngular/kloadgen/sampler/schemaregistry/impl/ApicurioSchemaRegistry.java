@@ -13,8 +13,11 @@ import java.util.Optional;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryConstants;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaParser;
@@ -30,7 +33,7 @@ import io.apicurio.registry.serde.protobuf.ProtobufSchemaParser;
 import io.apicurio.registry.types.ArtifactState;
 import org.apache.tika.io.IOUtils;
 
-public class ApicurioSchemaRegistry implements SchemaRegistryManager {
+public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
 
   private RegistryClient schemaRegistryClient;
 
@@ -58,11 +61,6 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
   }
 
   @Override
-  public Map<String, String> getPropertiesMap() {
-    return propertiesMap;
-  }
-
-  @Override
   public Collection<String> getAllSubjects() throws KLoadGenException {
     Collection<String> subjects = new ArrayList<>();
     try {
@@ -79,10 +77,11 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
   }
 
   @Override
-  public Object getLatestSchemaMetadata(String subjectName) throws KLoadGenException {
+  public BaseSchemaMetadata<ApicurioSchemaMetadata> getLatestSchemaMetadata(String subjectName) throws KLoadGenException {
     try {
       final SearchedArtifact searchedArtifact = getLastestSearchedArtifact(subjectName);
-      return this.schemaRegistryClient.getArtifactMetaData(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_DEFAULT_GROUP, searchedArtifact.getId());
+      final ArtifactMetaData artifactMetaData = this.schemaRegistryClient.getArtifactMetaData(searchedArtifact.getGroupId(), searchedArtifact.getId());
+      return new BaseSchemaMetadata(new ApicurioSchemaMetadata(artifactMetaData));
     } catch (RestClientException e) {
       throw new KLoadGenException(e.getMessage());
     }
@@ -122,15 +121,14 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
     }
   }
 
-  public Object getSchemaBySubjectAndId(String subjectName, Object metadata) {
+  public Object getSchemaBySubjectAndId(String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     Object schema = null;
-    final ArtifactMetaData schemaMetadata = (ArtifactMetaData) metadata;
-
+    SchemaMetadataAdapter schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
     try {
-      InputStream inputStream = this.schemaRegistryClient.getContentByGlobalId(schemaMetadata.getGlobalId());
+      InputStream inputStream = this.schemaRegistryClient.getContentByGlobalId(schemaMetadataAdapter.getGlobalId());
       String result = IOUtils.toString(inputStream, String.valueOf(StandardCharsets.UTF_8));
 
-      String searchedArtifactType = schemaMetadata.getType().toString();
+      String searchedArtifactType = schemaMetadataAdapter.getType();
       if (SchemaTypeEnum.AVRO.name().equalsIgnoreCase(searchedArtifactType)) {
         SchemaParser parserAvro = new AvroSchemaParser(null);
         schema = parserAvro.parseSchema(result.getBytes(StandardCharsets.UTF_8), new HashMap<>());
@@ -153,7 +151,7 @@ public class ApicurioSchemaRegistry implements SchemaRegistryManager {
     boolean found = false;
     SearchedArtifact best = null;
     final Comparator<SearchedArtifact> comparator = Comparator.comparing(SearchedArtifact::getModifiedOn);
-    for (SearchedArtifact artifact : this.schemaRegistryClient.searchArtifacts(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_DEFAULT_GROUP, null, null, null, null, null, null, null,
+    for (SearchedArtifact artifact : this.schemaRegistryClient.searchArtifacts(null, null, null, null, null, null, null, null,
                                                                                null,
                                                                                null, null).getArtifacts()) {
       if (artifact.getName().equals(subjectName) && ArtifactState.ENABLED.equals(artifact.getState()) && !found || comparator.compare(artifact, best) > 0) {

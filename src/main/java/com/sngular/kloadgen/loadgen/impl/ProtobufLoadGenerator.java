@@ -10,6 +10,8 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
@@ -43,8 +45,9 @@ public class ProtobufLoadGenerator implements SRLoadGenerator, BaseLoadGenerator
   public final void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final ProtobufSchema protobufSchema = new ProtobufSchema(schema);
     this.protobufSchemaProcessor
-        .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema,
-                       new SchemaMetadata(1, 1, "PROTOBUF", Collections.emptyList(), schema), fieldExprMappings);
+        .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema, new BaseSchemaMetadata<>(
+                           ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.PROTOBUF.name(), Collections.emptyList(), schema)))
+            , fieldExprMappings);
   }
 
   @Override
