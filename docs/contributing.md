@@ -9,10 +9,11 @@ interactions with the project.
 
 ## Code Style
 
-To ensure everybody can work easily and focus in the code, make easy the review process and keep the same style. We have a couple of files defining our code standards:
+We have a couple of files defining our code standards. This ensures anyone can work easily and focus on the code, simplifies the review process, and keeps a consistent style:
+
 - IntelliJ editor style at `config/checkstyle/OSS_style_idea.xml`.
 - Checkstyle configuration files at `checkstyle.xml`.
-  - Suppression file at `config/checkstyle/OSS_checkstyle/OSS_checkstyle_suppressions.xml`.
+- Suppression file at `config/checkstyle/OSS_checkstyle/OSS_checkstyle_suppressions.xml`.
 
 ## Pull Request Process
 
