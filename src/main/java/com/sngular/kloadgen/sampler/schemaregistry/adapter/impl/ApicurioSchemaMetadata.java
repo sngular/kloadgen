@@ -1,5 +1,6 @@
 package com.sngular.kloadgen.sampler.schemaregistry.adapter.impl;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -64,4 +65,8 @@ public class ApicurioSchemaMetadata extends SchemaMetadataAdapter {
     return this.schemaType;
   }
 
+  @Override
+  public <T> List<T> getReferences() {
+    return Collections.<T>emptyList();
+  }
 }
