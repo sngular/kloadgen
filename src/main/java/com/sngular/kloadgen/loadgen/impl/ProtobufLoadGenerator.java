@@ -46,7 +46,7 @@ public class ProtobufLoadGenerator implements SRLoadGenerator, BaseLoadGenerator
     final ProtobufSchema protobufSchema = new ProtobufSchema(schema);
     this.protobufSchemaProcessor
         .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema, new BaseSchemaMetadata<>(
-                           ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, "PROTOBUF", Collections.emptyList(), schema)))
+                           ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.PROTOBUF.name(), Collections.emptyList(), schema)))
             , fieldExprMappings);
   }
 
