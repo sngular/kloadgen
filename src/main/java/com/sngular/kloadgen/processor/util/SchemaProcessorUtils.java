@@ -25,20 +25,27 @@ import com.github.os72.protobuf.dynamic.MessageDefinition.Builder;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProtobufHelper;
 import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
+import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
+import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jmeter.threads.JMeterContextService;
 
 public class SchemaProcessorUtils {
 
   private static final String OPTIONAL = "optional";
+
+  private static final String TYPE_MAP_NUMBER = "typemapnumber";
 
   private SchemaProcessorUtils() {
   }
@@ -142,11 +149,11 @@ public class SchemaProcessorUtils {
     return Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).toArray(String[]::new);
   }
 
-  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema) throws Descriptors.DescriptorValidationException, IOException {
+  public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, final Object metadata) throws Descriptors.DescriptorValidationException, IOException {
 
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
     final List<String> imports = schema.getImports();
-    for (String importedClass : imports) {
+    for (final String importedClass : imports) {
       try (final InputStream resourceStream = SchemaProcessorUtils.class.getClassLoader().getResourceAsStream(importedClass)) {
         if (null != resourceStream) {
           final String schemaToString = new String(resourceStream.readAllBytes());
@@ -155,6 +162,13 @@ public class SchemaProcessorUtils {
             final var importedSchema = processImported(lines);
             schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
             schemaBuilder.addSchema(importedSchema);
+          }
+        } else {
+          final var importedProtobufSchema = (ProtobufSchema) JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                                           JMeterContextService.getContext().getProperties());
+          if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
+            schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
+            schemaBuilder.addSchema(convertDynamicSchema(importedProtobufSchema));
           }
         }
       }
@@ -173,6 +187,24 @@ public class SchemaProcessorUtils {
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
   }
 
+  private static String getSubjectName(final String importedClass, final Object metadata) {
+    final List<SchemaReference> references = ((SchemaMetadata) metadata).getReferences();
+    String subjectName = null;
+
+    for (final SchemaReference schemaReference : references) {
+      if (schemaReference.getName().equals(importedClass)) {
+        subjectName = schemaReference.getSubject();
+        break;
+      }
+    }
+
+    return Objects.requireNonNullElse(subjectName, importedClass);
+  }
+
+  private static DynamicSchema convertDynamicSchema(final ProtobufSchema importSchema) throws DescriptorValidationException {
+    return processImported(Arrays.asList(importSchema.rawSchema().toSchema().split("\\n")));
+  }
+
   private static Predicate<String> isValid() {
     return line -> !line.contains("//") && !line.isEmpty();
   }
@@ -184,7 +216,7 @@ public class SchemaProcessorUtils {
     String packageName = "";
     final var linesIterator = importedLines.listIterator();
     while (linesIterator.hasNext()) {
-      final var fileLine = linesIterator.next();
+      final var fileLine = linesIterator.next().trim();
 
       if (fileLine.startsWith("package")) {
         packageName = StringUtils.chop(fileLine.substring(7).trim());
@@ -211,9 +243,11 @@ public class SchemaProcessorUtils {
     while (messageLines.hasNext() && !exit) {
       final var field = messageLines.next().trim().split("\\s");
       if (ProtobufHelper.isValidType(field[0])) {
-        messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfChoppable(field[3])));
+        messageDefinition.addField(OPTIONAL, field[0], field[1], Integer.parseInt(checkIfGreppable(field[3])));
       } else if (ProtobufHelper.LABEL.contains(field[0])) {
-        messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfChoppable(field[4])));
+        messageDefinition.addField(field[0], field[1], field[2], Integer.parseInt(checkIfGreppable(field[4])));
+      } else if ("message".equalsIgnoreCase(field[0])) {
+        messageDefinition.addMessageDefinition(buildMessage(field[1], messageLines));
       } else if ("}".equalsIgnoreCase(field[0])) {
         exit = true;
       }
@@ -222,7 +256,7 @@ public class SchemaProcessorUtils {
     return messageDefinition.build();
   }
 
-  private static String checkIfChoppable(final String field) {
+  private static String checkIfGreppable(final String field) {
     String choppedField = field;
     if (field.endsWith(";")) {
       choppedField = StringUtils.chop(field);
@@ -241,7 +275,7 @@ public class SchemaProcessorUtils {
     final MessageDefinition.Builder msgDef = MessageDefinition.newBuilder(fieldName);
     final var element = (MessageElement) messageElement;
     extracted(globalNestedTypesByLevelAndMessage, msgDef, element.getFields(), nextDeepLevel, fieldName);
-    for (var optionalField : element.getOneOfs()) {
+    for (final var optionalField : element.getOneOfs()) {
       extracted(globalNestedTypesByLevelAndMessage, msgDef, optionalField.getFields(), nextDeepLevel, fieldName);
     }
     return msgDef.build();
@@ -254,7 +288,7 @@ public class SchemaProcessorUtils {
     final HashMap<String, TypeElement> nestedTypes = processLevelTypes(globalNestedTypesByLevelAndMessage, msgDef, fieldElementList, deepLevel,
                                                                        messageName);
 
-    for (var elementField : fieldElementList) {
+    for (final var elementField : fieldElementList) {
       final var elementFieldType = elementField.getType();
       final var dotType = checkDotType(elementFieldType);
       if (nestedTypes.containsKey(elementFieldType)) {
@@ -292,10 +326,10 @@ public class SchemaProcessorUtils {
 
           addDefinition(msgDef, mapDotType, removed, globalNestedTypesByLevelAndMessage, deepLevel);
         }
-        msgDef.addField("repeated", "typemapnumber" + elementField.getName(), elementField.getName(), elementField.getTag());
+        msgDef.addField("repeated", TYPE_MAP_NUMBER + elementField.getName(), elementField.getName(), elementField.getTag());
 
         msgDef.addMessageDefinition(
-            MessageDefinition.newBuilder("typemapnumber" + elementField.getName()).addField(OPTIONAL, "string", "key", 1).addField(OPTIONAL, realType, "value", 2).build());
+            MessageDefinition.newBuilder(TYPE_MAP_NUMBER + elementField.getName()).addField(OPTIONAL, "string", "key", 1).addField(OPTIONAL, realType, "value", 2).build());
       } else if (Objects.nonNull(elementField.getLabel())) {
         msgDef.addField(elementField.getLabel().toString().toLowerCase(), elementField.getType(), elementField.getName(), elementField.getTag());
       } else {
@@ -346,7 +380,7 @@ public class SchemaProcessorUtils {
     if (typeElement instanceof EnumElement) {
       final var enumElement = (EnumElement) typeElement;
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
-      for (var constant : enumElement.getConstants()) {
+      for (final var constant : enumElement.getConstants()) {
         builder.addValue(constant.getName(), constant.getTag());
       }
       msgDef.addEnumDefinition(builder.build());

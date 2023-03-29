@@ -176,3 +176,23 @@ The same applies when there is more than one level. The last child in the last l
 The other exception applies to JSON Schema: in order to support `null`values, the collections within objects (_type : object_) cannot be null. Therefore, they will be **required by default** and they will be **initialized as an empty collection** if the object than contains them is not `null`.
 
 > Within JSON Schema, a maximum of **2 nesting levels** is allowed.
+
+
+### Protobuf Schema - Schema Registry
+
+If you need use the Protobuf Schema with the Schema Registry, you must put the subject with the same name as the protobuf file, as the following example:
+
+```
+{
+    "schema": "...",
+    "schemaType": "PROTOBUF",
+    "references": [
+    {
+      "name": "[the_name_you_want].proto",
+      "subject": "[the_name_you_want]",
+      "version": ...
+    }]
+}
+
+```
+> This example is based on a petition from Schema Registry
