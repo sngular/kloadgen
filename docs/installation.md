@@ -4,7 +4,7 @@ This guide helps you install KLoadGen plugin.
 
 ## Install as a JMeter library
 
-By default, the installation process will generate the JMeter plugin JAR file. After cloning the repository, run the following command:
+By default, the installation process will generate the JMeter plugin JAR file. After cloning the repository, run the following command where the `pom.xml` file is located:
 
 ```bash
  mvn clean install -P plugin
@@ -33,7 +33,7 @@ You can also download a prebuilt version of this plugin from [Maven Central](htt
 
 ## Install as a dependency
 
-This plugin can also be used automatically as a dependency. Include this code in your file:
+This plugin can also be used automatically as a dependency. Include this code in your `pom.xml` file:
 
 ```
 <dependency>
