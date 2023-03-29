@@ -3,10 +3,10 @@ package com.sngular.kloadgen.loadgen.impl;
 import java.io.IOException;
 import java.util.Map;
 
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import org.apache.commons.lang3.tuple.Pair;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")

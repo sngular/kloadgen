@@ -7,10 +7,12 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.3.2</version>
+  <version>5.4.0</version>
 
   <name>KLoadGen</name>
-  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial data base on Data specification</description>
+  <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
+    data base on Data specification
+  </description>
   <url>https://sngular.github.io/kloadgen/</url>
 
   <licenses>
@@ -211,6 +213,17 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>rabad-sng</id>
+      <name>Raúl Abad</name>
+      <email>raul.abad@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://www.sngular.com</organizationUrl>
+      <roles>
+        <role>Senior Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
 
   <scm>
@@ -247,7 +260,7 @@
     <json-path.version>2.6.0</json-path.version>
     <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
-    <apicurio-registry.version>2.3.1.Final</apicurio-registry.version>
+    <apicurio-registry.version>2.4.1.Final</apicurio-registry.version>
     <kafka.version>3.1.0</kafka.version>
     <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>

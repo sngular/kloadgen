@@ -5,19 +5,19 @@ import java.util.Map;
 
 public interface SchemaRegistryManager {
 
-    String getSchemaRegistryUrlKey();
+  String getSchemaRegistryUrlKey();
 
-    void setSchemaRegistryClient(String url, Map<String, ?> properties);
+  void setSchemaRegistryClient(String url, Map<String, ?> properties);
 
-    void setSchemaRegistryClient(Map<String, ?> properties);
-    Map<String, String> getPropertiesMap();
+  void setSchemaRegistryClient(Map<String, ?> properties);
 
-    Collection<String> getAllSubjects();
+  Map<String, String> getPropertiesMap();
 
-    Object getLatestSchemaMetadata(String subjectName);
+  Collection<String> getAllSubjects();
 
-    // todo: definir objeto que se devuelve
-    Object getSchemaBySubject(String subjectName);
+  Object getLatestSchemaMetadata(String subjectName);
 
-    Object getSchemaBySubjectAndId(String subjectName, Object metadata);
+  Object getSchemaBySubject(String subjectName);
+
+  Object getSchemaBySubjectAndId(String subjectName, Object metadata);
 }

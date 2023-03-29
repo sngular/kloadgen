@@ -18,21 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.PropertyMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
+import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
-import com.sngular.kloadgen.exception.KLoadGenException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
@@ -163,8 +161,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
           JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
 
           originals.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":"
-                  + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
+          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":" +
+                                                                         schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
         }
       }
 
@@ -179,13 +177,13 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
           JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
           JMeterContextService.getContext().getProperties().setProperty(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
           JMeterContextService.getContext().getProperties().setProperty(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG,
-                  schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":"
-                          + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
+                                                                        schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":"
+                                                                        + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
         } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_TYPE.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
           JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_TYPE);
           JMeterContextService.getContext().getProperties().setProperty(AbstractKafkaSchemaSerDeConfig.BEARER_AUTH_CREDENTIALS_SOURCE, "STATIC_TOKEN");
           JMeterContextService.getContext().getProperties()
-                  .setProperty(AbstractKafkaSchemaSerDeConfig.BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY));
+                              .setProperty(AbstractKafkaSchemaSerDeConfig.BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY));
         }
       }
       JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + checkPropertyOrVariable(schemaRegistryUrl.getText())

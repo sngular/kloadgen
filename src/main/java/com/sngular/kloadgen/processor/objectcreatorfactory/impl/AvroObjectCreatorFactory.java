@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
@@ -17,11 +18,11 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
+import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
+import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
@@ -31,7 +32,9 @@ import org.apache.commons.collections4.IteratorUtils;
 public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
+
   private static final Set<Type> TYPES_SET = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
+
   private final Schema schema;
 
   private final KloadSchemaMetadata kloadSchemaMetadata;
@@ -48,10 +51,10 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     }
 
     if (metadata instanceof SchemaMetadata) {
-      SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
+      final SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
       this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
     } else if (metadata instanceof ArtifactMetaData) {
-      ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
+      final ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
       this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
     } else {
       throw new KLoadGenException("Unsupported metadata type");
@@ -127,7 +130,6 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
-    entity.get(pojo.getRootFieldName());
   }
 
   @Override
@@ -141,7 +143,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
       } else if (innerSchema.getType().equals(Type.ARRAY)) {
         innerSchema = findRecursiveSchemaForRecord(innerSchema.getElementType());
       } else if (innerSchema.getType().equals(Type.UNION)) {
-        innerSchema = findRecursiveSchemaForRecord(getRecordUnion(innerSchema.getTypes()));
+        innerSchema = getRecordUnion(innerSchema.getTypes()).map(this::findRecursiveSchemaForRecord).orElse(innerSchema);
       }
       entity.put(objectName, new GenericData.Record(innerSchema));
     }
@@ -185,14 +187,14 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     return entityObject;
   }
 
-  private Schema getRecordUnion(final List<Schema> types) {
+  private Optional<Schema> getRecordUnion(final List<Schema> types) {
     Schema isRecord = null;
     for (final Schema innerSchema : types) {
       if (Type.RECORD == innerSchema.getType() || Type.ARRAY == innerSchema.getType() || Type.MAP == innerSchema.getType() || TYPES_SET.contains(innerSchema.getType())) {
         isRecord = innerSchema;
       }
     }
-    return isRecord;
+    return Optional.ofNullable(isRecord);
   }
 
   private Boolean isOptionalField(final Schema schema) {
@@ -223,7 +225,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
       } else if (Type.MAP.equals(subSchema.getType())) {
         subSchema = findSchema(fieldNamePath, subSchema.getValueType(), found);
       } else if (Type.UNION.equals(subSchema.getType())) {
-        subSchema = findSchema(fieldNamePath, getRecordUnion(subSchema.getTypes()), found);
+        subSchema = getRecordUnion(subSchema.getTypes()).map(type -> findSchema(fieldNamePath, type, found)).orElse(subSchema);
       }
     }
     return subSchema;
@@ -236,7 +238,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     } else if (Type.MAP.equals(subSchema.getType())) {
       subSchema = findRecursiveSchemaForRecord(subSchema.getValueType());
     } else if (Type.UNION.equals(subSchema.getType())) {
-      subSchema = findRecursiveSchemaForRecord(getRecordUnion(subSchema.getTypes()));
+      subSchema = getRecordUnion(subSchema.getTypes()).map(this::findRecursiveSchemaForRecord).orElse(subSchema);
     }
     return subSchema;
   }

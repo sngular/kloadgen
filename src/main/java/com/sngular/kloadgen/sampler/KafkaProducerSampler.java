@@ -115,9 +115,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   private Properties properties(final JavaSamplerContext context) {
     final var commonProps = SamplerUtil.setupCommonProperties(context);
-
-    //todo: obtener unas properties u otras en funcion de si el schema registry es de Confluent o de Apicurio
-
     if (Objects.nonNull(context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
       commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY));
     }
