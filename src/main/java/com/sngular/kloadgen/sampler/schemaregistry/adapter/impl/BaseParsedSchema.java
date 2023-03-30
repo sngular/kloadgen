@@ -1,12 +1,15 @@
 package com.sngular.kloadgen.sampler.schemaregistry.adapter.impl;
 
-public class BaseParsedSchema <T extends ParsedSchemaAdapter>{
+import org.apache.avro.Schema.Parser;
+
+public class BaseParsedSchema <T extends ParsedSchemaAdapter> extends Parser {
 
   private final T parsedSchemaAdapter;
 
-  public BaseParsedSchema(final T parsedSchemaAdapter) {this.parsedSchemaAdapter = parsedSchemaAdapter;}
+  public BaseParsedSchema(T parsedSchemaAdapter) {this.parsedSchemaAdapter = parsedSchemaAdapter;}
 
-public T getParsedSchemaAdapter(){
+
+  public T getParsedSchemaAdapter(){
     return parsedSchemaAdapter;
-}
+  }
 }

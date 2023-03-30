@@ -4,7 +4,9 @@ import java.util.List;
 
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.Getter;
+import org.apache.avro.Schema;
 
 @Getter
 public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
@@ -26,8 +28,29 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
     this.rawSchema = parsedSchema.rawSchema();
   }
 
+  private ConfluentParsedSchemaMetadata(Schema schema){
+    this.schemaType = schema.getType().getName();
+    this.name = schema.getName();
+  }
+
+  public ConfluentParsedSchemaMetadata(ProtobufSchema schema){
+    this.schemaType = schema.schemaType();
+    this.name = schema.name();
+    this.rawSchema = schema.rawSchema();
+    this.references = schema.references();
+    this.canonicalString = schema.canonicalString();
+  }
+
+
   public static ParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
     return new ConfluentParsedSchemaMetadata(parsedSchema);
+  }
+
+  public static ParsedSchemaAdapter parse(final Schema schema) {
+    return new ConfluentParsedSchemaMetadata(schema);
+  }
+  public static ParsedSchemaAdapter parse (final ProtobufSchema schema){
+    return new ConfluentParsedSchemaMetadata(schema);
   }
 
   @Override
