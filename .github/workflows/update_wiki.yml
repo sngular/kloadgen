@@ -1,49 +1,46 @@
-name: Sync Docs
+name: Sync Docs (Merge)
+
 on:
-  push:
-    paths:
-    - '**.asciidoc'
-    - '**.md'
-    - '**.adoc'
-    branches:
-    - master
-  workflow_dispatch:
+  pull_request:
+    types: [closed]
+
 jobs:
   update-wiki:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master' && contains(github.event.pull_request.labels.*.name, 'documentation')
     steps:
-    - name: setup variables
-      run: |
-        echo "REPO_DEST=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}').wiki" >> $GITHUB_ENV
-      shell: bash
-    - name: Checkout KLoadgen Repository
-      run: git clone https://github.com/sngular/kloadgen.git kloadgen
-    - name: Checkout KLoadgen Wiki Repository
-      run: git clone https://github.com/sngular/kloadgen.wiki.git wiki
-    - name: Copy docs and consolidate links
-      run: |
-        cp -rf kloadgen/docs/* wiki/
-        cd wiki
-        grep -lr "(.*\.md)" *|xargs  -r sed -i 's/\.md//g'
-        echo ">"
-        git diff-index --quiet HEAD & git status -s
-        echo "<"
-        git status
-        echo ">"
-        git diff-index --quiet HEAD & git status -s
-        echo "<"
-        echo "TO_BE_CANCELLED=$(if [[ $(git diff-index --quiet HEAD & git status -s) ]]; then echo "false"; else echo "true"; fi)" >> $GITHUB_ENV
-        echo "$TO_BE_CANCELLED"
-    - name: setup git user
-      if: ${{ env.TO_BE_CANCELLED == 'false' }}
-      run: |
-        git config --global user.name ${{ github.actor }}
-    - name: Sync Wiki
-      if: ${{ env.TO_BE_CANCELLED == 'false' }}
-      run: |
-        cd wiki                
-        git status
-        git add .
-        git commit -m "kloadgen documentation | GitHub Actions $GITHUB_WORKFLOW $GITHUB_RUN_NUMBER"
-        git remote add origin-wiki "https://${{secrets.GITBOT_TOKEN}}@github.com/sngular/kloadgen.wiki.git"
-        git push origin-wiki master
+      - name: Setup variables
+        run: |
+          echo "REPO_DEST=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}').wiki" >> $GITHUB_ENV
+        shell: bash
+      - name: Checkout KLoadgen Repository
+        run: git clone https://github.com/sngular/kloadgen.git kloadgen
+      - name: Checkout KLoadgen Wiki Repository
+        run: git clone https://github.com/sngular/kloadgen.wiki.git wiki
+      - name: Copy docs and consolidate links
+        run: |
+          cp -rf kloadgen/docs/* wiki/
+          cd wiki
+          grep -lr "(.*\.md)" *|xargs  -r sed -i 's/\.md//g'
+          echo ">"
+          git diff-index --quiet HEAD & git status -s
+          echo "<"
+          git status
+          echo ">"
+          git diff-index --quiet HEAD & git status -s
+          echo "<"
+          echo "TO_BE_CANCELLED=$(if [[ $(git diff-index --quiet HEAD & git status -s) ]]; then echo "false"; else echo "true"; fi)" >> $GITHUB_ENV
+          echo "$TO_BE_CANCELLED"
+      - name: Setup git user
+        if: ${{ env.TO_BE_CANCELLED == 'false' }}
+        run: |
+          git config --global user.name ${{ github.actor }}
+      - name: Sync Wiki
+        if: ${{ env.TO_BE_CANCELLED == 'false' }}
+        run: |
+          cd wiki                
+          git status
+          git add .
+          git commit -m "kloadgen documentation | GitHub Actions $GITHUB_WORKFLOW $GITHUB_RUN_NUMBER"
+          git remote add origin-wiki "https://${{secrets.GITBOT_TOKEN}}@github.com/sngular/kloadgen.wiki.git"
+          git push origin-wiki master
