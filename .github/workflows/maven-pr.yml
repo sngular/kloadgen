@@ -2,7 +2,7 @@ name: Java CI with Maven (PR)
 
 on:
   pull_request:
-    types: [opened, synchronize, ready_for_review, review_requested]
+    types: [opened, synchronize, ready_for_review, review_requested, labeled]
 
 jobs:
   check-version:
