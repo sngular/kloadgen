@@ -14,4 +14,4 @@ jobs:
         uses: thollander/actions-comment-pull-request@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          message: "This pull request hasn't been labeled as `release` nor `documentation`. Please ensure this is intentional before merging"
+          message: "This pull request hasn't been labeled as `release` nor `documentation`. Please ensure this is intentional before merging."
