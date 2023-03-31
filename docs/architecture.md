@@ -1,7 +1,5 @@
 # KLoadGen architecture
 
-## Overview
-
 KLoadGen is a JMeter plugin that sends and receives Kafka messages. It also allows to establish a connection to a Schema Registry server to get schemas.
 
 ![KLoadGen plugin](images/kloadgen.png)
@@ -28,7 +26,7 @@ KLoadGen includes the following components:
 
   - **KLG - Simple Value Config:** this JMeter config element allows to define a simple basic value to send into the message.
 
-> We will go through the details of setting up this sampler and its configuration elements in the [Producer configuration](producer-configuration.md) page.
+> You can go through the details of setting up this sampler and its configuration elements in the [Producer configuration](producer-configuration.md) page.
  
 - **Kafka Consumer Sampler:** this JMeter Java sampler reads messages from Kafka. It uses the key and value configuration to deserialize the messages that it reads.
 
@@ -40,7 +38,7 @@ KLoadGen includes the following components:
 
   - **KLG - Key Schema File Deserializer Config:** this JMeter config element allows to upload a key schema file to deserialize the message key.
 
-> We will go through the details of setting up this sampler and its configuration elements in the [Consumer configuration](consumer-configuration.md) page.
+> You can go through the details of setting up this sampler and its configuration elements in the [Consumer configuration](consumer-configuration.md) page.
 
 
 
