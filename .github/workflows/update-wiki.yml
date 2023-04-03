@@ -1,13 +1,25 @@
 name: Sync Docs (Merge)
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches: [master]
 
 jobs:
+  check-pr-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      labels: ${{ steps.get-pr.outputs.pr_labels }}
+    steps:
+    - name: Get Pull Request information
+      uses: 8BitJonny/gh-get-current-pr@2.2.0
+      id: get-pr
+
   update-wiki:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master' && contains(github.event.pull_request.labels.*.name, 'documentation')
+    needs: [check-pr-labels]
+    if: contains(needs.check-pr-labels.outputs.labels, 'documentation')
     steps:
       - name: Setup variables
         run: |
