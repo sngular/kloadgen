@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [check-pr-labels]
-    if: contains(needs.check-pr-labels.outputs.labels.*.name, 'release')
+    if: contains(needs.check-pr-labels.outputs.labels, 'release')
     steps:
       - uses: actions/checkout@v2
         with:

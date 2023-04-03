@@ -19,7 +19,7 @@ jobs:
   update-wiki:
     runs-on: ubuntu-latest
     needs: [check-pr-labels]
-    if: contains(needs.check-pr-labels.outputs.labels.*.name, 'documentation')
+    if: contains(needs.check-pr-labels.outputs.labels, 'documentation')
     steps:
       - name: Setup variables
         run: |
