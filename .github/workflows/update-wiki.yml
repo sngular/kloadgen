@@ -7,6 +7,8 @@ on:
 jobs:
   check-pr-labels:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
     outputs:
       labels: ${{ steps.get-pr.outputs.pr_labels }}
     steps:
