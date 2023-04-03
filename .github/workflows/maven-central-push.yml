@@ -1,4 +1,4 @@
-name: Java CI with Maven (Merge)
+name: Java CI with Maven (Push)
 
 on:
   push:
