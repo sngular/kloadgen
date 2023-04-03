@@ -50,7 +50,8 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
   public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final var parsedSchema = new JsonSchemaProvider().parseSchema(schema, Collections.emptyList(), true);
     metadata =
-        parsedSchema.map(parsSchema -> Pair.of(new BaseSchemaMetadata(ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, "JSON", Collections.emptyList(), schema))),
+        parsedSchema.map(parsSchema -> Pair.of(new BaseSchemaMetadata(ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.JSON.name(), Collections.emptyList(),
+                                                                                                                       schema))),
                                                parsSchema)).orElse(null);
     this.jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, fieldExprMappings);
   }

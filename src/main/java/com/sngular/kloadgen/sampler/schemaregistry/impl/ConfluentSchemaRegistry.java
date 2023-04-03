@@ -99,7 +99,6 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
       throw new KLoadGenException(e.getMessage());
     }
   }
-
   private String checkPropertyOrVariable(final String textToCheck) {
     final String result;
     if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {

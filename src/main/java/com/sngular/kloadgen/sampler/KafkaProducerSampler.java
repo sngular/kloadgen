@@ -96,18 +96,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props2.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
       props2.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
       props2.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-      // Use the Apicurio Registry provided Kafka Serializer for Avro
       props2.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
-
-      // Configure Service Registry location
-      //      props2.putIfAbsent(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, props.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
-      //      props2.putIfAbsent(PropsKeysHelper.VALUE_SUBJECT_NAME_STRATEGY, props.get(PropsKeysHelper.VALUE_SUBJECT_NAME_STRATEGY));
-
-      // Register the artifact if not found in the registry.
-      // props2.putIfAbsent(SerdeConfig.AUTO_REGISTER_ARTIFACT, Boolean.TRUE);
-
-      //      props2.putIfAbsent(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, props.get(ProducerKeysHelper.VALUE_NAME_STRATEGY));
-
       producer = new KafkaProducer<>(props);
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
@@ -164,8 +153,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
           }
         });
 
-        super.getNewLogger().info("Send message with key: {} and body: {} and headers: {}",
-                                  producerRecord.key(), producerRecord.value(), producerRecord.headers());
         fillSampleResult(sampleResult, prettyPrint(result.get()), true);
       } catch (KLoadGenException | InterruptedException | ExecutionException e) {
         super.getNewLogger().error("Failed to send message", e);

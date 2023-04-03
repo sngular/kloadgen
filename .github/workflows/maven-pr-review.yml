@@ -1,0 +1,18 @@
+name: Pull Request Approved
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  check-labels:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.mergeable == true && github.event.review.state == 'approved'
+    steps:
+      - name: Warn about missing labels
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') && !contains(github.event.pull_request.labels.*.name, 'documentation') }}
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: "This pull request hasn't been labeled as `release` nor `documentation`. Please ensure this is intentional before merging."
+          comment_tag: label-warn

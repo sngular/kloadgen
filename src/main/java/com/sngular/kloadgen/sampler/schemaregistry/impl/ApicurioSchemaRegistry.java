@@ -19,7 +19,6 @@ import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioParsedSc
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
@@ -35,7 +34,6 @@ import io.apicurio.registry.serde.avro.AvroSchemaParser;
 import io.apicurio.registry.serde.jsonschema.JsonSchemaParser;
 import io.apicurio.registry.serde.protobuf.ProtobufSchemaParser;
 import io.apicurio.registry.types.ArtifactState;
-import kotlinx.html.B;
 import org.apache.tika.io.IOUtils;
 
 public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {

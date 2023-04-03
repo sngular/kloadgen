@@ -1,13 +1,13 @@
 name: Greetings
 
-on: [ pull_request, issues ]
+on: [pull_request, issues]
 
 jobs:
   greeting:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/first-interaction@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: 'Thank you for collaborating with the project by giving us feedback!!'' You will help us a lot if you can attach an example AVRO and an example Test Plan in order to be able to reproduce the error, if that is the case. Cheers'
-        pr-message: 'Thank you for collaborating with the project to help us to improve!!'''
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: "Thank you for collaborating with the project by giving us feedback! In case it applies, it would be helpful if you could attach an example AVRO and an example test plan for us to reproduce the error. Cheers!"
+          pr-message: "Thank you for collaborating with the project to help us improve!"
