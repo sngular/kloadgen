@@ -4,7 +4,6 @@ We have migrated to a new domain: https://github.com/sngular/kloadgen
 You can find it and keep using it as usual from there.
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/85c9817742944668b5cc75e3fa1cdb23)](https://app.codacy.com/gh/sngular/kloadgen?utm_source=github.com&utm_medium=referral&utm_content=sngular/kloadgen&utm_campaign=Badge_Grade_Dashboard)
-[![Build Status](https://api.travis-ci.org/sngular/kloadgen.svg?branch=master)](https://travis-ci.org/sngular/kloadgen)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.sngular/kloadgen/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.sngular/kloadgen)
 
 <p align="center">
