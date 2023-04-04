@@ -166,11 +166,12 @@ public class SchemaProcessorUtils {
             schemaBuilder.addSchema(importedSchema);
           }
         } else {
-          final var importedProtobufSchema = (ProtobufSchema) JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
-                                                                                                          JMeterContextService.getContext().getProperties());
+          ProtoFileElement protoFileElement = (ProtoFileElement) JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                                              JMeterContextService.getContext().getProperties());
+          final var importedProtobufSchema = new ProtobufSchema(protoFileElement, metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
           if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
             schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
-            schemaBuilder.addSchema(convertDynamicSchema( importedProtobufSchema));
+            schemaBuilder.addSchema(convertDynamicSchema(importedProtobufSchema));
           }
         }
       }
