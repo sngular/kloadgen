@@ -6,7 +6,10 @@ import java.util.Properties;
 
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 
@@ -39,7 +42,8 @@ public final class JMeterHelper {
         }
       }
     }
-    return schemaRegistryManager.getSchemaBySubject(subjectName);
+    BaseParsedSchema baseParsedSchema= schemaRegistryManager.getSchemaBySubject(subjectName);
+    return baseParsedSchema.getParsedSchemaAdapter().getRawSchema();
   }
 
   public static String checkPropertyOrVariable(final String textToCheck) {

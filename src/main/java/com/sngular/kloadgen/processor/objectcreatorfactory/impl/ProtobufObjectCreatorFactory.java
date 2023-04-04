@@ -24,11 +24,16 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
+import org.apache.avro.Schema;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
@@ -46,7 +51,12 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema(), metadata);
     } else if (schema instanceof ProtoFileElement) {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schema, metadata);
-    } else {
+    } else if (schema instanceof BaseParsedSchema) {
+      BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
+      ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
+      final Object schemaParsed = adapterParse.getRawSchema();
+      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schemaParsed, metadata);
+  } else {
       throw new KLoadGenException("Unsupported schema type");
     }
 

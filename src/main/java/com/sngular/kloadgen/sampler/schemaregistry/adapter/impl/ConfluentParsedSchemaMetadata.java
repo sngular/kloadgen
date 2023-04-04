@@ -11,9 +11,9 @@ import org.apache.avro.Schema;
 @Getter
 public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
 
-  private String schemaType;
+  private final String schemaType;
 
-  private String name;
+  private final String name;
 
   private String canonicalString;
 
