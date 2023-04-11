@@ -199,12 +199,10 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
-    if (Objects.isNull(producerRecord.key())) {
-      sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
-    } else {
-      sampleResult.setSamplerData(String.format("key: %s, payload: %s", producerRecord.key().toString(),
-                                                producerRecord.value().toString()));
-    }
+    StringBuilder result = new StringBuilder();
+    result.append("key: ").append(Objects.isNull(producerRecord.key()) ? null : producerRecord.key().toString())
+          .append(", payload: ").append(Objects.isNull(producerRecord.value()) ? null : producerRecord.value().toString());
+    sampleResult.setSamplerData(result.toString());
   }
 
   private void fillSampleResult(final SampleResult sampleResult, final String respondeData, final boolean successful) {
