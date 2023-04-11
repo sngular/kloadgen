@@ -8,6 +8,8 @@ import java.util.Set;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import org.apache.avro.Schema;

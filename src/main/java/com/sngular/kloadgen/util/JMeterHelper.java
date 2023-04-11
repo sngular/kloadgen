@@ -19,7 +19,7 @@ public final class JMeterHelper {
   private JMeterHelper() {
   }
 
-  public static Object getParsedSchema(final String subjectName, final Properties properties) {
+  public static BaseParsedSchema getParsedSchema(final String subjectName, final Properties properties) {
     final Map<String, String> originals = new HashMap<>();
 
     String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
@@ -43,7 +43,7 @@ public final class JMeterHelper {
       }
     }
     BaseParsedSchema baseParsedSchema= schemaRegistryManager.getSchemaBySubject(subjectName);
-    return baseParsedSchema.getParsedSchemaAdapter().getRawSchema();
+    return baseParsedSchema;
   }
 
   public static String checkPropertyOrVariable(final String textToCheck) {
