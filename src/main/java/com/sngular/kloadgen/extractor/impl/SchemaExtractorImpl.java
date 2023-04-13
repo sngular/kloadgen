@@ -66,7 +66,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
 
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final List<FieldValueMapping> attributeList = new ArrayList<>();
-final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     if (Objects.nonNull(registryName) && registryName.equalsIgnoreCase(SchemaRegistryEnum.APICURIO.toString())) {
       ApicurioParsedSchema apicurioParsedSchema = (ApicurioParsedSchema) schemaParsed;
