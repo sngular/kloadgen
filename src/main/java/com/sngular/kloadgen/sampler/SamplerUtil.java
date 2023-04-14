@@ -190,8 +190,17 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
     defaultParameters.addArgument(PropsKeysHelper.TIMEOUT_MILLIS, "5000");
-    defaultParameters.addArgument(CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG, "3000");
     defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
+    defaultParameters.addArgument(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, "1");
+    defaultParameters.addArgument(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, "57671680");
+    defaultParameters.addArgument(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "500");
+    defaultParameters.addArgument(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "500");
+    defaultParameters.addArgument(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000");
+    defaultParameters.addArgument(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "45000");
+    defaultParameters.addArgument(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "3000");
+    defaultParameters.addArgument(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, "50");
+    defaultParameters.addArgument(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, "1000");
+
     return defaultParameters;
   }
 
@@ -267,6 +276,16 @@ public final class SamplerUtil {
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, context.getParameter(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG));
     props.put(PropsKeysHelper.TIMEOUT_MILLIS, context.getParameter(PropsKeysHelper.TIMEOUT_MILLIS));
 
+    props.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, context.getParameter(ConsumerConfig.FETCH_MIN_BYTES_CONFIG));
+    props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, context.getParameter(ConsumerConfig.FETCH_MAX_BYTES_CONFIG));
+    props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, context.getParameter(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG));
+    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, context.getParameter(ConsumerConfig.MAX_POLL_RECORDS_CONFIG));
+    props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, context.getParameter(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG));
+    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, context.getParameter(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG));
+    props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, context.getParameter(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG));
+    props.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, context.getParameter(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG));
+    props.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, context.getParameter(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG));
+
     final Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
       if (parameter.startsWith("_")) {
@@ -276,7 +295,6 @@ public final class SamplerUtil {
 
     verifySecurity(context, props);
 
-    props.put(CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG, context.getParameter(CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG));
     return props;
   }
 
