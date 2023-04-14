@@ -17,7 +17,7 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   private String canonicalString;
 
-  private List<SchemaReference> references;
+  private String SuppressWarnings
   private  Object rawSchema;
 
   private ConfluentParsedSchemaMetadata(ParsedSchema parsedSchema){
