@@ -58,7 +58,7 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   @Override
   public String getType() {
-    return this.getSchemaType();
+    return this.schemaType;
   }
 
   @Override
