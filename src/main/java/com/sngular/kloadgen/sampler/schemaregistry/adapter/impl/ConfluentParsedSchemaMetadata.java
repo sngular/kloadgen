@@ -17,14 +17,12 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   private String canonicalString;
 
-  private String SuppressWarnings
   private  Object rawSchema;
 
   private ConfluentParsedSchemaMetadata(ParsedSchema parsedSchema){
     this.schemaType = parsedSchema.schemaType();
     this.name = parsedSchema.name();
     this.canonicalString = parsedSchema.canonicalString();
-    this.references = parsedSchema.references();
     this.rawSchema = parsedSchema.rawSchema();
   }
 
@@ -37,7 +35,6 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
     this.schemaType = schema.schemaType();
     this.name = schema.name();
     this.rawSchema = schema.rawSchema();
-    this.references = schema.references();
     this.canonicalString = schema.canonicalString();
   }
 
