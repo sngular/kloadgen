@@ -6,6 +6,8 @@
 
 package com.sngular.kloadgen.processor.util;
 
+import static com.sngular.kloadgen.util.JMeterHelper.getParsedSchema;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,12 +27,9 @@ import com.github.os72.protobuf.dynamic.MessageDefinition.Builder;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
-import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProtobufHelper;
 import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.FieldElement;
@@ -153,6 +152,7 @@ public class SchemaProcessorUtils {
     return Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).toArray(String[]::new);
   }
 
+  @SuppressWarnings("checkstyle:SingleSpaceSeparator")
   public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata)
       throws Descriptors.DescriptorValidationException, IOException {
 
@@ -169,9 +169,8 @@ public class SchemaProcessorUtils {
             schemaBuilder.addSchema(importedSchema);
           }
         } else {
-          BaseParsedSchema baseParsedSchema = (BaseParsedSchema) JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
-                                                                                              JMeterContextService.getContext().getProperties());
-          ParsedSchemaAdapter protoFileElement = baseParsedSchema.getParsedSchemaAdapter();
+          final ParsedSchemaAdapter protoFileElement = getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                       JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
           final var importedProtobufSchema = new ProtobufSchema(protoFileElement.getRawSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
           if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
             schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());

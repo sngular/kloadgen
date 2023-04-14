@@ -4,17 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
-import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class JMeterHelper {
+
 
   private JMeterHelper() {
   }
@@ -30,20 +30,22 @@ public final class JMeterHelper {
 
       if (ProducerKeysHelper.FLAG_YES.equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
         if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-            .equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
+                .equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
           originals.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
                         properties.getProperty(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
           originals.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, properties.getProperty(SchemaRegistryClientConfig.USER_INFO_CONFIG));
         } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY
-            .equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
+                       .equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
           originals.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE,
                         properties.getProperty(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
           originals.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, properties.getProperty(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
         }
       }
+    } else {
+      throw new KLoadGenException("Schema registry name is required");
     }
-    BaseParsedSchema baseParsedSchema= schemaRegistryManager.getSchemaBySubject(subjectName);
-    return baseParsedSchema;
+    return schemaRegistryManager.getSchemaBySubject(subjectName);
+
   }
 
   public static String checkPropertyOrVariable(final String textToCheck) {
