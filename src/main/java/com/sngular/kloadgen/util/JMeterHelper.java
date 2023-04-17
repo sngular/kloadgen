@@ -15,7 +15,6 @@ import org.apache.jmeter.threads.JMeterContextService;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class JMeterHelper {
 
-
   private JMeterHelper() {
   }
 
@@ -24,7 +23,9 @@ public final class JMeterHelper {
 
     String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
-
+    if (schemaRegistryManager == null || StringUtils.isEmpty(schemaRegistryName)) {
+      throw new KLoadGenException("Schema registry name is required");
+    }
     if (StringUtils.isNotEmpty(schemaRegistryName)) {
       originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), properties.getProperty(schemaRegistryManager.getSchemaRegistryUrlKey()));
 
@@ -41,8 +42,6 @@ public final class JMeterHelper {
           originals.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, properties.getProperty(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
         }
       }
-    } else {
-      throw new KLoadGenException("Schema registry name is required");
     }
     return schemaRegistryManager.getSchemaBySubject(subjectName);
 

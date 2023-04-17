@@ -26,7 +26,6 @@ import com.sngular.kloadgen.extractor.extractors.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.ProtoBufExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
 import com.sngular.kloadgen.util.JMeterHelper;
@@ -66,13 +65,8 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   public final Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) throws IOException, RestClientException {
     String schemaType = null;
     Properties properties = JMeterContextService.getContext().getProperties();
-    BaseParsedSchema schemaParsed;
-    try {
-      schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
-    } catch (KLoadGenException e) {
-      throw new KLoadGenException("Schema registry name is required");
-    }
 
+    final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
