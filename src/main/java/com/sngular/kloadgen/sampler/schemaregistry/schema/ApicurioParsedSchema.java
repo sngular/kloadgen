@@ -17,6 +17,7 @@ public class ApicurioParsedSchema extends ParsedSchemaAdapter {
 
   private String rawSchema;
 
+  @SuppressWarnings("UnnecessarilyFullyQualified")
   private ApicurioParsedSchema(final ApicurioParsedSchema apicurioParsedSchema){
     this.rawSchema= apicurioParsedSchema.getRawSchema();
     this.schema = apicurioParsedSchema.getSchema();

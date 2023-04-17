@@ -67,6 +67,9 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     Properties properties = JMeterContextService.getContext().getProperties();
 
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
+    if (schemaParsed == null) {
+      throw new KLoadGenException("Schema registry name is required");
+    }
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
@@ -93,7 +96,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
         attributeList.addAll(jsonExtractor.processSchema(jsonSchema.toJsonNode()));
       } else if (SchemaTypeEnum.PROTOBUF.name().equalsIgnoreCase(schemaType)) {
         final var protoFileElement = ((ProtoFileElement) parsedSchemaAdapter.getRawSchema());
-        protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false,nestedTypes));
+        protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false, nestedTypes));
       } else {
         throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
       }
