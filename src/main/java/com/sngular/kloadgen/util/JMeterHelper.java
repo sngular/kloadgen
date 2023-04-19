@@ -1,14 +1,11 @@
 package com.sngular.kloadgen.util;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 
@@ -19,29 +16,10 @@ public final class JMeterHelper {
   }
 
   public static BaseParsedSchema getParsedSchema(final String subjectName, final Properties properties) {
-    final Map<String, String> originals = new HashMap<>();
-
-    String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+    final String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
     if (schemaRegistryManager == null || StringUtils.isEmpty(schemaRegistryName)) {
       throw new KLoadGenException("Schema registry name is required");
-    }
-    if (StringUtils.isNotEmpty(schemaRegistryName)) {
-      originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), properties.getProperty(schemaRegistryManager.getSchemaRegistryUrlKey()));
-
-      if (ProducerKeysHelper.FLAG_YES.equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-                .equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
-          originals.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE,
-                        properties.getProperty(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
-          originals.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, properties.getProperty(SchemaRegistryClientConfig.USER_INFO_CONFIG));
-        } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY
-                       .equals(properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
-          originals.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE,
-                        properties.getProperty(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
-          originals.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, properties.getProperty(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
-        }
-      }
     }
     return schemaRegistryManager.getSchemaBySubject(subjectName);
 

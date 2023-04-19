@@ -70,35 +70,36 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public BaseSchemaMetadata<ConfluentSchemaMetadata> getLatestSchemaMetadata(String subjectName) {
+  public BaseSchemaMetadata<ConfluentSchemaMetadata> getLatestSchemaMetadata(final String subjectName) {
     try {
-      SchemaMetadataAdapter schemaMetadataAdapter = ConfluentSchemaMetadata.parse(this.schemaRegistryClient.getLatestSchemaMetadata(subjectName));
+      final SchemaMetadataAdapter schemaMetadataAdapter = ConfluentSchemaMetadata.parse(this.schemaRegistryClient.getLatestSchemaMetadata(subjectName));
       return new BaseSchemaMetadata(schemaMetadataAdapter);
     } catch (RestClientException | IOException e) {
       throw new KLoadGenException(e.getMessage());
     }
   }
 
-  public BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubject(String subjectName) {
+  public BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubject(final String subjectName) {
     try {
       final ConfluentSchemaMetadata schemaMetadata = ConfluentSchemaMetadata.parse(this.schemaRegistryClient.getLatestSchemaMetadata(subjectName));
-      ParsedSchema parsedSchema= this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
-      ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);
+      final ParsedSchema parsedSchema = this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
+      final ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);
       return new BaseParsedSchema(parsedSchemaAdapter);
     } catch (RestClientException | IOException e) {
       throw new KLoadGenException(e.getMessage());
     }
   }
 
-  public BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubjectAndId(String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
+  public BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubjectAndId(final String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     try {
-      ParsedSchema parsedSchema= this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, metadata.getSchemaMetadataAdapter().getId());
-      ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);
+      final ParsedSchema parsedSchema = this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, metadata.getSchemaMetadataAdapter().getId());
+      final ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);
       return new BaseParsedSchema(parsedSchemaAdapter);
     } catch (RestClientException | IOException e) {
       throw new KLoadGenException(e.getMessage());
     }
   }
+
   private String checkPropertyOrVariable(final String textToCheck) {
     final String result;
     if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {

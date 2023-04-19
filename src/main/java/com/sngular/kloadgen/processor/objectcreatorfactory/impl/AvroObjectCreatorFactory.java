@@ -49,12 +49,11 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     } else if (schema instanceof Schema) {
       this.schema = (Schema) schema;
     } else if (schema instanceof BaseParsedSchema) {
-      BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
-      ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
+      final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
+      final ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
       if (adapterParse instanceof ApicurioParsedSchema) {
         this.schema = (Schema) ((ApicurioParsedSchema) adapterParse).getSchema();
-      }
-      else{
+      } else {
         this.schema = adapterParse.getRawSchema();
       }
     } else {

@@ -64,16 +64,16 @@ public class SchemaExtractorImpl implements SchemaExtractor {
   @Override
   public final Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) throws IOException, RestClientException {
     String schemaType = null;
-    Properties properties = JMeterContextService.getContext().getProperties();
+    final Properties properties = JMeterContextService.getContext().getProperties();
 
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-    String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
+    final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+    final ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
     schemaType = parsedSchemaAdapter.getType();
     if (Objects.nonNull(registryName) && registryName.equalsIgnoreCase(SchemaRegistryEnum.APICURIO.toString())) {
-      Object schema = ((ApicurioParsedSchema) parsedSchemaAdapter).getSchema();
+      final Object schema = ((ApicurioParsedSchema) parsedSchemaAdapter).getSchema();
       if (SchemaTypeEnum.AVRO.name().equalsIgnoreCase(schemaType)) {
         ((Schema) schema).getFields().forEach(field -> avroExtractor.processField(field, attributeList, true, false));
       } else if (SchemaTypeEnum.JSON.name().equalsIgnoreCase(schemaType)) {
@@ -89,10 +89,10 @@ public class SchemaExtractorImpl implements SchemaExtractor {
       if (SchemaTypeEnum.AVRO.name().equalsIgnoreCase(schemaType)) {
         ((Schema) parsedSchemaAdapter.getRawSchema()).getFields().forEach(field -> avroExtractor.processField(field, attributeList, true, false));
       } else if (SchemaTypeEnum.JSON.name().equalsIgnoreCase(schemaType)) {
-        JsonSchema jsonSchema = new JsonSchema(parsedSchemaAdapter.getRawSchema().toString());
+        final JsonSchema jsonSchema = new JsonSchema(parsedSchemaAdapter.getRawSchema().toString());
         attributeList.addAll(jsonExtractor.processSchema(jsonSchema.toJsonNode()));
       } else if (SchemaTypeEnum.PROTOBUF.name().equalsIgnoreCase(schemaType)) {
-        final var protoFileElement = ((ProtoFileElement) parsedSchemaAdapter.getRawSchema());
+        final var protoFileElement = (ProtoFileElement) parsedSchemaAdapter.getRawSchema();
         protoFileElement.getTypes().forEach(field -> protoBufExtractor.processField(field, attributeList, protoFileElement.getImports(), false, nestedTypes));
       } else {
         throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));

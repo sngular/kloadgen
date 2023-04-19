@@ -6,8 +6,6 @@
 
 package com.sngular.kloadgen.processor.util;
 
-import static com.sngular.kloadgen.util.JMeterHelper.getParsedSchema;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -30,6 +28,7 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProtobufHelper;
 import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.FieldElement;
@@ -169,8 +168,8 @@ public class SchemaProcessorUtils {
             schemaBuilder.addSchema(importedSchema);
           }
         } else {
-          final ParsedSchemaAdapter protoFileElement = getParsedSchema(getSubjectName(importedClass, metadata),
-                                                                       JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
+          final ParsedSchemaAdapter protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                                    JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
           final var importedProtobufSchema = new ProtobufSchema(protoFileElement.getRawSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
           if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
             schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
