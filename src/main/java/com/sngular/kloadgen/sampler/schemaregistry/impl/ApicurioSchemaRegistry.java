@@ -21,7 +21,6 @@ import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaParser;
 import io.apicurio.registry.rest.client.RegistryClient;
@@ -41,6 +40,8 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   private RegistryClient schemaRegistryClient;
 
   private Map<String, String> propertiesMap;
+
+  private ApicurioParsedSchemaMetadata apicurioParsedSchemaMetadata;
 
   public ApicurioSchemaRegistry() {
     this.propertiesMap = Map.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryConstants.SCHEMA_REGISTRY_APICURIO,
@@ -92,7 +93,7 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
 
   @Override
   public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubject(String subjectName) {
-    final ApicurioParsedSchema schema = new ApicurioParsedSchema();
+    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
     try {
       List<SearchedArtifact> artifacts = this.schemaRegistryClient.searchArtifacts(null, subjectName, null,
                                                                                    null, null, null, null, null, null).getArtifacts();
@@ -117,7 +118,7 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
           throw new KLoadGenException(String.format("Schema type not supported %s", searchedArtifactType));
         }
         schema.setType(searchedArtifactType);
-        ParsedSchemaAdapter parsedSchemaAdapter = ApicurioParsedSchema.parse(schema);
+        ParsedSchemaAdapter parsedSchemaAdapter = schema;
         return new BaseParsedSchema(parsedSchemaAdapter);
       }
     } catch (IOException e) {
@@ -126,7 +127,7 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubjectAndId(String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
-    final ApicurioParsedSchema schema = new ApicurioParsedSchema();
+    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
 
     SchemaMetadataAdapter schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
     try {
@@ -149,7 +150,7 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    ParsedSchemaAdapter parsedSchemaAdapter = ApicurioParsedSchema.parse(schema);
+    ParsedSchemaAdapter parsedSchemaAdapter = schema;
     return new BaseParsedSchema(parsedSchemaAdapter);
   }
 

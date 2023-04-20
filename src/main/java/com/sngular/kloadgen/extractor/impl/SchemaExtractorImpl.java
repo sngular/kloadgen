@@ -26,8 +26,8 @@ import com.sngular.kloadgen.extractor.extractors.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.ProtoBufExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
@@ -73,7 +73,7 @@ public class SchemaExtractorImpl implements SchemaExtractor {
     final ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
     schemaType = parsedSchemaAdapter.getType();
     if (Objects.nonNull(registryName) && registryName.equalsIgnoreCase(SchemaRegistryEnum.APICURIO.toString())) {
-      final Object schema = ((ApicurioParsedSchema) parsedSchemaAdapter).getSchema();
+      final Object schema = ((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
       if (SchemaTypeEnum.AVRO.name().equalsIgnoreCase(schemaType)) {
         ((Schema) schema).getFields().forEach(field -> avroExtractor.processField(field, attributeList, true, false));
       } else if (SchemaTypeEnum.JSON.name().equalsIgnoreCase(schemaType)) {

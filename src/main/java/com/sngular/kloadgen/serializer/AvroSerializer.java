@@ -24,7 +24,7 @@ public class AvroSerializer<T extends EnrichedRecord> implements Serializer<T> {
 
   private static final byte MAGIC_BYTE = 0x0;
 
-  private static final int ID_SIZE = 4;
+  private static final int ID_SIZE = 32;
 
   public AvroSerializer() {
     AvroSerializersUtil.setupLogicalTypesConversion();
