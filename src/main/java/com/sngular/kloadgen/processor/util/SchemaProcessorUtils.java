@@ -26,6 +26,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProtobufHelper;
@@ -150,6 +151,7 @@ public class SchemaProcessorUtils {
     return Arrays.stream(fields).map(field -> field.replaceAll("\\[.*]", "")).toArray(String[]::new);
   }
 
+  @SuppressWarnings("checkstyle:SingleSpaceSeparator")
   public static Descriptors.Descriptor buildProtoDescriptor(final ProtoFileElement schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata)
       throws Descriptors.DescriptorValidationException, IOException {
 
@@ -166,8 +168,9 @@ public class SchemaProcessorUtils {
             schemaBuilder.addSchema(importedSchema);
           }
         } else {
-          final var importedProtobufSchema = (ProtobufSchema) JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
-                                                                                           JMeterContextService.getContext().getProperties());
+          final ParsedSchemaAdapter protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                                    JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
+          final var importedProtobufSchema = new ProtobufSchema(protoFileElement.getRawSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
           if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
             schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
             schemaBuilder.addSchema(convertDynamicSchema(importedProtobufSchema));

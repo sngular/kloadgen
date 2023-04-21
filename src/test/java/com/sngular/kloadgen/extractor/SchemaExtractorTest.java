@@ -21,6 +21,8 @@ import com.sngular.kloadgen.extractor.extractors.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.ProtoBufExtractor;
 import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.testutil.ParsedSchemaUtil;
 import com.sngular.kloadgen.util.JMeterHelper;
@@ -96,8 +98,8 @@ class SchemaExtractorTest {
 
     Mockito.when(avroExtractor.getParsedSchema(Mockito.anyString())).thenCallRealMethod();
     final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "AVRO");
-
-    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
+    BaseParsedSchema baseParsedSchema = new BaseParsedSchema(ConfluentParsedSchemaMetadata.parse(parsedSchema));
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
     Mockito.doNothing().when(avroExtractor).processField(Mockito.any(Field.class), Mockito.anyList(), ArgumentMatchers.eq(true), ArgumentMatchers.eq(false));
     schemaExtractor.flatPropertiesList("avroSubject");
@@ -113,9 +115,9 @@ class SchemaExtractorTest {
     final File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
     final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "JSON");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
-
+    BaseParsedSchema baseParsedSchema = new BaseParsedSchema(ConfluentParsedSchemaMetadata.parse(parsedSchema));
     jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
-    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     Mockito.when(jsonExtractor.processSchema(Mockito.any(JsonNode.class))).thenReturn(new ArrayList<>());
 
     schemaExtractor.flatPropertiesList("jsonSubject");
@@ -131,9 +133,9 @@ class SchemaExtractorTest {
     final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
     final ParsedSchema parsedSchema = schemaExtractor.schemaTypesList(testFile, "PROTOBUF");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
-
+    BaseParsedSchema baseParsedSchema = new BaseParsedSchema(ConfluentParsedSchemaMetadata.parse(parsedSchema));
     jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
-    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     Mockito.doNothing().when(protoBufExtractor).processField(Mockito.any(MessageElement.class), Mockito.anyList(), Mockito.anyList(), ArgumentMatchers.eq(false), Mockito.any());
 
     schemaExtractor.flatPropertiesList("protobufSubject");
@@ -147,11 +149,12 @@ class SchemaExtractorTest {
   void testFlatPropertiesListWithException() throws IOException, RestClientException {
 
     final ParsedSchema parsedSchema = new ParsedSchemaUtil();
+    BaseParsedSchema baseParsedSchema = new BaseParsedSchema(ConfluentParsedSchemaMetadata.parse(parsedSchema));
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
     jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
 
-    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(parsedSchema);
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     Assertions.assertThatExceptionOfType(KLoadGenException.class)
               .isThrownBy(() -> schemaExtractor.flatPropertiesList("exceptionSubject")
               ).withMessage(String.format("Schema type not supported %s", parsedSchema.schemaType()));
