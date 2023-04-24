@@ -22,9 +22,8 @@ class AvroExtractorTest {
 
     final String testFile = fileHelper.getContent("/avro-files/embedded-avros-example-test.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(4)
@@ -45,9 +44,8 @@ class AvroExtractorTest {
 
     final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(1)
@@ -70,9 +68,8 @@ class AvroExtractorTest {
 
     final String testFile = fileHelper.getContent("/avro-files/testOptionalMap.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -101,9 +98,8 @@ class AvroExtractorTest {
   void testFlatPropertiesMap() throws Exception {
     final String testFile = fileHelper.getContent("/avro-files/testMap.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(9)
@@ -135,9 +131,8 @@ class AvroExtractorTest {
 
     final String testFile = fileHelper.getContent("/avro-files/testLogicalTypes.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(10)
@@ -167,9 +162,8 @@ class AvroExtractorTest {
 
     final String testFile = fileHelper.getContent("/avro-files/issue.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -189,9 +183,8 @@ class AvroExtractorTest {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -221,9 +214,8 @@ class AvroExtractorTest {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionReverseOrder.avsc");
     final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
-    final Schema schema = (Schema) parsedSchema.rawSchema();
 
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(5)

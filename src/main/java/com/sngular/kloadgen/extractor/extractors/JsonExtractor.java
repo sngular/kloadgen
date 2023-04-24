@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
@@ -19,16 +18,38 @@ import com.sngular.kloadgen.model.json.NumberField;
 import com.sngular.kloadgen.model.json.ObjectField;
 import com.sngular.kloadgen.model.json.Schema;
 import com.sngular.kloadgen.model.json.StringField;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
 
-public class JsonExtractor {
+public class JsonExtractor implements Extractor{
+
+  public static final String ARRAY = "-array";
 
   private final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
 
-  public final List<FieldValueMapping> processSchema(final JsonNode jsonNode) {
+  public final List<FieldValueMapping> processSchema(final Object schema) {
+    var jsonNode=((JsonSchema) schema).toJsonNode();
     return processSchema(jsonSchemaParser.parse(jsonNode));
+  }
+
+  public final ParsedSchema getParsedSchema(final String schema){
+    return new JsonSchema(schema);
+  }
+
+  public List<FieldValueMapping> processApicurioParsedSchema(final Object schema){
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    attributeList.addAll(new JsonExtractor().processSchema(((io.apicurio.registry.serde.jsonschema.JsonSchema) schema).toJsonNode()));
+    return attributeList;
+  }
+
+  public List<FieldValueMapping> processConfluentParsedSchema(final Object schema){
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    final JsonSchema jsonSchema = new JsonSchema(schema.toString());
+    attributeList.addAll(this.processSchema(jsonSchema.toJsonNode()));
+    return attributeList;
   }
 
   public final List<FieldValueMapping> processSchema(final Schema schema) {
@@ -174,7 +195,7 @@ public class JsonExtractor {
         completeFieldList.add(
             FieldValueMapping.builder()
                              .fieldName(name)
-                             .fieldType(value.getType() + "-array" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? "-array" :
+                             .fieldType(value.getType() + ARRAY + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? ARRAY :
                                  (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" : breadCrumb))
                              .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
                              .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
@@ -204,7 +225,7 @@ public class JsonExtractor {
           FieldValueMapping.builder()
                            .fieldName(name)
                            .fieldType(value.getType() + "-map" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" :
-                               (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? "-array" : breadCrumb))
+                               (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? ARRAY : breadCrumb))
                            .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
                            .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
                            .build());

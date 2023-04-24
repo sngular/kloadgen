@@ -26,7 +26,7 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -44,7 +44,7 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -68,7 +68,7 @@ class JsonExtractorTest {
                                                                         ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE, "0", ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE, "0",
                                                                         ConstraintTypeEnum.MULTIPLE_OF, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(2)
@@ -85,7 +85,7 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(12)
@@ -121,7 +121,7 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -149,7 +149,7 @@ class JsonExtractorTest {
     final Map<ConstraintTypeEnum, String> constraintsCode = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "2", ConstraintTypeEnum.MAXIMUM_VALUE, "3");
     final Map<ConstraintTypeEnum, String> constraintsFreeForm = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "1", ConstraintTypeEnum.MAXIMUM_VALUE, "256");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .contains(
@@ -171,7 +171,7 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0", ConstraintTypeEnum.REGEX, "^(.*)$");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .contains(
@@ -186,7 +186,7 @@ class JsonExtractorTest {
   void testMultipleType() throws Exception {
     final String testFile = fileHelper.getContent("/jsonschema/multiple-type-single.jcs");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(1)
@@ -202,7 +202,7 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -229,7 +229,7 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode());
+    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
 
     Assertions.assertThat(fieldValueMappingList).contains(
         FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
@@ -245,7 +245,7 @@ class JsonExtractorTest {
   void testFlatPropertiesCaptureThreeLevelException() throws Exception {
     final String testFile = fileHelper.getContent("/jsonschema/test-level-nested-exception.jcs");
     Assertions.assertThatExceptionOfType(KLoadGenException.class)
-              .isThrownBy(() -> jsonExtractor.processSchema(new JsonSchema(testFile).toJsonNode()))
+              .isThrownBy(() -> jsonExtractor.processSchema(new JsonSchema(testFile)))
               .withMessage("Wrong Json Schema, 3+ consecutive nested collections are not allowed");
   }
 

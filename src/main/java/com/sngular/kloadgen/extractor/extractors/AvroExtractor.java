@@ -14,13 +14,14 @@ import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.commons.collections4.IteratorUtils;
 
-public class AvroExtractor {
+public class AvroExtractor implements Extractor{
 
   private final Set<Schema.Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
 
   private final RandomObject randomObject = new RandomObject();
 
-  public final List<FieldValueMapping> processSchema(final Schema schema) {
+  public final List<FieldValueMapping> processSchema(final Object schemaReceived) {
+    var schema = ((AvroSchema) schemaReceived).rawSchema();
     final var attributeList = new ArrayList<FieldValueMapping>();
     schema.getFields().forEach(field -> processField(field, attributeList, true, true));
     return attributeList;
@@ -35,6 +36,16 @@ public class AvroExtractor {
       result = new AvroSchema(lastElement.toString());
     }
     return result;
+  }
+
+  public List<FieldValueMapping> processApicurioParsedSchema(final Object schema){
+    final var attributeList = new ArrayList<FieldValueMapping>();
+    ((Schema) schema).getFields().forEach(field -> this.processField(field, attributeList, true, false));
+    return attributeList;
+  }
+
+  public List<FieldValueMapping> processConfluentParsedSchema(final Object schema){
+    return this.processApicurioParsedSchema(schema);
   }
 
   public final void processField(final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
