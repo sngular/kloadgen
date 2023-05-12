@@ -15,10 +15,12 @@ import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryConstants;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.ApicurioParsedSchema;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaParser;
 import io.apicurio.registry.rest.client.RegistryClient;
@@ -38,6 +40,8 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   private RegistryClient schemaRegistryClient;
 
   private Map<String, String> propertiesMap;
+
+  private ApicurioParsedSchemaMetadata apicurioParsedSchemaMetadata;
 
   public ApicurioSchemaRegistry() {
     this.propertiesMap = Map.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryConstants.SCHEMA_REGISTRY_APICURIO,
@@ -88,8 +92,8 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public ApicurioParsedSchema getSchemaBySubject(String subjectName) {
-    final ApicurioParsedSchema schema = new ApicurioParsedSchema();
+  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubject(String subjectName) {
+    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
     try {
       List<SearchedArtifact> artifacts = this.schemaRegistryClient.searchArtifacts(null, subjectName, null,
                                                                                    null, null, null, null, null, null).getArtifacts();
@@ -114,15 +118,17 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
           throw new KLoadGenException(String.format("Schema type not supported %s", searchedArtifactType));
         }
         schema.setType(searchedArtifactType);
-        return schema;
+        ParsedSchemaAdapter parsedSchemaAdapter = schema;
+        return new BaseParsedSchema(parsedSchemaAdapter);
       }
     } catch (IOException e) {
       throw new KLoadGenException(e);
     }
   }
 
-  public Object getSchemaBySubjectAndId(String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
-    Object schema = null;
+  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubjectAndId(String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
+    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
+
     SchemaMetadataAdapter schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
     try {
       InputStream inputStream = this.schemaRegistryClient.getContentByGlobalId(schemaMetadataAdapter.getGlobalId());
@@ -131,20 +137,21 @@ public class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
       String searchedArtifactType = schemaMetadataAdapter.getType();
       if (SchemaTypeEnum.AVRO.name().equalsIgnoreCase(searchedArtifactType)) {
         SchemaParser parserAvro = new AvroSchemaParser(null);
-        schema = parserAvro.parseSchema(result.getBytes(StandardCharsets.UTF_8), new HashMap<>());
+        schema.setSchema(parserAvro.parseSchema(result.getBytes(StandardCharsets.UTF_8), new HashMap<>()));
       } else if (SchemaTypeEnum.JSON.name().equalsIgnoreCase(searchedArtifactType)) {
         SchemaParser parserJson = new JsonSchemaParser();
-        schema = parserJson.parseSchema(result.getBytes(StandardCharsets.UTF_8), new HashMap<>());
+        schema.setSchema(parserJson.parseSchema(result.getBytes(StandardCharsets.UTF_8), new HashMap<>()));
       } else if (SchemaTypeEnum.PROTOBUF.name().equalsIgnoreCase(searchedArtifactType)) {
         SchemaParser parserProtobuf = new ProtobufSchemaParser();
-        schema = parserProtobuf.parseSchema(result.getBytes(StandardCharsets.UTF_8), new HashMap<>());
+        schema.setSchema(parserProtobuf.parseSchema(result.getBytes(StandardCharsets.UTF_8), new HashMap<>()));
       } else {
         throw new KLoadGenException(String.format("Schema type not supported %s", searchedArtifactType));
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return schema;
+    ParsedSchemaAdapter parsedSchemaAdapter = schema;
+    return new BaseParsedSchema(parsedSchemaAdapter);
   }
 
   private SearchedArtifact getLastestSearchedArtifact(final String subjectName) {

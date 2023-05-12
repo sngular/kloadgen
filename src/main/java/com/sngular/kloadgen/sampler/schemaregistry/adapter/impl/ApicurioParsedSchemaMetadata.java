@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.sampler.schemaregistry.schema;
+package com.sngular.kloadgen.sampler.schemaregistry.adapter.impl;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,11 +7,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ApicurioParsedSchema {
-
-  private String type;
+public class ApicurioParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   private Object schema;
 
   private String rawSchema;
+
+  private String type;
+
 }

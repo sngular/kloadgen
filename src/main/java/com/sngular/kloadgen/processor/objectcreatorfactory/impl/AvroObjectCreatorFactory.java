@@ -18,7 +18,10 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -45,6 +48,14 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
       this.schema = (Schema) ((ParsedSchema) schema).rawSchema();
     } else if (schema instanceof Schema) {
       this.schema = (Schema) schema;
+    } else if (schema instanceof BaseParsedSchema) {
+      final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
+      final ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
+      if (adapterParse instanceof ApicurioParsedSchemaMetadata) {
+        this.schema = (Schema) ((ApicurioParsedSchemaMetadata) adapterParse).getSchema();
+      } else {
+        this.schema = adapterParse.getRawSchema();
+      }
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }
