@@ -26,6 +26,17 @@
 
   <developers>
     <developer>
+      <id>AnxoGomezSngular</id>
+      <name>Anxo Gómez Sánchez</name>
+      <email>anxo.gomez@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
       <id>jegarcia</id>
       <name>Jose Enrique Garcia Maciñeiras</name>
       <email>joseenrique.garcia@sngular.com</email>
