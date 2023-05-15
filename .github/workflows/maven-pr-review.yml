@@ -9,7 +9,7 @@ concurrency: pr-${{ github.event.pull_request.id }}
 jobs:
   check-labels:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.mergeable == true && github.event.review.state == 'approved'
+    if: github.event.review.state == 'approved'
     steps:
       - name: Warn about missing labels
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') && !contains(github.event.pull_request.labels.*.name, 'documentation') }}
