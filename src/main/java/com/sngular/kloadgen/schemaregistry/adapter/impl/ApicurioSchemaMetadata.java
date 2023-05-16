@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.sampler.schemaregistry.adapter.impl;
+package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
 import java.util.Collections;
 import java.util.Date;
@@ -10,7 +10,7 @@ import io.apicurio.registry.types.ArtifactState;
 import lombok.Getter;
 
 @Getter
-public class ApicurioSchemaMetadata extends SchemaMetadataAdapter {
+public class ApicurioSchemaMetadata implements SchemaMetadataAdapter {
 
   private final String id;
 

@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.sampler.schemaregistry.adapter.impl;
+package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

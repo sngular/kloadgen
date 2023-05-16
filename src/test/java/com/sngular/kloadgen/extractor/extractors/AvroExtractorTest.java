@@ -5,7 +5,6 @@ import java.util.List;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import org.apache.avro.Schema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ class AvroExtractorTest {
   void testFlatPropertiesEmbeddedAvros() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/embedded-avros-example-test.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
@@ -43,7 +42,7 @@ class AvroExtractorTest {
   void testOptionalEnum() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
@@ -67,7 +66,7 @@ class AvroExtractorTest {
   void testFlatPropertiesOptionalMapArray() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testOptionalMap.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
@@ -97,7 +96,7 @@ class AvroExtractorTest {
   @DisplayName("Should extract Map of Record")
   void testFlatPropertiesMap() throws Exception {
     final String testFile = fileHelper.getContent("/avro-files/testMap.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
@@ -130,7 +129,7 @@ class AvroExtractorTest {
   void testFlatPropertiesLogicalTypes() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testLogicalTypes.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
@@ -161,7 +160,7 @@ class AvroExtractorTest {
   void testFlatPropertiesOptionalArray() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/issue.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
@@ -182,7 +181,7 @@ class AvroExtractorTest {
   void testFlatPropertiesUnionRecordAvros() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 
@@ -213,7 +212,7 @@ class AvroExtractorTest {
   void testFlatPropertiesRecordUnionReverseOrder() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionReverseOrder.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getParsedSchema(testFile);
+    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
 
     final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
 

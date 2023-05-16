@@ -22,6 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.sngular.kloadgen.common.SchemaTypeEnum;
+import com.sngular.kloadgen.extractor.SchemaExtractor;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.util.AutoCompletion;
+import com.sngular.kloadgen.util.PropsKeysHelper;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -29,15 +35,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
-
-import com.sngular.kloadgen.common.SchemaTypeEnum;
-import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.util.AutoCompletion;
-import com.sngular.kloadgen.util.PropsKeysHelper;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.AvroRuntimeException;
 import org.apache.jmeter.gui.ClearGui;
@@ -58,11 +55,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private final JPanel panel = new JPanel();
 
-  private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
-
   private final JButton openFileDialogButton = new JButton(JMeterUtils.getResString("file_visualizer_open"));
 
-  private ParsedSchema parserSchema;
+  private List<String> parserSchema;
 
   private JComboBox<String> schemaTypeComboBox;
 
@@ -109,10 +104,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
       final File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
       try {
         final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
-        parserSchema = schemaExtractor.schemaTypesList(subjectName, schemaType);
+        parserSchema = SchemaExtractor.schemaTypesList(subjectName, schemaType);
         subjectNameComboBox.removeAllItems();
-        subjectNameComboBox.addItem(parserSchema.name());
-        subjectNameComboBox.setSelectedItem(parserSchema.name());
+        subjectNameComboBox.addItem(parserSchema.get(0));
+        subjectNameComboBox.setSelectedItem(parserSchema.get(0));
       } catch (final IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
                                       JOptionPane.ERROR_MESSAGE);
@@ -129,7 +124,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   public final List<FieldValueMapping> getAttributeList(final ParsedSchema selectedSchema) {
     final List<FieldValueMapping> result = new ArrayList<>();
     if (Objects.nonNull(selectedSchema)) {
-      result.addAll(schemaExtractor.flatPropertiesList(selectedSchema));
+      result.addAll(SchemaExtractor.flatPropertiesList(selectedSchema));
     }
     return result;
   }

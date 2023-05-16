@@ -8,35 +8,27 @@ import java.util.Properties;
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.extractor.extractors.protobuff.ProtoBufConfluentExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
 
-public class ExtractorFactory {
-  private final AvroExtractor avroExtractor;
+public final class ExtractorFactory {
+  private static AvroExtractor avroExtractor = new AvroExtractor();
 
-  private final JsonExtractor jsonExtractor;
+  private static JsonExtractor jsonExtractor = new JsonExtractor();
 
-  private final ProtoBufExtractor protoBufExtractor;
+  private static ProtoBufConfluentExtractor protoBufConfluentExtractor = new ProtoBufConfluentExtractor();
 
-  public ExtractorFactory() {
-    this.avroExtractor = new AvroExtractor();
-    this.jsonExtractor = new JsonExtractor();
-    this.protoBufExtractor = new ProtoBufExtractor();
+  private ExtractorFactory() {
   }
 
-  public ExtractorFactory(final AvroExtractor avroExtractor, final JsonExtractor jsonExtractor, final ProtoBufExtractor protoBufExtractor) {
-    this.avroExtractor = avroExtractor;
-    this.jsonExtractor = jsonExtractor;
-    this.protoBufExtractor = protoBufExtractor;
-  }
-
-  public Extractor getExtractor(final String schemaType) {
+  public static Extractor getExtractor(final String schemaType) {
     if (schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
       final Extractor response;
       switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
@@ -47,7 +39,7 @@ public class ExtractorFactory {
           response = avroExtractor;
           break;
         case PROTOBUF:
-          response = protoBufExtractor;
+          response = protoBufConfluentExtractor;
           break;
         default:
           throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
@@ -58,7 +50,7 @@ public class ExtractorFactory {
     }
   }
 
-  public Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) {
+  public static Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) {
     final Properties properties = JMeterContextService.getContext().getProperties();
 
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
@@ -68,14 +60,16 @@ public class ExtractorFactory {
     schemaType = parsedSchemaAdapter.getType();
 
     final List<FieldValueMapping> attributeList = new ArrayList<>();
-    if(Objects.nonNull(registryName)) {
+    if (Objects.nonNull(registryName)) {
       switch (SchemaRegistryEnum.valueOf(registryName.toUpperCase())) {
         case APICURIO:
-          this.getExtractor(schemaType).processApicurioParsedSchema(((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema());
+          getExtractor(schemaType).processSchema(((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema());
           break;
         case CONFLUENT:
-          this.getExtractor(schemaType).processConfluentParsedSchema(parsedSchemaAdapter.getRawSchema());
+          getExtractor(schemaType).processSchema(parsedSchemaAdapter.getRawSchema());
           break;
+        default:
+          throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
       }
     }
     return Pair.of(schemaType, attributeList);

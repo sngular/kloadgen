@@ -20,8 +20,8 @@ import java.util.Objects;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.PropertyMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;

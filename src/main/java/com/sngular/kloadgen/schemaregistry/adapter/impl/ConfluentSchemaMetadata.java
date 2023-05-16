@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.sampler.schemaregistry.adapter.impl;
+package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 import lombok.Getter;
 
 @Getter
-public class ConfluentSchemaMetadata extends SchemaMetadataAdapter {
+public class ConfluentSchemaMetadata implements SchemaMetadataAdapter {
 
   private Integer id;
 

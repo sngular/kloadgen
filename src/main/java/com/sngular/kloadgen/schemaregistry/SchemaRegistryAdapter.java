@@ -1,11 +1,11 @@
-package com.sngular.kloadgen.sampler.schemaregistry;
+package com.sngular.kloadgen.schemaregistry;
 
 import java.util.Collection;
 import java.util.Map;
 
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 
 public interface SchemaRegistryAdapter {
 

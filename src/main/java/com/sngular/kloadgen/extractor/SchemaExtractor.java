@@ -1,20 +1,54 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package com.sngular.kloadgen.extractor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import org.apache.commons.lang3.tuple.Pair;
 
-public interface SchemaExtractor {
+public final class SchemaExtractor {
 
-  Pair<String, List<FieldValueMapping>> flatPropertiesList(String subjectName) throws IOException, RestClientException;
+  private SchemaExtractor() {
+  }
 
-  List<FieldValueMapping> flatPropertiesList(ParsedSchema parserSchema);
+  public static Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) {
+    return ExtractorFactory.flatPropertiesList(subjectName);
+  }
 
-  ParsedSchema schemaTypesList(File schemaFile, String schemaType) throws IOException;
+  public static List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
+    return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema);
+  }
+
+  public static List<String> schemaTypesList(final File schemaFile, final String schemaType) throws IOException {
+    return ExtractorFactory.getExtractor(schemaType).getSchemaNameList(readLineByLine(schemaFile.getPath()));
+  }
+
+  private static String readLineByLine(final String filePath) throws IOException {
+    final StringBuilder contentBuilder = new StringBuilder();
+
+    try (Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
+      stream.forEach(s -> contentBuilder.append(s).append("\n"));
+    }
+
+    return contentBuilder.toString();
+  }
+
+  private static List<FieldValueMapping> processSchema(final ParsedSchema schema) {
+    return new ArrayList<>(ExtractorFactory.getExtractor(schema.schemaType()).processSchema(schema));
+  }
 
 }

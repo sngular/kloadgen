@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.sampler.schemaregistry;
+package com.sngular.kloadgen.schemaregistry;
 
 public final class SchemaRegistryConstants {
 

@@ -8,26 +8,24 @@ import java.util.Set;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.commons.collections4.IteratorUtils;
 
-public class AvroExtractor implements Extractor{
+public class AvroExtractor implements Extractor<AvroSchema> {
 
   private final Set<Schema.Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
 
   private final RandomObject randomObject = new RandomObject();
 
-  public final List<FieldValueMapping> processSchema(final Object schemaReceived) {
-    var schema = ((AvroSchema) schemaReceived).rawSchema();
+  public final List<FieldValueMapping> processSchema(final AvroSchema schemaReceived) {
     final var attributeList = new ArrayList<FieldValueMapping>();
-    schema.getFields().forEach(field -> processField(field, attributeList, true, true));
+    schemaReceived.rawSchema().getFields().forEach(field -> processField(field, attributeList, true, true));
     return attributeList;
   }
 
-  public final ParsedSchema getParsedSchema(final String schema) {
+  public final List<String> getSchemaNameList(final String schema) {
     final var parsed = new AvroSchema(schema);
     final Schema schemaObj = parsed.rawSchema();
     var result = parsed;
@@ -38,17 +36,7 @@ public class AvroExtractor implements Extractor{
     return result;
   }
 
-  public List<FieldValueMapping> processApicurioParsedSchema(final Object schema){
-    final var attributeList = new ArrayList<FieldValueMapping>();
-    ((Schema) schema).getFields().forEach(field -> this.processField(field, attributeList, true, false));
-    return attributeList;
-  }
-
-  public List<FieldValueMapping> processConfluentParsedSchema(final Object schema){
-    return this.processApicurioParsedSchema(schema);
-  }
-
-  public final void processField(final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
+  private final void processField(final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
     if (checkIfRecord(innerField.schema())) {
       processRecordFieldList(innerField.name(), ".", processFieldList(innerField.schema().getFields(), isAncestorRequired), completeFieldList);
     } else if (checkIfArray(innerField.schema())) {

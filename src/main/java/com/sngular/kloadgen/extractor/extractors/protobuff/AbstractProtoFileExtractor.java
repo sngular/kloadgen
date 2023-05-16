@@ -1,9 +1,8 @@
-package com.sngular.kloadgen.extractor.extractors;
+package com.sngular.kloadgen.extractor.extractors.protobuff;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,15 +18,12 @@ import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.OneOfElement;
-import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class ProtoBufExtractor implements Extractor{
+public abstract class AbstractProtoFileExtractor {
 
   public static final String ARRAY_POSTFIX = "-array";
 
@@ -35,37 +31,13 @@ public class ProtoBufExtractor implements Extractor{
 
   public static final String UNSUPPORTED_TYPE_OF_VALUE = "Something Odd Just Happened: Unsupported type of value";
 
-  public final List<FieldValueMapping> processSchema(final Object schemaReceived) {
-    var schema =((ProtobufSchema) schemaReceived).rawSchema();
-    final List<FieldValueMapping> attributeList = new ArrayList<>();
-    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-    schema.getTypes().forEach(field -> processField(field, attributeList, schema.getImports(), true, nestedTypes));
-    return attributeList;
+  protected AbstractProtoFileExtractor() {
   }
 
-  public final ParsedSchema getParsedSchema(final String schema){
-    return new ProtobufSchema(schema);
-  }
-
-  public List<FieldValueMapping> processApicurioParsedSchema(final Object schema){
-    final List<FieldValueMapping> attributeList = new ArrayList<>();
-    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-    final var protoFileElement = ((io.apicurio.registry.utils.protobuf.schema.ProtobufSchema) schema).getProtoFileElement();
-    protoFileElement.getTypes().forEach(field -> this.processField(field, attributeList, protoFileElement.getImports(), false, nestedTypes));
-    return attributeList;
-  }
-
-  public List<FieldValueMapping> processConfluentParsedSchema(final Object schema){
-    final List<FieldValueMapping> attributeList = new ArrayList<>();
-    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
-    final var protoFileElement = (ProtoFileElement) schema;
-    protoFileElement.getTypes().forEach(field -> this.processField(field, attributeList, protoFileElement.getImports(), false, nestedTypes));
-    return attributeList;
-  }
-
-  public final void processField(final TypeElement field, final List<FieldValueMapping> completeFieldList,
-                                 final List<String> imports, final boolean isAncestorRequired,
-                                 final Map<String, TypeElement> nestedTypes) {
+  public static void processField(
+      final TypeElement field, final List<FieldValueMapping> completeFieldList,
+      final List<String> imports, final boolean isAncestorRequired,
+      final Map<String, TypeElement> nestedTypes) {
     fillNestedTypes(field, nestedTypes);
     if (field instanceof MessageElement) {
       final var messageField = (MessageElement) field;
@@ -73,24 +45,7 @@ public class ProtoBufExtractor implements Extractor{
         extractOneOfs((MessageElement) field, completeFieldList, nestedTypes, isAncestorRequired);
       }
       for (var subfield : messageField.getFields()) {
-        final Field.Label label = checkNullLabel(subfield);
-        final boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
-        final boolean isOptional = "optional".equals(Objects.requireNonNull(label.toString()));
-        final boolean isMap = subfield.getType().startsWith("map");
-        if (ProtobufHelper.isValidType(subfield.getType())) {
-          extractPrimitiveTypes(completeFieldList, subfield, isArray, !isOptional, isAncestorRequired);
-        } else if (isMap) {
-          extractMapType(completeFieldList, nestedTypes, subfield, imports, !isOptional, isAncestorRequired);
-        } else {
-          final String dotType = checkDotType(subfield.getType(), imports);
-          if (nestedTypes.containsKey(subfield.getType())) {
-            extractNestedTypes(completeFieldList, nestedTypes, subfield, isArray, imports, !isOptional, isAncestorRequired);
-          } else if (nestedTypes.containsKey(dotType)) {
-            completeFieldList.addAll(extractDotTypesWhenIsInNestedType(nestedTypes, subfield, isArray, dotType, imports, !isOptional, isAncestorRequired));
-          } else {
-            completeFieldList.add(extractDotTypeWhenNotNestedType(subfield, isArray, dotType, !isOptional, isAncestorRequired));
-          }
-        }
+        processField(subfield, completeFieldList, imports, isAncestorRequired, nestedTypes);
       }
     } else if (field instanceof EnumElement) {
       final var values = extractEnums((EnumElement) field);
@@ -102,13 +57,36 @@ public class ProtoBufExtractor implements Extractor{
     }
   }
 
-  private List<FieldValueMapping> processFieldList(final TypeElement fieldList, final List<String> imports, final Map<String, TypeElement> nestedTypes) {
+  private static void processField(
+      final FieldElement field,
+      final List<FieldValueMapping> completeFieldList, final List<String> imports, final boolean isAncestorRequired, final Map<String, TypeElement> nestedTypes) {
+    final Field.Label label = checkNullLabel(field);
+    final boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
+    final boolean isOptional = "optional".equals(Objects.requireNonNull(label.toString()));
+    final boolean isMap = field.getType().startsWith("map");
+    if (ProtobufHelper.isValidType(field.getType())) {
+      extractPrimitiveTypes(completeFieldList, field, isArray, !isOptional, isAncestorRequired);
+    } else if (isMap) {
+      extractMapType(completeFieldList, nestedTypes, field, imports, !isOptional, isAncestorRequired);
+    } else {
+      final String dotType = checkDotType(field.getType(), imports);
+      if (nestedTypes.containsKey(field.getType())) {
+        extractNestedTypes(completeFieldList, nestedTypes, field, isArray, imports, !isOptional, isAncestorRequired);
+      } else if (nestedTypes.containsKey(dotType)) {
+        completeFieldList.addAll(extractDotTypesWhenIsInNestedType(nestedTypes, field, isArray, dotType, imports, !isOptional, isAncestorRequired));
+      } else {
+        completeFieldList.add(extractDotTypeWhenNotNestedType(field, isArray, dotType, !isOptional, isAncestorRequired));
+      }
+    }
+  }
+
+  private static List<FieldValueMapping> processFieldList(final TypeElement fieldList, final List<String> imports, final Map<String, TypeElement> nestedTypes) {
     final List<FieldValueMapping> completeFieldList = new ArrayList<>();
     processField(fieldList, completeFieldList, imports, false, nestedTypes);
     return completeFieldList;
   }
 
-  private void extractOneOfs(
+  private static void extractOneOfs(
       final MessageElement field, final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final boolean isAncestorRequired) {
     final List<OneOfElement> oneOfs = new ArrayList<>(field.getOneOfs());
     for (OneOfElement oneOfElement : oneOfs) {
@@ -130,7 +108,8 @@ public class ProtoBufExtractor implements Extractor{
     }
   }
 
-  private FieldValueMapping extractDotTypeWhenNotNestedType(final FieldElement subfield, final boolean isArray, final String dotType, final boolean isRequired,
+  private static FieldValueMapping extractDotTypeWhenNotNestedType(
+      final FieldElement subfield, final boolean isArray, final String dotType, final boolean isRequired,
       final boolean isAncestorRequired) {
     final FieldValueMapping completeFieldList;
     if (isArray) {
@@ -142,7 +121,7 @@ public class ProtoBufExtractor implements Extractor{
     return completeFieldList;
   }
 
-  private void extractMapType(
+  private static void extractMapType(
       final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final FieldElement subfield, final List<String> imports,
       final boolean isRequired, final boolean isAncestorRequired) {
     final String subFieldType = extractInternalMapFields(subfield);
@@ -163,12 +142,12 @@ public class ProtoBufExtractor implements Extractor{
     }
   }
 
-  private String extractInternalMapFields(final FieldElement subfield) {
+  private static String extractInternalMapFields(final FieldElement subfield) {
     final String[] mapSplit = subfield.getType().split(",");
     return mapSplit[1].replace(">", "").trim();
   }
 
-  private void extractPrimitiveTypes(
+  private static void extractPrimitiveTypes(
       final List<FieldValueMapping> completeFieldList, final FieldElement subfield, final boolean isArray, final boolean isRequired, final boolean isAncestorRequired) {
     if (isArray) {
       completeFieldList.add(FieldValueMapping.builder().fieldName(subfield.getName() + "[]")
@@ -181,7 +160,7 @@ public class ProtoBufExtractor implements Extractor{
     }
   }
 
-  private List<FieldValueMapping> extractDotTypesWhenIsInNestedType(
+  private static List<FieldValueMapping> extractDotTypesWhenIsInNestedType(
       final Map<String, TypeElement> nestedTypes, final FieldElement subfield, final boolean isArray, final String dotType,
       final List<String> imports, final boolean isRequired, final boolean isAncestorRequired) {
     final List<FieldValueMapping> finalFieldValueMapping = new ArrayList<>();
@@ -200,7 +179,7 @@ public class ProtoBufExtractor implements Extractor{
     return finalFieldValueMapping;
   }
 
-  private void extractNestedTypes(
+  private static void extractNestedTypes(
       final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final FieldElement subfield, final boolean isArray,
       final List<String> imports, final boolean isRequired, final boolean isAncestorRequired) {
     final List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(subfield.getType()), imports, nestedTypes);
@@ -228,11 +207,11 @@ public class ProtoBufExtractor implements Extractor{
     }
   }
 
-  private String buildFieldName(final String fieldName, final String lastFieldName, final String splitter) {
+  private static String buildFieldName(final String fieldName, final String lastFieldName, final String splitter) {
     return StringUtils.isNotEmpty(lastFieldName) ? fieldName + splitter + lastFieldName : fieldName;
   }
 
-  private void extractNestedTypesMap(
+  private static void extractNestedTypesMap(
       final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final FieldElement subfield, final List<String> imports,
       final boolean isRequired, final boolean isAncestorRequired) {
     final List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(extractInternalMapFields(subfield)), imports, nestedTypes);
@@ -248,12 +227,12 @@ public class ProtoBufExtractor implements Extractor{
     }
   }
 
-  private String getValueList(final FieldValueMapping fieldValueMapping) {
+  private static String getValueList(final FieldValueMapping fieldValueMapping) {
     final var valueList = fieldValueMapping.getFieldValuesList().toString();
     return "[]".equalsIgnoreCase(valueList) ? "" : valueList;
   }
 
-  private void extractDotTypesMap(
+  private static void extractDotTypesMap(
       final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final FieldElement subfield, final String dotType,
       final List<String> imports, final boolean isRequired, final boolean isAncestorRequired) {
     final List<FieldValueMapping> fieldValueMappingList = processFieldList(nestedTypes.get(dotType), imports, nestedTypes);
@@ -265,12 +244,12 @@ public class ProtoBufExtractor implements Extractor{
     }
   }
 
-  private String extractEnums(final EnumElement field) {
+  private static String extractEnums(final EnumElement field) {
     final var enumConstantList = CollectionUtils.collect(field.getConstants(), EnumConstantElement::getName);
     return String.join(",", enumConstantList);
   }
 
-  private String checkDotType(final String subfieldType, final List<String> imports) {
+  private static String checkDotType(final String subfieldType, final List<String> imports) {
     String dotType = subfieldType;
     if (subfieldType.startsWith(".") || subfieldType.contains(".")) {
       final String[] typeSplit = subfieldType.split("\\.");
@@ -280,7 +259,7 @@ public class ProtoBufExtractor implements Extractor{
     return dotType;
   }
 
-  private boolean isExternalType(final List<String> imports, final String fieldType) {
+  private static boolean isExternalType(final List<String> imports, final String fieldType) {
     boolean externalType = false;
     for (String importType : imports) {
       final Pattern pattern = Pattern.compile("(/([^/]+)\\.)");
@@ -301,7 +280,7 @@ public class ProtoBufExtractor implements Extractor{
     return externalType;
   }
 
-  private boolean isExternalTypeByURL(final String importType, final String fieldType) {
+  private static boolean isExternalTypeByURL(final String importType, final String fieldType) {
     String[] importTypeSplitted = importType.split("/");
     importTypeSplitted = Arrays.copyOf(importTypeSplitted, importTypeSplitted.length - 1);
     String[] fieldTypeSplitted = fieldType.split("\\.");
@@ -312,7 +291,7 @@ public class ProtoBufExtractor implements Extractor{
     return stringFieldSplitted.equals(stringImportSplitted);
   }
 
-  private Field.Label checkNullLabel(final FieldElement subfield) {
+  private static Field.Label checkNullLabel(final FieldElement subfield) {
     final Field.Label label;
     if (Objects.nonNull(subfield.getLabel())) {
       label = subfield.getLabel();
@@ -322,7 +301,7 @@ public class ProtoBufExtractor implements Extractor{
     return label;
   }
 
-  private void fillNestedTypes(final TypeElement field, final Map<String, TypeElement> nestedTypes) {
+  private static void fillNestedTypes(final TypeElement field, final Map<String, TypeElement> nestedTypes) {
     if (!field.getNestedTypes().isEmpty()) {
       for (var nestedField : field.getNestedTypes()) {
         nestedTypes.put(nestedField.getName(), nestedField);

@@ -6,28 +6,22 @@
 
 package com.sngular.kloadgen.sampler;
 
+import static com.sngular.kloadgen.serializer.SerializerTestFixture.createFieldValueMapping;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.stream.Stream;
 
 import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
-import com.sngular.kloadgen.loadgen.impl.AvroSRLoadGenerator;
-import com.sngular.kloadgen.loadgen.impl.SRLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.processor.SchemaProcessor;
-import com.sngular.kloadgen.processor.fixture.AvroSchemaFixturesConstants;
 import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import org.apache.commons.math3.util.Pair;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -37,15 +31,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static com.sngular.kloadgen.serializer.SerializerTestFixture.createFieldValueMapping;
-
 class SamplerUtilTest {
 
     private JMeterContext jmcx;
 
     private final FileHelper fileHelper = new FileHelper();
 
-    private final SchemaExtractor extractor = new SchemaExtractorImpl();
+    private final SchemaExtractor extractor = new SchemaExtractor();
 
     private static Stream<Object> parametersForConfigureValueGeneratorTest() {
         return Stream.of("localhost:8081", "");

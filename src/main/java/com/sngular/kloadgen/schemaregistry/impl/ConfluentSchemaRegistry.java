@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.sampler.schemaregistry.impl;
+package com.sngular.kloadgen.schemaregistry.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryConstants;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryConstants;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchemaProvider;
@@ -47,14 +47,14 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public void setSchemaRegistryClient(String url, Map<String, ?> properties) {
+  public void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
     this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
                                                                List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);
   }
 
   @Override
-  public void setSchemaRegistryClient(Map<String, ?> properties) {
-    String url = properties.get(this.getSchemaRegistryUrlKey()).toString();
+  public void setSchemaRegistryClient(final Map<String, ?> properties) {
+    final String url = properties.get(this.getSchemaRegistryUrlKey()).toString();
     this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
                                                                List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);
 
