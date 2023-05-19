@@ -15,6 +15,7 @@
   - [Producer configuration](producer-configuration.md)
   - [Consumer configuration](consumer-configuration.md)
   - [Schemas](schemas.md)
+  - [Schema Registry](schema-registry.md)
 
 # Knowledge center
   - [How to run a test plan](how-to-run.md)
