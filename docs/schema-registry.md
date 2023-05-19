@@ -1,7 +1,7 @@
 # Configuration Schema Registry
 
 Although we support the use of schemas without external dependencies such as Schema Registry, it is common to use it, since it allows to
-have a control of the schemas with versions.
+have control of the schemas with versions.
 
 To choose the use of Schema Registry it is necessary to do it in the following way introducing the basic properties that appear in the
 image:
@@ -21,8 +21,7 @@ A list of the properties explained here:
 To avoid having unclear schemas, when use Apicurio they recommend using this functionality instead of auto-generating.
 https://www.apicur.io/registry/docs/apicurio-registry/2.1.x/assets-attachments/registry-rest-api.htm#tag/Artifacts/operation/createArtifact
 
-In Confluent Schema Registry instead they take the SubjectName as ID, so remember this if you see a different name in your Schema List
-
+However, in Confluent Schema Registry, they take the SubjectName as ID, so remember it if you see a different name in your Schema List.
 
 
 
