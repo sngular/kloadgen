@@ -1,23 +1,28 @@
-package com.sngular.kloadgen.extractor.extractors;
+package com.sngular.kloadgen.extractor.extractors.json;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
-import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import org.assertj.core.api.Assertions;
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
+import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class JsonExtractorTest {
+class JsonDefaultTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final JsonExtractor jsonExtractor = new JsonExtractor();
+  private final JsonDefaultExtractor jsonDefaultExtractor = new JsonDefaultExtractor();
+
+  public final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
 
   @Test
   @DisplayName("Should extract basic types")
@@ -25,8 +30,9 @@ class JsonExtractorTest {
     final String testFile = fileHelper.getContent("/jsonschema/basic.jcs");
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
-
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -43,8 +49,9 @@ class JsonExtractorTest {
     final String testFile = fileHelper.getContent("/jsonschema/basic-array.jcs");
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
-
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -68,7 +75,9 @@ class JsonExtractorTest {
                                                                         ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE, "0", ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE, "0",
                                                                         ConstraintTypeEnum.MULTIPLE_OF, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(2)
@@ -78,6 +87,7 @@ class JsonExtractorTest {
               );
   }
 
+
   @Test
   @DisplayName("Should extract optional collections and optional collections inside objects")
   void testFlatPropertiesOptionalCollections() throws Exception {
@@ -85,7 +95,9 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(12)
@@ -121,7 +133,9 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -149,7 +163,9 @@ class JsonExtractorTest {
     final Map<ConstraintTypeEnum, String> constraintsCode = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "2", ConstraintTypeEnum.MAXIMUM_VALUE, "3");
     final Map<ConstraintTypeEnum, String> constraintsFreeForm = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "1", ConstraintTypeEnum.MAXIMUM_VALUE, "256");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .contains(
@@ -171,7 +187,9 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0", ConstraintTypeEnum.REGEX, "^(.*)$");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .contains(
@@ -186,7 +204,9 @@ class JsonExtractorTest {
   void testMultipleType() throws Exception {
     final String testFile = fileHelper.getContent("/jsonschema/multiple-type-single.jcs");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(1)
@@ -202,7 +222,9 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -229,7 +251,9 @@ class JsonExtractorTest {
 
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
 
-    final List<FieldValueMapping> fieldValueMappingList = jsonExtractor.processSchema(new JsonSchema(testFile));
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList).contains(
         FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
@@ -244,8 +268,11 @@ class JsonExtractorTest {
   @DisplayName("Should capture 3+ level exception in collections. Three levels of nested collections are not allowed")
   void testFlatPropertiesCaptureThreeLevelException() throws Exception {
     final String testFile = fileHelper.getContent("/jsonschema/test-level-nested-exception.jcs");
+    final JSONObject jsonObject = new JSONObject(testFile);
+    final Schema schema = SchemaLoader.load(jsonObject);
+
     Assertions.assertThatExceptionOfType(KLoadGenException.class)
-              .isThrownBy(() -> jsonExtractor.processSchema(new JsonSchema(testFile)))
+              .isThrownBy(() -> jsonDefaultExtractor.processSchema(schema))
               .withMessage("Wrong Json Schema, 3+ consecutive nested collections are not allowed");
   }
 

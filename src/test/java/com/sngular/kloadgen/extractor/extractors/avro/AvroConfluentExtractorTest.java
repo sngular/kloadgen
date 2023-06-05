@@ -1,28 +1,29 @@
-package com.sngular.kloadgen.extractor.extractors;
+package com.sngular.kloadgen.extractor.extractors.avro;
 
 import java.util.List;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class AvroExtractorTest {
+class AvroConfluentExtractorTest {
+
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final AvroExtractor avroExtractor = new AvroExtractor();
+  private final AvroConfluentExtractor avroConfluentExtractor = new AvroConfluentExtractor();
+
 
   @Test
   @DisplayName("Should extract Embedded Record")
   void testFlatPropertiesEmbeddedAvros() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/embedded-avros-example-test.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(4)
@@ -42,9 +43,8 @@ class AvroExtractorTest {
   void testOptionalEnum() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(1)
@@ -66,9 +66,8 @@ class AvroExtractorTest {
   void testFlatPropertiesOptionalMapArray() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testOptionalMap.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -96,9 +95,8 @@ class AvroExtractorTest {
   @DisplayName("Should extract Map of Record")
   void testFlatPropertiesMap() throws Exception {
     final String testFile = fileHelper.getContent("/avro-files/testMap.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(9)
@@ -129,9 +127,8 @@ class AvroExtractorTest {
   void testFlatPropertiesLogicalTypes() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testLogicalTypes.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(10)
@@ -160,9 +157,8 @@ class AvroExtractorTest {
   void testFlatPropertiesOptionalArray() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/issue.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -181,9 +177,8 @@ class AvroExtractorTest {
   void testFlatPropertiesUnionRecordAvros() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -212,9 +207,8 @@ class AvroExtractorTest {
   void testFlatPropertiesRecordUnionReverseOrder() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionReverseOrder.avsc");
-    final ParsedSchema parsedSchema = avroExtractor.getSchemaNameList(testFile);
-
-    final List<FieldValueMapping> fieldValueMappingList = avroExtractor.processSchema(parsedSchema);
+    final AvroSchema schema = new AvroSchema(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(5)

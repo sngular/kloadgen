@@ -8,7 +8,9 @@ import java.util.Properties;
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.extractor.extractors.protobuff.ProtoBufConfluentExtractor;
+import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
+import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
+import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
@@ -23,14 +25,17 @@ public final class ExtractorFactory {
 
   private static JsonExtractor jsonExtractor = new JsonExtractor();
 
-  private static ProtoBufConfluentExtractor protoBufConfluentExtractor = new ProtoBufConfluentExtractor();
+  private static ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
 
   private ExtractorFactory() {
   }
 
-  public static Extractor getExtractor(final String schemaType) {
+  public static ExtractorRegistry getExtractor(final String schemaType, final String schemaRegistryEnum) {
+
+    SchemaRegistryEnum registryEnum = getSchemaRegistry(schemaRegistryEnum);
+
     if (schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
-      final Extractor response;
+      final ExtractorRegistry response;
       switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
         case JSON:
           response = jsonExtractor;
@@ -39,7 +44,7 @@ public final class ExtractorFactory {
           response = avroExtractor;
           break;
         case PROTOBUF:
-          response = protoBufConfluentExtractor;
+          response = protobuffExtractor;
           break;
         default:
           throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
@@ -50,27 +55,41 @@ public final class ExtractorFactory {
     }
   }
 
+  public static SchemaRegistryEnum getSchemaRegistry(String schemaRegistryEnum) {
+    SchemaRegistryEnum registryEnum = null;
+    if (schemaRegistryEnum != null && EnumUtils.isValidEnum(SchemaRegistryEnum.class, schemaRegistryEnum.toUpperCase())) {
+      registryEnum = SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
+    } else {
+      throw new KLoadGenException(String.format("Schema Registry type not supported %s", schemaRegistryEnum));
+    }
+    return  registryEnum;
+  }
+
   public static Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) {
     final Properties properties = JMeterContextService.getContext().getProperties();
-
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     String schemaType = null;
     final ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
     schemaType = parsedSchemaAdapter.getType();
 
-    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    List<FieldValueMapping> attributeList = new ArrayList<>();
+    SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
+
+    Object schema = null;
     if (Objects.nonNull(registryName)) {
-      switch (SchemaRegistryEnum.valueOf(registryName.toUpperCase())) {
+      //TODO change parser
+      switch (schemaRegistryEnum) {
         case APICURIO:
-          getExtractor(schemaType).processSchema(((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema());
+          schema = ((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
           break;
         case CONFLUENT:
-          getExtractor(schemaType).processSchema(parsedSchemaAdapter.getRawSchema());
+          schema = parsedSchemaAdapter.getRawSchema();
           break;
         default:
           throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
       }
+      attributeList = getExtractor(schemaType,registryName.toUpperCase()).processSchema(schema, schemaRegistryEnum);
     }
     return Pair.of(schemaType, attributeList);
   }

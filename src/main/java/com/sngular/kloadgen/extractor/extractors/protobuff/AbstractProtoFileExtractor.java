@@ -1,14 +1,19 @@
 package com.sngular.kloadgen.extractor.extractors.protobuff;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.github.os72.protobuf.dynamic.DynamicSchema;
+import com.google.protobuf.Descriptors;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.util.ProtobufHelper;
@@ -18,6 +23,7 @@ import com.squareup.wire.schema.internal.parser.EnumElement;
 import com.squareup.wire.schema.internal.parser.FieldElement;
 import com.squareup.wire.schema.internal.parser.MessageElement;
 import com.squareup.wire.schema.internal.parser.OneOfElement;
+import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.TypeElement;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -32,6 +38,23 @@ public abstract class AbstractProtoFileExtractor {
   public static final String UNSUPPORTED_TYPE_OF_VALUE = "Something Odd Just Happened: Unsupported type of value";
 
   protected AbstractProtoFileExtractor() {
+  }
+
+  public List<FieldValueMapping>  processSchemaDefault(ProtoFileElement schema){
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
+    schema.getTypes().forEach(field -> processField(field, attributeList, schema.getImports(), true, nestedTypes));
+    return attributeList;
+  }
+
+  public List<String> getSchemaNameListDefault(String schema){
+    final DynamicSchema dynamicSchema;
+    try {
+      dynamicSchema = DynamicSchema.parseFrom(schema.getBytes(StandardCharsets.UTF_8));
+    } catch (Descriptors.DescriptorValidationException | IOException e) {
+      throw new KLoadGenException(e);
+    }
+    return new ArrayList<>(dynamicSchema.getMessageTypes());
   }
 
   public static void processField(

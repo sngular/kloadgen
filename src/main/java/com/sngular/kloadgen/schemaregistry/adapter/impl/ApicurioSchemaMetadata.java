@@ -69,4 +69,5 @@ public class ApicurioSchemaMetadata implements SchemaMetadataAdapter {
   public <T> List<T> getReferences() {
     return Collections.<T>emptyList();
   }
+
 }

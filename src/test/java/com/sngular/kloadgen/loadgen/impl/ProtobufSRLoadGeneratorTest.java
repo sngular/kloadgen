@@ -20,6 +20,8 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
+import com.sngular.kloadgen.testutil.FileHelper;
+import com.sngular.kloadgen.testutil.WireMockLoaderUtil;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
@@ -34,8 +36,13 @@ import org.junit.jupiter.api.Test;
 @WireMockTest
 class ProtobufSRLoadGeneratorTest {
 
+  private FileHelper fileHelper = new FileHelper();
+
+  private final WireMockLoaderUtil wireMockLoaderUtil = new WireMockLoaderUtil();
+
   @BeforeEach
   public void setUp(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+    wireMockLoaderUtil.setUpMocks(wmRuntimeInfo);
     final File file = new File("src/test/resources");
     final String absolutePath = file.getAbsolutePath();
     final String kloadPath = absolutePath + "/kloadgen.properties";
@@ -51,10 +58,11 @@ class ProtobufSRLoadGeneratorTest {
     jmcx.getProperties().putAll(properties);
     jmcx.setVariables(new JMeterVariables());
     JMeterUtils.setLocale(Locale.ENGLISH);
+
   }
 
   @Test
-  void testProtobufLoadGenerator(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
+  void testProtobufLoadGeneratorConfluent(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     final List<FieldValueMapping> fieldValueMappingList = Arrays.asList(
         FieldValueMapping.builder().fieldName("propertyTest1.importedProperty.nestedProperty").fieldType("string").valueLength(0).fieldValueList("").required(true)
@@ -86,4 +94,5 @@ class ProtobufSRLoadGeneratorTest {
     Assertions.assertThat(message.getGenericRecord().toString()).contains("propertyNumberOne");
     Assertions.assertThat(message.getGenericRecord().toString()).contains("propertyNumberTwo");
   }
+
 }

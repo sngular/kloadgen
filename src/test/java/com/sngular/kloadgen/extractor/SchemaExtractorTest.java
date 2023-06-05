@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -72,10 +73,10 @@ class SchemaExtractorTest {
   void testFlatPropertiesListWithAVRO() throws IOException, RestClientException {
 
     final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-    properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
+    properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.APICURIO.toString());
 
     final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
-    final var baseParsedSchema = new BaseParsedSchema<>(ConfluentParsedSchemaMetadata.parse(parsedSchema));
+    final var baseParsedSchema = new BaseParsedSchema<>(ApicurioParsedSchemaMetadata.parse(parsedSchema));
     jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
     final var result = SchemaExtractor.flatPropertiesList("avroSubject");

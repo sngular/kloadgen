@@ -1,42 +1,48 @@
-package com.sngular.kloadgen.extractor.extractors;
+package com.sngular.kloadgen.extractor.extractors.avro;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import com.sngular.kloadgen.extractor.extractors.SchemaExtractorUtil;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
-import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import org.apache.avro.Schema;
-import org.apache.avro.Schema.Type;
 import org.apache.commons.collections4.IteratorUtils;
 
-public class AvroExtractor implements Extractor<AvroSchema> {
+public abstract class AbstractAvroFileExtractor {
 
-  private final Set<Schema.Type> typesSet = EnumSet.of(Type.INT, Type.DOUBLE, Type.FLOAT, Type.BOOLEAN, Type.STRING, Type.LONG, Type.BYTES, Type.FIXED);
+  private final Set<Schema.Type> typesSet = EnumSet.of(Schema.Type.INT, Schema.Type.DOUBLE, Schema.Type.FLOAT, Schema.Type.BOOLEAN, Schema.Type.STRING, Schema.Type.LONG,
+                                                       Schema.Type.BYTES, Schema.Type.FIXED);
 
   private final RandomObject randomObject = new RandomObject();
 
-  public final List<FieldValueMapping> processSchema(final AvroSchema schemaReceived) {
+  protected AbstractAvroFileExtractor() {
+  }
+
+  public List<FieldValueMapping> processSchemaDefault(final Schema schemaReceived) {
     final var attributeList = new ArrayList<FieldValueMapping>();
-    schemaReceived.rawSchema().getFields().forEach(field -> processField(field, attributeList, true, true));
+    if (checkIfUnion(schemaReceived)) {
+      Schema last = schemaReceived.getTypes().get(schemaReceived.getTypes().size() - 1);
+      last.getFields().forEach(field -> processField(field, attributeList, true, true));
+    } else if (checkIfRecord(schemaReceived)) {
+      schemaReceived.getFields().forEach(field -> processField(field, attributeList, true, true));
+    }
+
     return attributeList;
   }
 
-  public final List<String> getSchemaNameList(final String schema) {
-    final var parsed = new AvroSchema(schema);
-    final Schema schemaObj = parsed.rawSchema();
-    var result = parsed;
-    if (checkIfUnion(schemaObj)) {
-      final Schema lastElement = schemaObj.getTypes().get(schemaObj.getTypes().size() - 1);
-      result = new AvroSchema(lastElement.toString());
-    }
+  public List<String> getSchemaNameList(Schema schema) {
+    List<String> result = new ArrayList<>();
+    result.addAll(extractSchemaNames(schema));
     return result;
   }
 
-  private final void processField(final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
+  public void processField(
+      final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
     if (checkIfRecord(innerField.schema())) {
       processRecordFieldList(innerField.name(), ".", processFieldList(innerField.schema().getFields(), isAncestorRequired), completeFieldList);
     } else if (checkIfArray(innerField.schema())) {
@@ -84,7 +90,8 @@ public class AvroExtractor implements Extractor<AvroSchema> {
     }
   }
 
-  private void processRecordFieldList(final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
+  private void processRecordFieldList(
+      final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
       final List<FieldValueMapping> completeFieldList) {
     internalFields.forEach(internalField -> {
       if (internalField.getFieldName().startsWith(fieldName + ".")) {
@@ -313,24 +320,24 @@ public class AvroExtractor implements Extractor<AvroSchema> {
     return schema.getType().getName();
   }
 
-  private boolean checkIfRecord(final Schema innerSchema) {
-    return Type.RECORD.equals(innerSchema.getType());
+  public boolean checkIfRecord(final Schema innerSchema) {
+    return Schema.Type.RECORD.equals(innerSchema.getType());
   }
 
-  private boolean checkIfMap(final Schema innerSchema) {
-    return Type.MAP.equals(innerSchema.getType());
+  public boolean checkIfMap(final Schema innerSchema) {
+    return Schema.Type.MAP.equals(innerSchema.getType());
   }
 
-  private boolean checkIfArray(final Schema innerSchema) {
-    return Type.ARRAY.equals(innerSchema.getType());
+  public boolean checkIfArray(final Schema innerSchema) {
+    return Schema.Type.ARRAY.equals(innerSchema.getType());
   }
 
-  private boolean checkIfUnion(final Schema innerSchema) {
-    return Type.UNION.equals(innerSchema.getType());
+  public boolean checkIfUnion(final Schema innerSchema) {
+    return Schema.Type.UNION.equals(innerSchema.getType());
   }
 
-  private boolean checkIfEnum(final Schema type) {
-    return Type.ENUM.equals(type.getType());
+  public boolean checkIfEnum(final Schema type) {
+    return Schema.Type.ENUM.equals(type.getType());
   }
 
   private boolean checkIfLogicalType(final Schema innerSchema) {
@@ -340,9 +347,28 @@ public class AvroExtractor implements Extractor<AvroSchema> {
   private boolean checkIfRequiredField(final Schema innerSchema) {
     boolean result = Boolean.TRUE;
     if (checkIfUnion(innerSchema)) {
-      result = !IteratorUtils.matchesAny(innerSchema.getTypes().iterator(), type -> type.getType() == Type.NULL);
+      result = !IteratorUtils.matchesAny(innerSchema.getTypes().iterator(), type -> type.getType() == Schema.Type.NULL);
     }
     return result;
+  }
+
+  public Set<String> extractSchemaNames(Schema schema) {
+    Set<String> schemaNames = new HashSet<>();
+    if (checkIfRecord(schema)) {
+      schemaNames.add(schema.getName());
+
+      List<Schema.Field> fields = schema.getFields();
+      for (Schema.Field field : fields) {
+        schemaNames.addAll(extractSchemaNames(field.schema()));
+      }
+    } else if (checkIfArray(schema)) {
+      schemaNames.addAll(extractSchemaNames(schema.getElementType()));
+    } else if (checkIfUnion(schema)) {
+      for (Schema subSchema : schema.getTypes()) {
+        schemaNames.addAll(extractSchemaNames(subSchema));
+      }
+    }
+    return schemaNames;
   }
 
 }

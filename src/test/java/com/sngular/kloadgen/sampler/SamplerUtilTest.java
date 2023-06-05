@@ -19,6 +19,7 @@ import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import com.sngular.kloadgen.testutil.FileHelper;
+import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -32,6 +33,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class SamplerUtilTest {
+
 
     private JMeterContext jmcx;
 
@@ -59,7 +61,7 @@ class SamplerUtilTest {
 
     public JMeterVariables getVariablesAvro() throws IOException {
         final File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-        final ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+        final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
         var variables = new JMeterVariables();
         variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "avro");
         variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "test");
@@ -77,7 +79,7 @@ class SamplerUtilTest {
     public JMeterVariables getVariablesProtobuf() throws IOException {
 
         final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
-        final ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "PROTOBUF");
+        final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "PROTOBUF");
         var variables = new JMeterVariables();
         variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "protobuf");
         variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "protobufSubject");
@@ -98,7 +100,7 @@ class SamplerUtilTest {
     public JMeterVariables getVariablesJsonSchema() throws IOException {
 
         final File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
-        final ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "JSON");
+        final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "JSON");
 
         var variables = new JMeterVariables();
         variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "JSON");

@@ -28,6 +28,7 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.util.AutoCompletion;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.AvroRuntimeException;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -104,8 +106,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
       final File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
       try {
         final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
-        parserSchema = SchemaExtractor.schemaTypesList(subjectName, schemaType);
+        parserSchema = SchemaExtractor.schemaTypesList(subjectName, schemaType, "CONFLUENT"); //TODO CHANGE
         subjectNameComboBox.removeAllItems();
+        //TODO CHANGE? get number of index (need debug)
         subjectNameComboBox.addItem(parserSchema.get(0));
         subjectNameComboBox.setSelectedItem(parserSchema.get(0));
       } catch (final IOException e) {
@@ -117,8 +120,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public final ParsedSchema getSelectedSchema(final String name) {
-    return parserSchema;
+  public final String getSelectedSchema(final String name) {
+    return parserSchema.indexOf(name) > 0 ? parserSchema.get(parserSchema.indexOf(name)) : null;
   }
 
   public final List<FieldValueMapping> getAttributeList(final ParsedSchema selectedSchema) {
@@ -131,11 +134,12 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   @Override
   public final void actionPerformed(final ActionEvent event) {
+
     if (subjectNameComboBox.getItemCount() != 0) {
       final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
       final String selectedItem = (String) subjectNameComboBox.getSelectedItem();
-      final ParsedSchema selectedSchema = getSelectedSchema(selectedItem);
-      final List<FieldValueMapping> attributeList = getAttributeList(selectedSchema);
+      final String selectedSchema = getSelectedSchema(selectedItem);
+      final List<FieldValueMapping> attributeList = Lists.newArrayList();
 
       if (!attributeList.isEmpty()) {
         try {
