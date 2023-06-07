@@ -56,13 +56,11 @@ public final class ExtractorFactory {
   }
 
   public static SchemaRegistryEnum getSchemaRegistry(String schemaRegistryEnum) {
-    SchemaRegistryEnum registryEnum = null;
     if (schemaRegistryEnum != null && EnumUtils.isValidEnum(SchemaRegistryEnum.class, schemaRegistryEnum.toUpperCase())) {
-      registryEnum = SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
+      return SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
     } else {
       throw new KLoadGenException(String.format("Schema Registry type not supported %s", schemaRegistryEnum));
     }
-    return  registryEnum;
   }
 
   public static Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) {

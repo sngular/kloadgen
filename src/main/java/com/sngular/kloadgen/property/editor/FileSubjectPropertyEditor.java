@@ -108,7 +108,6 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
         parserSchema = SchemaExtractor.schemaTypesList(subjectName, schemaType, "CONFLUENT"); //TODO CHANGE
         subjectNameComboBox.removeAllItems();
-        //TODO CHANGE? get number of index (need debug)
         subjectNameComboBox.addItem(parserSchema.get(0));
         subjectNameComboBox.setSelectedItem(parserSchema.get(0));
       } catch (final IOException e) {

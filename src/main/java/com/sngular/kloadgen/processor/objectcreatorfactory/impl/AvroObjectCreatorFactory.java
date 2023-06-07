@@ -138,11 +138,11 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   @Override
   public final void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
+      var aux = this.schema;
       if (Schema.Type.UNION.equals(this.schema.getType())) {
-        entity.put(objectName, new GenericData.Record(this.schema.getTypes().get(this.schema.getTypes().size() - 1)));
-      } else {
-        entity.put(objectName, new GenericData.Record(this.schema));
+        aux = this.schema.getTypes().get(this.schema.getTypes().size() - 1);
       }
+      entity.put(objectName, new GenericData.Record(aux));
     } else {
       Schema innerSchema = findSchema(completeFieldName, this.schema, new AtomicBoolean(false));
       if (innerSchema.getType().equals(Type.MAP)) {

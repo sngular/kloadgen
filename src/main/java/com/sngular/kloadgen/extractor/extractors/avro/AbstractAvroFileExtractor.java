@@ -25,13 +25,15 @@ public abstract class AbstractAvroFileExtractor {
 
   public List<FieldValueMapping> processSchemaDefault(final Schema schemaReceived) {
     final var attributeList = new ArrayList<FieldValueMapping>();
+    Schema aux = null;
     if (checkIfUnion(schemaReceived)) {
-      Schema last = schemaReceived.getTypes().get(schemaReceived.getTypes().size() - 1);
-      last.getFields().forEach(field -> processField(field, attributeList, true, true));
+      aux = schemaReceived.getTypes().get(schemaReceived.getTypes().size() - 1);
     } else if (checkIfRecord(schemaReceived)) {
-      schemaReceived.getFields().forEach(field -> processField(field, attributeList, true, true));
+      aux = schemaReceived;
     }
-
+    if(aux != null && (checkIfUnion(schemaReceived) || checkIfRecord(schemaReceived))){
+      aux.getFields().forEach(field -> processField(field, attributeList, true, true));
+    }
     return attributeList;
   }
 
@@ -356,17 +358,11 @@ public abstract class AbstractAvroFileExtractor {
     Set<String> schemaNames = new HashSet<>();
     if (checkIfRecord(schema)) {
       schemaNames.add(schema.getName());
-
-      List<Schema.Field> fields = schema.getFields();
-      for (Schema.Field field : fields) {
-        schemaNames.addAll(extractSchemaNames(field.schema()));
-      }
+      schema.getFields().forEach(field -> schemaNames.addAll(extractSchemaNames(field.schema())));
     } else if (checkIfArray(schema)) {
       schemaNames.addAll(extractSchemaNames(schema.getElementType()));
     } else if (checkIfUnion(schema)) {
-      for (Schema subSchema : schema.getTypes()) {
-        schemaNames.addAll(extractSchemaNames(subSchema));
-      }
+      schema.getTypes().forEach(schemaIt -> schemaNames.addAll(extractSchemaNames(schemaIt)));
     }
     return schemaNames;
   }
