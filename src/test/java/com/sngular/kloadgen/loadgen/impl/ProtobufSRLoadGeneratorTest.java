@@ -21,7 +21,6 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.WireMockLoaderUtil;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
@@ -38,11 +37,8 @@ class ProtobufSRLoadGeneratorTest {
 
   private FileHelper fileHelper = new FileHelper();
 
-  private final WireMockLoaderUtil wireMockLoaderUtil = new WireMockLoaderUtil();
-
   @BeforeEach
   public void setUp(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
-    wireMockLoaderUtil.setUpMocks(wmRuntimeInfo);
     final File file = new File("src/test/resources");
     final String absolutePath = file.getAbsolutePath();
     final String kloadPath = absolutePath + "/kloadgen.properties";

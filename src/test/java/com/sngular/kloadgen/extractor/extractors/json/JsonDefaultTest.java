@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
@@ -20,7 +21,7 @@ class JsonDefaultTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final JsonDefaultExtractor jsonDefaultExtractor = new JsonDefaultExtractor();
+  private final Extractor<Schema> jsonDefaultExtractor = new JsonDefaultExtractor();
 
   public final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
 

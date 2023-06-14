@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
+import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
@@ -20,7 +21,7 @@ class ProtobufConfluentExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final ProtoBufConfluentExtractor protoBufConfluentExtractor = new ProtoBufConfluentExtractor();
+  private final Extractor<ProtobufSchema> protoBufConfluentExtractor = new ProtoBufConfluentExtractor();
 
   @BeforeEach
   public void setUp() {

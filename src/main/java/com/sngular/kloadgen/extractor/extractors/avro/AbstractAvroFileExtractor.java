@@ -322,23 +322,23 @@ public abstract class AbstractAvroFileExtractor {
     return schema.getType().getName();
   }
 
-  public boolean checkIfRecord(final Schema innerSchema) {
+  private boolean checkIfRecord(final Schema innerSchema) {
     return Schema.Type.RECORD.equals(innerSchema.getType());
   }
 
-  public boolean checkIfMap(final Schema innerSchema) {
+  private boolean checkIfMap(final Schema innerSchema) {
     return Schema.Type.MAP.equals(innerSchema.getType());
   }
 
-  public boolean checkIfArray(final Schema innerSchema) {
+  private boolean checkIfArray(final Schema innerSchema) {
     return Schema.Type.ARRAY.equals(innerSchema.getType());
   }
 
-  public boolean checkIfUnion(final Schema innerSchema) {
+  private boolean checkIfUnion(final Schema innerSchema) {
     return Schema.Type.UNION.equals(innerSchema.getType());
   }
 
-  public boolean checkIfEnum(final Schema type) {
+  private boolean checkIfEnum(final Schema type) {
     return Schema.Type.ENUM.equals(type.getType());
   }
 
@@ -354,7 +354,7 @@ public abstract class AbstractAvroFileExtractor {
     return result;
   }
 
-  public Set<String> extractSchemaNames(Schema schema) {
+  private Set<String> extractSchemaNames(Schema schema) {
     Set<String> schemaNames = new HashSet<>();
     if (checkIfRecord(schema)) {
       schemaNames.add(schema.getName());

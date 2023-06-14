@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
+import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.squareup.wire.schema.Location;
@@ -22,7 +23,7 @@ class ProtobufApicurioExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final ProtoBufApicurioExtractor protoBufApicurioExtractor = new ProtoBufApicurioExtractor();
+  private final Extractor<ProtoFileElement> protoBufApicurioExtractor = new ProtoBufApicurioExtractor();
 
   private Location location = Location.get("","");
 

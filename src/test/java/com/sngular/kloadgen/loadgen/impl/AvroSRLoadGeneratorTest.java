@@ -22,7 +22,6 @@ import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.WireMockLoaderUtil;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -37,11 +36,8 @@ class AvroSRLoadGeneratorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final WireMockLoaderUtil wireMockLoaderUtil = new WireMockLoaderUtil();
-
   @BeforeEach
   public void setUp(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
-    wireMockLoaderUtil.setUpMocks(wmRuntimeInfo);
     final File file = new File("src/test/resources");
     final String absolutePath = file.getAbsolutePath();
     JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");

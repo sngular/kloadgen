@@ -2,6 +2,7 @@ package com.sngular.kloadgen.extractor.extractors.avro;
 
 import java.util.List;
 
+import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
 import org.apache.avro.Schema;
@@ -13,7 +14,7 @@ class AvroApicurioExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final AvroApicurioExtractor avroApicurioExtractor = new AvroApicurioExtractor();
+  private final Extractor<Schema> avroApicurioExtractor = new AvroApicurioExtractor();
 
   @Test
   @DisplayName("Should extract Embedded Record")
