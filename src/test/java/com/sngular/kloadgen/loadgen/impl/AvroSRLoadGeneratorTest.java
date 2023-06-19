@@ -58,7 +58,7 @@ class AvroSRLoadGeneratorTest {
     originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), wmRuntimeInfo.getHttpBaseUrl());
 
     final AvroSRLoadGenerator avroLoadGenerator = new AvroSRLoadGenerator();
-    avroLoadGenerator.setUpGenerator(originals, "simple-schema", fieldValueMappingList);
+    avroLoadGenerator.setUpGenerator(originals, "dad37185-782b-4bed-9cf6-678d1d4587d9", fieldValueMappingList);
     final Object message = avroLoadGenerator.nextMessage();
     Assertions.assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
 
