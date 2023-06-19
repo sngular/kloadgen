@@ -85,7 +85,7 @@ public abstract class AbstractProtoFileExtractor {
       final List<FieldValueMapping> completeFieldList, final List<String> imports, final boolean isAncestorRequired, final Map<String, TypeElement> nestedTypes) {
     final Field.Label label = checkNullLabel(field);
     final boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
-    final boolean isOptional = "optional".equals(Objects.requireNonNull(label.toString()));
+    final boolean isOptional = Objects.equals(Objects.requireNonNull(label.toString()), "optional");
     final boolean isMap = field.getType().startsWith("map");
     if (ProtobufHelper.isValidType(field.getType())) {
       extractPrimitiveTypes(completeFieldList, field, isArray, !isOptional, isAncestorRequired);
