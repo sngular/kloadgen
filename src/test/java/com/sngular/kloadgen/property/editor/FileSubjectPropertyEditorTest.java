@@ -10,10 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
+import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -25,13 +24,11 @@ class FileSubjectPropertyEditorTest {
 
   private final FileSubjectPropertyEditor editor = new FileSubjectPropertyEditor();
 
-  private final SchemaExtractor extractor = new SchemaExtractorImpl();
-
   @Test
   @DisplayName("File Subject Property Editor extract AVRO")
   void extractEmbeddedAvroTest() throws IOException {
     final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-    final ParsedSchema schema = extractor.schemaTypesList(testFile, "AVRO");
+    final ParsedSchema schema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
     final List<FieldValueMapping> fieldValueMappingList = editor.getAttributeList(schema);
 
     Assertions.assertThat(fieldValueMappingList)

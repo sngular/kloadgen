@@ -3,9 +3,9 @@ package com.sngular.kloadgen.loadgen.impl;
 import java.io.IOException;
 import java.util.Map;
 
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import org.apache.commons.lang3.tuple.Pair;
