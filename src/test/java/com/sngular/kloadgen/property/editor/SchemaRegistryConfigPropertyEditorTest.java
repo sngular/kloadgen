@@ -10,11 +10,10 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.util.Locale;
 
+import com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElement;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;

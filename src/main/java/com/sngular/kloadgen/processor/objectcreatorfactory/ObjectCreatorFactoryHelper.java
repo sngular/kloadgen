@@ -8,8 +8,8 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.AvroObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.JsonObjectCreatorFactory;
 import com.sngular.kloadgen.processor.objectcreatorfactory.impl.ProtobufObjectCreatorFactory;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
