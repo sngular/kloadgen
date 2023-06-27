@@ -13,24 +13,20 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.sngular.kloadgen.extractor.SchemaExtractor;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.util.AutoCompletion;
+import com.sngular.kloadgen.util.PropsKeysHelper;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.util.AutoCompletion;
-import com.sngular.kloadgen.util.PropsKeysHelper;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
@@ -48,8 +44,6 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
   private final JButton loadClassBtn = new JButton("Load Subject");
 
   private final JPanel panel = new JPanel();
-
-  private final SchemaExtractor schemaExtractor = new SchemaExtractorImpl();
 
   private JComboBox<String> subjectNameComboBox;
 
@@ -82,7 +76,7 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
     final var subjectName = Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
 
     try {
-      final var attributeList = schemaExtractor.flatPropertiesList(subjectName);
+      final var attributeList = SchemaExtractor.flatPropertiesList(subjectName);
 
       final var testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
       final var customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
@@ -105,7 +99,7 @@ public class SerialisedSubjectPropertyEditor extends PropertyEditorSupport imple
       }
       JOptionPane.showMessageDialog(null, "Successful retrieving of subject : " + subjectName, "Successful retrieving properties",
                                     JOptionPane.INFORMATION_MESSAGE);
-    } catch (IOException | RestClientException | NoSuchFieldException | IllegalAccessException e) {
+    } catch (NoSuchFieldException | IllegalAccessException e) {
       JOptionPane.showMessageDialog(null, "Failed retrieve schema properties : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
                                     JOptionPane.ERROR_MESSAGE);
       log.error(e.getMessage(), e);

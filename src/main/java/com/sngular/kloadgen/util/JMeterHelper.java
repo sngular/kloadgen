@@ -9,9 +9,9 @@ package com.sngular.kloadgen.util;
 import java.util.Properties;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 

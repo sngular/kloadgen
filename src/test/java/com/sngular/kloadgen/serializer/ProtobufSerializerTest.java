@@ -20,11 +20,11 @@ import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -78,7 +78,7 @@ class ProtobufSerializerTest {
   @ParameterizedTest
   @MethodSource("getSchemaToTest")
   void serialize(File schemaFile, List<FieldValueMapping> fieldValueMappings) throws IOException {
-    final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(schemaFile, "Protobuf");
+    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(schemaFile, "Protobuf");
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     final BaseSchemaMetadata confluentBaseSchemaMetadata =
         new BaseSchemaMetadata<>(

@@ -6,7 +6,7 @@
 
 package com.sngular.kloadgen.serializer;
 
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import lombok.Builder;
 import lombok.Value;
 

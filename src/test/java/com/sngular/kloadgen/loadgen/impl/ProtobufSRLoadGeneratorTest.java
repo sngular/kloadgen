@@ -18,8 +18,9 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
+import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
@@ -33,6 +34,8 @@ import org.junit.jupiter.api.Test;
 
 @WireMockTest
 class ProtobufSRLoadGeneratorTest {
+
+  private FileHelper fileHelper = new FileHelper();
 
   @BeforeEach
   public void setUp(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
@@ -51,10 +54,11 @@ class ProtobufSRLoadGeneratorTest {
     jmcx.getProperties().putAll(properties);
     jmcx.setVariables(new JMeterVariables());
     JMeterUtils.setLocale(Locale.ENGLISH);
+
   }
 
   @Test
-  void testProtobufLoadGenerator(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
+  void testProtobufLoadGeneratorConfluent(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     final List<FieldValueMapping> fieldValueMappingList = Arrays.asList(
         FieldValueMapping.builder().fieldName("propertyTest1.importedProperty.nestedProperty").fieldType("string").valueLength(0).fieldValueList("").required(true)
@@ -86,4 +90,5 @@ class ProtobufSRLoadGeneratorTest {
     Assertions.assertThat(message.getGenericRecord().toString()).contains("propertyNumberOne");
     Assertions.assertThat(message.getGenericRecord().toString()).contains("propertyNumberTwo");
   }
+
 }

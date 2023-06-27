@@ -14,7 +14,6 @@ import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
 import javax.swing.JPanel;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.jmeter.gui.ClearGui;

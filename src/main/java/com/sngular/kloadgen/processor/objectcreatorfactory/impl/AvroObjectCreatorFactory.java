@@ -18,11 +18,11 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseParsedSchema;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.ParsedSchemaAdapter;
-import com.sngular.kloadgen.sampler.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.avro.Schema;
@@ -138,7 +138,11 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   @Override
   public final void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
-      entity.put(objectName, new GenericData.Record(this.schema));
+      var aux = this.schema;
+      if (Schema.Type.UNION.equals(this.schema.getType())) {
+        aux = this.schema.getTypes().get(this.schema.getTypes().size() - 1);
+      }
+      entity.put(objectName, new GenericData.Record(aux));
     } else {
       Schema innerSchema = findSchema(completeFieldName, this.schema, new AtomicBoolean(false));
       if (innerSchema.getType().equals(Type.MAP)) {

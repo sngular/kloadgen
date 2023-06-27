@@ -35,7 +35,7 @@ services:
     ports:
     - '8080:8080'
     environment:
-      AUTH_ENABLED: false
+      AUTH_ENABLED: "false"
   kafka-manager:
     image: iunera/cmak
     depends_on:
