@@ -348,14 +348,11 @@ public final class SamplerUtil {
     final BaseLoadGenerator generator;
 
     final String valueNameStrategy = jMeterVariables.get(ProducerKeysHelper.VALUE_NAME_STRATEGY);
-    if (Objects.isNull(valueNameStrategy)) {
-      if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-        props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
-      } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-        props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
-      }
-    } else {
-      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, valueNameStrategy);
+
+    if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO));
+    } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT));
     }
 
     generator = getLoadGenerator(jMeterVariables);
