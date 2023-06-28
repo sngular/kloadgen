@@ -92,6 +92,7 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
     defaultParameters.addArgument(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
+    defaultParameters.addArgument(ProducerKeysHelper.APICURIO_LEGACY_ID_HANDLER, ProducerKeysHelper.FLAG_NO);
     return defaultParameters;
   }
 

@@ -81,6 +81,8 @@ public final class ProducerKeysHelper {
 
   public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT = "false";
 
+  public static final String APICURIO_LEGACY_ID_HANDLER = "apicurio.avro.confluent.compatibility";
+
   private ProducerKeysHelper() {
   }
 }
