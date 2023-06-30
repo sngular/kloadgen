@@ -93,7 +93,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props.put(SerdeConfig.ID_HANDLER, Legacy4ByteIdHandler.class.getName());
     }
     if (context.getParameter(ProducerKeysHelper.APICURIO_ENABLE_HEADERS_ID).equals(ProducerKeysHelper.FLAG_YES)) {
-      props.put(SerdeConfig.ENABLE_HEADERS, "true");
+      props.put(SerdeConfig.ENABLE_HEADERS, "false");
     }
 
     topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
