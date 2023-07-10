@@ -16,10 +16,10 @@
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">1</stringProp>
+          <stringProp name="LoopController.loops">1000</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">1</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <stringProp name="ThreadGroup.num_threads">1000</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">10</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
@@ -376,7 +376,7 @@
               <boolProp name="ancestorRequired">false</boolProp>
             </elementProp>
             <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">customer_account.billing_party.party_contact[].contact_id</stringProp>
+              <stringProp name="fieldName">customer_account.billing_party.party_contact[4].contact_id</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">int</stringProp>
               <stringProp name="fieldValuesList"></stringProp>
@@ -387,7 +387,7 @@
               <stringProp name="fieldName">customer_account.billing_party.party_contact[].contact_name</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">string</stringProp>
-              <stringProp name="fieldValuesList"></stringProp>
+              <stringProp name="fieldValuesList">Juan, Pedro, tomas, brais, jose, Adrian</stringProp>
               <boolProp name="required">true</boolProp>
               <boolProp name="ancestorRequired">false</boolProp>
             </elementProp>
@@ -408,7 +408,7 @@
               <boolProp name="ancestorRequired">false</boolProp>
             </elementProp>
             <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">details.in_details.customs_details.party.party_contact[].contact_id</stringProp>
+              <stringProp name="fieldName">details.in_details.customs_details.party.party_contact[6].contact_id</stringProp>
               <intProp name="valueLength">0</intProp>
               <stringProp name="fieldType">int</stringProp>
               <stringProp name="fieldValuesList"></stringProp>
@@ -424,10 +424,10 @@
               <boolProp name="ancestorRequired">false</boolProp>
             </elementProp>
             <elementProp name="" elementType="com.sngular.kloadgen.model.FieldValueMapping">
-              <stringProp name="fieldName">details.in_details.customs_details.party.p_contact[].contact_id</stringProp>
+              <stringProp name="fieldName">details.in_details.customs_details.party.p_contact[2].contact_id</stringProp>
               <intProp name="valueLength">0</intProp>
-              <stringProp name="fieldType">int</stringProp>
-              <stringProp name="fieldValuesList"></stringProp>
+              <stringProp name="fieldType">seq</stringProp>
+              <stringProp name="fieldValuesList">2000</stringProp>
               <boolProp name="required">true</boolProp>
               <boolProp name="ancestorRequired">false</boolProp>
             </elementProp>
