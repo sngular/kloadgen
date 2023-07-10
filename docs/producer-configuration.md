@@ -131,6 +131,9 @@ This configuration element allows to define a simple key with primitive types.
 
 You need to provide values for **Key Value**, **Key Class Type** and **Serializer**.
 
+> If you want generate random keys you can use the [JMeter funcitons](https://jmeter.apache.org/usermanual/functions.html#__RandomString)
+> for that. <em>*The key is generated at the start of each thread</em>
+
 ### KLG - Simple Value Config
 
 ![KLG - Simple Value Config](images/simple-value-config.png)
