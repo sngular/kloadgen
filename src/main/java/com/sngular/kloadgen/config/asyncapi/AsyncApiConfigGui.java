@@ -12,201 +12,253 @@
 
 package com.sngular.kloadgen.config.asyncapi;
 
-import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.property.editor.FileSubjectPropertyEditor;
-import org.apache.jmeter.config.gui.AbstractConfigGui;
-import org.apache.jmeter.testelement.TestElement;
-import org.apache.jmeter.util.JMeterUtils;
-import org.jetbrains.annotations.NotNull;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.List;
+import java.util.Objects;
 
-import javax.swing.*;
+import com.sngular.kloadgen.extractor.ApiExtractor;
+import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.JTableHeader;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
+import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
+import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jorphan.gui.JLabeledTextField;
+import org.jetbrains.annotations.NotNull;
 
-public class AsyncApiConfigGui extends AbstractConfigGui {
+public class AsyncApiConfigGui extends AbstractSamplerGui {
 
-    private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+  public static final String ERROR_FAILED_TO_RETRIEVE_PROPERTIES = "ERROR: Failed to retrieve properties!";
 
-    private JPanel mainPanel;
-    private JTabbedPane asyncApiTabs;
-    private JTable brokerInfo;
-    private JTextField textField1;
-    private JTable schemaRegistry;
-    private JTable schemaFields;
-    private JTextField asyncApiFileTextField;
-    private JButton fileButton;
-    private JTableHeader jTableHeaderKafka;
-    private JTableHeader jTableHeaderRegistry;
-    private JTableHeader jTableHeaderSchema;
+  private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
-    private final SchemaExtractor asyncApiExtractor = new AsyncApiExtractorImpl();
+  private final ApiExtractor asyncApiExtractor = new AsyncApiExtractorImpl();
 
+  private JPanel mainPanel;
 
-    @Override
-    public String getLabelResource() {
-        return null;
+  private JTable brokerInfo;
+
+  private JTextField asyncApiFileTextField;
+
+  private JTextField registryUrl;
+
+  private JTable schemaRegistry;
+
+  private JTable schemaFields;
+
+  private JButton fileButton;
+
+  private JTableHeader jTableHeaderKafka;
+
+  private JTableHeader jTableHeaderRegistry;
+
+  private JTableHeader jTableHeaderSchema;
+
+  protected AsyncApiConfigGui() {
+    init();
+  }
+
+  private void init() {
+    setLayout(new BorderLayout());
+    setBorder(makeBorder());
+    mainPanel = new JPanel();
+    mainPanel.setLayout(new GridBagLayout());
+    mainPanel.setPreferredSize(new Dimension(-1, -1));
+    mainPanel.putClientProperty("html.disable", Boolean.FALSE);
+    mainPanel.setBorder(
+      BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+
+    mainPanel.add("asyncapi.file.selector", createAsyncApiFileSelectPanel());
+    mainPanel.add("asyncapi.config.options", createAsyncApiTabs());
+  }
+
+  @NotNull
+  private JPanel createAsyncApiFileSelectPanel() {
+    final JPanel fileChoosingPanel = new JPanel();
+    fileChoosingPanel.setLayout(new GridBagLayout());
+    fileChoosingPanel.setName("AsyncApi File");
+    var gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.weighty = 0.03;
+    gridBagConstraints.fill = GridBagConstraints.BOTH;
+    asyncApiFileTextField = new JTextField();
+    asyncApiFileTextField.setPreferredSize(new Dimension(249, 30));
+    asyncApiFileTextField.setText("");
+    gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.anchor = GridBagConstraints.WEST;
+    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+    fileChoosingPanel.add(asyncApiFileTextField, gridBagConstraints);
+    fileButton = new JButton();
+    fileButton.setText("Open File");
+    fileButton.addActionListener(this::actionFileChooser);
+    gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 2;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+    fileChoosingPanel.add(fileButton, gridBagConstraints);
+    final JLabel label1 = new JLabel();
+    label1.setText("AsyncApi File");
+    gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.anchor = GridBagConstraints.WEST;
+    fileChoosingPanel.add(label1, gridBagConstraints);
+    return fileChoosingPanel;
+  }
+
+  @NotNull
+  private JTabbedPane createAsyncApiTabs() {
+    var tabbedPanel = new JTabbedPane();
+    tabbedPanel.addTab("Broker", createBrokerPanel());
+    tabbedPanel.addTab("Registry", createRegistryTab());
+    tabbedPanel.addTab("Schema", createSchemaTab());
+    return tabbedPanel;
+  }
+
+  public final void actionFileChooser(final ActionEvent event) {
+
+    final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
+
+    if (JFileChooser.APPROVE_OPTION == returnValue) {
+      final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
+      asyncApiFileTextField.setText(apiFile.getAbsolutePath());
+      var asyncApiFile = asyncApiExtractor.processFile(apiFile);
+
+      fillTable(brokerInfo, asyncApiExtractor.getBrokerData(asyncApiFile));
+      fillTable(schemaRegistry, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
+      fillTable(schemaFields, asyncApiExtractor.getSchemaData(asyncApiFile));
     }
+  }
 
-    @Override
-    public TestElement createTestElement() {
-        var testElement = new AsyncApiTestElement();
-        modifyTestElement(testElement);
-        return testElement;
-    }
+  private <T> void fillTable(final JTable schemaFields, final List<T> schemaData) {
 
-    @Override
-    public void modifyTestElement(TestElement element) {
+  }
 
-    }
+  @NotNull
+  private JPanel createBrokerPanel() {
+    final JPanel brokerPanel = new JPanel();
+    brokerPanel.setLayout(new BorderLayout(0, 0));
+    var label = new JLabeledTextField("")
+    brokerInfo = new JTable();
+    brokerInfo.setIntercellSpacing(new Dimension(2, 1));
+    brokerInfo.putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
+    brokerInfo.putClientProperty("Table.isFileList", Boolean.TRUE);
+    jTableHeaderKafka = new JTableHeader();
+    jTableHeaderKafka.add(getComponentProperty("Property"));
+    jTableHeaderKafka.add(getComponentProperty("Value"));
+    brokerInfo.setTableHeader(jTableHeaderKafka);
+    brokerPanel.add(brokerInfo, BorderLayout.CENTER);
+    return brokerPanel;
+  }
 
-    private void init() {
-        setLayout(new BorderLayout());
-        setBorder(makeBorder());
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new GridBagLayout());
-        mainPanel.setPreferredSize(new Dimension(-1, -1));
-        mainPanel.putClientProperty("html.disable", Boolean.FALSE);
-        mainPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-        final JPanel fileChoosingPanel = new JPanel();
-        fileChoosingPanel.setLayout(new GridBagLayout());
-        fileChoosingPanel.setName("AsyncApi File");
-        var gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weighty = 0.03;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        mainPanel.add(fileChoosingPanel, gridBagConstraints);
-        asyncApiFileTextField = new JTextField();
-        asyncApiFileTextField.setPreferredSize(new Dimension(249, 30));
-        asyncApiFileTextField.setText("");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        fileChoosingPanel.add(asyncApiFileTextField, gridBagConstraints);
-        fileButton = new JButton();
-        fileButton.setText("Open File");
-        fileButton.addActionListener(this::actionFileChooser);
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        fileChoosingPanel.add(fileButton, gridBagConstraints);
-        final JLabel label1 = new JLabel();
-        label1.setText("AsyncApi File");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        fileChoosingPanel.add(label1, gridBagConstraints);
-        asyncApiTabs = new JTabbedPane();
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.weighty = 0.1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        mainPanel.add(asyncApiTabs, gridBagConstraints);
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new BorderLayout(0, 0));
-        asyncApiTabs.addTab("Broker", panel3);
-        brokerInfo = new JTable();
-        brokerInfo.setIntercellSpacing(new Dimension(2, 1));
-        brokerInfo.putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
-        brokerInfo.putClientProperty("Table.isFileList", Boolean.TRUE);
-        jTableHeaderKafka = new JTableHeader();
-        jTableHeaderKafka.add(getComponentProperty("Property"));
-        jTableHeaderKafka.add(getComponentProperty("Value"));
-        brokerInfo.setTableHeader(jTableHeaderKafka);
-        panel3.add(brokerInfo, BorderLayout.CENTER);
-        final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridBagLayout());
-        panel4.setMinimumSize(new Dimension(45, 45));
-        panel4.setPreferredSize(new Dimension(200, 45));
-        asyncApiTabs.addTab("Registry", panel4);
-        final JLabel label2 = new JLabel();
-        label2.setText("Schema Registry URL");
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        panel4.add(label2, gridBagConstraints);
-        textField1 = new JTextField();
-        textField1.setPreferredSize(new Dimension(249, 30));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        panel4.add(textField1, gridBagConstraints);
-        final JPanel panel5 = new JPanel();
-        panel5.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        panel4.add(panel5, gridBagConstraints);
-        final JLabel label3 = new JLabel();
-        label3.setText("Security Options");
-        panel5.add(label3);
-        schemaRegistry = new JTable();
-        jTableHeaderRegistry = new JTableHeader();
-        jTableHeaderRegistry.add(getComponentProperty("Property"));
-        jTableHeaderRegistry.add(getComponentProperty("Value"));
-        schemaRegistry.setTableHeader(jTableHeaderRegistry);
-        panel5.add(schemaRegistry);
-        final JPanel panel6 = new JPanel();
-        panel6.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        asyncApiTabs.addTab("Schema", panel6);
-        schemaFields = new JTable();
-        jTableHeaderSchema = new JTableHeader();
-        jTableHeaderSchema.add(getComponentProperty("Field Name"));
-        jTableHeaderSchema.add(getComponentProperty("Field Type"));
-        jTableHeaderSchema.add(getComponentProperty("Field Size"));
-        jTableHeaderSchema.add(getComponentProperty("Field Value"));
-        schemaFields.setTableHeader(jTableHeaderSchema);
-        schemaFields.setSurrendersFocusOnKeystroke(false);
-        panel6.add(schemaFields);
-        fileChoosingPanel.setNextFocusableComponent(asyncApiTabs);
-    }
+  @NotNull
+  private JPanel createRegistryTab() {
+    GridBagConstraints gridBagConstraints;
+    final JPanel registryUrlPanel = new JPanel();
+    registryUrlPanel.setLayout(new GridBagLayout());
+    registryUrlPanel.setMinimumSize(new Dimension(45, 45));
+    registryUrlPanel.setPreferredSize(new Dimension(200, 45));
+    final JLabel label2 = new JLabel();
+    label2.setText("Schema Registry URL");
+    gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.anchor = GridBagConstraints.WEST;
+    registryUrlPanel.add(label2, gridBagConstraints);
+    this.registryUrl = new JTextField();
+    this.registryUrl.setPreferredSize(new Dimension(249, 30));
+    gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 0;
+    gridBagConstraints.anchor = GridBagConstraints.WEST;
+    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+    registryUrlPanel.add(this.registryUrl, gridBagConstraints);
+    final JPanel panel5 = new JPanel();
+    panel5.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+    gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridwidth = 2;
+    gridBagConstraints.fill = GridBagConstraints.BOTH;
+    registryUrlPanel.add(panel5, gridBagConstraints);
+    final JLabel label3 = new JLabel();
+    label3.setText("Security Options");
+    panel5.add(label3);
+    schemaRegistry = new JTable();
+    jTableHeaderRegistry = new JTableHeader();
+    jTableHeaderRegistry.add(getComponentProperty("Property"));
+    jTableHeaderRegistry.add(getComponentProperty("Value"));
+    schemaRegistry.setTableHeader(jTableHeaderRegistry);
+    panel5.add(schemaRegistry);
+    return registryUrlPanel;
+  }
 
-    @NotNull
-    private static Component getComponentProperty(String Property) {
-        return new Component() {
-            @Override
-            public String getName() {
-                return Property;
-            }
-        };
-    }
+  @NotNull
+  private JPanel createSchemaTab() {
+    final JPanel schemaTab = new JPanel();
+    schemaTab.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+    schemaFields = new JTable();
+    jTableHeaderSchema = new JTableHeader();
+    jTableHeaderSchema.add(getComponentProperty("Field Name"));
+    jTableHeaderSchema.add(getComponentProperty("Field Type"));
+    jTableHeaderSchema.add(getComponentProperty("Field Size"));
+    jTableHeaderSchema.add(getComponentProperty("Field Value"));
+    schemaFields.setTableHeader(jTableHeaderSchema);
+    schemaFields.setSurrendersFocusOnKeystroke(false);
+    schemaTab.add(schemaFields);
+    return schemaTab;
+  }
 
-    public final void actionFileChooser(final ActionEvent event) {
+  @NotNull
+  private static Component getComponentProperty(final String Property) {
+    return new Component() {
+      @Override
+      public String getName() {
+        return Property;
+      }
+    };
+  }
 
-        final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
+  @Override
+  public void clearGui() {
+    super.clearGui();
+    asyncApiFileTextField.setText("");
+    registryUrl.setText("");
+  }
 
-        if (JFileChooser.APPROVE_OPTION == returnValue) {
-            final File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
-            asyncApiFileTextField.setText(subjectName.getAbsolutePath());
-            try {
+  @Override
+  public String getLabelResource() {
+    return null;
+  }
 
-                brokerInfo. = asyncApiExtractor.schemaTypesList(subjectName, schemaType);
-                subjectNameComboBox.removeAllItems();
-                subjectNameComboBox.addItem(parserSchema.name());
-                subjectNameComboBox.setSelectedItem(parserSchema.name());
-            } catch (final IOException e) {
-                JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
-                        JOptionPane.ERROR_MESSAGE);
-                log.error(e.getMessage(), e);
-            }
-            subjectNameComboBox.addFocusListener(new FileSubjectPropertyEditor.ComboFiller());
-        }
-    }
+  @Override
+  public TestElement createTestElement() {
+    var testElement = new AsyncApiTestElement();
+    modifyTestElement(testElement);
+    return testElement;
+  }
+
+  @Override
+  public void modifyTestElement(TestElement element) {
+
+  }
 }
