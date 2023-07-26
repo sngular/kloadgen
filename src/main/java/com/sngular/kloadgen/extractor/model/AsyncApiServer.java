@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class AsyncApiServer {
+public class AsyncApiServer implements AsyncApiAbstract {
 
   String name;
 
@@ -14,4 +14,9 @@ public class AsyncApiServer {
   String protocol;
 
   String description;
+
+  @Override
+  public Object[] getProperties() {
+    return new Object[0];
+  }
 }

@@ -16,5 +16,5 @@ public interface ApiExtractor {
 
   List<AsyncApiSR> getSchemaRegistryData(AsyncApiFile asyncApiFile);
 
-  List<AsyncApiSchema> getSchemaData(AsyncApiFile asyncApiFile);
+  AsyncApiSchema getSchemaData(AsyncApiFile asyncApiFile);
 }

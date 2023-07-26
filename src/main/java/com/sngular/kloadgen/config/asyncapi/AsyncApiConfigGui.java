@@ -25,8 +25,11 @@ import java.util.Objects;
 
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
+import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
+import com.sngular.kloadgen.extractor.model.AsyncApiServer;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -35,12 +38,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.JTableHeader;
+import javax.swing.table.DefaultTableModel;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
-import org.jetbrains.annotations.NotNull;
 
 public class AsyncApiConfigGui extends AbstractSamplerGui {
 
@@ -52,23 +54,19 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
 
   private JPanel mainPanel;
 
-  private JTable brokerInfo;
-
   private JTextField asyncApiFileTextField;
 
   private JTextField registryUrl;
 
-  private JTable schemaRegistry;
+  private DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Field Values List"}, 20);
 
-  private JTable schemaFields;
+  private DefaultTableModel brokerFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
+
+  private DefaultTableModel schemaRegistryFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
 
   private JButton fileButton;
 
-  private JTableHeader jTableHeaderKafka;
-
-  private JTableHeader jTableHeaderRegistry;
-
-  private JTableHeader jTableHeaderSchema;
+  private JComboBox<AsyncApiServer> serverComboBox;
 
   protected AsyncApiConfigGui() {
     init();
@@ -82,13 +80,13 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
     mainPanel.setPreferredSize(new Dimension(-1, -1));
     mainPanel.putClientProperty("html.disable", Boolean.FALSE);
     mainPanel.setBorder(
-      BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+        BorderFactory
+          .createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
 
     mainPanel.add("asyncapi.file.selector", createAsyncApiFileSelectPanel());
     mainPanel.add("asyncapi.config.options", createAsyncApiTabs());
   }
 
-  @NotNull
   private JPanel createAsyncApiFileSelectPanel() {
     final JPanel fileChoosingPanel = new JPanel();
     fileChoosingPanel.setLayout(new GridBagLayout());
@@ -125,7 +123,6 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
     return fileChoosingPanel;
   }
 
-  @NotNull
   private JTabbedPane createAsyncApiTabs() {
     var tabbedPanel = new JTabbedPane();
     tabbedPanel.addTab("Broker", createBrokerPanel());
@@ -141,45 +138,44 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
     if (JFileChooser.APPROVE_OPTION == returnValue) {
       final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
       asyncApiFileTextField.setText(apiFile.getAbsolutePath());
-      var asyncApiFile = asyncApiExtractor.processFile(apiFile);
-
-      fillTable(brokerInfo, asyncApiExtractor.getBrokerData(asyncApiFile));
-      fillTable(schemaRegistry, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
-      fillTable(schemaFields, asyncApiExtractor.getSchemaData(asyncApiFile));
+      final var asyncApiFile = asyncApiExtractor.processFile(apiFile);
+      asyncApiFile.getApiServerList().forEach(serverComboBox::addItem);
+      fillTable(brokerFieldModel, asyncApiExtractor.getBrokerData(asyncApiFile));
+      fillTable(schemaRegistryFieldModel, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
+      fillTable(schemaFieldModel, asyncApiExtractor.getSchemaData(asyncApiFile).getModel());
     }
   }
 
-  private <T> void fillTable(final JTable schemaFields, final List<T> schemaData) {
-
+  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final List<T> schemaData) {
+    final var count = schemaFields.getRowCount();
+    for (var i = 0; i < count; i++) {
+      schemaFields.removeRow(i);
+    }
+    schemaData.forEach(data -> schemaFields.addRow(dataToRow(data)));
   }
 
-  @NotNull
+  private <T extends AsyncApiAbstract> Object[] dataToRow(final T data) {
+    return data.getProperties();
+  }
+
   private JPanel createBrokerPanel() {
     final JPanel brokerPanel = new JPanel();
     brokerPanel.setLayout(new BorderLayout(0, 0));
-    var label = new JLabeledTextField("")
-    brokerInfo = new JTable();
-    brokerInfo.setIntercellSpacing(new Dimension(2, 1));
-    brokerInfo.putClientProperty("JTable.autoStartsEdit", Boolean.TRUE);
-    brokerInfo.putClientProperty("Table.isFileList", Boolean.TRUE);
-    jTableHeaderKafka = new JTableHeader();
-    jTableHeaderKafka.add(getComponentProperty("Property"));
-    jTableHeaderKafka.add(getComponentProperty("Value"));
-    brokerInfo.setTableHeader(jTableHeaderKafka);
-    brokerPanel.add(brokerInfo, BorderLayout.CENTER);
+    brokerPanel.add(new JLabeledTextField("Broker Server"));
+    serverComboBox = new JComboBox<>();
+    brokerPanel.add(serverComboBox);
+    brokerPanel.add(new JTable(brokerFieldModel), BorderLayout.CENTER);
     return brokerPanel;
   }
 
-  @NotNull
   private JPanel createRegistryTab() {
-    GridBagConstraints gridBagConstraints;
     final JPanel registryUrlPanel = new JPanel();
     registryUrlPanel.setLayout(new GridBagLayout());
     registryUrlPanel.setMinimumSize(new Dimension(45, 45));
     registryUrlPanel.setPreferredSize(new Dimension(200, 45));
     final JLabel label2 = new JLabel();
     label2.setText("Schema Registry URL");
-    gridBagConstraints = new GridBagConstraints();
+    var gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -203,37 +199,22 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
     final JLabel label3 = new JLabel();
     label3.setText("Security Options");
     panel5.add(label3);
-    schemaRegistry = new JTable();
-    jTableHeaderRegistry = new JTableHeader();
-    jTableHeaderRegistry.add(getComponentProperty("Property"));
-    jTableHeaderRegistry.add(getComponentProperty("Value"));
-    schemaRegistry.setTableHeader(jTableHeaderRegistry);
-    panel5.add(schemaRegistry);
+    panel5.add(new JTable(schemaRegistryFieldModel));
     return registryUrlPanel;
   }
 
-  @NotNull
   private JPanel createSchemaTab() {
     final JPanel schemaTab = new JPanel();
     schemaTab.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-    schemaFields = new JTable();
-    jTableHeaderSchema = new JTableHeader();
-    jTableHeaderSchema.add(getComponentProperty("Field Name"));
-    jTableHeaderSchema.add(getComponentProperty("Field Type"));
-    jTableHeaderSchema.add(getComponentProperty("Field Size"));
-    jTableHeaderSchema.add(getComponentProperty("Field Value"));
-    schemaFields.setTableHeader(jTableHeaderSchema);
-    schemaFields.setSurrendersFocusOnKeystroke(false);
-    schemaTab.add(schemaFields);
+    schemaTab.add(new JTable(schemaFieldModel));
     return schemaTab;
   }
 
-  @NotNull
-  private static Component getComponentProperty(final String Property) {
+  private static Component getComponentProperty(final String property) {
     return new Component() {
       @Override
       public String getName() {
-        return Property;
+        return property;
       }
     };
   }

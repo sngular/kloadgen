@@ -5,9 +5,14 @@ import lombok.Value;
 
 @Value
 @Data
-public class AsyncApiSR {
+public class AsyncApiSR implements AsyncApiAbstract {
 
   String schemaRegistryUrl;
 
   String schemaRegistryVendor;
+
+  @Override
+  public Object[] getProperties() {
+    return new Object[0];
+  }
 }

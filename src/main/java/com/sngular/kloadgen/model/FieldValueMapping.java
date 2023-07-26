@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ import org.apache.jmeter.testelement.AbstractTestElement;
 @ToString
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class FieldValueMapping extends AbstractTestElement {
+public class FieldValueMapping extends AbstractTestElement implements AsyncApiAbstract {
 
   public static final String FIELD_CONSTRAINTS = "constraints";
 
@@ -165,6 +166,10 @@ public class FieldValueMapping extends AbstractTestElement {
 
   public final void setConstraints(final Map<ConstraintTypeEnum, String> constraints) {
     this.constraints = constraints;
+  }
+
+  public final Object[] getProperties() {
+    return new Object[] {getFieldName(), getFieldType(), getValueLength(), getFieldValuesList()};
   }
 
   public static final class FieldValueMappingBuilder {
