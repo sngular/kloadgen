@@ -1,0 +1,691 @@
+{
+	"info": {
+		"_postman_id": "910e732b-f6eb-457e-88f7-9f24a6f5d098",
+		"name": "kloadgen",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17904497"
+	},
+	"item": [
+		{
+			"name": "Apicurio",
+			"item": [
+				{
+					"name": "Create Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"id\":\"simple-subject\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8080/apis/registry/v2/groups/",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"groups",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Schema",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "X-Registry-ArtifactType",
+								"value": "AVRO",
+								"type": "default"
+							},
+							{
+								"key": "X-Registry-ArtifactId",
+								"value": "simple-schema",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"type\": \"record\", \"name\": \"test_plan_subject\", \"fields\": [{\"name\": \"metadata\", \"type\": {\"type\": \"record\", \"name\": \"Metadata\", \"fields\": [{\"name\": \"name\", \"type\": \"string\"}, {\"name\": \"domain\", \"type\": \"string\"}, {\"name\": \"version\", \"type\": \"string\"}]}}, {\"name\": \"payload\", \"type\": {\"name\": \"Payload\", \"type\": \"record\", \"fields\": [{\"name\": \"id\", \"type\": \"int\"}, {\"name\": \"code\", \"type\": \"string\"}, {\"name\": \"type\", \"type\": \"string\"}]}}]}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/groups/:groupName/artifacts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"groups",
+								":groupName",
+								"artifacts"
+							],
+							"variable": [
+								{
+									"key": "groupName",
+									"value": "default"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Schema by Global ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/ids/globalIds/:globalId",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"ids",
+								"globalIds",
+								":globalId"
+							],
+							"variable": [
+								{
+									"key": "globalId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search all schemas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/search/artifacts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"search",
+								"artifacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search schemas by Group ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/search/artifacts?group=default",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"search",
+								"artifacts"
+							],
+							"query": [
+								{
+									"key": "group",
+									"value": "default"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search schema by Group and Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/search/artifacts?group=default&name=test_plan_subject",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"search",
+								"artifacts"
+							],
+							"query": [
+								{
+									"key": "group",
+									"value": "default"
+								},
+								{
+									"key": "name",
+									"value": "test_plan_subject"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List artifacts in group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/groups/:groupId/artifacts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"groups",
+								":groupId",
+								"artifacts"
+							],
+							"variable": [
+								{
+									"key": "groupId",
+									"value": "default"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get artifact metadata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/groups/:groupId/artifacts/:artifactId/meta",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"groups",
+								":groupId",
+								"artifacts",
+								":artifactId",
+								"meta"
+							],
+							"variable": [
+								{
+									"key": "groupId",
+									"value": "default"
+								},
+								{
+									"key": "artifactId",
+									"value": "test_plan_subject"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get artifact (simple-schema) metadata",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/groups/:groupId/artifacts/:artifactId/meta",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"groups",
+								":groupId",
+								"artifacts",
+								":artifactId",
+								"meta"
+							],
+							"variable": [
+								{
+									"key": "groupId",
+									"value": "simple-subject"
+								},
+								{
+									"key": "artifactId",
+									"value": "simple-schema"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get latest artifact",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/apis/registry/v2/groups/:groupId/artifacts/:artifactId/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"apis",
+								"registry",
+								"v2",
+								"groups",
+								":groupId",
+								"artifacts",
+								":artifactId",
+								""
+							],
+							"variable": [
+								{
+									"key": "groupId",
+									"value": "default"
+								},
+								{
+									"key": "artifactId",
+									"value": "test_plan_subject"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Confluent",
+			"item": [
+				{
+					"name": "Get All Subjects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName/versions/:version",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName",
+								"versions",
+								":version"
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								},
+								{
+									"key": "version",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Schema",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName/versions/:version",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName",
+								"versions",
+								":version"
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								},
+								{
+									"key": "version",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Schema Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/schemas/ids/:id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"schemas",
+								"ids",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Schema",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"schema\": \"{\\\"type\\\": \\\"record\\\", \\\"name\\\": \\\"test_plan_subject\\\", \\\"fields\\\": [{\\\"name\\\": \\\"metadata\\\", \\\"type\\\": {\\\"type\\\": \\\"record\\\", \\\"name\\\": \\\"Metadata\\\", \\\"fields\\\": [{\\\"name\\\": \\\"name\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"domain\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"version\\\", \\\"type\\\": \\\"string\\\"}]}}, {\\\"name\\\": \\\"payload\\\", \\\"type\\\": {\\\"name\\\": \\\"Payload\\\", \\\"type\\\": \\\"record\\\", \\\"fields\\\": [{\\\"name\\\": \\\"id\\\", \\\"type\\\": \\\"int\\\"}, {\\\"name\\\": \\\"code\\\", \\\"type\\\": \\\"string\\\"}, {\\\"name\\\": \\\"type\\\", \\\"type\\\": \\\"string\\\"}]}}]}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName/versions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName",
+								"versions",
+								""
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Schema (issue 311)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"schema\": \"syntax = \\\"proto3\\\";\\r\\npackage demo;\\r\\n\\r\\noption java_package = \\\"com.demo.order.proto\\\";\\r\\noption java_outer_classname = \\\"DemoOrder\\\";\\r\\noption java_multiple_files = true;\\r\\n\\r\\nmessage Order {\\r\\n  int32 order_id = 1;\\r\\n  string order_number = 2;\\r\\n  .demo.Order.CustomerAccount customer_account = 3;\\r\\n\\r\\n  message CustomerAccount {\\r\\n    .demo.Order.CustomerAccount.BillingParty billing_party = 1;\\r\\n  \\r\\n    message BillingParty {\\r\\n      string party_id = 1;\\r\\n      .demo.Order.Address address = 2;\\r\\n    }\\r\\n  }\\r\\n  message Address {\\r\\n    string address_line_one = 1;\\r\\n    string address_line_two = 2;\\r\\n  }\\r\\n}\",\n    \"schemaType\": \"PROTOBUF\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName/versions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName",
+								"versions",
+								""
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Schema Protobuf (added Contact)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"schema\": \"syntax = \\\"proto3\\\";\\r\\n\\r\\npackage tutorial;\\r\\n\\r\\noption java_multiple_files = true;\\r\\noption java_package = \\\"com.example.tutorial.protos\\\";\\r\\noption java_outer_classname = \\\"AddressOrderProtos\\\";\\r\\n\\r\\nmessage Order {\\r\\n\\r\\n  message Address {\\r\\n    string address_line_one = 2;\\r\\n  }\\r\\n\\r\\n  message CustomerAccount {\\r\\n    .jbhunt.Order.CustomerAccount.BillingParty billing_party = 1;\\r\\n\\r\\n    message BillingParty {\\r\\n      string party_id = 3;\\r\\n      .jbhunt.Order.Address party_address = 4;\\r\\n    }\\r\\n  }\\r\\n  \\r\\n  int32 order_id = 1;\\r\\n  .jbhunt.Order.Address address = 2;\\r\\n  .jbhunt.Order.CustomerAccount customer_account = 3;\\r\\n}\",\n    \"schemaType\": \"PROTOBUF\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName/versions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName",
+								"versions",
+								""
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Schema Protobuf (added Contact) Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"schema\": \"syntax = \\\"proto3\\\";\\r\\npackage demo;\\r\\n\\r\\noption java_package = \\\"com.demo.order.proto\\\";\\r\\noption java_outer_classname = \\\"DemoOrder\\\";\\r\\noption java_multiple_files = true;\\r\\n\\r\\nmessage Order {\\r\\n  int32 order_id = 1;\\r\\n  string order_number = 2;\\r\\n  .demo.Order.CustomerAccount customer_account = 3;\\r\\n  .demo.Order.Details details = 4;\\r\\n\\r\\n  message CustomerAccount {\\r\\n    .demo.Order.CustomerAccount.BillingParty billing_party = 1;\\r\\n\\r\\n    message BillingParty {\\r\\n      string party_id = 1;\\r\\n      .demo.Order.Address address = 2;\\r\\n      repeated .demo.Order.Contact party_contact = 3;\\r\\n    }\\r\\n  }\\r\\n  message Address {\\r\\n    string address_line_one = 1;\\r\\n    string address_line_two = 2;\\r\\n  }\\r\\n  message Contact {\\r\\n    int32 contact_id = 1;\\r\\n    string contact_name = 2;\\r\\n  }\\r\\n  message Details {\\r\\n    .demo.Order.Details.InDetails in_details = 1;\\r\\n\\r\\n    message InDetails {\\r\\n      .demo.Order.Details.InDetails.CustomsDetails customs_details = 1;\\r\\n\\r\\n      message CustomsDetails {\\r\\n        .demo.Order.Details.InDetails.CustomsDetails.Party party = 1;\\r\\n\\r\\n        message Party {\\r\\n          .demo.Order.Address party_address = 1;\\r\\n          repeated .demo.Order.Contact party_contact = 2;\\r\\n          repeated .demo.Order.Contact p_contact = 3;\\r\\n        }\\r\\n      }\\r\\n    }\\r\\n  }\\r\\n}\",\n    \"schemaType\": \"PROTOBUF\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName/versions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName",
+								"versions",
+								""
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Schema Protobuf without package",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"schema\": \"syntax = \\\"proto3\\\";\\r\\npackage jbhunt;\\r\\n\\r\\noption java_package = \\\"com.jbhunt.unmanaged.order.proto\\\";\\r\\noption java_outer_classname = \\\"IntraOrder\\\";\\r\\noption java_multiple_files = true;\\r\\n\\r\\nmessage Order {\\r\\n  int32 order_id = 1;\\r\\n  string order_number = 2;\\r\\n  .jbhunt.Order.CustomerAccount customer_account = 3;\\r\\n\\r\\n  message CustomerAccount {\\r\\n    .jbhunt.Order.CustomerAccount.BillingParty billing_party = 1;\\r\\n  \\r\\n    message BillingParty {\\r\\n      string party_id = 1;\\r\\n      .jbhunt.Order.Address address = 2;\\r\\n    }\\r\\n  }\\r\\n  message Address {\\r\\n    string address_line_one = 1;\\r\\n    string address_line_two = 2;\\r\\n  }\\r\\n}\",\n    \"schemaType\": \"PROTOBUF\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName/versions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName",
+								"versions",
+								""
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Schemas",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/subjects/:subjectName?permanent=false",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"subjects",
+								":subjectName"
+							],
+							"query": [
+								{
+									"key": "permanent",
+									"value": "true",
+									"disabled": true
+								},
+								{
+									"key": "permanent",
+									"value": "false"
+								}
+							],
+							"variable": [
+								{
+									"key": "subjectName",
+									"value": "simple-subject"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
