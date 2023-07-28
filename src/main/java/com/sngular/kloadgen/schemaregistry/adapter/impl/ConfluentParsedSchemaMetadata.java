@@ -14,21 +14,21 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   private String canonicalString;
 
-  private  Object rawSchema;
+  private Object rawSchema;
 
-  private ConfluentParsedSchemaMetadata(ParsedSchema parsedSchema){
+  private ConfluentParsedSchemaMetadata(final ParsedSchema parsedSchema) {
     this.schemaType = parsedSchema.schemaType();
     this.name = parsedSchema.name();
     this.canonicalString = parsedSchema.canonicalString();
     this.rawSchema = parsedSchema.rawSchema();
   }
 
-  private ConfluentParsedSchemaMetadata(Schema schema){
+  private ConfluentParsedSchemaMetadata(final Schema schema) {
     this.schemaType = schema.getType().getName();
     this.name = schema.getName();
   }
 
-  public ConfluentParsedSchemaMetadata(ProtobufSchema schema){
+  public ConfluentParsedSchemaMetadata(final ProtobufSchema schema) {
     this.schemaType = schema.schemaType();
     this.name = schema.name();
     this.rawSchema = schema.rawSchema();
@@ -46,17 +46,18 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
   public static ParsedSchemaAdapter parse(final Schema schema) {
     return new ConfluentParsedSchemaMetadata(schema);
   }
-  public static ParsedSchemaAdapter parse (final ProtobufSchema schema){
+
+  public static ParsedSchemaAdapter parse(final ProtobufSchema schema) {
     return new ConfluentParsedSchemaMetadata(schema);
   }
 
   @Override
-  public String getType() {
+  public final String getType() {
     return this.schemaType;
   }
 
   @Override
-  public Object getRawSchema() {
+  public final Object getRawSchema() {
     return this.rawSchema;
   }
 }

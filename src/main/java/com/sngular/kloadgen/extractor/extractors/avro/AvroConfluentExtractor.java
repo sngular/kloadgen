@@ -9,7 +9,7 @@ import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 public class AvroConfluentExtractor extends AbstractAvroFileExtractor implements Extractor<AvroSchema> {
 
   public final List<FieldValueMapping> processSchema(final AvroSchema schema) {
-    return this.processSchemaDefault(schema.rawSchema());
+    return processSchemaDefault(schema.rawSchema());
   }
 
   public final List<String> getSchemaNameList(final String schema) {

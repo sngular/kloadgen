@@ -14,18 +14,18 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.commons.lang3.tuple.Pair;
 
-public  class SchemaExtractor {
+public class SchemaExtractor {
 
   private SchemaRegistryEnum type;
 
   public SchemaExtractor() {
   }
 
-  public SchemaRegistryEnum getType(){
+  public final SchemaRegistryEnum getType(){
     return type;
   }
 
-  public void setType(SchemaRegistryEnum type){
+  public final void setType(SchemaRegistryEnum type){
     this.type = type;
   }
 
