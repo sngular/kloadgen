@@ -124,6 +124,22 @@
           "schema": "syntax = \"proto3\";\r\npackage sngular;\r\n\r\noption java_package = \"com.sngular.external.proto\";\r\noption java_outer_classname = \"ExternalMessage\";\r\noption java_multiple_files = true;\r\n\r\nmessage ExternalEntity{\r\n string parentPropertyOne = 1;\r\n int32 parentPropertyTwo = 2;\r\n \r\n  message EntityOne {\r\n    int32 entityNumberOne = 1;\r\n    string entityNumberTwo = 2;\r\n    \r\n    message NestingEntity {\r\n      string nestedProperty = 1;\r\n      \r\n      }\r\n    \r\n  }\r\n  \r\n  message EntityTwo {\r\n    int32 propertyNumberOne = 1;\r\n    string propertyNumberTwo = 2; \r\n  }\r\n\r\n}"
         }
       }
+    },{
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/subjects/protobuf_subject.proto/versions/latest"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "subject": "ProtobufSubject",
+          "version": 1,
+          "id": 74,
+          "schemaType": "PROTOBUF",
+          "schema": "syntax = \"proto3\";\r\npackage sngular;\r\n\r\noption java_package = \"com.sngular.external.proto\";\r\noption java_outer_classname = \"ExternalMessage\";\r\noption java_multiple_files = true;\r\n\r\nmessage ExternalEntity{\r\n string parentPropertyOne = 1;\r\n int32 parentPropertyTwo = 2;\r\n \r\n  message EntityOne {\r\n    int32 entityNumberOne = 1;\r\n    string entityNumberTwo = 2;\r\n    \r\n    message NestingEntity {\r\n      string nestedProperty = 1;\r\n      \r\n      }\r\n    \r\n  }\r\n  \r\n  message EntityTwo {\r\n    int32 propertyNumberOne = 1;\r\n    string propertyNumberTwo = 2; \r\n  }\r\n\r\n}"
+        }
+      }
     },
     {
       "priority": 10,
@@ -276,6 +292,15 @@
               "type": "AVRO",
               "state": "ENABLED",
               "modifiedOn": "2023-01-01T00:00:00Z"
+            },
+            {
+              "id": "dad37185-782b-4bed-9cf6-678d1d458710",
+              "name": "simple-schema",
+              "createdOn": "2023-01-01T00:00:00Z",
+              "createdBy": "",
+              "type": "AVRO",
+              "state": "ENABLED",
+              "modifiedOn": "2023-01-01T00:00:00Z"
             }
           ],
           "count": 2
@@ -328,6 +353,106 @@
             },
             {
               "name": "Age",
+              "type": "int"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/ids/globalIds/72/references"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [{
+          "groupId": "73",
+          "artifactId": "dad37185-782b-4bed-9cf6-678d1d458710",
+          "name": "data",
+          "version": 1
+        }],
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/groups/default/artifacts/dad37185-782b-4bed-9cf6-678d1d458710"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": "test",
+          "type": "record",
+          "fields": [
+            {
+              "name": "NewName",
+              "type": "string"
+            },
+            {
+              "name": "NewAge",
+              "type": "int"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/groups/default/artifacts/dad37185-782b-4bed-9cf6-678d1d458710/meta"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": "test",
+          "type": "record",
+          "fields": [
+            {
+              "name": "NewName",
+              "type": "string"
+            },
+            {
+              "name": "NewAge",
+              "type": "int"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/vnd.schemaregistry.v1+json"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/apis/registry/v2/ids/globalIds/73\\?dereference=false"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": "test",
+          "type": "record",
+          "fields": [
+            {
+              "name": "NewName",
+              "type": "string"
+            },
+            {
+              "name": "NewAge",
               "type": "int"
             }
           ]

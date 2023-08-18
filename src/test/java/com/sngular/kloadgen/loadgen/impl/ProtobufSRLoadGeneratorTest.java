@@ -6,21 +6,12 @@
 
 package com.sngular.kloadgen.loadgen.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
@@ -32,10 +23,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
 @WireMockTest
 class ProtobufSRLoadGeneratorTest {
-
-  private FileHelper fileHelper = new FileHelper();
 
   @BeforeEach
   public void setUp(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {

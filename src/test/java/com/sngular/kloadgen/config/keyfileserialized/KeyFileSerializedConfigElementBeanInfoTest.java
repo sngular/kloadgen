@@ -6,13 +6,13 @@
 
 package com.sngular.kloadgen.config.keyfileserialized;
 
-import java.beans.PropertyDescriptor;
-import java.util.Locale;
-
 import org.apache.jmeter.util.JMeterUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.beans.PropertyDescriptor;
+import java.util.Locale;
 
 class KeyFileSerializedConfigElementBeanInfoTest {
 
@@ -39,7 +39,7 @@ class KeyFileSerializedConfigElementBeanInfoTest {
   @Test
   void shouldGenerateElements() {
     final PropertyDescriptor[] propertyDescriptors = keyFileSerializedConfigElementBeanInfo.getPropertyDescriptors();
-    Assertions.assertThat(propertyDescriptors).hasSize(6);
+    Assertions.assertThat(propertyDescriptors).hasSize(8);
     Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_NAME_STRATEGY);
     Assertions.assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_DEFINITION);
     Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
