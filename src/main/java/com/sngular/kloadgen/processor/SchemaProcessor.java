@@ -166,8 +166,9 @@ public class SchemaProcessor {
 
   private ArrayDeque<FieldValueMapping> calculateFieldsToProcess() {
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-    return initialFieldExpMappingsQueue.stream().filter(fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue))
-                                       .collect(Collectors.toCollection(ArrayDeque::new));
+    return initialFieldExpMappingsQueue.stream()
+               .filter(fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue))
+               .collect(Collectors.toCollection(ArrayDeque::new));
   }
 
   private boolean shouldProcessField(final FieldValueMapping fieldValueMapping, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue) {
@@ -179,8 +180,18 @@ public class SchemaProcessor {
       for (int level = 0; level < fields.length; level++) {
         shouldProcess = shouldProcessAccordingToSubField(fieldValueMapping, initialFieldExpMappingsQueue, level);
       }
+
+      if(!shouldProcess
+         && initialFieldExpMappingsQueue.getLast().equals(fieldValueMapping)) {
+        shouldProcess = shouldProcessAccordingToAllOptionals(initialFieldExpMappingsQueue);
+
+      }
     }
     return shouldProcess;
+  }
+
+  private boolean shouldProcessAccordingToAllOptionals(final ArrayDeque<FieldValueMapping> fieldMappingsQueue) {
+    return fieldMappingsQueue.stream().noneMatch(FieldValueMapping::getRequired);
   }
 
   private boolean shouldProcessAccordingToSubField(final FieldValueMapping fieldValueMapping, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue, final int level) {
