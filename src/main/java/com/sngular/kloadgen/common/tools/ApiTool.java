@@ -291,6 +291,6 @@ public final class ApiTool {
     return JsonNode::asText;
   }
 
-  protected static String findValue(final JsonNode message, final String key) {
-  }
+/*  protected static String findValue(final JsonNode message, final String key) {
+  }*/
 }

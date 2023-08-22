@@ -52,7 +52,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
     var message = ApiTool.getNode(node, "message");
     if (ApiTool.hasNode(message, "bindings")) {
       builder.key(true);
-      builder.keyType(ApiTool.findValue(message, "key"))
+     // builder.keyType(ApiTool.findValue(message, "key"));
     }
     return builder.build();
   }
