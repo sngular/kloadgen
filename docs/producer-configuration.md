@@ -39,7 +39,10 @@ Here you can find the list of the parameters to be configured when defining the 
 - `ssl.provider`: the name of the security provider used for SSL connections. The default value is blank.
 - `ssl.protocol`: the SSL protocol used to generate the SSLContext. The default value is `TLSv1.3`.
 - `auto.register.schemas`: allows or disallows the Schema Registry client to register the schema if missing. The default value is `false`.
+- `apicurio.avro.confluent.compatibility`: This property store the ID by 4 bytes intead of the 8 bytes by default of Apicurio, if its enabled with a `YES`.
+- `apicurio.avro.header.id`: Change the ID location from the message to the headers if its enabled.
 
+> To allow the compatibility between Apicurio Avro and Confluetn Avro you must enable`apicurio.avro.confluent.compatibility`
 ## Kafka producer configuration elements
 
 These are the configuration elements corresponding to the Kafka producer. See below the details for each one.
@@ -130,6 +133,9 @@ The four previous configuration elements share the same table, which includes th
 This configuration element allows to define a simple key with primitive types.
 
 You need to provide values for **Key Value**, **Key Class Type** and **Serializer**.
+
+> If you want generate random keys you can use the [JMeter funcitons](https://jmeter.apache.org/usermanual/functions.html#__RandomString)
+> for that. <em>*The key is generated at the start of each thread</em>
 
 ### KLG - Simple Value Config
 
