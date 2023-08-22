@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.testelement.AbstractTestElement;
+import scala.Console;
 
 @ToString
 @NoArgsConstructor
@@ -107,16 +108,19 @@ public class FieldValueMapping extends AbstractTestElement {
     if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
       try {
         inputFieldValueAux = inputFieldValueList;
-        if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
-          inputFieldValueAux = "[" + inputFieldValueAux;
-        }
-        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
-          inputFieldValueAux += "]";
-        }
-        final JsonNode nodes = OBJECT_MAPPER.readTree(inputFieldValueAux);
-        final Iterator<JsonNode> nodeElements = nodes.elements();
-        while (nodeElements.hasNext()) {
-          result.add(nodeElements.next().toString());
+
+
+          if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
+            inputFieldValueAux = "[" + inputFieldValueAux;
+          }
+          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
+            inputFieldValueAux += "]";
+          }
+          final JsonNode nodes = OBJECT_MAPPER.readTree(inputFieldValueAux);
+          final Iterator<JsonNode> nodeElements = nodes.elements();
+          while (nodeElements.hasNext()) {
+            result.add(nodeElements.next().toString());
+
         }
       } catch (final JsonProcessingException ex) {
         inputFieldValueAux = inputFieldValueList;
@@ -126,9 +130,15 @@ public class FieldValueMapping extends AbstractTestElement {
         if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
           inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
         }
+        if (inputFieldValueAux.contains("],")){
+          result.addAll(Arrays.asList( inputFieldValueAux.trim().substring(0,inputFieldValueAux.length()).split(", ",-1)));
+        }else{
         result.addAll(Arrays.asList(inputFieldValueAux.trim().split("\\s*,\\s*", -1)));
+
+        }
       }
     }
+
     return result;
   }
 

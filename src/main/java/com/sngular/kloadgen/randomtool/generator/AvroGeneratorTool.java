@@ -248,7 +248,7 @@ public class AvroGeneratorTool {
         }
       }
     } else {
-      value = (HashMap<Object, Object>) RANDOM_MAP.generateMap(fieldType, mapSize, parameterList, valueLength, mapSize, constraints);
+      value = (HashMap<Object, Object>) RANDOM_MAP.generateMap(fieldType, /*mapSize*/parameterList.size(), parameterList, valueLength, mapSize, constraints);
     }
 
     return value;
