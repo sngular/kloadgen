@@ -9,11 +9,13 @@ package com.sngular.kloadgen.config.kafkaheaders;
 import java.beans.PropertyDescriptor;
 import java.util.Locale;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.util.JMeterUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@Slf4j
 class KafkaHeadersConfigElementBeanInfoTest {
 
   private static final String KAFKA_HEADERS = "kafkaHeaders";
@@ -29,7 +31,10 @@ class KafkaHeadersConfigElementBeanInfoTest {
   @Test
   final void shouldGenerateElements() {
     final PropertyDescriptor[] propertyDescriptors = kafkaHeadersConfigElementBeanInfo.getPropertyDescriptors();
-    Assertions.assertThat(propertyDescriptors).hasSize(1);
+    Assertions.assertThat(propertyDescriptors).hasSize(3);
     Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(KAFKA_HEADERS);
+    for (var property : propertyDescriptors) {
+      log.info(property.toString());
+    }
   }
 }

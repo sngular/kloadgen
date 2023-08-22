@@ -27,6 +27,7 @@ import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
 import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
 import com.sngular.kloadgen.extractor.model.AsyncApiServer;
+import com.sngular.kloadgen.sampler.AsyncApiSampler;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -43,10 +44,12 @@ import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
 
-public class AsyncApiConfigGui extends AbstractSamplerGui {
+public final class AsyncApiConfigGui extends AbstractSamplerGui {
 
-  public static final String ERROR_FAILED_TO_RETRIEVE_PROPERTIES = "ERROR: Failed to retrieve properties!";
+  private static final Logger log = LoggingManager.getLoggerForClass();
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
@@ -58,18 +61,22 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
 
   private JTextField registryUrl;
 
-  private DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Field Values List"}, 20);
+  private final DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Field Values List"}, 20);
 
-  private DefaultTableModel brokerFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
+  private final DefaultTableModel brokerFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
 
-  private DefaultTableModel schemaRegistryFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
-
-  private JButton fileButton;
+  private final DefaultTableModel schemaRegistryFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
 
   private JComboBox<AsyncApiServer> serverComboBox;
 
-  protected AsyncApiConfigGui() {
+  public AsyncApiConfigGui() {
+    super();
     init();
+  }
+
+  @Override
+  public String getStaticLabel() {
+    return "AsyncApi Sampler";
   }
 
   private void init() {
@@ -77,14 +84,14 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
     setBorder(makeBorder());
     mainPanel = new JPanel();
     mainPanel.setLayout(new GridBagLayout());
-    mainPanel.setPreferredSize(new Dimension(-1, -1));
     mainPanel.putClientProperty("html.disable", Boolean.FALSE);
     mainPanel.setBorder(
         BorderFactory
           .createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
 
-    mainPanel.add("asyncapi.file.selector", createAsyncApiFileSelectPanel());
-    mainPanel.add("asyncapi.config.options", createAsyncApiTabs());
+    mainPanel.add(createAsyncApiFileSelectPanel(), BorderLayout.NORTH);
+    mainPanel.add(createAsyncApiTabs(), BorderLayout.SOUTH);
+    add(mainPanel);
   }
 
   private JPanel createAsyncApiFileSelectPanel() {
@@ -105,7 +112,7 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
     gridBagConstraints.anchor = GridBagConstraints.WEST;
     gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
     fileChoosingPanel.add(asyncApiFileTextField, gridBagConstraints);
-    fileButton = new JButton();
+    JButton fileButton = new JButton();
     fileButton.setText("Open File");
     fileButton.addActionListener(this::actionFileChooser);
     gridBagConstraints = new GridBagConstraints();
@@ -233,7 +240,7 @@ public class AsyncApiConfigGui extends AbstractSamplerGui {
 
   @Override
   public TestElement createTestElement() {
-    var testElement = new AsyncApiTestElement();
+    var testElement = new AsyncApiSampler();
     modifyTestElement(testElement);
     return testElement;
   }
