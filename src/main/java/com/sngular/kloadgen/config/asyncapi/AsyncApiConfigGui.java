@@ -83,7 +83,7 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
     setLayout(new BorderLayout());
     setBorder(makeBorder());
     mainPanel = new JPanel();
-    mainPanel.setLayout(new GridBagLayout());
+    mainPanel.setLayout(new BorderLayout());
     mainPanel.putClientProperty("html.disable", Boolean.FALSE);
     mainPanel.setBorder(
         BorderFactory
@@ -138,7 +138,7 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
     return tabbedPanel;
   }
 
-  public final void actionFileChooser(final ActionEvent event) {
+  public void actionFileChooser(final ActionEvent event) {
 
     final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
 

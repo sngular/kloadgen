@@ -37,7 +37,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
       throw new KLoadGenException(ERROR_WRONG_ASYNC_API_SCHEMA, e);
     }
 
-    return null;
+    return builder.build();
   }
 
   private List<AsyncApiSchema> nodeToSchema(final JsonNode node) {
@@ -74,16 +74,16 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
 
   @Override
   public List<AsyncApiServer> getBrokerData(final AsyncApiFile asyncApiFile) {
-    return null;
+    return asyncApiFile.getApiServerList();
   }
 
   @Override
   public List<AsyncApiSR> getSchemaRegistryData(final AsyncApiFile asyncApiFile) {
-    return null;
+    return asyncApiFile.getApiAsyncApiSRList();
   }
 
   @Override
   public AsyncApiSchema getSchemaData(final AsyncApiFile asyncApiFile) {
-    return null;
+    return asyncApiFile.getApiSchemaList().get(0);
   }
 }
