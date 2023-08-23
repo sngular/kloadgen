@@ -273,7 +273,7 @@ public final class SamplerUtil {
     if (Objects.nonNull(context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA))) {
       props.put(PropsKeysHelper.KEY_SCHEMA, context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA));
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))){
+    if (Objects.nonNull(context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
       props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
     }
 
