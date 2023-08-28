@@ -415,6 +415,12 @@
       <groupId>io.apicurio</groupId>
       <artifactId>apicurio-registry-client</artifactId>
       <version>${apicurio-registry.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.slf4j</groupId>
+          <artifactId>slf4j-jboss-logmanager</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.apicurio</groupId>
@@ -456,6 +462,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j-api.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

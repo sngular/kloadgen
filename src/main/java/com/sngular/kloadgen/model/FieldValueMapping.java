@@ -7,12 +7,13 @@
 package com.sngular.kloadgen.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -24,7 +25,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.testelement.AbstractTestElement;
-import scala.Console;
 
 @ToString
 @NoArgsConstructor
@@ -109,32 +109,24 @@ public class FieldValueMapping extends AbstractTestElement {
       try {
         inputFieldValueAux = inputFieldValueList;
 
-
-          if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
-            inputFieldValueAux = "[" + inputFieldValueAux;
-          }
-          if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
-            inputFieldValueAux += "]";
-          }
-          final JsonNode nodes = OBJECT_MAPPER.readTree(inputFieldValueAux);
-          final Iterator<JsonNode> nodeElements = nodes.elements();
-          while (nodeElements.hasNext()) {
-            result.add(nodeElements.next().toString());
+        if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
+          inputFieldValueAux = "[" + inputFieldValueAux;
+        }
+        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
+          inputFieldValueAux += "]";
+        }
+        final JsonNode nodes = OBJECT_MAPPER.readTree(inputFieldValueAux);
+        final Iterator<JsonNode> nodeElements = nodes.elements();
+        while (nodeElements.hasNext()) {
+          result.add(nodeElements.next().toString());
 
         }
       } catch (final JsonProcessingException ex) {
-        inputFieldValueAux = inputFieldValueList;
-        if (inputFieldValueAux.charAt(0) == "[".charAt(0)) {
-          inputFieldValueAux = inputFieldValueAux.substring(1);
-        }
-        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
-          inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
-        }
-        if (inputFieldValueAux.contains("],")){
-          result.addAll(Arrays.asList( inputFieldValueAux.trim().substring(0,inputFieldValueAux.length()).split(", ",-1)));
-        }else{
-        result.addAll(Arrays.asList(inputFieldValueAux.trim().split("\\s*,\\s*", -1)));
-
+        String pattern = "(?<=\\[?)(((\\p{Alnum}+:(\\p{Alnum}+|\\[(\\p{Alnum}+,\\p{Alnum}+|)*]))|\\p{Alnum}+)(?=[]|,]))";
+        Pattern r = Pattern.compile(pattern);
+        Matcher matcher = r.matcher(inputFieldValueList.trim());
+        while (matcher.find()) {
+          result.add(matcher.group(1));
         }
       }
     }
