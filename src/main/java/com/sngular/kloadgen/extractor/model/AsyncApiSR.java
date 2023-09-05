@@ -13,6 +13,6 @@ public class AsyncApiSR implements AsyncApiAbstract {
 
   @Override
   public Object[] getProperties() {
-    return new Object[0];
+    return new Object[] {schemaRegistryUrl, schemaRegistryVendor};
   }
 }

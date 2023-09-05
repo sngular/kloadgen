@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
@@ -24,6 +23,8 @@ public final class ApiTool {
   public static final String ONE_OF = "oneOf";
   public static final String COMPONENTS = "components";
   public static final String SCHEMAS = "schemas";
+
+  public static final String MESSAGES = "messages";
   public static final String REQUIRED = "required";
 
   public static final String PARAMETERS = "parameters";
@@ -33,6 +34,9 @@ public final class ApiTool {
   private ApiTool() {
   }
 
+  public static JsonNode findNodeValue(final JsonNode node, final String valueName) {
+    return node.findValue(valueName);
+  }
   public static String getType(final JsonNode schema) {
     return hasType(schema) ? getNodeAsString(schema, "type") : "";
   }
@@ -96,44 +100,31 @@ public final class ApiTool {
   }
 
   public static Map<String, JsonNode> getComponentSchemas(final JsonNode openApi) {
-    final var schemasMap = new HashMap<String, JsonNode>();
+    return getSchemas(openApi, SCHEMAS);
+  }
 
-    if (hasNode(openApi, COMPONENTS)) {
-      final var components = getNode(openApi, COMPONENTS);
-      if (hasNode(components, SCHEMAS)) {
-        final var schemas = getNode(components, SCHEMAS);
-        final var schemasIt = schemas.fieldNames();
-        schemasIt.forEachRemaining(name -> schemasMap.put(name, getNode(schemas, name)));
-      }
-    }
-
-    return schemasMap;
+  public static Map<String, JsonNode> getComponentMessages(final JsonNode openApi) {
+    return getSchemas(openApi, MESSAGES);
   }
 
   public static Map<String, JsonNode> getParameterSchemas(final JsonNode openApi) {
-    final var schemasMap = new HashMap<String, JsonNode>();
-
-    if (hasNode(openApi, COMPONENTS)) {
-      final var components = getNode(openApi, COMPONENTS);
-      if (hasNode(components, PARAMETERS)) {
-        final var schemas = getNode(components, PARAMETERS);
-        final var schemasIt = schemas.fieldNames();
-        schemasIt.forEachRemaining(name -> schemasMap.put(name, getNode(schemas, name)));
-      }
-    }
-
-    return schemasMap;
+    return getSchemas(openApi, PARAMETERS);
   }
 
   public static Map<String, JsonNode> getResponseSchemas(final JsonNode openApi) {
+
+    return getSchemas(openApi, RESPONSES);
+  }
+
+  public static Map<String, JsonNode> getSchemas(final JsonNode openApi, final String schemaType) {
     final var schemasMap = new HashMap<String, JsonNode>();
 
     if (hasNode(openApi, COMPONENTS)) {
       final var components = getNode(openApi, COMPONENTS);
-      if (hasNode(components, RESPONSES)) {
-        final var schemas = getNode(components, RESPONSES);
+      if (hasNode(components, schemaType)) {
+        final var schemas = getNode(components, schemaType);
         final var schemasIt = schemas.fieldNames();
-        schemasIt.forEachRemaining(name -> schemasMap.put(name, getNode(schemas, name)));
+        schemasIt.forEachRemaining(name -> schemasMap.put(schemaType + "/" + name, getNode(schemas, name)));
       }
     }
 
@@ -156,20 +147,14 @@ public final class ApiTool {
   public static String getNumberType(final JsonNode schema) {
     final String type;
     if (hasType(schema)) {
-      switch (getType(schema)) {
-        case TypeConstants.DOUBLE: type = TypeConstants.DOUBLE;
-                                      break;
-        case TypeConstants.FLOAT: type = TypeConstants.FLOAT;
-                                      break;
-        case TypeConstants.NUMBER: type = TypeConstants.NUMBER;
-                                      break;
-        case TypeConstants.INT_64: type = TypeConstants.INT_64;
-                                      break;
-        case TypeConstants.INT_32: type = TypeConstants.INT_32;
-                                      break;
-        default: type = TypeConstants.INTEGER;
-          break;
-      }
+      type = switch (getType(schema)) {
+        case TypeConstants.DOUBLE -> TypeConstants.DOUBLE;
+        case TypeConstants.FLOAT -> TypeConstants.FLOAT;
+        case TypeConstants.NUMBER -> TypeConstants.NUMBER;
+        case TypeConstants.INT_64 -> TypeConstants.INT_64;
+        case TypeConstants.INT_32 -> TypeConstants.INT_32;
+        default -> TypeConstants.INTEGER;
+      };
     } else {
       type = TypeConstants.INTEGER;
     }

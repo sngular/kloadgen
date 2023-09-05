@@ -1,7 +1,7 @@
 package com.sngular.kloadgen.extractor.model;
 
 import java.util.List;
-
+import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
 
@@ -13,5 +13,5 @@ public class AsyncApiFile {
 
   List<AsyncApiSR> apiAsyncApiSRList;
 
-  List<AsyncApiSchema> apiSchemaList;
+  Map<String, AsyncApiSchema> apiSchemaList;
 }

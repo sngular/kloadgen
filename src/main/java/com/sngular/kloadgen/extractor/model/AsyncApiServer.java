@@ -17,6 +17,6 @@ public class AsyncApiServer implements AsyncApiAbstract {
 
   @Override
   public Object[] getProperties() {
-    return new Object[0];
+    return new Object[] {name, url, protocol, description};
   }
 }
