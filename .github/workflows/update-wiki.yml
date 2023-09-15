@@ -1,0 +1,58 @@
+name: Sync Docs (Merge)
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  check-pr-labels:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      labels: ${{ steps.get-pr.outputs.pr_labels }}
+    steps:
+    - name: Get Pull Request information
+      uses: 8BitJonny/gh-get-current-pr@2.2.0
+      id: get-pr
+
+  update-wiki:
+    runs-on: ubuntu-latest
+    needs: [check-pr-labels]
+    if: contains(needs.check-pr-labels.outputs.labels, 'documentation')
+    steps:
+      - name: Setup variables
+        run: |
+          echo "REPO_DEST=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}').wiki" >> $GITHUB_ENV
+        shell: bash
+      - name: Checkout KLoadgen Repository
+        run: git clone https://github.com/sngular/kloadgen.git kloadgen
+      - name: Checkout KLoadgen Wiki Repository
+        run: git clone https://github.com/sngular/kloadgen.wiki.git wiki
+      - name: Copy docs and consolidate links
+        run: |
+          cp -rf kloadgen/docs/* wiki/
+          cd wiki
+          grep -lr "(.*\.md)" *|xargs  -r sed -i 's/\.md//g'
+          echo ">"
+          git diff-index --quiet HEAD & git status -s
+          echo "<"
+          git status
+          echo ">"
+          git diff-index --quiet HEAD & git status -s
+          echo "<"
+          echo "TO_BE_CANCELLED=$(if [[ $(git diff-index --quiet HEAD & git status -s) ]]; then echo "false"; else echo "true"; fi)" >> $GITHUB_ENV
+          echo "$TO_BE_CANCELLED"
+      - name: Setup git user
+        if: ${{ env.TO_BE_CANCELLED == 'false' }}
+        run: |
+          git config --global user.name ${{ github.actor }}
+      - name: Sync Wiki
+        if: ${{ env.TO_BE_CANCELLED == 'false' }}
+        run: |
+          cd wiki                
+          git status
+          git add .
+          git commit -m "kloadgen documentation | GitHub Actions $GITHUB_WORKFLOW $GITHUB_RUN_NUMBER"
+          git remote add origin-wiki "https://${{secrets.GITBOT_TOKEN}}@github.com/sngular/kloadgen.wiki.git"
+          git push origin-wiki master

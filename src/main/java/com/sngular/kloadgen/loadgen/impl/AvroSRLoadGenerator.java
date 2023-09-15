@@ -9,12 +9,13 @@ package com.sngular.kloadgen.loadgen.impl;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
@@ -43,7 +44,10 @@ public final class AvroSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
 
   public void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final Schema.Parser parser = new Schema.Parser();
-    this.avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parser.parse(schema), new SchemaMetadata(1, 1, schema), fieldExprMappings);
+    this.avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parser.parse(schema),
+                                           new BaseSchemaMetadata<>(ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1,
+                                                                                                                     schema))),
+                                           fieldExprMappings);
   }
 
   public EnrichedRecord nextMessage() {

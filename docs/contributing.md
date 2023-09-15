@@ -9,10 +9,11 @@ interactions with the project.
 
 ## Code Style
 
-To ensure everybody can work easily and focus in the code, make easy the review process and keep the same style, we have a couple of files defining our code standards:
-- Intellij editor style at `config/checkstyle/OSS_style_idea.xml`
-- Checkstyle configuration files at `checkstyle.xml`
-  - suppression file at `config/checkstyle/OSS_checkstyle/OSS_checkstyle_suppressions.xml`
+We have a couple of files defining our code standards. This ensures anyone can work easily and focus on the code, simplifies the review process, and keeps a consistent style:
+
+- IntelliJ editor style at `config/checkstyle/OSS_style_idea.xml`.
+- Checkstyle configuration files at `checkstyle.xml`.
+- Suppression file at `config/checkstyle/OSS_checkstyle/OSS_checkstyle_suppressions.xml`.
 
 ## Pull Request Process
 
@@ -24,7 +25,10 @@ parameters.
 3. Increase the version numbers in any examples files and the README.md to the
 new version that this Pull Request would represent. The versioning scheme we
 use is [SemVer](http://semver.org/).
-4. You may merge the Pull Request in once you have the sign-off of two other
+4. If your Pull Request corresponds to a new release, label it as `release`. If
+it updates the documentation, label it as `documentation`. You can add both
+labels simultaneously if that is the case.
+5. You may merge the Pull Request in once you have the sign-off of two other
 developers, or if you do not have permission to do that, you may request the
 second reviewer to merge it for you.
 
@@ -44,22 +48,22 @@ identity and orientation.
 Examples of behavior that contributes to creating a positive environment
 include:
 
-* Using welcoming and inclusive language
-* Being respectful of differing viewpoints and experiences
-* Gracefully accepting constructive criticism
-* Focusing on what is best for the community
-* Showing empathy towards other community members
+* Using welcoming and inclusive language.
+* Being respectful of differing viewpoints and experiences.
+* Gracefully accepting constructive criticism.
+* Focusing on what is best for the community.
+* Showing empathy towards other community members.
 
 Examples of unacceptable behavior by participants include:
 
 * The use of sexualized language or imagery and unwelcome sexual attention or
-  advances
-* Trolling, insulting/derogatory comments, and personal or political attacks
-* Public or private harassment
+  advances.
+* Trolling, insulting/derogatory comments, and personal or political attacks.
+* Public or private harassment.
 * Publishing others' private information, such as a physical or electronic
-  address, without explicit permission
+  address, without explicit permission.
 * Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+  professional setting.
 
 ### Our Responsibilities
 

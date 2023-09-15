@@ -11,18 +11,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
@@ -37,28 +38,28 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private final Schema schema;
 
-  private final KloadSchemaMetadata kloadSchemaMetadata;
+  private final SchemaMetadataAdapter schemaMetadataAdapter;
 
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
-  public AvroObjectCreatorFactory(final Object schema, final Object metadata) {
+  public AvroObjectCreatorFactory(final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     if (schema instanceof ParsedSchema) {
       this.schema = (Schema) ((ParsedSchema) schema).rawSchema();
     } else if (schema instanceof Schema) {
       this.schema = (Schema) schema;
+    } else if (schema instanceof BaseParsedSchema) {
+      final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
+      final ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
+      if (adapterParse instanceof ApicurioParsedSchemaMetadata) {
+        this.schema = (Schema) ((ApicurioParsedSchemaMetadata) adapterParse).getSchema();
+      } else {
+        this.schema = adapterParse.getRawSchema();
+      }
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }
 
-    if (metadata instanceof SchemaMetadata) {
-      SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
-    } else if (metadata instanceof ArtifactMetaData) {
-      ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
-    } else {
-      throw new KLoadGenException("Unsupported metadata type");
-    }
+    this.schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
   }
 
   @Override
@@ -130,12 +131,17 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   public final void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
+    entity.get(pojo.getRootFieldName());
   }
 
   @Override
   public final void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
-      entity.put(objectName, new GenericData.Record(this.schema));
+      var aux = this.schema;
+      if (Schema.Type.UNION.equals(this.schema.getType())) {
+        aux = this.schema.getTypes().get(this.schema.getTypes().size() - 1);
+      }
+      entity.put(objectName, new GenericData.Record(aux));
     } else {
       Schema innerSchema = findSchema(completeFieldName, this.schema, new AtomicBoolean(false));
       if (innerSchema.getType().equals(Type.MAP)) {
@@ -151,7 +157,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   @Override
   public final Object generateRecord() {
-    return EnrichedRecord.builder().schemaMetadata(kloadSchemaMetadata).genericRecord(this.entity.get("root")).build();
+    return EnrichedRecord.builder().schemaMetadata(schemaMetadataAdapter).genericRecord(this.entity.get("root")).build();
   }
 
   @Override

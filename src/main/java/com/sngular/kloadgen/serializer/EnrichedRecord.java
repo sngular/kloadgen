@@ -6,15 +6,15 @@
 
 package com.sngular.kloadgen.serializer;
 
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import lombok.Builder;
 import lombok.Value;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
 
 @Value
 @Builder
 public class EnrichedRecord {
 
-  KloadSchemaMetadata schemaMetadata;
+  SchemaMetadataAdapter schemaMetadata;
 
   Object genericRecord;
 }

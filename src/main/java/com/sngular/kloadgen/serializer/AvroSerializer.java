@@ -25,7 +25,7 @@ public class AvroSerializer<T extends EnrichedRecord> implements Serializer<T> {
 
   private static final byte MAGIC_BYTE = 0x0;
 
-  private static final int ID_SIZE = 4;
+  private static final int ID_SIZE = 32;
 
   public AvroSerializer() {
     AvroSerializersUtil.setupLogicalTypesConversion();
@@ -41,7 +41,7 @@ public class AvroSerializer<T extends EnrichedRecord> implements Serializer<T> {
 
         final var byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
-        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).put(data.getSchemaMetadata().getId().getBytes()).array());
+        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).put(data.getSchemaMetadata().getId().toString().getBytes()).array());
         final var binaryEncoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
         final var datumWriter = new GenericDatumWriter<>(((GenericRecord) data.getGenericRecord()).getSchema());
         datumWriter.write(data.getGenericRecord(), binaryEncoder);

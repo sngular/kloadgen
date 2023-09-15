@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
@@ -24,39 +23,40 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
-import com.sngular.kloadgen.sampler.schemaregistry.schema.KloadSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final ProtoBufGeneratorTool PROTOBUF_GENERATOR_TOOL = new ProtoBufGeneratorTool();
+
   private final Descriptors.Descriptor schema;
-  private final KloadSchemaMetadata kloadSchemaMetadata;
+
+  private final SchemaMetadataAdapter schemaMetadataAdapter;
+
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
-  public ProtobufObjectCreatorFactory(final Object schema, final Object metadata) throws DescriptorValidationException, IOException {
+  public ProtobufObjectCreatorFactory(final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) throws DescriptorValidationException, IOException {
     if (schema instanceof ParsedSchema) {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema(), metadata);
     } else if (schema instanceof ProtoFileElement) {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schema, metadata);
+    } else if (schema instanceof BaseParsedSchema) {
+      final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
+      final ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
+      final Object schemaParsed = adapterParse.getRawSchema();
+      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schemaParsed, metadata);
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }
 
-    if (metadata instanceof SchemaMetadata) {
-      final SchemaMetadata schemaMetadata = (SchemaMetadata) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(String.valueOf(schemaMetadata.getId()), String.valueOf(schemaMetadata.getVersion()), schemaMetadata.getSchemaType());
-    } else if (metadata instanceof ArtifactMetaData) {
-      final ArtifactMetaData artifactMetaData = (ArtifactMetaData) metadata;
-      this.kloadSchemaMetadata = new KloadSchemaMetadata(artifactMetaData.getId(), artifactMetaData.getVersion(), artifactMetaData.getType().toString());
-    } else {
-      throw new KLoadGenException("Unsupported metadata type");
-    }
+    this.schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
   }
 
   @Override
@@ -150,7 +150,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 
   @Override
   public final Object generateRecord() {
-    return EnrichedRecord.builder().schemaMetadata(kloadSchemaMetadata).genericRecord(entity.get("root").build()).build();
+    return EnrichedRecord.builder().schemaMetadata(schemaMetadataAdapter).genericRecord(entity.get("root").build()).build();
   }
 
   @Override
@@ -221,7 +221,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
     if (Objects.nonNull(fieldDescriptor) && FieldDescriptor.Type.ENUM.equals(fieldDescriptor.getType())) {
       final var enumDescriptor = fieldDescriptor.getEnumType();
       final Object generatedObject = PROTOBUF_GENERATOR_TOOL.generateObject(enumDescriptor, getOneDimensionValueType(pojo.getValueType()), pojo.getFieldSize(),
-                                                        pojo.getFieldValuesList());
+                                                                            pojo.getFieldValuesList());
       objectReturn = generatedObject instanceof List<?> ? (List<Object>) generatedObject : List.of(generatedObject);
     } else {
       objectReturn = PROTOBUF_GENERATOR_TOOL.generateArray(pojo.getFieldNameSubEntity(), pojo.getValueType(), pojo.getFieldSize(), pojo.getValueLength(),

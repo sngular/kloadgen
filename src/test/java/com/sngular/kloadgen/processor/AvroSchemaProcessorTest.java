@@ -17,17 +17,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.fixture.AvroSchemaFixturesConstants;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.testutil.FileHelper;
+import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -50,7 +49,9 @@ class AvroSchemaProcessorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final SchemaExtractor extractor = new SchemaExtractorImpl();
+  private final BaseSchemaMetadata confluentBaseSchemaMetadata
+      = new BaseSchemaMetadata<>(ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1,
+                                                                                                                           "")));
 
   private static Stream<Object> parametersForTestNullOnOptionalField() {
     return Stream.of(
@@ -79,9 +80,9 @@ class AvroSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("topLevelIntArray[3]").fieldType("int-array").valueLength(0).fieldValueList("[2]").required(true).isAncestorRequired(true).build());
 
     final File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-    final ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
     final SchemaProcessor avroSchemaProcessor = new SchemaProcessor();
-    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final GenericRecord entity = setUpEntityForAvroTestWithSubEntitySimpleArray(parsedSchema);
     final EnrichedRecord message = (EnrichedRecord) avroSchemaProcessor.next();
 
@@ -129,9 +130,9 @@ class AvroSchemaProcessorTest {
             .build());
 
     final var testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-    final var parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    final var parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
     final var avroSchemaProcessor = new SchemaProcessor();
-    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var entity = setUpEntityForAvroTestWithSubEntityArray(parsedSchema);
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
 
@@ -173,9 +174,9 @@ class AvroSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("timestamp").fieldType("long").valueLength(0).fieldValueList("5").required(true).isAncestorRequired(true).build()
     );
     final var testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-    final var parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    final var parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
     final var avroSchemaProcessor = new SchemaProcessor();
-    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
     final var entity = setUpEntityForEmbeddedAvroTest(parsedSchema);
 
@@ -185,7 +186,16 @@ class AvroSchemaProcessorTest {
   }
 
   private GenericRecord setUpEntityForEmbeddedAvroTest(final ParsedSchema parsedSchema) {
-    final var entity = new GenericData.Record((Schema) parsedSchema.rawSchema());
+    GenericData.Record entity = null; //TODO HERE
+
+    if (parsedSchema.rawSchema() instanceof Schema) {
+      Schema schema = (Schema) parsedSchema.rawSchema();
+      if (Schema.Type.UNION.equals(schema.getType())) {
+        entity = new GenericData.Record(schema.getTypes().get(schema.getTypes().size()-1));
+      } else {
+        entity = new GenericData.Record(schema);
+      }
+    }
     final var subEntityFieldMySchema = new GenericData.Record(entity.getSchema().getField("fieldMySchema").schema());
 
     subEntityFieldMySchema.put("testInt_id", 4);
@@ -206,7 +216,7 @@ class AvroSchemaProcessorTest {
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO,
                                       SchemaBuilder.builder().record("testing").fields().requiredString("name").optionalInt("age").endRecord(),
-                                      new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+                                      confluentBaseSchemaMetadata, fieldValueMappingList);
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
     Assertions.assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
     Assertions.assertThat(message.getGenericRecord()).isNotNull();
@@ -226,7 +236,7 @@ class AvroSchemaProcessorTest {
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, SchemaBuilder.builder().record("testing").fields().requiredString("name").name(
                                           "decimal").type(decimalSchemaBytes).noDefault().endRecord(),
-                                      new SchemaMetadata(1, 1, ""), fieldValueMappingList);
+                                      confluentBaseSchemaMetadata, fieldValueMappingList);
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
     Assertions.assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
     Assertions.assertThat(message.getGenericRecord()).isNotNull();
@@ -245,39 +255,39 @@ class AvroSchemaProcessorTest {
 
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, SchemaBuilder
-                                                               .builder()
-                                                               .record("arrayMap")
-                                                               .fields()
-                                                               .name("values")
-                                                               .type()
-                                                               .array()
-                                                               .items()
-                                                               .type(SchemaBuilder
-                                                                         .builder()
-                                                                         .map()
-                                                                         .values()
-                                                                         .stringType()
-                                                                         .getValueType())
-                                                               .noDefault()
-                                                               .name("topLevelRecord")
-                                                               .type()
-                                                               .record("subvalues")
-                                                               .fields()
-                                                               .name("subvalues")
-                                                               .type()
-                                                               .array()
-                                                               .items()
-                                                               .type(SchemaBuilder
-                                                                         .builder()
-                                                                         .map()
-                                                                         .values()
-                                                                         .stringType()
-                                                                         .getValueType())
-                                                               .noDefault()
-                                                               .endRecord()
-                                                               .noDefault()
-                                                               .endRecord(),
-                                      new SchemaMetadata(1, 1, ""),
+                                          .builder()
+                                          .record("arrayMap")
+                                          .fields()
+                                          .name("values")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .map()
+                                                    .values()
+                                                    .stringType()
+                                                    .getValueType())
+                                          .noDefault()
+                                          .name("topLevelRecord")
+                                          .type()
+                                          .record("subvalues")
+                                          .fields()
+                                          .name("subvalues")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .map()
+                                                    .values()
+                                                    .stringType()
+                                                    .getValueType())
+                                          .noDefault()
+                                          .endRecord()
+                                          .noDefault()
+                                          .endRecord(),
+                                      confluentBaseSchemaMetadata,
                                       fieldValueMappingList);
 
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
@@ -307,23 +317,23 @@ class AvroSchemaProcessorTest {
 
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, SchemaBuilder
-                                                               .builder()
-                                                               .record("array")
-                                                               .fields()
-                                                               .name("values")
-                                                               .type()
-                                                               .array()
-                                                               .items()
-                                                               .type(SchemaBuilder
-                                                                         .builder()
-                                                                         .record("test")
-                                                                         .fields()
-                                                                         .requiredString("name")
-                                                                         .requiredFloat("amount")
-                                                                         .endRecord())
-                                                               .noDefault()
-                                                               .endRecord(),
-                                      new SchemaMetadata(1, 1, ""),
+                                          .builder()
+                                          .record("array")
+                                          .fields()
+                                          .name("values")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .record("test")
+                                                    .fields()
+                                                    .requiredString("name")
+                                                    .requiredFloat("amount")
+                                                    .endRecord())
+                                          .noDefault()
+                                          .endRecord(),
+                                      confluentBaseSchemaMetadata,
                                       fieldValueMappingList);
 
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
@@ -347,22 +357,22 @@ class AvroSchemaProcessorTest {
 
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, SchemaBuilder
-                                                               .builder()
-                                                               .record("arrayMap")
-                                                               .fields()
-                                                               .name("values")
-                                                               .type()
-                                                               .array()
-                                                               .items()
-                                                               .type(SchemaBuilder
-                                                                         .builder()
-                                                                         .map()
-                                                                         .values()
-                                                                         .stringType()
-                                                                         .getValueType())
-                                                               .noDefault()
-                                                               .endRecord(),
-                                      new SchemaMetadata(1, 1, ""),
+                                          .builder()
+                                          .record("arrayMap")
+                                          .fields()
+                                          .name("values")
+                                          .type()
+                                          .array()
+                                          .items()
+                                          .type(SchemaBuilder
+                                                    .builder()
+                                                    .map()
+                                                    .values()
+                                                    .stringType()
+                                                    .getValueType())
+                                          .noDefault()
+                                          .endRecord(),
+                                      confluentBaseSchemaMetadata,
                                       fieldValueMappingList);
 
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
@@ -383,7 +393,7 @@ class AvroSchemaProcessorTest {
   @ParameterizedTest
   @MethodSource("parametersForTestNullOnOptionalField")
   void testNullOnOptionalField(final Schema schema, final List<FieldValueMapping> fieldValueMapping) {
-    final var metadata = new SchemaMetadata(1, 1, "");
+    final var metadata = confluentBaseSchemaMetadata;
 
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, schema, metadata, fieldValueMapping);
@@ -409,29 +419,29 @@ class AvroSchemaProcessorTest {
 
     final var avroSchemaProcessor = new SchemaProcessor();
     final var schemaWithTwoSequencesWithSameStartingValue = SchemaBuilder
-                                                                .builder()
-                                                                .record("Root")
-                                                                .fields()
-                                                                .name("values")
-                                                                .type()
-                                                                .array()
-                                                                .items()
-                                                                .type(SchemaBuilder.builder()
-                                                                                   .record("valuesData")
-                                                                                   .fields()
-                                                                                   .name("id")
-                                                                                   .type(Schema.Type.STRING.getName())
-                                                                                   .noDefault()
-                                                                                   .name("otherId")
-                                                                                   .type(Schema.Type.LONG.getName())
-                                                                                   .noDefault()
-                                                                                   .endRecord())
-                                                                .noDefault()
-                                                                .endRecord();
+        .builder()
+        .record("Root")
+        .fields()
+        .name("values")
+        .type()
+        .array()
+        .items()
+        .type(SchemaBuilder.builder()
+                           .record("valuesData")
+                           .fields()
+                           .name("id")
+                           .type(Schema.Type.STRING.getName())
+                           .noDefault()
+                           .name("otherId")
+                           .type(Schema.Type.LONG.getName())
+                           .noDefault()
+                           .endRecord())
+        .noDefault()
+        .endRecord();
     final var entity = entityForCustomSequenceOfValuesWithSameStartingStartingValue(schemaWithTwoSequencesWithSameStartingValue, Arrays.asList("1", "2", "1"),
                                                                                     Arrays.asList("1", "3", "1"));
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, schemaWithTwoSequencesWithSameStartingValue,
-                                      new SchemaMetadata(1, 1, ""),
+                                      confluentBaseSchemaMetadata,
                                       fieldValueMappingList);
 
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
@@ -444,13 +454,13 @@ class AvroSchemaProcessorTest {
     final var valuesSchema = entity.getSchema().getField("values").schema();
     final var valuesDataSchema = valuesSchema.getElementType();
     final var valuesData = IntStream
-                               .range(0, Math.min(idValues.size(), otherIdValues.size()))
-                               .mapToObj(idx -> {
-                                 final var valuesDataRecord = new GenericData.Record(valuesDataSchema);
-                                 valuesDataRecord.put("id", idValues.get(idx));
-                                 valuesDataRecord.put("otherId", Long.valueOf(otherIdValues.get(idx)));
-                                 return valuesDataRecord;
-                               }).collect(Collectors.toList());
+        .range(0, Math.min(idValues.size(), otherIdValues.size()))
+        .mapToObj(idx -> {
+          final var valuesDataRecord = new GenericData.Record(valuesDataSchema);
+          valuesDataRecord.put("id", idValues.get(idx));
+          valuesDataRecord.put("otherId", Long.valueOf(otherIdValues.get(idx)));
+          return valuesDataRecord;
+        }).collect(Collectors.toList());
 
     entity.put("values", valuesData);
     return entity;
@@ -467,38 +477,38 @@ class AvroSchemaProcessorTest {
 
     final var avroSchemaProcessor = new SchemaProcessor();
     final var schemaWithTwoIteratorsWithSameStartingValue = SchemaBuilder
-                                                                .builder()
-                                                                .record("Root")
-                                                                .fields()
-                                                                .name("values")
-                                                                .type()
-                                                                .array()
-                                                                .items()
-                                                                .type(SchemaBuilder.builder()
-                                                                                   .record("valuesData")
-                                                                                   .fields()
-                                                                                   .name("id")
-                                                                                   .type(idSchema)
-                                                                                   .noDefault()
-                                                                                   .endRecord())
-                                                                .noDefault()
-                                                                .name("otherValues")
-                                                                .type()
-                                                                .array()
-                                                                .items()
-                                                                .type(SchemaBuilder.builder()
-                                                                                   .record("otherValuesData")
-                                                                                   .fields()
-                                                                                   .name("id")
-                                                                                   .type(idSchema)
-                                                                                   .noDefault()
-                                                                                   .endRecord())
-                                                                .noDefault()
-                                                                .endRecord();
+        .builder()
+        .record("Root")
+        .fields()
+        .name("values")
+        .type()
+        .array()
+        .items()
+        .type(SchemaBuilder.builder()
+                           .record("valuesData")
+                           .fields()
+                           .name("id")
+                           .type(idSchema)
+                           .noDefault()
+                           .endRecord())
+        .noDefault()
+        .name("otherValues")
+        .type()
+        .array()
+        .items()
+        .type(SchemaBuilder.builder()
+                           .record("otherValuesData")
+                           .fields()
+                           .name("id")
+                           .type(idSchema)
+                           .noDefault()
+                           .endRecord())
+        .noDefault()
+        .endRecord();
     final var entity = entityForCustomIteratorOfValuesWithSameFieldNameInDifferentMappings(schemaWithTwoIteratorsWithSameStartingValue, Arrays.asList("1", "2.44", "3.6", "1"),
                                                                                            Arrays.asList("1", "3.02", "4.98", "1"));
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, schemaWithTwoIteratorsWithSameStartingValue,
-                                      new SchemaMetadata(1, 1, ""),
+                                      confluentBaseSchemaMetadata,
                                       fieldValueMappingList);
 
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
@@ -526,6 +536,7 @@ class AvroSchemaProcessorTest {
     }).collect(Collectors.toList());
   }
 
+
   @Test
   @DisplayName("Should process Embedded Avro Schema Processor")
   void testEnumProcessor() throws IOException {
@@ -541,9 +552,9 @@ class AvroSchemaProcessorTest {
             .build()
     );
     final File testFile = fileHelper.getFile("/avro-files/optionalEnum.avsc");
-    final ParsedSchema parsedSchema = extractor.schemaTypesList(testFile, "AVRO");
+    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
     final SchemaProcessor avroSchemaProcessor = new SchemaProcessor();
-    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final EnrichedRecord message = (EnrichedRecord) avroSchemaProcessor.next();
 
     final var entity = entityForEnumMappings((Schema) parsedSchema.rawSchema());

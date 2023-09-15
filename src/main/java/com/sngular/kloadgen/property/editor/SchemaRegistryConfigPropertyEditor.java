@@ -18,18 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.model.PropertyMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
-import com.sngular.kloadgen.util.ProducerKeysHelper;
-import com.sngular.kloadgen.util.PropsKeysHelper;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.model.PropertyMapping;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.util.ProducerKeysHelper;
+import com.sngular.kloadgen.util.PropsKeysHelper;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.gui.ClearGui;
@@ -151,7 +152,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
       String schemaRegistryName = schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
       JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, schemaRegistryName);
-      final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
+
+      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
 
       originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), checkPropertyOrVariable(schemaRegistryUrl.getText()));
 

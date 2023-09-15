@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.loadgen.impl.AvroSRLoadGenerator;
@@ -27,11 +26,12 @@ import com.sngular.kloadgen.loadgen.impl.ProtobufLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.HeaderMapping;
 import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import org.apache.commons.lang3.StringUtils;
@@ -91,7 +91,8 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
     defaultParameters.addArgument(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, ProducerKeysHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG_DEFAULT);
-
+    defaultParameters.addArgument(ProducerKeysHelper.APICURIO_LEGACY_ID_HANDLER, ProducerKeysHelper.FLAG_NO);
+    defaultParameters.addArgument(ProducerKeysHelper.APICURIO_ENABLE_HEADERS_ID, ProducerKeysHelper.FLAG_YES);
     return defaultParameters;
   }
 
@@ -126,12 +127,18 @@ public final class SamplerUtil {
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(ProducerKeysHelper.SASL_MECHANISM, context.getParameter(ProducerKeysHelper.SASL_MECHANISM));
 
-    String schemaRegistryNameValue = context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    String enableSchemaRegistrationValue = context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG);
-    if (schemaRegistryNameValue.equalsIgnoreCase(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO)) {
+    final String schemaRegistryNameValue = context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+    final String enableSchemaRegistrationValue = context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG);
+    if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(schemaRegistryNameValue)) {
       props.put(SerdeConfig.AUTO_REGISTER_ARTIFACT, enableSchemaRegistrationValue);
+      props.put(SchemaResolverConfig.REGISTRY_URL, context.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
     } else {
       props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, enableSchemaRegistrationValue);
+      final String schemaRegistryURL = context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL);
+      if (StringUtils.isNotBlank(schemaRegistryURL)) {
+        props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, schemaRegistryURL);
+      }
     }
 
     final Iterator<String> parameters = context.getParameterNamesIterator();
@@ -183,8 +190,17 @@ public final class SamplerUtil {
     defaultParameters.addArgument(SslConfigs.SSL_PROVIDER_CONFIG, "");
     defaultParameters.addArgument(SslConfigs.SSL_PROTOCOL_CONFIG, SslConfigs.DEFAULT_SSL_PROTOCOL);
     defaultParameters.addArgument(PropsKeysHelper.TIMEOUT_MILLIS, "5000");
-    defaultParameters.addArgument(CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG, "3000");
     defaultParameters.addArgument(ConsumerConfig.GROUP_ID_CONFIG, "anonymous");
+    defaultParameters.addArgument(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, "1");
+    defaultParameters.addArgument(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, "57671680");
+    defaultParameters.addArgument(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "500");
+    defaultParameters.addArgument(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "500");
+    defaultParameters.addArgument(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, "300000");
+    defaultParameters.addArgument(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "45000");
+    defaultParameters.addArgument(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "3000");
+    defaultParameters.addArgument(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, "50");
+    defaultParameters.addArgument(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, "1000");
+
     return defaultParameters;
   }
 
@@ -217,7 +233,7 @@ public final class SamplerUtil {
   private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
     if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
 
-      final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
       props.put(schemaRegistryManager.getSchemaRegistryUrlKey(), context.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
       props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
 
@@ -260,6 +276,16 @@ public final class SamplerUtil {
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, context.getParameter(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG));
     props.put(PropsKeysHelper.TIMEOUT_MILLIS, context.getParameter(PropsKeysHelper.TIMEOUT_MILLIS));
 
+    props.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, context.getParameter(ConsumerConfig.FETCH_MIN_BYTES_CONFIG));
+    props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, context.getParameter(ConsumerConfig.FETCH_MAX_BYTES_CONFIG));
+    props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, context.getParameter(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG));
+    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, context.getParameter(ConsumerConfig.MAX_POLL_RECORDS_CONFIG));
+    props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, context.getParameter(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG));
+    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, context.getParameter(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG));
+    props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, context.getParameter(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG));
+    props.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, context.getParameter(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG));
+    props.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, context.getParameter(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG));
+
     final Iterator<String> parameters = context.getParameterNamesIterator();
     parameters.forEachRemaining(parameter -> {
       if (parameter.startsWith("_")) {
@@ -269,7 +295,6 @@ public final class SamplerUtil {
 
     verifySecurity(context, props);
 
-    props.put(CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG, context.getParameter(CommonClientConfigs.MAX_POLL_INTERVAL_MS_CONFIG));
     return props;
   }
 
@@ -323,14 +348,11 @@ public final class SamplerUtil {
     final BaseLoadGenerator generator;
 
     final String valueNameStrategy = jMeterVariables.get(ProducerKeysHelper.VALUE_NAME_STRATEGY);
-    if (Objects.isNull(valueNameStrategy)) {
-      if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-        props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
-      } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-        props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
-      }
-    } else {
-      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, valueNameStrategy);
+
+    if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO));
+    } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT));
     }
 
     generator = getLoadGenerator(jMeterVariables);
@@ -405,7 +427,7 @@ public final class SamplerUtil {
 
     if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
       final Map<String, String> originals = new HashMap<>();
-      final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
       originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), jMeterVariables.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
 
       if (ProducerKeysHelper.FLAG_YES.equals(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {

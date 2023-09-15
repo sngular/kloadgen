@@ -7,9 +7,9 @@
 package com.sngular.kloadgen.testutil;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
 import org.apache.commons.io.IOUtils;
 
 public final class FileHelper {
@@ -19,7 +19,7 @@ public final class FileHelper {
     return new File(url.getFile());
   }
 
-  public String getContent(final String fileName) throws Exception {
+  public String getContent(final String fileName) throws IOException {
     return IOUtils.toString(
         getClass().getResourceAsStream(fileName),
         StandardCharsets.UTF_8

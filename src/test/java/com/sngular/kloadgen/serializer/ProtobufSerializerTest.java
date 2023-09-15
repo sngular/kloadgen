@@ -1,5 +1,11 @@
 package com.sngular.kloadgen.serializer;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
+
 import static com.sngular.kloadgen.serializer.ProtobuffSerializerTestFixture.TEST_COMPLETE_PROTO;
 import static com.sngular.kloadgen.serializer.ProtobuffSerializerTestFixture.TEST_COMPLEX;
 import static com.sngular.kloadgen.serializer.ProtobuffSerializerTestFixture.TEST_DATE_TIME;
@@ -13,18 +19,13 @@ import static com.sngular.kloadgen.serializer.ProtobuffSerializerTestFixture.TES
 import static com.sngular.kloadgen.serializer.ProtobuffSerializerTestFixture.TEST_ONE_OF;
 import static com.sngular.kloadgen.serializer.ProtobuffSerializerTestFixture.TEST_PROVIDED;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Stream;
-import java.util.stream.Stream.Builder;
-
 import com.sngular.kloadgen.common.SchemaTypeEnum;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,16 +71,19 @@ class ProtobufSerializerTest {
     builder.add(Arguments.arguments(Named.of(testOneOfFile.getName(), testOneOfFile), TEST_ONE_OF.getSecond()));
     File testProvidedFile = TEST_PROVIDED.getFirst();
     builder.add(Arguments.arguments(Named.of(testProvidedFile.getName(), testProvidedFile), TEST_PROVIDED.getSecond()));
-    
+
     return builder.build();
   }
 
   @ParameterizedTest
   @MethodSource("getSchemaToTest")
   void serialize(File schemaFile, List<FieldValueMapping> fieldValueMappings) throws IOException {
-    final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(schemaFile, "Protobuf");
+    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(schemaFile, "Protobuf");
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, new SchemaMetadata(1, 1, ""), fieldValueMappings);
+    final BaseSchemaMetadata confluentBaseSchemaMetadata =
+        new BaseSchemaMetadata<>(
+            ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1, "")));
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
 
     final var generatedRecord = protobufSchemaProcessor.next();
 

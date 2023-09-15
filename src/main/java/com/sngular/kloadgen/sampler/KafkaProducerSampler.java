@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.HeaderMapping;
@@ -25,6 +24,8 @@ import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.serializer.ProtobufSerializer;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
+import io.apicurio.registry.resolver.SchemaResolverConfig;
+import io.apicurio.registry.serde.Legacy4ByteIdHandler;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -87,27 +88,25 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
     }
 
+    if (context.getParameter(ProducerKeysHelper.APICURIO_LEGACY_ID_HANDLER).equals(ProducerKeysHelper.FLAG_YES)) {
+      props.put(SerdeConfig.ID_HANDLER, Legacy4ByteIdHandler.class.getName());
+    }
+    if (context.getParameter(ProducerKeysHelper.APICURIO_ENABLE_HEADERS_ID).equals(ProducerKeysHelper.FLAG_NO)) {
+      props.put(SerdeConfig.ENABLE_HEADERS, "false");
+    }
+
     topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
     try {
 
-      Properties props2 = new Properties();
+      final Properties props2 = new Properties();
 
       props2.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
       props2.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
       props2.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
       props2.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-      // Use the Apicurio Registry provided Kafka Serializer for Avro
       props2.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
 
-      // Configure Service Registry location
-      props2.putIfAbsent(SerdeConfig.REGISTRY_URL, "http://localhost:8080");
-
-      // Register the artifact if not found in the registry.
-      // props2.putIfAbsent(SerdeConfig.AUTO_REGISTER_ARTIFACT, Boolean.TRUE);
-
-      props2.putIfAbsent("apicurio.registry.artifact-resolver-strategy", props.get(ProducerKeysHelper.VALUE_NAME_STRATEGY));
-
-      producer = new KafkaProducer<>(props2);
+      producer = new KafkaProducer<>(props);
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
     }
@@ -115,8 +114,13 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   private Properties properties(final JavaSamplerContext context) {
     final var commonProps = SamplerUtil.setupCommonProperties(context);
-    if (Objects.nonNull(context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
-      commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY));
+
+    final String artifactResolverStrategy = context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY);
+    if (Objects.nonNull(artifactResolverStrategy)) {
+      commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, artifactResolverStrategy);
+    }
+    if (Objects.nonNull(context.getParameter(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY))) {
+      commonProps.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, artifactResolverStrategy);
     }
     return commonProps;
   }
@@ -159,7 +163,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
         });
 
         fillSampleResult(sampleResult, prettyPrint(result.get()), true);
-      } catch (KLoadGenException | InterruptedException | ExecutionException e) {
+      } catch (final KLoadGenException | InterruptedException | ExecutionException e) {
         super.getNewLogger().error("Failed to send message", e);
         fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "", false);
       }
@@ -204,12 +208,10 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
-    if (Objects.isNull(producerRecord.key())) {
-      sampleResult.setSamplerData(String.format("key: null, payload: %s", producerRecord.value().toString()));
-    } else {
-      sampleResult.setSamplerData(String.format("key: %s, payload: %s", producerRecord.key().toString(),
-                                                producerRecord.value().toString()));
-    }
+    final StringBuilder result = new StringBuilder();
+    result.append("key: ").append(producerRecord.key())
+          .append(", payload: ").append(producerRecord.value());
+    sampleResult.setSamplerData(result.toString());
   }
 
   private void fillSampleResult(final SampleResult sampleResult, final String respondeData, final boolean successful) {
@@ -222,7 +224,8 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     return String.format(TEMPLATE, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
   }
 
-  private Object getObject(final EnrichedRecord messageVal, final boolean valueFlag) {
-    return valueFlag ? messageVal : messageVal.getGenericRecord();
+  private Object getObject(final EnrichedRecord messageVal, final boolean isKloadSerializer) {
+    return isKloadSerializer ? messageVal : messageVal.getGenericRecord();
   }
 }
+

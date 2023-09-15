@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
@@ -26,7 +25,7 @@ public class AvroDeserializer implements Deserializer<Object> {
 
   private static final byte MAGIC_BYTE = 0x0;
 
-  private static final int ID_SIZE = 4;
+  private static final int ID_SIZE = 32;
 
   private static final Map<String, Object> CONFIGS = new HashMap<>();
 
@@ -54,7 +53,7 @@ public class AvroDeserializer implements Deserializer<Object> {
       final var buffer = getByteBuffer(data);
       final var reader = new GenericDatumReader<>(avroSchema);
 
-      final int length = buffer.limit() - 1 - 4;
+      final int length = buffer.limit() - 1-4;
       final int start = buffer.position() + buffer.arrayOffset();
 
       try {

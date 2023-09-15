@@ -6,9 +6,9 @@ public class SerDesPackageValue {
 
 	public static final String IO_CONFLUENT_KAFKA_SERIALIZERS = "io.confluent.kafka.serializers";
 
-	public static final String IO_APICURIO_REGISTRY_SERDE_AVRO_AVRO_KAFKA_DESERIALIZER = "io.apicurio.registry.serde.avro.AvroKafkaDeserializer";
+	public static final String IO_APICURIO_REGISTRY_SERDE_AVRO_AVRO_KAFKA_DESERIALIZER = "io.apicurio.registry.serde.avro";
 
-	public static final String IO_APICURIO_REGISTRY_SERDE_JSONSCHEMA_JSON_SCHEMA_KAFKA_DESERIALIZER = "io.apicurio.registry.serde.jsonschema.JsonSchemaKafkaDeserializer";
+	public static final String IO_APICURIO_REGISTRY_SERDE_JSONSCHEMA_JSON_SCHEMA_KAFKA_DESERIALIZER = "io.apicurio.registry.serde.jsonschema";
 
-	public static final String IO_APICURIO_REGISTRY_SERDE_PROTOBUF_PROTOBUF_KAFKA_DESERIALIZER = "io.apicurio.registry.serde.protobuf.ProtobufKafkaDeserializer";
+	public static final String IO_APICURIO_REGISTRY_SERDE_PROTOBUF_PROTOBUF_KAFKA_DESERIALIZER = "io.apicurio.registry.serde.protobuf";
 }

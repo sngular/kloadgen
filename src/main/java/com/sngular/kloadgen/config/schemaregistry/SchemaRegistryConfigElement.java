@@ -6,18 +6,18 @@
 
 package com.sngular.kloadgen.config.schemaregistry;
 
-import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME;
-import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES;
-import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME;
+import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES;
+import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL;
+
 import com.sngular.kloadgen.model.PropertyMapping;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManager;
-import com.sngular.kloadgen.sampler.schemaregistry.SchemaRegistryManagerFactory;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -59,7 +59,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
     final JMeterVariables jMeterVariables = getThreadContext().getVariables();
 
     final Map<String, String> schemaProperties = getProperties();
-    final SchemaRegistryManager schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(getRegistryName());
+    final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(getRegistryName());
 
     JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, getRegistryName());
     jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, JMeterHelper.checkPropertyOrVariable(getRegistryName()));

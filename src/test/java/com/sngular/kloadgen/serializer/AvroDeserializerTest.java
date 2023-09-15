@@ -1,5 +1,13 @@
 package com.sngular.kloadgen.serializer;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
+
+import javax.xml.bind.DatatypeConverter;
+
 import static com.sngular.kloadgen.serializer.AvroSerializersTestFixture.TEST_FILE_ISSUE;
 import static com.sngular.kloadgen.serializer.AvroSerializersTestFixture.TEST_ISSUE;
 import static com.sngular.kloadgen.serializer.AvroSerializersTestFixture.TEST_LOGICAL_TYPES;
@@ -12,20 +20,14 @@ import static com.sngular.kloadgen.serializer.AvroSerializersTestFixture.TEST_UN
 import static com.sngular.kloadgen.serializer.AvroSerializersTestFixture.TEST_USER;
 import static com.sngular.kloadgen.serializer.SerializerTestFixture.readSchema;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-import java.util.stream.Stream.Builder;
-
 import com.sngular.kloadgen.common.SchemaTypeEnum;
-import com.sngular.kloadgen.extractor.impl.SchemaExtractorImpl;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
-import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,12 +86,15 @@ class AvroDeserializerTest {
   @MethodSource("getSchemaToTest")
   void deserialize(File schemaFile, List<FieldValueMapping> fieldValueMappings) throws Exception {
     final var schemaStr = readSchema(schemaFile);
-    final var metadata = new SchemaMetadata(1, 1, schemaStr);
+    final BaseSchemaMetadata confluentBaseSchemaMetadata =
+        new BaseSchemaMetadata<>(
+            ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1,
+                                                                                                      schemaStr)));
 
     avroDeserializer.configure(Map.of(PropsKeysHelper.VALUE_SCHEMA, schemaStr), false);
 
-    final ParsedSchema parsedSchema = new SchemaExtractorImpl().schemaTypesList(schemaFile, "AVRO");
-    AVRO_SCHEMA_PROCESSOR.processSchema(SchemaTypeEnum.AVRO, parsedSchema, metadata, fieldValueMappings);
+    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(schemaFile, "AVRO");
+    AVRO_SCHEMA_PROCESSOR.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var generatedRecord = AVRO_SCHEMA_PROCESSOR.next();
 
     final var message = avroSerializer.serialize("the-topic",

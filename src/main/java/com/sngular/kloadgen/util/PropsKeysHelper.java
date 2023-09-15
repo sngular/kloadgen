@@ -48,6 +48,8 @@ public class PropsKeysHelper {
 
   public static final String MESSAGE_VALUE = "message.value";
 
+  public static final String VALUE_SUBJECT_NAME_STRATEGY = "value.subject.name.strategy";
+
   public static final String VALUE_SERIALIZER_CLASS_PROPERTY = "value.serializer.class.property";
 
   public static final String KEY_SERIALIZER_CLASS_PROPERTY = "key.serializer.class.property";
