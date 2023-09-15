@@ -122,12 +122,27 @@ public class FieldValueMapping extends AbstractTestElement {
 
         }
       } catch (final JsonProcessingException ex) {
-        String pattern = "(?<=\\[?)(((\\p{Alnum}+:(\\p{Alnum}+|\\[(\\p{Alnum}+,\\p{Alnum}+|)*]))|\\p{Alnum}+)(?=[]|,]))";
-        Pattern r = Pattern.compile(pattern);
-        Matcher matcher = r.matcher(inputFieldValueList.trim());
-        while (matcher.find()) {
-          result.add(matcher.group(1));
-        }
+          // Warning: even though IntelliJ say that can be simplified, it can't be simplified!! (test fails)
+
+          if(inputFieldValueList.startsWith("[") && inputFieldValueList.endsWith("]")) {
+            String pattern = "(?<=\\[?)((([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+:([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|\\[([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+," +
+                             "[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|)*]))|[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)(?=[]|,]))";
+            Pattern r = Pattern.compile(pattern);
+            Matcher matcher = r.matcher(inputFieldValueList.trim());
+            while (matcher.find()) {
+              result.add(matcher.group(0));
+            }
+          } else {
+            String pattern = "([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]][À-ÿ\\s\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)[^,\\s]?+";
+            Pattern r = Pattern.compile(pattern);
+            Matcher matcher = r.matcher(inputFieldValueList.trim());
+            while (matcher.find()) {
+              result.add(matcher.group(0));
+            }
+          }
+
+
+
       }
     }
 

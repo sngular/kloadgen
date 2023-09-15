@@ -25,6 +25,7 @@ class RandomArrayTest {
         Arguments.of("long-array", 1, Collections.singletonList("1"), 1L),
         Arguments.of("short-array", 1, Collections.singletonList("1"), (short) 1),
         Arguments.of("double-array", 1, Collections.singletonList("1.0"), 1.0),
+        Arguments.of("map-array", 1, Collections.singletonList("testString:testString,testString:testString"), 2),
         Arguments.of("float-array", 1, Collections.singletonList("1.0"), 1.0f),
         Arguments.of("uuid-array", 1, Collections.singletonList("0177f035-e51c-4a46-8b82-5b157371c2a5"),
                      UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"))

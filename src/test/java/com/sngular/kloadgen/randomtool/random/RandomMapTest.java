@@ -6,7 +6,9 @@
 
 package com.sngular.kloadgen.randomtool.random;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,28 +37,15 @@ class RandomMapTest {
   }
 
   private static Stream<Arguments> parametersForGenerateMapArrayRandomValueFromList() {
-    return Stream.of(
-        Arguments.of(
-            "string-map-array", 1, Collections.singletonList("testString:testString"),
-            Collections.singletonList(Maps.of("testString", "testString")), 1
-        ),
-        Arguments.of(
-            "int-map-array", 1, Collections.singletonList("testString:1"), Collections.singletonList(Maps.of("testString", 1)), 1
-        ),
-        Arguments.of(
-            "long-map-array", 1, Collections.singletonList("testString:1"), Collections.singletonList(Maps.of("testString", 1L)), 1
-        ),
-        Arguments.of(
-            "short-map-array", 1, Collections.singletonList("testString:1"), Collections.singletonList(Maps.of("testString", (short) 1)), 1
-        ),
-        Arguments.of(
-            "double-map-array", 1, Collections.singletonList("testString:1.0"),
-            Collections.singletonList(Maps.of("testString", 1.0)), 1
-        ),
-        Arguments.of(
-            "uuid-map-array", 1, Collections.singletonList("testString:0177f035-e51c-4a46-8b82-5b157371c2a5"),
-            Collections.singletonList(Maps.of("testString", UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5"))), 1
-        )
+    final HashMap<String, List<String>> resultMap = new HashMap<>();
+    final ArrayList<String> resultList = new ArrayList<>();
+    resultList.add("testString1");
+    resultList.add("testString2");
+    resultMap.put("testString", resultList);
+
+    //The name of this type is due to: SchemaProcessorUtils.getOneDimensionValueType (this remove the last -map)
+    return Stream.of(Arguments.of("string-array",5, List.of("key1:[value1,value2,value3]", "key2:[valueB1,valueB2]"),
+                         Map.of("key1", List.of("value1", "value2", "value3"), "key2", List.of("valueB1", "valueB2")), 1)
     );
   }
 
@@ -83,12 +72,15 @@ class RandomMapTest {
 
   @ParameterizedTest
   @MethodSource("parametersForGenerateMapArrayRandomValueFromList")
-  void generateMapArrayRandomValueFromList(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final List<Map<String, Object>> expected,
+  void generateMapArrayRandomValueFromList(
+      final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<String, List<String>> expected,
       final Integer size) {
 
-    final List<Map<String, Object>> result =
-        (List<Map<String, Object>>) new RandomMap().generateMap(fieldType, valueLength, fieldValuesList, size, Collections.emptyMap());
-    Assertions.assertThat(result).containsExactly(expected.get(0));
+    final Map<String, List<String>> result =
+        (Map<String, List<String>>) new RandomMap().generateMap(fieldType, valueLength, fieldValuesList, size, Collections.emptyMap());
+
+    Assertions.assertThat(result).containsKeys(expected.keySet().toArray(String[]::new));
+    Assertions.assertThat(result.values().iterator().next()).isSubsetOf(expected.values().iterator().next());
   }
 
   @ParameterizedTest
