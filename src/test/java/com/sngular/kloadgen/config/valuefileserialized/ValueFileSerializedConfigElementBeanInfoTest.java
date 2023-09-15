@@ -39,12 +39,12 @@ class ValueFileSerializedConfigElementBeanInfoTest {
   @Test
   void shouldGenerateElements() {
     final PropertyDescriptor[] propertyDescriptors = valueFileSerializedConfigElementBeanInfo.getPropertyDescriptors();
-    Assertions.assertThat(propertyDescriptors).hasSize(6);
-    Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(VALUE_NAME_STRATEGY);
-    Assertions.assertThat(propertyDescriptors[1].getName()).isEqualTo(VALUE_SCHEMA_DEFINITION);
-    Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(VALUE_SCHEMA_PROPERTIES);
-    Assertions.assertThat(propertyDescriptors[3].getName()).isEqualTo(VALUE_SCHEMA_TYPE);
-    Assertions.assertThat(propertyDescriptors[4].getName()).isEqualTo(SERIALIZER_PROPERTY);
-    Assertions.assertThat(propertyDescriptors[5].getName()).isEqualTo(VALUE_SUBJECT_NAME);
+    Assertions.assertThat(propertyDescriptors).hasSize(8);
+    Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(VALUE_NAME_STRATEGY);
+    Assertions.assertThat(propertyDescriptors[3].getName()).isEqualTo(VALUE_SCHEMA_DEFINITION);
+    Assertions.assertThat(propertyDescriptors[4].getName()).isEqualTo(VALUE_SCHEMA_PROPERTIES);
+    Assertions.assertThat(propertyDescriptors[5].getName()).isEqualTo(VALUE_SCHEMA_TYPE);
+    Assertions.assertThat(propertyDescriptors[6].getName()).isEqualTo(SERIALIZER_PROPERTY);
+    Assertions.assertThat(propertyDescriptors[7].getName()).isEqualTo(VALUE_SUBJECT_NAME);
   }
 }

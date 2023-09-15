@@ -3,6 +3,7 @@ package com.sngular.kloadgen.extractor.extractors.protobuff;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -24,7 +25,7 @@ class ProtobufApicurioExtractorTest {
 
   private final Extractor<ProtoFileElement> protoBufApicurioExtractor = new ProtoBufApicurioExtractor();
 
-  private Location location = Location.get("","");
+  private final Location location = Location.get("", "");
 
   @BeforeEach
   public void setUp() {

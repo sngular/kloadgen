@@ -11,7 +11,7 @@
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
-    data base on Data specification
+    data based on Data specification
   </description>
   <url>https://sngular.github.io/kloadgen/</url>
 
@@ -192,6 +192,17 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
+      <id>AnxoGomezSngular</id>
+      <name>Anxo Gómez Sánchez</name>
+      <email>anxo.gomez@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
       <id>pedrogarcia</id>
       <name>Pedro Garcia</name>
       <email>pedro.garcia@sngular.com</email>
@@ -210,6 +221,17 @@
       <organizationUrl>https://www.sngular.com</organizationUrl>
       <roles>
         <role>Senior Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>nuriaricorf</id>
+      <name>Nuria Rico Freire</name>
+      <email>nuria.rico@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
@@ -288,7 +310,7 @@
   </distributionManagement>
 
   <properties>
-    <assertj-core.version>3.22.0</assertj-core.version>
+    <assertj-core.version>3.24.2</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
     <jsonassert.version>1.5.1</jsonassert.version>
     <avro.version>1.11.0</avro.version>
@@ -300,9 +322,9 @@
     <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
     <jdk.version>11</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.5</jmeter.version>
-    <json-path.version>2.6.0</json-path.version>
-    <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
+    <jmeter.version>5.6.2</jmeter.version>
+    <json-path.version>2.8.0</json-path.version>
+    <junit-jupiter-api.version>5.10.0</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
     <apicurio-registry.version>2.4.1.Final</apicurio-registry.version>
     <kafka.version>3.1.0</kafka.version>
@@ -667,7 +689,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.8.1</version>
         <configuration>
           <optimize>true</optimize>
           <showDeprecation>true</showDeprecation>
@@ -706,7 +728,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.1.2</version>
       </plugin>
     </plugins>
   </build>
@@ -761,7 +783,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>2.4.2</version>
+            <version>3.2.4</version>
             <configuration>
               <filters>
                 <filter>

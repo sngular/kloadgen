@@ -37,7 +37,7 @@ class KeySerializedConfigElementBeanInfoTest {
   @Test
   void shouldGenerateElements() {
     final PropertyDescriptor[] propertyDescriptors = keySerializedConfigElementBeanInfo.getPropertyDescriptors();
-    Assertions.assertThat(propertyDescriptors).hasSize(5);
+    Assertions.assertThat(propertyDescriptors).hasSize(7);
     Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(KEY_NAME_STRATEGY);
     Assertions.assertThat(propertyDescriptors[1].getName()).isEqualTo(KEY_SCHEMA_PROPERTIES);
     Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_TYPE);
