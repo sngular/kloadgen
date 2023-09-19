@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.6.5</version>
+  <version>5.7.0</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
@@ -317,17 +317,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.jmeter</groupId>
-      <artifactId>jorphan</artifactId>
-      <version>${jmeter.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
@@ -722,10 +711,6 @@
           <scope>provided</scope>
           <exclusions>
             <exclusion>
-              <groupId>org.apache.jmeter</groupId>
-              <artifactId>jorphan</artifactId>
-            </exclusion>
-            <exclusion>
               <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-slf4j-impl</artifactId>
             </exclusion>
@@ -791,10 +776,6 @@
           <artifactId>ApacheJMeter_java</artifactId>
           <version>${jmeter.version}</version>
           <exclusions>
-            <exclusion>
-              <groupId>org.apache.jmeter</groupId>
-              <artifactId>jorphan</artifactId>
-            </exclusion>
             <exclusion>
               <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-slf4j-impl</artifactId>

@@ -14,7 +14,7 @@ import org.apache.jmeter.samplers.SampleResult;
 public class AsyncApiSampler extends AbstractSampler implements Serializable  {
 
   @Override
-  public boolean applies(final ConfigTestElement configElement) {
+  public final boolean applies(final ConfigTestElement configElement) {
     return super.applies(configElement);
   }
 

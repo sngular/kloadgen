@@ -13,7 +13,6 @@
 package com.sngular.kloadgen.config.asyncapi;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -23,6 +22,13 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
+import com.sngular.kloadgen.extractor.ApiExtractor;
+import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
+import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
+import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
+import com.sngular.kloadgen.extractor.model.AsyncApiServer;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.sampler.AsyncApiSampler;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -35,13 +41,6 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableModel;
-
-import com.sngular.kloadgen.extractor.ApiExtractor;
-import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
-import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
-import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
-import com.sngular.kloadgen.extractor.model.AsyncApiServer;
-import com.sngular.kloadgen.sampler.AsyncApiSampler;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
@@ -167,6 +166,18 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
     }
   }
 
+  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final Object[] schemaData) {
+    if (Objects.nonNull(schemaData)) {
+      final var count = schemaFields.getRowCount();
+      for (var i = 0; i < count; i++) {
+        schemaFields.removeRow(0);
+      }
+      for (var data : schemaData) {
+        schemaFields.addRow(((FieldValueMapping) data).getProperties());
+      }
+    }
+  }
+
   private <T extends AsyncApiAbstract> Object[] dataToRow(final T data) {
     return data.getProperties();
   }
@@ -219,21 +230,19 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
 
   private JPanel createSchemaTab() {
     final JPanel schemaTab = new JPanel();
-    schemaTab.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+    schemaTab.setLayout(new BorderLayout(5, 5));
     topicComboBox = new JComboBox<>();
     topicComboBox.setRenderer(new ApiSchemaRenderer());
+    topicComboBox.addActionListener(this::topicComboActionListener);
     schemaTab.add(topicComboBox);
     schemaTab.add(new JTable(schemaFieldModel));
     return schemaTab;
   }
 
-  private static Component getComponentProperty(final String property) {
-    return new Component() {
-      @Override
-      public String getName() {
-        return property;
-      }
-    };
+  private void topicComboActionListener(final ActionEvent event) {
+    final JComboBox cb = (JComboBox)event.getSource();
+    final var selectedSchema = (AsyncApiSchema) cb.getSelectedItem();
+    fillTable(schemaFieldModel, selectedSchema.getProperties());
   }
 
   @Override
