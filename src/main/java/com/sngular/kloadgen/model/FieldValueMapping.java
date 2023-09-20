@@ -109,10 +109,10 @@ public class FieldValueMapping extends AbstractTestElement {
       try {
         inputFieldValueAux = inputFieldValueList;
 
-        if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
+        if (inputFieldValueAux.charAt(0) != '[') {
           inputFieldValueAux = "[" + inputFieldValueAux;
         }
-        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
+        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != ']') {
           inputFieldValueAux += "]";
         }
         final JsonNode nodes = OBJECT_MAPPER.readTree(inputFieldValueAux);
@@ -122,26 +122,24 @@ public class FieldValueMapping extends AbstractTestElement {
 
         }
       } catch (final JsonProcessingException ex) {
-          // Warning: even though IntelliJ say that can be simplified, it can't be simplified!! (test fails)
+        // Warning: even though IntelliJ say that can be simplified, it can't be simplified!! (test fails)
 
-          if(inputFieldValueList.startsWith("[") && inputFieldValueList.endsWith("]")) {
-            String pattern = "(?<=\\[?)((([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+:([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|\\[([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+," +
-                             "[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|)*]))|[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)(?=[]|,]))";
-            Pattern r = Pattern.compile(pattern);
-            Matcher matcher = r.matcher(inputFieldValueList.trim());
-            while (matcher.find()) {
-              result.add(matcher.group(0));
-            }
-          } else {
-            String pattern = "([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]][À-ÿ\\s\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)[^,\\s]?+";
-            Pattern r = Pattern.compile(pattern);
-            Matcher matcher = r.matcher(inputFieldValueList.trim());
-            while (matcher.find()) {
-              result.add(matcher.group(0));
-            }
+        if (inputFieldValueList.startsWith("[") && inputFieldValueList.endsWith("]")) {
+          final String pattern = "(?<=\\[?)((([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+:([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|\\[([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+,"
+                                 + "[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|)*]))|[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)(?=[]|,]))";
+          final Pattern r = Pattern.compile(pattern);
+          final Matcher matcher = r.matcher(inputFieldValueList.trim());
+          while (matcher.find()) {
+            result.add(matcher.group(0));
           }
-
-
+        } else {
+          final String pattern = "([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]][À-ÿ\\s\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)[^,\\s]?+";
+          final Pattern r = Pattern.compile(pattern);
+          final Matcher matcher = r.matcher(inputFieldValueList.trim());
+          while (matcher.find()) {
+            result.add(matcher.group(0));
+          }
+        }
 
       }
     }
