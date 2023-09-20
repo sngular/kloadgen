@@ -324,7 +324,7 @@
     <rest-assured.version>4.5.0</rest-assured.version>
     <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
     <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
-    <wiremock.version>2.35.0</wiremock.version>
+    <wiremock.version>2.35.1</wiremock.version>
   </properties>
 
   <dependencies>
