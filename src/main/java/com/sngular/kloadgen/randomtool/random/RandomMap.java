@@ -6,7 +6,6 @@
 
 package com.sngular.kloadgen.randomtool.random;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,22 +20,15 @@ public class RandomMap {
 
   private final RandomObject randomObject;
 
+  private final RandomArray randomArray;
+
   public RandomMap() {
     randomObject = new RandomObject();
     randomArray = new RandomArray();
   }
 
-  private final RandomArray randomArray;
-
   private static String[] getMapEntryValue(final List<String> fieldValueList) {
     return fieldValueList.get(RandomUtils.nextInt(0, fieldValueList.size())).trim().split(":");
-  }
-
-  private static String[] getMapEntryValueAndRemove(final List<String> fieldValueList) {
-    final int randomAux = RandomUtils.nextInt(0, fieldValueList.size());
-    final String[] resultAux = fieldValueList.get(randomAux).trim().split(":");
-    fieldValueList.remove(randomAux);
-    return resultAux;
   }
 
   public final Object generateMap(
@@ -135,40 +127,41 @@ public class RandomMap {
       final Map<ConstraintTypeEnum, String> constraints) {
     final int size = mapSize > 0 ? mapSize : RandomUtils.nextInt(1, 5);
     final Map<String, Object> map = new HashMap<>(size);
-    final List<String> fieldValueListAux = new ArrayList<>(fieldValueList);
     if (!fieldValueList.isEmpty()) {
       while (map.size() < Math.min(size, fieldValueList.size())) {
-        final String[] tempValue = getMapEntryValueAndRemove(fieldValueListAux);
+        final String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          switch (type) {
-            case ValidTypeConstants.INT:
-              map.put(tempValue[0], Integer.parseInt(tempValue[1]));
-              break;
-            case ValidTypeConstants.LONG:
-              map.put(tempValue[0], Long.parseLong(tempValue[1]));
-              break;
-            case ValidTypeConstants.FLOAT:
-              map.put(tempValue[0], Float.parseFloat(tempValue[1]));
-              break;
-            case ValidTypeConstants.DOUBLE:
-              map.put(tempValue[0], Double.parseDouble(tempValue[1]));
-              break;
-            case ValidTypeConstants.SHORT:
-              map.put(tempValue[0], Short.parseShort(tempValue[1]));
-              break;
-            case ValidTypeConstants.UUID:
-              map.put(tempValue[0], UUID.fromString(tempValue[1]));
-              break;
-            case ValidTypeConstants.STRING_ARRAY:
-              /* array.addAll() */
-              String[] array = tempValue[1].substring(tempValue[1].indexOf("[")).replaceAll("[^a-zA-Z\\s*,\\s*^0-9]", "").split("\\s*,\\s*", -1);
-              map.put(tempValue[0], randomArray.generateArray(type, array.length, List.of(array), array.length, constraints));
-              break;
-            default:
-              map.put(tempValue[0], tempValue[1]);
-              break;
+          if (RandomArray.isArray(type)) {
+            final String[] array = tempValue[1].substring(tempValue[1].indexOf("[")).replaceAll("[^a-zA-Z\\s*,\\s*^0-9]", "").split("\\s*,\\s*", -1);
+            map.put(tempValue[0], List.of(array));
+          } else if (isMap(type)) {
+            final String[] fixMap = tempValue[1].substring(tempValue[1].indexOf("[")).replaceAll("[^a-zA-Z\\s*,\\s*^0-9]", "").split("\\s*,\\s*", -1);
+            map.put(tempValue[0], generateMap(type, fixMap.length, List.of(fixMap), fixMap.length, constraints));
+          } else {
+            switch (type) {
+              case ValidTypeConstants.INT:
+                map.put(tempValue[0], Integer.parseInt(tempValue[1]));
+                break;
+              case ValidTypeConstants.LONG:
+                map.put(tempValue[0], Long.parseLong(tempValue[1]));
+                break;
+              case ValidTypeConstants.FLOAT:
+                map.put(tempValue[0], Float.parseFloat(tempValue[1]));
+                break;
+              case ValidTypeConstants.DOUBLE:
+                map.put(tempValue[0], Double.parseDouble(tempValue[1]));
+                break;
+              case ValidTypeConstants.SHORT:
+                map.put(tempValue[0], Short.parseShort(tempValue[1]));
+                break;
+              case ValidTypeConstants.UUID:
+                map.put(tempValue[0], UUID.fromString(tempValue[1]));
+                break;
+              default:
+                map.put(tempValue[0], tempValue[1]);
+                break;
+            }
           }
-
         } else {
           map.put(
               tempValue[0],
@@ -179,15 +172,31 @@ public class RandomMap {
     }
 
     if (map.size() != mapSize) {
-      for (int i = 0; i <= Math.abs(map.size() - mapSize); i++) {
+      final int limit = Math.abs(map.size() - mapSize);
+      for (int i = 0; i < limit; i++) {
         map.put(
             (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), constraints),
-            randomObject.generateRandom(type, valueLength, Collections.emptyList(), constraints)
-        );
+            generateMapValue(type, valueLength, constraints));
       }
     }
 
     return map;
+  }
+
+  private Object generateMapValue(final String type, final int valueLength, final Map<ConstraintTypeEnum, String> constraints) {
+    final Object value;
+    if (isMap(type)) {
+      value = generateMap(type, valueLength, Collections.emptyList(), valueLength, constraints);
+    } else if (RandomArray.isArray(type)) {
+      value = randomArray.generateArray(type, valueLength, Collections.emptyList(), valueLength, constraints);
+    } else {
+      value = randomObject.generateRandom(type, valueLength, Collections.emptyList(), constraints);
+    }
+    return value;
+  }
+
+  private static boolean isMap(final String type) {
+    return type.toLowerCase().endsWith("map");
   }
 
   private Map<String, Object> generateMapOfMap(
