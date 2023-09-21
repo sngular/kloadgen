@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
@@ -11,8 +12,8 @@ import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.lang3.EnumUtils;
@@ -20,30 +21,28 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public final class ExtractorFactory {
-  private static AvroExtractor avroExtractor = new AvroExtractor();
+  private static final AvroExtractor AVRO_EXTRACTOR = new AvroExtractor();
 
-  private static JsonExtractor jsonExtractor = new JsonExtractor();
+  private static final JsonExtractor JSON_EXTRACTOR = new JsonExtractor();
 
-  private static ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
+  private static final ProtobuffExtractor PROTOBUFF_EXTRACTOR = new ProtobuffExtractor();
 
   private ExtractorFactory() {
   }
 
-  public static ExtractorRegistry getExtractor(final String schemaType, final String schemaRegistryEnum) {
-
-    SchemaRegistryEnum registryEnum = getSchemaRegistry(schemaRegistryEnum);
+  public static ExtractorRegistry getExtractor(final String schemaType) {
 
     if (schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
       final ExtractorRegistry response;
       switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
         case JSON:
-          response = jsonExtractor;
+          response = JSON_EXTRACTOR;
           break;
         case AVRO:
-          response = avroExtractor;
+          response = AVRO_EXTRACTOR;
           break;
         case PROTOBUF:
-          response = protobuffExtractor;
+          response = PROTOBUFF_EXTRACTOR;
           break;
         default:
           throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
@@ -54,7 +53,7 @@ public final class ExtractorFactory {
     }
   }
 
-  public static SchemaRegistryEnum getSchemaRegistry(String schemaRegistryEnum) {
+  public static SchemaRegistryEnum getSchemaRegistry(final String schemaRegistryEnum) {
     if (schemaRegistryEnum != null && EnumUtils.isValidEnum(SchemaRegistryEnum.class, schemaRegistryEnum.toUpperCase())) {
       return SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
     } else {
@@ -66,27 +65,21 @@ public final class ExtractorFactory {
     final Properties properties = JMeterContextService.getContext().getProperties();
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    String schemaType = null;
-    final ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
-    schemaType = parsedSchemaAdapter.getType();
+    final AbstractParsedSchemaAdapter abstractParsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
+    final String schemaType = abstractParsedSchemaAdapter.getType();
 
-    List<FieldValueMapping> attributeList = new ArrayList<>();
-    SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
 
-    Object schema = null;
+    final Object schema;
     if (Objects.nonNull(registryName)) {
       //TODO change parser
-      switch (schemaRegistryEnum) {
-        case APICURIO:
-          schema = ((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
-          break;
-        case CONFLUENT:
-          schema = parsedSchemaAdapter.getRawSchema();
-          break;
-        default:
-          throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
-      }
-      attributeList = getExtractor(schemaType,registryName.toUpperCase()).processSchema(schema, schemaRegistryEnum);
+      schema = switch (schemaRegistryEnum) {
+        case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
+        case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
+        default -> throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
+      };
+      attributeList.addAll(getExtractor(schemaType).processSchema(schema, schemaRegistryEnum));
     }
     return Pair.of(schemaType, attributeList);
   }

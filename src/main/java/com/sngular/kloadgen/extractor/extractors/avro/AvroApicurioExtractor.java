@@ -1,6 +1,7 @@
 package com.sngular.kloadgen.extractor.extractors.avro;
 
 import java.util.List;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import io.apicurio.registry.utils.serde.avro.AvroSchemaUtils;

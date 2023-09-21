@@ -2,9 +2,6 @@ package com.sngular.kloadgen.schemaregistry;
 
 import java.util.Map;
 
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.APICURIO;
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.CONFLUENT;
-
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.impl.ApicurioSchemaRegistry;
@@ -14,12 +11,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchemaRegistryManagerFactory {
 
-  static Map<SchemaRegistryEnum, SchemaRegistryAdapter> schemaRegistryMap = Map.of(CONFLUENT, new ConfluentSchemaRegistry(), APICURIO, new ApicurioSchemaRegistry());
+  private static final Map<SchemaRegistryEnum, SchemaRegistryAdapter> SCHEMA_REGISTRY_MAP =
+      Map.of(SchemaRegistryEnum.CONFLUENT, new ConfluentSchemaRegistry(), SchemaRegistryEnum.APICURIO, new ApicurioSchemaRegistry());
 
-  public static SchemaRegistryAdapter getSchemaRegistry(String registry) {
+  protected SchemaRegistryManagerFactory() {
+  }
+
+  public static SchemaRegistryAdapter getSchemaRegistry(final String registry) {
     try {
-      SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registry.toUpperCase());
-      return schemaRegistryMap.get(schemaRegistryEnum);
+      final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registry.toUpperCase());
+      return SCHEMA_REGISTRY_MAP.get(schemaRegistryEnum);
     } catch (final IllegalArgumentException e) {
       final String logMsg = "Can not parse the registry " + registry;
       log.error(logMsg, e);

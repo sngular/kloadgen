@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 import com.sngular.kloadgen.extractor.extractors.SchemaExtractorUtil;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
@@ -22,7 +23,7 @@ public abstract class AbstractAvroFileExtractor {
   protected AbstractAvroFileExtractor() {
   }
 
-  public List<FieldValueMapping> processSchemaDefault(final Schema schemaReceived) {
+  public final List<FieldValueMapping> processSchemaDefault(final Schema schemaReceived) {
     final var attributeList = new ArrayList<FieldValueMapping>();
     Schema aux = null;
     if (checkIfUnion(schemaReceived)) {
@@ -30,19 +31,17 @@ public abstract class AbstractAvroFileExtractor {
     } else if (checkIfRecord(schemaReceived)) {
       aux = schemaReceived;
     }
-    if(aux != null && (checkIfUnion(schemaReceived) || checkIfRecord(schemaReceived))){
+    if (aux != null && (checkIfUnion(schemaReceived) || checkIfRecord(schemaReceived))) {
       aux.getFields().forEach(field -> processField(field, attributeList, true, true));
     }
     return attributeList;
   }
 
-  public List<String> getSchemaNameList(Schema schema) {
-    List<String> result = new ArrayList<>();
-    result.addAll(extractSchemaNames(schema));
-    return result;
+  public final List<String> getSchemaNameList(final Schema schema) {
+    return new ArrayList<>(extractSchemaNames(schema));
   }
 
-  public void processField(
+  public final void processField(
       final Schema.Field innerField, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired, final boolean isAncestor) {
     if (checkIfRecord(innerField.schema())) {
       processRecordFieldList(innerField.name(), ".", processFieldList(innerField.schema().getFields(), isAncestorRequired), completeFieldList);
@@ -353,8 +352,8 @@ public abstract class AbstractAvroFileExtractor {
     return result;
   }
 
-  private Set<String> extractSchemaNames(Schema schema) {
-    Set<String> schemaNames = new HashSet<>();
+  private Set<String> extractSchemaNames(final Schema schema) {
+    final Set<String> schemaNames = new HashSet<>();
     if (checkIfRecord(schema)) {
       schemaNames.add(schema.getName());
       schema.getFields().forEach(field -> schemaNames.addAll(extractSchemaNames(field.schema())));

@@ -7,24 +7,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
+
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
+import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 
-public  class SchemaExtractor {
+@Getter
+public final class SchemaExtractor {
 
   private SchemaRegistryEnum type;
 
   public SchemaExtractor() {
   }
 
-  public SchemaRegistryEnum getType(){
-    return type;
-  }
-
-  public void setType(SchemaRegistryEnum type){
+  public void setType(final SchemaRegistryEnum type) {
     this.type = type;
   }
 
@@ -33,11 +32,11 @@ public  class SchemaExtractor {
   }
 
   public static List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
-    return ExtractorFactory.getExtractor(parserSchema.schemaType(), "CONFLUENT").processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
+    return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
   }
 
-  public static List<String> schemaTypesList(final File schemaFile, final String schemaType, String registry) throws IOException {
-    return ExtractorFactory.getExtractor(schemaType, registry).getSchemaNameList(readLineByLine(schemaFile.getPath()),
+  public static List<String> schemaTypesList(final File schemaFile, final String schemaType, final String registry) throws IOException {
+    return ExtractorFactory.getExtractor(schemaType).getSchemaNameList(readLineByLine(schemaFile.getPath()),
             ExtractorFactory.getSchemaRegistry(registry));
   }
 
@@ -49,10 +48,6 @@ public  class SchemaExtractor {
     }
 
     return contentBuilder.toString();
-  }
-
-  private static List<FieldValueMapping> processSchema(final ParsedSchema schema) {
-    return ExtractorFactory.getExtractor(schema.schemaType(),SchemaRegistryEnum.CONFLUENT.name()).processSchema(schema.rawSchema().toString(), SchemaRegistryEnum.CONFLUENT);
   }
 
 }

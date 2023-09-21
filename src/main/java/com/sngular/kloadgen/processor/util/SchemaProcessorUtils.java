@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import com.github.os72.protobuf.dynamic.DynamicSchema;
 import com.github.os72.protobuf.dynamic.EnumDefinition;
 import com.github.os72.protobuf.dynamic.MessageDefinition;
@@ -24,8 +25,8 @@ import com.github.os72.protobuf.dynamic.MessageDefinition.Builder;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProtobufHelper;
@@ -167,8 +168,8 @@ public class SchemaProcessorUtils {
             schemaBuilder.addSchema(importedSchema);
           }
         } else {
-          final ParsedSchemaAdapter protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
-                                                                                    JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
+          final AbstractParsedSchemaAdapter protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                                            JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
           final var importedProtobufSchema = new ProtobufSchema(protoFileElement.getRawSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
           if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
             schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
@@ -381,8 +382,7 @@ public class SchemaProcessorUtils {
       final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
       final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final int deepLevel) {
 
-    if (typeElement instanceof EnumElement) {
-      final var enumElement = (EnumElement) typeElement;
+    if (typeElement instanceof final EnumElement enumElement) {
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
       for (final var constant : enumElement.getConstants()) {
         builder.addValue(constant.getName(), constant.getTag());

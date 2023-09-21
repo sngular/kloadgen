@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
@@ -223,7 +224,7 @@ public class SchemaProcessor {
     if (otherFieldIsRequired) {
       shouldProcess = false;
     } else {
-      if (listFieldsSharingPath.size() > 0) {
+      if (!listFieldsSharingPath.isEmpty()) {
         makeFieldValueMappingRequiredAndNotNullable(fetchFieldSharingPathToMakeItRequired(listFieldsSharingPath));
         shouldProcess = fieldValueMapping.getRequired();
       } else {

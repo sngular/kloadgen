@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
@@ -23,9 +24,9 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
@@ -49,7 +50,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schema, metadata);
     } else if (schema instanceof BaseParsedSchema) {
       final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
-      final ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
+      final AbstractParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
       final Object schemaParsed = adapterParse.getRawSchema();
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schemaParsed, metadata);
     } else {
@@ -170,7 +171,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public Object getRootNode(final String rootNode) {
+  public final Object getRootNode(final String rootNode) {
     return entity.get(rootNode);
   }
 
