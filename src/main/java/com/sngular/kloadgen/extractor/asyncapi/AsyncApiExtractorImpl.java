@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -78,7 +79,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
   private List<FieldValueMapping> messageToFieldList(final JsonNode message, final Map<String, JsonNode> components, final List<String> antiLoopList) {
     var payload = ApiTool.getNode(message, "payload");
     if (ApiTool.hasRef(message)) {
-      payload = solveRef(message, components, antiLoopList, "messages");
+      payload = ApiTool.getNode(solveRef(message, components, antiLoopList, "messages"), "payload");
     } else if (!ApiTool.hasNode(message, "payload")) {
       throw new KLoadGenException("AsyncApi format still not supported");
     }

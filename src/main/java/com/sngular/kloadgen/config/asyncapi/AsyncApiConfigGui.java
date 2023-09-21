@@ -14,7 +14,6 @@ package com.sngular.kloadgen.config.asyncapi;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -22,6 +21,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
+import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
 import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
@@ -34,7 +34,9 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -45,12 +47,8 @@ import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
 
 public final class AsyncApiConfigGui extends AbstractSamplerGui {
-
-  private static final Logger log = LoggingManager.getLoggerForClass();
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
@@ -93,7 +91,7 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
           .createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
 
     mainPanel.add(createAsyncApiFileSelectPanel(), BorderLayout.NORTH);
-    mainPanel.add(createAsyncApiTabs(), BorderLayout.SOUTH);
+    mainPanel.add(createAsyncApiTabs(), BorderLayout.CENTER);
     add(mainPanel);
   }
 
@@ -146,13 +144,17 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
     final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
-      final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
-      asyncApiFileTextField.setText(apiFile.getAbsolutePath());
-      final var asyncApiFile = asyncApiExtractor.processFile(apiFile);
-      asyncApiFile.getApiServerList().forEach(serverComboBox::addItem);
-      fillTable(brokerFieldModel, asyncApiExtractor.getBrokerData(asyncApiFile));
-      fillTable(schemaRegistryFieldModel, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
-      asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
+      try {
+        final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
+        asyncApiFileTextField.setText(apiFile.getAbsolutePath());
+        final var asyncApiFile = asyncApiExtractor.processFile(apiFile);
+        asyncApiFile.getApiServerList().forEach(serverComboBox::addItem);
+        fillTable(brokerFieldModel, asyncApiExtractor.getBrokerData(asyncApiFile));
+        fillTable(schemaRegistryFieldModel, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
+        asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
+      } catch (KLoadGenException ex) {
+        JOptionPane.showMessageDialog(mainPanel, "Error has occurred: " + ex.getMessage(), "Weird Error", JOptionPane.ERROR_MESSAGE);
+      }
     }
   }
 
@@ -188,54 +190,31 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
     brokerPanel.add(new JLabeledTextField("Broker Server"));
     serverComboBox = new JComboBox<>();
     serverComboBox.setRenderer(new ApiServerRenderer());
-    brokerPanel.add(serverComboBox);
-    brokerPanel.add(new JTable(brokerFieldModel), BorderLayout.CENTER);
+    brokerPanel.add(serverComboBox, BorderLayout.NORTH);
+    brokerPanel.add(new JScrollPane(new JTable(brokerFieldModel)), BorderLayout.CENTER);
     return brokerPanel;
   }
 
   private JPanel createRegistryTab() {
     final JPanel registryUrlPanel = new JPanel();
-    registryUrlPanel.setLayout(new GridBagLayout());
-    registryUrlPanel.setMinimumSize(new Dimension(45, 45));
-    registryUrlPanel.setPreferredSize(new Dimension(800, 600));
-    final JLabel label2 = new JLabel();
-    label2.setText("Schema Registry URL");
-    var gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = GridBagConstraints.WEST;
-    registryUrlPanel.add(label2, gridBagConstraints);
+    registryUrlPanel.setLayout(new BorderLayout(0, 0));
+    registryUrlPanel.add(new JLabeledTextField("Schema Registry URL"));
     this.registryUrl = new JTextField();
     this.registryUrl.setPreferredSize(new Dimension(249, 30));
-    gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = GridBagConstraints.WEST;
-    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-    registryUrlPanel.add(this.registryUrl, gridBagConstraints);
-    final JPanel panel5 = new JPanel();
-    panel5.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-    gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.gridwidth = 2;
-    gridBagConstraints.fill = GridBagConstraints.BOTH;
-    registryUrlPanel.add(panel5, gridBagConstraints);
-    final JLabel label3 = new JLabel();
-    label3.setText("Security Options");
-    panel5.add(label3);
-    panel5.add(new JTable(schemaRegistryFieldModel));
+    registryUrlPanel.add(this.registryUrl, BorderLayout.NORTH);
+    registryUrlPanel.add(new JScrollPane(new JTable(schemaRegistryFieldModel)), BorderLayout.CENTER);
     return registryUrlPanel;
   }
 
   private JPanel createSchemaTab() {
     final JPanel schemaTab = new JPanel();
-    schemaTab.setLayout(new BorderLayout(5, 5));
+    schemaTab.setLayout(new BorderLayout(0, 0));
+    schemaTab.add(new JLabeledTextField("Schema Configuration"));
     topicComboBox = new JComboBox<>();
     topicComboBox.setRenderer(new ApiSchemaRenderer());
     topicComboBox.addActionListener(this::topicComboActionListener);
-    schemaTab.add(topicComboBox);
-    schemaTab.add(new JTable(schemaFieldModel));
+    schemaTab.add(topicComboBox, BorderLayout.NORTH);
+    schemaTab.add(new JScrollPane(new JTable(schemaFieldModel)), BorderLayout.CENTER);
     return schemaTab;
   }
 
