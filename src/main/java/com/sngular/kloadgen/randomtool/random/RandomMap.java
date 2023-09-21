@@ -6,7 +6,6 @@
 
 package com.sngular.kloadgen.randomtool.random;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,8 +20,11 @@ public class RandomMap {
 
   private final RandomObject randomObject;
 
+  private final RandomArray randomArray;
+
   public RandomMap() {
     randomObject = new RandomObject();
+    randomArray = new RandomArray();
   }
 
   private static String[] getMapEntryValue(final List<String> fieldValueList) {
@@ -60,14 +62,15 @@ public class RandomMap {
       case ValidTypeConstants.BOOLEAN_MAP:
         value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, mapSize, Collections.emptyMap());
         break;
+      case ValidTypeConstants.STRING_ARRAY:
+        value = generate(ValidTypeConstants.STRING_ARRAY, mapSize, fieldValueList, mapSize, constraints);
+        break;
       default:
         value = fieldType;
         break;
     }
 
-    if (fieldType.endsWith("array")) {
-      value = generateRandomMapArray(fieldType, mapSize, fieldValueList, mapSize, arraySize, constraints);
-    } else if (fieldType.endsWith("map-map")) {
+    if (fieldType.endsWith("map-map")) {
       value = generateMapOfMap(fieldType.replace("-map-map", "-map"), mapSize, mapSize, fieldValueList, arraySize, constraints);
     }
 
@@ -104,35 +107,19 @@ public class RandomMap {
       case ValidTypeConstants.BOOLEAN_MAP:
         value = generate(ValidTypeConstants.BOOLEAN, mapSize, fieldValueList, valueLength, Collections.emptyMap());
         break;
+      case ValidTypeConstants.STRING_ARRAY:
+        value = generate(ValidTypeConstants.STRING_ARRAY, mapSize, fieldValueList, mapSize, constraints);
+        break;
       default:
         value = fieldType;
         break;
     }
 
-    if (fieldType.endsWith("array")) {
-      value = generateRandomMapArray(fieldType, mapSize, fieldValueList, valueLength, arraySize, constraints);
-    } else if (fieldType.endsWith("map-map")) {
+    if (fieldType.endsWith("map-map")) {
       value = generateMapOfMap(fieldType.replace("-map-map", "-map"), mapSize, mapSize, fieldValueList, valueLength, constraints);
     }
 
     return value;
-  }
-
-  private Object generateRandomMapArray(
-      final String type, final Integer mapSize, final List<String> fieldValueList, final Integer valueLength, final Integer arraySize,
-      final Map<ConstraintTypeEnum, String> constraints) {
-
-    final List<Map<String, Object>> generatedMapArray = new ArrayList<>(arraySize);
-    int tempValueLength = valueLength;
-    if (valueLength == 0) {
-      tempValueLength = (int) Math.floor(Math.random() * (9 - 1 + 1) + 1);
-    }
-    final String newType = type.substring(0, type.length() - 6);
-    for (int i = 0; i < arraySize; i++) {
-      generatedMapArray.add((Map<String, Object>) generateMap(newType, mapSize, fieldValueList, tempValueLength, arraySize, constraints));
-    }
-
-    return generatedMapArray;
   }
 
   private Map<String, Object> generate(
@@ -144,30 +131,37 @@ public class RandomMap {
       while (map.size() < Math.min(size, fieldValueList.size())) {
         final String[] tempValue = getMapEntryValue(fieldValueList);
         if (tempValue.length > 1) {
-          switch (type) {
-            case ValidTypeConstants.INT:
-              map.put(tempValue[0], Integer.parseInt(tempValue[1]));
-              break;
-            case ValidTypeConstants.LONG:
-              map.put(tempValue[0], Long.parseLong(tempValue[1]));
-              break;
-            case ValidTypeConstants.FLOAT:
-              map.put(tempValue[0], Float.parseFloat(tempValue[1]));
-              break;
-            case ValidTypeConstants.DOUBLE:
-              map.put(tempValue[0], Double.parseDouble(tempValue[1]));
-              break;
-            case ValidTypeConstants.SHORT:
-              map.put(tempValue[0], Short.parseShort(tempValue[1]));
-              break;
-            case ValidTypeConstants.UUID:
-              map.put(tempValue[0], UUID.fromString(tempValue[1]));
-              break;
-            default:
-              map.put(tempValue[0], tempValue[1]);
-              break;
+          if (RandomArray.isArray(type)) {
+            final String[] array = tempValue[1].substring(tempValue[1].indexOf("[")).replaceAll("[^a-zA-Z\\s*,\\s*^0-9]", "").split("\\s*,\\s*", -1);
+            map.put(tempValue[0], List.of(array));
+          } else if (isMap(type)) {
+            final String[] fixMap = tempValue[1].substring(tempValue[1].indexOf("[")).replaceAll("[^a-zA-Z\\s*,\\s*^0-9]", "").split("\\s*,\\s*", -1);
+            map.put(tempValue[0], generateMap(type, fixMap.length, List.of(fixMap), fixMap.length, constraints));
+          } else {
+            switch (type) {
+              case ValidTypeConstants.INT:
+                map.put(tempValue[0], Integer.parseInt(tempValue[1]));
+                break;
+              case ValidTypeConstants.LONG:
+                map.put(tempValue[0], Long.parseLong(tempValue[1]));
+                break;
+              case ValidTypeConstants.FLOAT:
+                map.put(tempValue[0], Float.parseFloat(tempValue[1]));
+                break;
+              case ValidTypeConstants.DOUBLE:
+                map.put(tempValue[0], Double.parseDouble(tempValue[1]));
+                break;
+              case ValidTypeConstants.SHORT:
+                map.put(tempValue[0], Short.parseShort(tempValue[1]));
+                break;
+              case ValidTypeConstants.UUID:
+                map.put(tempValue[0], UUID.fromString(tempValue[1]));
+                break;
+              default:
+                map.put(tempValue[0], tempValue[1]);
+                break;
+            }
           }
-
         } else {
           map.put(
               tempValue[0],
@@ -178,15 +172,31 @@ public class RandomMap {
     }
 
     if (map.size() != mapSize) {
-      for (int i = 0; i <= Math.abs(map.size() - mapSize); i++) {
+      final int limit = Math.abs(map.size() - mapSize);
+      for (int i = 0; i < limit; i++) {
         map.put(
             (String) randomObject.generateRandom(ValidTypeConstants.STRING, valueLength, Collections.emptyList(), constraints),
-            randomObject.generateRandom(type, valueLength, Collections.emptyList(), constraints)
-        );
+            generateMapValue(type, valueLength, constraints));
       }
     }
 
     return map;
+  }
+
+  private Object generateMapValue(final String type, final int valueLength, final Map<ConstraintTypeEnum, String> constraints) {
+    final Object value;
+    if (isMap(type)) {
+      value = generateMap(type, valueLength, Collections.emptyList(), valueLength, constraints);
+    } else if (RandomArray.isArray(type)) {
+      value = randomArray.generateArray(type, valueLength, Collections.emptyList(), valueLength, constraints);
+    } else {
+      value = randomObject.generateRandom(type, valueLength, Collections.emptyList(), constraints);
+    }
+    return value;
+  }
+
+  private static boolean isMap(final String type) {
+    return type.toLowerCase().endsWith("map");
   }
 
   private Map<String, Object> generateMapOfMap(

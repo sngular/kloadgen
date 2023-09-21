@@ -358,7 +358,6 @@ public abstract class AbstractAvroFileExtractor {
     Set<String> schemaNames = new HashSet<>();
     if (checkIfRecord(schema)) {
       schemaNames.add(schema.getName());
-      schema.getFields().forEach(field -> schemaNames.addAll(extractSchemaNames(field.schema())));
     } else if (checkIfArray(schema)) {
       schemaNames.addAll(extractSchemaNames(schema.getElementType()));
     } else if (checkIfUnion(schema)) {
