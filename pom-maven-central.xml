@@ -852,6 +852,9 @@
                   <excludes>
                     <exclude>org/apache/jmeter/jmeter.properties</exclude>
                   </excludes>
+                  <includes>
+                    <include>*.proto</include>
+                  </includes>
                 </filter>
               </filters>
               <finalName>${project.artifactId}-${project.version}</finalName>
