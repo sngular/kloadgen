@@ -77,7 +77,6 @@ public final class ExtractorFactory {
       schema = switch (schemaRegistryEnum) {
         case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
         case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
-        default -> throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
       };
       attributeList.addAll(getExtractor(schemaType).processSchema(schema, schemaRegistryEnum));
     }

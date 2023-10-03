@@ -12,20 +12,21 @@ import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 
 public class ProtobuffExtractor implements ExtractorRegistry<Object> {
 
-  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
-                                                                       SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
+  private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
+                                                                                       SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
 
   public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
     final var resultSchema = new ArrayList<FieldValueMapping>();
     if (schemaReceived instanceof ProtoFileElement) {
-      resultSchema.addAll(schemaRegistryMap.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived));
+      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived));
+    } else {
+      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived));
     }
-    resultSchema.addAll(schemaRegistryMap.get(registryEnum).processSchema(schemaReceived));
     return resultSchema;
   }
 
   public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
-    return schemaRegistryMap.get(registryEnum).getSchemaNameList(schema);
+    return SCHEMA_REGISTRY_MAP.get(registryEnum).getSchemaNameList(schema);
   }
 
 }

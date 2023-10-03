@@ -189,12 +189,9 @@ public abstract class AbstractJsonExtractor {
       completeFieldList.add(
           FieldValueMapping.builder()
                            .fieldName(name)
-                           .fieldType(value.getType() + "-map" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" :
-                                                                                                                                                  (StringUtils.isNotEmpty(
-                                                                                                                                                      breadCrumb) &&
-                                                                                                                                                   breadCrumb.endsWith("[]"))
-                                                                                                                                                      ?
-                                                                                                                                                      SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
+                           .fieldType(value.getType() + "-map" + ((StringUtils.isNotEmpty(breadCrumb)
+                                                                   && breadCrumb.endsWith("[:]")) ? "-map"
+                                                                      : (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
                                                                                                                                                       : breadCrumb))
                            .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
                            .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
