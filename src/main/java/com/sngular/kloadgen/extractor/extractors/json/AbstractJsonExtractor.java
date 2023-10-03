@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.extractors.SchemaExtractorUtil;
+import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.json.ArrayField;
@@ -21,7 +22,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractJsonExtractor {
-  
+
+  private final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
+
+  protected final JSONSchemaParser getSchemaParser() {
+    return jsonSchemaParser;
+  }
+
   private static String extractFieldName(final String fieldName) {
     String fieldNameClean = fieldName;
     if (fieldName.endsWith("[][]") || fieldName.endsWith("[:][]")) {
