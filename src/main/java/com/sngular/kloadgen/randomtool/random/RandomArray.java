@@ -23,6 +23,10 @@ public class RandomArray {
     randomObject = new RandomObject();
   }
 
+  protected static boolean isArray(final String type) {
+    return type.toLowerCase().endsWith("array");
+  }
+
   public final Object generateArray(
       final String fieldType, final Integer valueLength, final List<String> fieldValueList, final Integer arraySize,
       final Map<ConstraintTypeEnum, String> constraints) {

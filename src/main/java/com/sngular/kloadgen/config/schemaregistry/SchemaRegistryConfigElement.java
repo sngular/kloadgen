@@ -63,7 +63,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
     JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, getRegistryName());
     jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, JMeterHelper.checkPropertyOrVariable(getRegistryName()));
-
+    jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JMeterHelper.checkPropertyOrVariable(getSchemaRegistryUrl()));
     jMeterVariables.put(schemaRegistryManager.getSchemaRegistryUrlKey(), JMeterHelper.checkPropertyOrVariable(getRegistryUrl()));
     if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
       jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
