@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
@@ -189,9 +190,9 @@ class AvroSchemaProcessorTest {
     GenericData.Record entity = null; //TODO HERE
 
     if (parsedSchema.rawSchema() instanceof Schema) {
-      Schema schema = (Schema) parsedSchema.rawSchema();
+      final Schema schema = (Schema) parsedSchema.rawSchema();
       if (Schema.Type.UNION.equals(schema.getType())) {
-        entity = new GenericData.Record(schema.getTypes().get(schema.getTypes().size()-1));
+        entity = new GenericData.Record(schema.getTypes().get(schema.getTypes().size() - 1));
       } else {
         entity = new GenericData.Record(schema);
       }

@@ -1,6 +1,7 @@
 package com.sngular.kloadgen.extractor.extractors.avro;
 
 import java.util.List;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -66,7 +67,6 @@ class AvroApicurioExtractorTest {
   void testFlatPropertiesOptionalMapArray() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testOptionalMap.avsc");
-    final List<String> parsedSchema = avroApicurioExtractor.getSchemaNameList(testFile);
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);
 
@@ -96,7 +96,6 @@ class AvroApicurioExtractorTest {
   @DisplayName("Should extract Map of Record")
   void testFlatPropertiesMap() throws Exception {
     final String testFile = fileHelper.getContent("/avro-files/testMap.avsc");
-    final List<String> parsedSchema = avroApicurioExtractor.getSchemaNameList(testFile);
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
@@ -128,7 +127,6 @@ class AvroApicurioExtractorTest {
   void testFlatPropertiesLogicalTypes() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testLogicalTypes.avsc");
-    final List<String> parsedSchema = avroApicurioExtractor.getSchemaNameList(testFile);
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
@@ -158,7 +156,6 @@ class AvroApicurioExtractorTest {
   void testFlatPropertiesOptionalArray() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/issue.avsc");
-    final List<String> parsedSchema = avroApicurioExtractor.getSchemaNameList(testFile);
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
@@ -178,7 +175,6 @@ class AvroApicurioExtractorTest {
   void testFlatPropertiesUnionRecordAvros() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionRecord.avsc");
-    final List<String> parsedSchema = avroApicurioExtractor.getSchemaNameList(testFile);
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);
 
@@ -209,7 +205,6 @@ class AvroApicurioExtractorTest {
   void testFlatPropertiesRecordUnionReverseOrder() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/testUnionReverseOrder.avsc");
-    final List<String> parsedSchema = avroApicurioExtractor.getSchemaNameList(testFile);
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);
 

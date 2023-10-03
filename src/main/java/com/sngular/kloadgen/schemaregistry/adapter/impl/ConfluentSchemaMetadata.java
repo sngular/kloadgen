@@ -1,6 +1,7 @@
 package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
 import java.util.List;
+
 import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 import lombok.Getter;
@@ -8,17 +9,17 @@ import lombok.Getter;
 @Getter
 public class ConfluentSchemaMetadata implements SchemaMetadataAdapter {
 
-  private Integer id;
+  private final Integer id;
 
-  private Integer version;
+  private final Integer version;
 
-  private String schemaType;
+  private final String schemaType;
 
-  private String schema;
+  private final String schema;
 
-  private List<SchemaReference> references;
+  private final List<SchemaReference> references;
 
-  private ConfluentSchemaMetadata(SchemaMetadata schemaMetadata) {
+  private ConfluentSchemaMetadata(final SchemaMetadata schemaMetadata) {
     this.id = schemaMetadata.getId();
     this.version = schemaMetadata.getVersion();
     this.schemaType = schemaMetadata.getSchemaType();
@@ -26,17 +27,17 @@ public class ConfluentSchemaMetadata implements SchemaMetadataAdapter {
     this.references = schemaMetadata.getReferences();
   }
 
-  public static ConfluentSchemaMetadata parse(SchemaMetadata schemaMetadata) {
+  public static ConfluentSchemaMetadata parse(final SchemaMetadata schemaMetadata) {
     return new ConfluentSchemaMetadata(schemaMetadata);
   }
 
   @Override
-  public Integer getGlobalId() {
+  public final Integer getGlobalId() {
     return this.getId();
   }
 
   @Override
-  public String getType() {
+  public final String getType() {
     return this.schemaType;
   }
 }

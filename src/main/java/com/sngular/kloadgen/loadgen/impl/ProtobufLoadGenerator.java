@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
@@ -45,8 +46,8 @@ public class ProtobufLoadGenerator implements SRLoadGenerator, BaseLoadGenerator
     final ProtobufSchema protobufSchema = new ProtobufSchema(schema);
     this.protobufSchemaProcessor
         .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema, new BaseSchemaMetadata<>(
-                           ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.PROTOBUF.name(), Collections.emptyList(), schema)))
-            , fieldExprMappings);
+                           ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.PROTOBUF.name(), Collections.emptyList(), schema))),
+                       fieldExprMappings);
   }
 
   @Override

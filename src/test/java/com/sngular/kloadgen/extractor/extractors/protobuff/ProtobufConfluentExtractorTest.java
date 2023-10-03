@@ -3,6 +3,7 @@ package com.sngular.kloadgen.extractor.extractors.protobuff;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -53,7 +54,8 @@ class ProtobufConfluentExtractorTest {
   void testEmbeddedTypes() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/embeddedTypeTest.proto");
     final ProtobufSchema schema = new ProtobufSchema(testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);    Assertions.assertThat(fieldValueMappingList)
+    final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
+    Assertions.assertThat(fieldValueMappingList)
               .hasSize(2)
               .containsExactlyInAnyOrder(
                   FieldValueMapping.builder().fieldName("phones.addressesPhone[:].id[]").fieldType("string-array").required(true).isAncestorRequired(true).build(),

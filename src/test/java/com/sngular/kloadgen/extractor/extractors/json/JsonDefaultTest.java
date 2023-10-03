@@ -3,9 +3,9 @@ package com.sngular.kloadgen.extractor.extractors.json;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
-import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -22,8 +22,6 @@ class JsonDefaultTest {
 
   private final Extractor<Schema> jsonDefaultExtractor = new JsonDefaultExtractor();
 
-  public final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
-
   @Test
   @DisplayName("Should extract basic types")
   void testBasic() throws Exception {
@@ -35,12 +33,12 @@ class JsonDefaultTest {
     final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
 
     Assertions.assertThat(fieldValueMappingList)
-              .hasSize(3)
-              .containsExactlyInAnyOrder(
-                  FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("lastName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("age").fieldType("number").required(true).isAncestorRequired(false).build()
-              );
+          .hasSize(3)
+          .containsExactlyInAnyOrder(
+              FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
+              FieldValueMapping.builder().fieldName("lastName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(false).build(),
+              FieldValueMapping.builder().fieldName("age").fieldType("number").required(true).isAncestorRequired(false).build()
+          );
   }
 
   @Test

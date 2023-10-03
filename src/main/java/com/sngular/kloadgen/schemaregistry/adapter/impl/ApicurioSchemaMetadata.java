@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.apicurio.registry.types.ArtifactState;
 import lombok.Getter;
@@ -60,13 +61,13 @@ public class ApicurioSchemaMetadata implements SchemaMetadataAdapter {
   }
 
   @Override
-  public String getType() {
+  public final String getType() {
     return this.schemaType;
   }
 
   @Override
-  public <T> List<T> getReferences() {
-    return Collections.<T>emptyList();
+  public final <T> List<T> getReferences() {
+    return Collections.emptyList();
   }
 
 }
