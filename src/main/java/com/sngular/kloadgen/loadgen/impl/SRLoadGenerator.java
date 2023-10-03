@@ -2,6 +2,7 @@ package com.sngular.kloadgen.loadgen.impl;
 
 import java.io.IOException;
 import java.util.Map;
+
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;

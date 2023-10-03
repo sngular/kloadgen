@@ -2,6 +2,7 @@ package com.sngular.kloadgen.schemaregistry;
 
 import java.util.Collection;
 import java.util.Map;
+
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;

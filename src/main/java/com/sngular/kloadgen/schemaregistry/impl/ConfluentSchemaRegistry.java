@@ -30,9 +30,6 @@ public final class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
 
   private SchemaRegistryClient schemaRegistryClient;
 
-  public ConfluentSchemaRegistry() {
-  }
-
   @Override
   public String getSchemaRegistryUrlKey() {
     return AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;

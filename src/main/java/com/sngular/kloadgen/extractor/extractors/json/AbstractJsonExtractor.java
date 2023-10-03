@@ -6,7 +6,6 @@ import java.util.Objects;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.extractors.SchemaExtractorUtil;
-import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.json.ArrayField;
@@ -19,15 +18,10 @@ import com.sngular.kloadgen.model.json.StringField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractJsonExtractor {
-
-  private static final JSONSchemaParser JSON_SCHEMA_PARSER = new JSONSchemaParser();
-
-  public final JSONSchemaParser getSchemaParser() {
-    return JSON_SCHEMA_PARSER;
-  }
-
+  
   private static String extractFieldName(final String fieldName) {
     String fieldNameClean = fieldName;
     if (fieldName.endsWith("[][]") || fieldName.endsWith("[:][]")) {
@@ -157,17 +151,24 @@ public abstract class AbstractJsonExtractor {
         completeFieldList.add(
             FieldValueMapping.builder()
                              .fieldName(name)
-                             .fieldType(value.getType()
-                                        + SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
-                                        + ((StringUtils.isNotEmpty(breadCrumb)
-                                            && breadCrumb.endsWith("[]"))
-                                              ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX : (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" : breadCrumb))
+                             .fieldType(calculateFieldType(breadCrumb, value))
                              .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
                              .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
                              .build());
       }
     }
     return completeFieldList;
+  }
+
+  @NotNull
+  private static String calculateFieldType(final String breadCrumb, final Field value) {
+    return value.getType() 
+           + SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
+           + ((StringUtils.isNotEmpty(breadCrumb) 
+               && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
+                  : (StringUtils.isNotEmpty(breadCrumb)
+                     && breadCrumb.endsWith("[:]")) ? "-map"
+                        : breadCrumb);
   }
 
   private List<FieldValueMapping> extractMapInternalFields(
@@ -189,10 +190,7 @@ public abstract class AbstractJsonExtractor {
       completeFieldList.add(
           FieldValueMapping.builder()
                            .fieldName(name)
-                           .fieldType(value.getType() + "-map" + ((StringUtils.isNotEmpty(breadCrumb)
-                                                                   && breadCrumb.endsWith("[:]")) ? "-map"
-                                                                      : (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
-                                                                                                                                                      : breadCrumb))
+                           .fieldType(getFieldType(breadCrumb, value))
                            .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
                            .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
                            .build());
@@ -200,22 +198,36 @@ public abstract class AbstractJsonExtractor {
     return completeFieldList;
   }
 
-  private void processRecordFieldList(final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
-      final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired) {
-    internalFields.forEach(internalField -> {
-      if (Objects.nonNull(internalField.getFieldName())) {
-        internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
-      } else {
-        internalField.setFieldName(fieldName);
-      }
-      final String[] splittedName = internalField.getFieldName().split("\\.");
-      String parentName = splittedName[splittedName.length - 2];
-      parentName = parentName.replace("[]", "");
-      if (fieldName.equals(parentName)) {
-        internalField.setAncestorRequired(isAncestorRequired);
-      }
-      completeFieldList.add(internalField);
-    });
+  @NotNull
+  private static String getFieldType(final String breadCrumb, final Field value) {
+    return value.getType() 
+           + "-map" 
+           + ((StringUtils.isNotEmpty(breadCrumb) 
+               && breadCrumb.endsWith("[:]")) ? "-map"
+                  : (StringUtils.isNotEmpty(breadCrumb)
+                     && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
+                        : breadCrumb);
+  }
+
+  private void processRecordFieldList(final String fieldName, final String splitter, final List<FieldValueMapping> internalFields, final List<FieldValueMapping> completeFieldList,
+      final boolean isAncestorRequired) {
+    internalFields.forEach(internalField -> extracted(fieldName, splitter, completeFieldList, isAncestorRequired, internalField));
+  }
+
+  private static void extracted(final String fieldName, final String splitter, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired,
+      final FieldValueMapping internalField) {
+    if (Objects.nonNull(internalField.getFieldName())) {
+      internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
+    } else {
+      internalField.setFieldName(fieldName);
+    }
+    final String[] splitName = internalField.getFieldName().split("\\.");
+    String parentName = splitName[splitName.length - 2];
+    parentName = parentName.replace("[]", "");
+    if (fieldName.equals(parentName)) {
+      internalField.setAncestorRequired(isAncestorRequired);
+    }
+    completeFieldList.add(internalField);
   }
 
   private Boolean checkRequiredByType(
