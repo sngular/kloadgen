@@ -88,13 +88,13 @@ class SamplerUtilTest {
     props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, "localhost:8081");
     props.put(PropsKeysHelper.KEY_SCHEMA_TYPE, jmeterProps);
 
-    if (jmeterProps.equalsIgnoreCase("json")) {
+    if ("json".equalsIgnoreCase(jmeterProps)) {
       jmcx.setVariables(getVariablesJsonSchema());
     }
-    if (jmeterProps.equalsIgnoreCase("avro")) {
+    if ("avro".equalsIgnoreCase(jmeterProps)) {
       jmcx.setVariables(getVariablesAvro());
     }
-    if (jmeterProps.equalsIgnoreCase("protobuf")) {
+    if ("protobuf".equalsIgnoreCase(jmeterProps)) {
       jmcx.setVariables(getVariablesProtobuf());
     }
 

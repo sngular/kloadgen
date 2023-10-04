@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
+import javax.xml.bind.DatatypeConverter;
+
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.SchemaProcessor;
@@ -14,7 +16,6 @@ import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import javax.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
