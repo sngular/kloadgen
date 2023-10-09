@@ -92,8 +92,12 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     if (element instanceof AsyncApiSampler asyncApiSampler) {
       if (Objects.nonNull(asyncApiFile)) {
         asyncApiSampler.setAsyncApiFile(asyncApiFile);
-        asyncApiSampler.setAsyncApiServerName(((AsyncApiServer) serverComboBox.getSelectedItem()).getName());
-        asyncApiSampler.setAsyncApiSchemaName(((AsyncApiSchema) topicComboBox.getSelectedItem()).getTopicName());
+        if (serverComboBox.getSelectedIndex() > -1) {
+          asyncApiSampler.setAsyncApiServerName(((AsyncApiServer) serverComboBox.getSelectedItem()).getName());
+        }
+        if (topicComboBox.getSelectedIndex() > -1) {
+          asyncApiSampler.setAsyncApiSchemaName(((AsyncApiSchema) topicComboBox.getSelectedItem()).getTopicName());
+        }
         // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
       }
     }
@@ -127,9 +131,11 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   private void populateData() {
     if (Objects.nonNull(asyncApiFile)) {
       asyncApiFile.getApiServerMap().forEach((name, value) -> serverComboBox.addItem(value));
+      serverComboBox.setSelectedIndex(0);
       fillTable(brokerFieldModel, asyncApiExtractor.getBrokerData(asyncApiFile).values());
       fillTable(schemaRegistryFieldModel, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
       asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
+      topicComboBox.setSelectedIndex(0);
     }
   }
 

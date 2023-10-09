@@ -11,6 +11,7 @@ import com.sngular.kloadgen.extractor.model.AsyncApiFile;
 import com.sngular.kloadgen.extractor.model.AsyncApiSR;
 import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
 import com.sngular.kloadgen.extractor.model.AsyncApiServer;
+import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import org.apache.commons.lang3.StringUtils;
 
@@ -104,7 +105,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
       fieldList.addAll(processPayload(solveRef(finalPayload, components, antiLoopList, "schemas"), root, components, antiLoopList));
     } else if (ApiTool.hasAdditionalProperties(finalPayload)) {
       fieldList.addAll(processMap(finalPayload, root, components, antiLoopList));
-    } else {
+    } else if (ApiTool.hasProperties(finalPayload)) {
       for (Iterator<Entry<String, JsonNode>> it = ApiTool.getProperties(finalPayload); it.hasNext();) {
         final var property = it.next();
         final var propertyDef = property.getValue();
@@ -120,11 +121,71 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
                           .builder()
                           .fieldName(calculateName(property.getKey(), root))
                           .fieldType(ApiTool.getType(propertyDef))
+                          .fieldValueList(hasValues(propertyDef))
+                          .constraints(getConstraints(propertyDef))
                           .build());
         }
       }
+    } else {
+      fieldList.add(FieldValueMapping
+              .builder()
+              .fieldName(calculateName(null, root))
+              .fieldType(getType(finalPayload))
+              .fieldValueList(hasValues(finalPayload))
+              .constraints(getConstraints(finalPayload))
+              .build());
     }
     return fieldList;
+  }
+
+  private String getType(JsonNode finalPayload) {
+    String type = ApiTool.getType(finalPayload);
+    if (ApiTool.hasFormat(finalPayload)) {
+        type = switch (ApiTool.getFormat(finalPayload)) {
+            case "date-time" -> "datetime";
+            case "int64" -> "long";
+            case "double" -> "double";
+            case "date" -> "date";
+            default -> ApiTool.getType(finalPayload);
+        };
+
+    }
+    return type;
+  }
+
+  private Map<ConstraintTypeEnum, String> getConstraints(JsonNode finalPayload) {
+    Map<ConstraintTypeEnum, String> constraints = new EnumMap<>(ConstraintTypeEnum.class);
+    if (ApiTool.hasNode(finalPayload, "minLength")) {
+      constraints.put(ConstraintTypeEnum.MIN_LENGTH, ApiTool.getNodeAsString(finalPayload, "minLength"));
+    }
+    if (ApiTool.hasNode(finalPayload, "maxLength")) {
+      constraints.put(ConstraintTypeEnum.MAX_LENGTH, ApiTool.getNodeAsString(finalPayload, "minLength"));
+    }
+    if (ApiTool.hasNode(finalPayload, "minimum")) {
+      constraints.put(ConstraintTypeEnum.MINIMUM_VALUE, ApiTool.getNodeAsString(finalPayload, "minimum"));
+    }
+    if (ApiTool.hasNode(finalPayload, "maximum")) {
+      constraints.put(ConstraintTypeEnum.MAXIMUM_VALUE, ApiTool.getNodeAsString(finalPayload, "maximum"));
+    }
+    if (ApiTool.hasNode(finalPayload, "exclusiveMinimum")) {
+      constraints.put(ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE, ApiTool.getNodeAsString(finalPayload, "exclusiveMinimum"));
+    }
+    if (ApiTool.hasNode(finalPayload, "exclusiveMaximum")) {
+      constraints.put(ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE, ApiTool.getNodeAsString(finalPayload, "exclusiveMaximum"));
+    }
+    if (ApiTool.hasNode(finalPayload, "multipleOf")) {
+      constraints.put(ConstraintTypeEnum.MULTIPLE_OF, ApiTool.getNodeAsString(finalPayload, "multipleOf"));
+    }
+
+    return constraints;
+  }
+
+  private String hasValues(JsonNode propertyDef) {
+    String values = null;
+    if (ApiTool.isEnum(propertyDef)) {
+      values = String.join(",", ApiTool.getEnumValues(propertyDef));
+    }
+    return values;
   }
 
   private List<FieldValueMapping> calculatePayload(final JsonNode propertyDef, final String root, final Map<String, JsonNode> components, final List<String> antiLoopList) {
@@ -190,10 +251,14 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
 
   private String calculateName(final String propertyName, final String root) {
     final String finalName;
-    if (StringUtils.isEmpty(root)) {
-      finalName = propertyName;
+    if (Objects.nonNull(propertyName)) {
+      if (StringUtils.isEmpty(root)) {
+        finalName = propertyName;
+      } else {
+        finalName = root + "." + propertyName;
+      }
     } else {
-      finalName = root + "." + propertyName;
+      finalName = root.substring(root.lastIndexOf("."));
     }
     return finalName;
   }

@@ -1,19 +1,13 @@
 package com.sngular.kloadgen.common.tools;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public final class ApiTool {
 
@@ -196,6 +190,10 @@ public final class ApiTool {
 
   public static boolean hasAdditionalProperties(final JsonNode schema) {
     return hasNode(schema, "additionalProperties");
+  }
+
+  public static boolean hasFormat(JsonNode schema) {
+    return hasNode(schema, "format");
   }
 
   public static boolean isObject(final JsonNode schema) {
