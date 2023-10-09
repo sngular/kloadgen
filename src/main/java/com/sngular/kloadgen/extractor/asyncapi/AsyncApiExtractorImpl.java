@@ -1,16 +1,5 @@
 package com.sngular.kloadgen.extractor.asyncapi;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -24,6 +13,11 @@ import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
 import com.sngular.kloadgen.extractor.model.AsyncApiServer;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class AsyncApiExtractorImpl implements ApiExtractor {
 
@@ -41,7 +35,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
     final var builder = AsyncApiFile.builder();
     try {
       final JsonNode openApi = om.readTree(apiFile);
-      builder.apiServerList(nodeToApServer(ApiTool.getNode(openApi, SERVERS)));
+      builder.apiServerMap(nodeToApServer(ApiTool.getNode(openApi, SERVERS)));
       builder.apiSchemaList(nodeToSchema(openApi));
     } catch (final IOException e) {
       throw new KLoadGenException(ERROR_WRONG_ASYNC_API_SCHEMA, e);
@@ -204,9 +198,9 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
     return finalName;
   }
 
-  private List<AsyncApiServer> nodeToApServer(final JsonNode node) {
-    final var serverList = new ArrayList<AsyncApiServer>();
-    node.fields().forEachRemaining(server -> serverList.add(mapNodeToServer(server.getKey(), server.getValue())));
+  private Map<String, AsyncApiServer> nodeToApServer(final JsonNode node) {
+    final var serverList = new HashMap<String, AsyncApiServer>();
+    node.fields().forEachRemaining(server -> serverList.put(server.getKey(), mapNodeToServer(server.getKey(), server.getValue())));
     return serverList;
   }
 
@@ -231,8 +225,8 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
   }
 
   @Override
-  public final List<AsyncApiServer> getBrokerData(final AsyncApiFile asyncApiFile) {
-    return asyncApiFile.getApiServerList();
+  public final Map<String, AsyncApiServer> getBrokerData(final AsyncApiFile asyncApiFile) {
+    return asyncApiFile.getApiServerMap();
   }
 
   @Override

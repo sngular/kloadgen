@@ -10,45 +10,30 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.sngular.kloadgen.config.asyncapi;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.List;
-import java.util.Objects;
+package com.sngular.kloadgen.sampler.gui;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
-import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
-import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
-import com.sngular.kloadgen.extractor.model.AsyncApiServer;
+import com.sngular.kloadgen.extractor.model.*;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.sampler.AsyncApiSampler;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.DefaultTableModel;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
 
-public final class AsyncApiConfigGui extends AbstractSamplerGui {
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.Collection;
+import java.util.Objects;
+
+public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
@@ -57,8 +42,6 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
   private JPanel mainPanel;
 
   private JTextField asyncApiFileTextField;
-
-  private JTextField registryUrl;
 
   private final DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Field Values List"}, 20);
 
@@ -70,7 +53,11 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
 
   private JComboBox<AsyncApiSchema> topicComboBox;
 
-  public AsyncApiConfigGui() {
+  private JComboBox<AsyncApiSR> registryComboBox;
+
+  private AsyncApiFile asyncApiFile;
+
+  public AsyncApiSamplerGui() {
     super();
     init();
   }
@@ -78,6 +65,72 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
   @Override
   public String getStaticLabel() {
     return "AsyncApi Sampler";
+  }
+
+  @Override
+  public void clearGui() {
+    super.clearGui();
+    asyncApiFileTextField.setText("");
+    // registryUrl.setText("");
+  }
+
+  @Override
+  public String getLabelResource() {
+    return "Asyncapi";
+  }
+
+  @Override
+  public TestElement createTestElement() {
+    final var testElement = new AsyncApiSampler();
+    configureTestElement(testElement);
+    return testElement;
+  }
+
+  @Override
+  public void modifyTestElement(TestElement element) {
+    super.configureTestElement(element);
+    if (element instanceof AsyncApiSampler asyncApiSampler) {
+      if (Objects.nonNull(asyncApiFile)) {
+        asyncApiSampler.setAsyncApiFile(asyncApiFile);
+        asyncApiSampler.setAsyncApiServerName(((AsyncApiServer) serverComboBox.getSelectedItem()).getName());
+        asyncApiSampler.setAsyncApiSchemaName(((AsyncApiSchema) topicComboBox.getSelectedItem()).getTopicName());
+        // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
+      }
+    }
+  }
+
+  @Override
+  public void configure(TestElement element) {
+    super.configure(element);
+    if (element instanceof AsyncApiSampler) {
+      asyncApiFile = ((AsyncApiSampler) element).getAsyncApiFile();
+      populateData();
+    }
+  }
+
+  private void actionFileChooser(final ActionEvent event) {
+
+    final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
+
+    if (JFileChooser.APPROVE_OPTION == returnValue) {
+      try {
+        final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
+        asyncApiFileTextField.setText(apiFile.getAbsolutePath());
+        asyncApiFile = asyncApiExtractor.processFile(apiFile);
+        populateData();
+      } catch (KLoadGenException ex) {
+        JOptionPane.showMessageDialog(mainPanel, "Error has occurred: " + ex.getMessage(), "Weird Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+
+  private void populateData() {
+    if (Objects.nonNull(asyncApiFile)) {
+      asyncApiFile.getApiServerMap().forEach((name, value) -> serverComboBox.addItem(value));
+      fillTable(brokerFieldModel, asyncApiExtractor.getBrokerData(asyncApiFile).values());
+      fillTable(schemaRegistryFieldModel, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
+      asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
+    }
   }
 
   private void init() {
@@ -134,31 +187,12 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
   private JTabbedPane createAsyncApiTabs() {
     final var tabbedPanel = new JTabbedPane();
     tabbedPanel.addTab("Broker", createBrokerPanel());
-    tabbedPanel.addTab("Registry", createRegistryTab());
+   // tabbedPanel.addTab("Registry", createRegistryTab());
     tabbedPanel.addTab("Schema", createSchemaTab());
     return tabbedPanel;
   }
 
-  public void actionFileChooser(final ActionEvent event) {
-
-    final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
-
-    if (JFileChooser.APPROVE_OPTION == returnValue) {
-      try {
-        final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
-        asyncApiFileTextField.setText(apiFile.getAbsolutePath());
-        final var asyncApiFile = asyncApiExtractor.processFile(apiFile);
-        asyncApiFile.getApiServerList().forEach(serverComboBox::addItem);
-        fillTable(brokerFieldModel, asyncApiExtractor.getBrokerData(asyncApiFile));
-        fillTable(schemaRegistryFieldModel, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
-        asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
-      } catch (KLoadGenException ex) {
-        JOptionPane.showMessageDialog(mainPanel, "Error has occurred: " + ex.getMessage(), "Weird Error", JOptionPane.ERROR_MESSAGE);
-      }
-    }
-  }
-
-  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final List<T> schemaData) {
+  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final Collection<T> schemaData) {
     if (Objects.nonNull(schemaData)) {
       final var count = schemaFields.getRowCount();
       for (var i = 0; i < count; i++) {
@@ -190,18 +224,21 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
     brokerPanel.add(new JLabeledTextField("Broker Server"));
     serverComboBox = new JComboBox<>();
     serverComboBox.setRenderer(new ApiServerRenderer());
+    serverComboBox.addActionListener(this::serverChooseActionListener);
     brokerPanel.add(serverComboBox, BorderLayout.NORTH);
     brokerPanel.add(new JScrollPane(new JTable(brokerFieldModel)), BorderLayout.CENTER);
     return brokerPanel;
   }
 
+
   private JPanel createRegistryTab() {
     final JPanel registryUrlPanel = new JPanel();
     registryUrlPanel.setLayout(new BorderLayout(0, 0));
     registryUrlPanel.add(new JLabeledTextField("Schema Registry URL"));
-    this.registryUrl = new JTextField();
-    this.registryUrl.setPreferredSize(new Dimension(249, 30));
-    registryUrlPanel.add(this.registryUrl, BorderLayout.NORTH);
+    registryComboBox = new JComboBox<>();
+    registryComboBox.setRenderer(new AsyncApiSRRenderer());
+    registryComboBox.addActionListener(this::registryComboActionListener);
+    registryUrlPanel.add(this.registryComboBox, BorderLayout.NORTH);
     registryUrlPanel.add(new JScrollPane(new JTable(schemaRegistryFieldModel)), BorderLayout.CENTER);
     return registryUrlPanel;
   }
@@ -224,27 +261,12 @@ public final class AsyncApiConfigGui extends AbstractSamplerGui {
     fillTable(schemaFieldModel, selectedSchema.getProperties());
   }
 
-  @Override
-  public void clearGui() {
-    super.clearGui();
-    asyncApiFileTextField.setText("");
-    registryUrl.setText("");
+  private void registryComboActionListener(ActionEvent actionEvent) {
   }
 
-  @Override
-  public String getLabelResource() {
-    return "Asyncapi";
-  }
-
-  @Override
-  public TestElement createTestElement() {
-    final var testElement = new AsyncApiSampler();
-    modifyTestElement(testElement);
-    return testElement;
-  }
-
-  @Override
-  public void modifyTestElement(TestElement element) {
-
+  private void serverChooseActionListener(ActionEvent actionEvent) {
+    final JComboBox cb = (JComboBox)actionEvent.getSource();
+    final var selectedSchema = (AsyncApiServer) cb.getSelectedItem();
+    fillTable(brokerFieldModel, selectedSchema.getProperties());
   }
 }

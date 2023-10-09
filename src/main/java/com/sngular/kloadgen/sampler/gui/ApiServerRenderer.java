@@ -1,12 +1,10 @@
-package com.sngular.kloadgen.config.asyncapi;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.util.Objects;
+package com.sngular.kloadgen.sampler.gui;
 
 import com.sngular.kloadgen.extractor.model.AsyncApiServer;
-import javax.swing.JLabel;
-import javax.swing.JList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Objects;
 
 public class ApiServerRenderer extends JLabel implements javax.swing.ListCellRenderer<AsyncApiServer> {
 

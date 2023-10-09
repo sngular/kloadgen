@@ -1,15 +1,16 @@
 package com.sngular.kloadgen.extractor.model;
 
-import java.util.List;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
+
+import java.util.List;
+import java.util.Map;
 
 @Value
 @Builder
 public class AsyncApiFile {
 
-  List<AsyncApiServer> apiServerList;
+  Map<String, AsyncApiServer> apiServerMap;
 
   List<AsyncApiSR> apiAsyncApiSRList;
 
