@@ -11,6 +11,8 @@ import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 
 public class ProtobuffExtractor implements ExtractorRegistry<Object> {
 
@@ -22,6 +24,11 @@ public class ProtobuffExtractor implements ExtractorRegistry<Object> {
       return schemaRegistryMap.get(APICURIO).processSchema(schemaReceived);
     }
     return schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
+  }
+
+  @Override
+  public ParsedSchema processSchema(String fileContent) {
+    return new ProtobufSchema(fileContent);
   }
 
   public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {

@@ -22,8 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
+import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
+import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.util.AutoCompletion;
 import com.sngular.kloadgen.util.PropsKeysHelper;
@@ -45,6 +48,7 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
@@ -58,11 +62,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private final JButton openFileDialogButton = new JButton(JMeterUtils.getResString("file_visualizer_open"));
 
-  private List<String> parserSchema;
+  private ParsedSchema parserSchema;
 
   private JComboBox<String> schemaTypeComboBox;
-
-  private JComboBox<String> subjectNameComboBox;
 
   public FileSubjectPropertyEditor() {
     this.init();
@@ -86,15 +88,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     schemaTypeComboBox.insertItemAt(SchemaTypeEnum.JSON.name(), 1);
     schemaTypeComboBox.insertItemAt(SchemaTypeEnum.PROTOBUF.name(), 2);
     schemaTypeComboBox.setSelectedIndex(0);
-    subjectNameComboBox = new JComboBox<>();
-    subjectNameComboBox.setEditable(true);
     panel.setLayout(new BorderLayout());
     openFileDialogButton.addActionListener(this::actionFileChooser);
     panel.add(openFileDialogButton, BorderLayout.LINE_END);
-    panel.add(subjectNameComboBox);
     panel.add(schemaTypeComboBox);
-    AutoCompletion.enable(subjectNameComboBox);
-    this.subjectNameComboBox.addActionListener(this);
   }
 
   public final void actionFileChooser(final ActionEvent event) {
@@ -102,24 +99,26 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     final int returnValue = fileChooser.showDialog(panel, JMeterUtils.getResString("file_visualizer_open"));
 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
-      final File subjectName = Objects.requireNonNull(fileChooser.getSelectedFile());
-      try {
-        final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
-        parserSchema = SchemaExtractor.schemaTypesList(subjectName, schemaType, "CONFLUENT"); //TODO CHANGE
-        subjectNameComboBox.removeAllItems();
-        subjectNameComboBox.addItem(parserSchema.get(0));
-        subjectNameComboBox.setSelectedItem(parserSchema.get(0));
-      } catch (final IOException e) {
+      final File schemaFile = Objects.requireNonNull(fileChooser.getSelectedFile());
+        try {
+            final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
+            ExtractorRegistry extractor = ExtractorFactory.getExtractor(schemaType);
+            String fileContent = SchemaExtractor.readSchemaFile(schemaFile.getPath());
+            this.parserSchema =  extractor.processSchema(fileContent);
+            List<FieldValueMapping> schemaFieldList = extractor.processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
+            buildTable(schemaFieldList);
+            JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA, fileContent);
+            JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE, schemaType);
+        } catch (final IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
                                       JOptionPane.ERROR_MESSAGE);
         log.error(e.getMessage(), e);
       }
-      subjectNameComboBox.addFocusListener(new ComboFiller());
     }
   }
 
   public final String getSelectedSchema(final String name) {
-    return parserSchema.indexOf(name) > 0 ? parserSchema.get(parserSchema.indexOf(name)) : null;
+    return Objects.equals(parserSchema.name(), name) ? parserSchema.name() : null;
   }
 
   public final List<FieldValueMapping> getAttributeList(final ParsedSchema selectedSchema) {
@@ -133,9 +132,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   @Override
   public final void actionPerformed(final ActionEvent event) {
 
-    if (subjectNameComboBox.getItemCount() != 0) {
+    if (parserSchema != null) {
       final String schemaType = (String) schemaTypeComboBox.getSelectedItem();
-      final String selectedItem = (String) subjectNameComboBox.getSelectedItem();
+      final String selectedItem = parserSchema.schemaType();
       final String selectedSchema = getSelectedSchema(selectedItem);
       final List<FieldValueMapping> attributeList = SchemaExtractor.flatPropertiesList(selectedSchema).getValue();
 
@@ -181,6 +180,46 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
+  public final void buildTable(final List<FieldValueMapping> attributeList) {
+
+    if (!attributeList.isEmpty()) {
+      try {
+        //Get current test GUI component
+        final TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
+        final Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
+        customizer.setAccessible(true);
+
+        //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
+        final GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
+        final Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
+        editors.setAccessible(true);
+
+        //Retrieve TableEditor and set all fields with default values to it
+        final PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
+        for (PropertyEditor propertyEditor : propertyEditors) {
+          if (propertyEditor instanceof TableEditor) {
+            propertyEditor.setValue(attributeList);
+          }
+        }
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        JOptionPane
+                .showMessageDialog(panel, "Failed to retrieve schema : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
+                        JOptionPane.ERROR_MESSAGE);
+        log.error(e.getMessage(), e);
+      } catch (final AvroRuntimeException ex) {
+        JOptionPane
+                .showMessageDialog(panel, "Failed to process schema : " + ex.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
+                        JOptionPane.ERROR_MESSAGE);
+        log.error(ex.getMessage(), ex);
+      }
+    } else {
+      JOptionPane
+              .showMessageDialog(panel, "No schema has been loaded, we cannot extract properties", ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
+                      JOptionPane.WARNING_MESSAGE);
+    }
+
+  }
+
   @Override
   public void clearGui() {
     // Not implementation required
@@ -191,10 +230,6 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     super.setSource(propertyDescriptor);
   }
 
-  @Override
-  public final String getAsText() {
-    return Objects.requireNonNull(this.subjectNameComboBox.getSelectedItem()).toString();
-  }
 
   @Override
   public final Component getCustomEditor() {
@@ -202,39 +237,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   }
 
   @Override
-  public final void setAsText(final String text) throws IllegalArgumentException {
-    this.subjectNameComboBox.setSelectedItem(text);
-    super.setValue(text);
-  }
-
-  @Override
-  public final void setValue(final Object value) {
-    this.subjectNameComboBox.setSelectedItem(Objects.requireNonNullElse(value, ""));
-    super.setValue(value);
-  }
-
-  @Override
-  public final Object getValue() {
-    return this.subjectNameComboBox.getSelectedItem();
-  }
-
-  @Override
   public final boolean supportsCustomEditor() {
     return true;
-  }
-
-  class ComboFiller implements FocusListener {
-
-    @Override
-    public void focusGained(final FocusEvent e) {
-      final String subjects = JMeterContextService.getContext().getProperties().getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS);
-      subjectNameComboBox.setModel(new DefaultComboBoxModel<>(subjects.split(",")));
-    }
-
-    @Override
-    public void focusLost(final FocusEvent e) {
-      // Override but not used. Implementation not needed.
-    }
   }
 
 }

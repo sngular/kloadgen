@@ -10,6 +10,8 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
 
 
 public class JsonExtractor implements ExtractorRegistry<Object> {
@@ -19,6 +21,11 @@ public class JsonExtractor implements ExtractorRegistry<Object> {
 
   public final List<FieldValueMapping> processSchema(final Object schemaReceived, SchemaRegistryEnum registryEnum) {
     return schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
+  }
+
+  @Override
+  public ParsedSchema processSchema(String fileContent) {
+    return new JsonSchema(fileContent);
   }
 
   public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {

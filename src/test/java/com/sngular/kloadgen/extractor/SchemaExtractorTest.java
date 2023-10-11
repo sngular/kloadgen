@@ -132,4 +132,13 @@ class SchemaExtractorTest {
 
   }
 
+  @Test
+  @DisplayName("Test readSchemaFile with AVRO")
+  void testReadSchemaFile() throws IOException, RestClientException {
+    final String testFilePath = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc").toPath().toString();
+
+
+    final var result = SchemaExtractor.readSchemaFile(testFilePath);
+    Assertions.assertThat(result).isNotNull();
+  }
 }

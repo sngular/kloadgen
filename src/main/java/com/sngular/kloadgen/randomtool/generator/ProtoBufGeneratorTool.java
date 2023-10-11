@@ -13,9 +13,9 @@ import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.randomtool.random.RandomArray;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
 import com.sngular.kloadgen.randomtool.random.RandomSequence;
-import com.sngular.kloadgen.randomtool.util.ValueUtils;
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.jmeter.threads.JMeterContextService;
+
+import static com.sngular.kloadgen.randomtool.util.ValueUtils.replaceValuesContext;
 
 public class ProtoBufGeneratorTool {
 
@@ -29,13 +29,10 @@ public class ProtoBufGeneratorTool {
 
   private final Map<String, Object> context = new HashMap<>();
 
-  public final List generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
+  public final List<Object> generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
-    final List<String> parameterList = new ArrayList<>(fieldValuesList);
-    parameterList.replaceAll(
-        fieldValue -> fieldValue.matches("\\$\\{\\w*}") ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
-
-    final List value = new ArrayList<>(arraySize);
+    final List<String> parameterList = replaceValuesContext(fieldValuesList);
+    final List<Object> value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
         value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, context));
@@ -52,7 +49,7 @@ public class ProtoBufGeneratorTool {
   }
 
   public final Object generateObject(final Descriptors.EnumDescriptor descriptor, final String fieldType, final int arraySize, final List<String> fieldValuesList) {
-    final List<String> parameterList = ValueUtils.replaceValuesContext(fieldValuesList);
+    final List<String> parameterList = replaceValuesContext(fieldValuesList);
     Object value = new Object();
     if (ENUM_TYPE.equalsIgnoreCase(fieldType)) {
       value = getEnumOrGenerate(descriptor, fieldType, parameterList);

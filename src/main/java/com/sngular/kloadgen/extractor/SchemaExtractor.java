@@ -34,12 +34,15 @@ public  class SchemaExtractor {
   }
 
   public static List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
-    return ExtractorFactory.getExtractor(parserSchema.schemaType(), "CONFLUENT").processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
+    return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
   }
 
-  public static List<String> schemaTypesList(final File schemaFile, final String schemaType, String registry) throws IOException {
-    return ExtractorFactory.getExtractor(schemaType, registry).getSchemaNameList(readLineByLine(schemaFile.getPath()),
-            ExtractorFactory.getSchemaRegistry(registry));
+  public static List<String> schemaTypesList(final File schemaFile, final String schemaType, final SchemaRegistryEnum schemaRegistryEnum) throws IOException {
+    return ExtractorFactory.getExtractor(schemaType).getSchemaNameList(readLineByLine(schemaFile.getPath()), schemaRegistryEnum);
+  }
+
+  public static String readSchemaFile(final String filePath) throws IOException {
+    return readLineByLine(filePath);
   }
 
   private static String readLineByLine(final String filePath) throws IOException {
@@ -52,8 +55,8 @@ public  class SchemaExtractor {
     return contentBuilder.toString();
   }
 
-  private static List<FieldValueMapping> processSchema(final ParsedSchema schema) {
-    return ExtractorFactory.getExtractor(schema.schemaType(),SchemaRegistryEnum.CONFLUENT.name()).processSchema(schema.rawSchema().toString(), SchemaRegistryEnum.CONFLUENT);
+  private static List<FieldValueMapping> processSchema(final ParsedSchema parsedSchema) {
+    return ExtractorFactory.getExtractor(parsedSchema.schemaType()).processSchema(parsedSchema.rawSchema().toString(), SchemaRegistryEnum.CONFLUENT);
   }
 
 }

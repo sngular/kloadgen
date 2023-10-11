@@ -100,7 +100,7 @@ public class AvroGeneratorTool {
         final List<String> enumValueList = schema.getEnumSymbols();
         value = new GenericData.EnumSymbol(schema, enumValueList.get(RandomUtils.nextInt(0, enumValueList.size())));
       } else {
-        if ("Seq".equalsIgnoreCase(fieldType)) {
+        if ("Seq".equalsIgnoreCase(fieldType)) { // Este if nunca da true, no se si sobra o está mal
           value = new GenericData.EnumSymbol(schema, RandomSequence.generateSeq(fieldName, fieldValueMappingType, parameterList, context));
         } else if ("It".equalsIgnoreCase(fieldType)) {
           value = new GenericData.EnumSymbol(schema, RandomIterator.generateIteratorForFieldValueList(fieldName, fieldValueMappingType, parameterList, context));

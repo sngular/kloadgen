@@ -71,7 +71,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   @Override
   public void setupTest(final JavaSamplerContext context) {
-    props = properties(context);
+    props = JMeterContextService.getContext().getProperties();
 
     generator = SamplerUtil.configureValueGenerator(props);
 
@@ -99,13 +99,11 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
     try {
 
-      final Properties props2 = new Properties();
-
-      props2.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-      props2.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
-      props2.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
-      props2.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-      props2.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
+      props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
+      props.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
+      props.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
+      props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
 
       producer = new KafkaProducer<>(props);
     } catch (final KafkaException ex) {
@@ -209,10 +207,9 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
-    final StringBuilder result = new StringBuilder();
-    result.append("key: ").append(producerRecord.key())
-          .append(", payload: ").append(producerRecord.value());
-    sampleResult.setSamplerData(result.toString());
+    String result = "key: " + producerRecord.key() +
+            ", payload: " + producerRecord.value();
+    sampleResult.setSamplerData(result);
   }
 
   private void fillSampleResult(final SampleResult sampleResult, final String respondeData, final boolean successful) {

@@ -21,18 +21,16 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public final class ExtractorFactory {
-  private static AvroExtractor avroExtractor = new AvroExtractor();
+  private static final AvroExtractor avroExtractor = new AvroExtractor();
 
-  private static JsonExtractor jsonExtractor = new JsonExtractor();
+  private static final JsonExtractor jsonExtractor = new JsonExtractor();
 
-  private static ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
+  private static final ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
 
   private ExtractorFactory() {
   }
 
-  public static ExtractorRegistry getExtractor(final String schemaType, final String schemaRegistryEnum) {
-
-    SchemaRegistryEnum registryEnum = getSchemaRegistry(schemaRegistryEnum);
+  public static ExtractorRegistry getExtractor(final String schemaType) {
 
     if (schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
       final ExtractorRegistry response;
@@ -67,28 +65,25 @@ public final class ExtractorFactory {
     final Properties properties = JMeterContextService.getContext().getProperties();
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    String schemaType = null;
     final ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
-    schemaType = parsedSchemaAdapter.getType();
+    final String schemaType = parsedSchemaAdapter.getType();
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
     SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
 
     Object schema = null;
-    if (Objects.nonNull(registryName)) {
-      //TODO change parser
-      switch (schemaRegistryEnum) {
-        case APICURIO:
-          schema = ((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
-          break;
-        case CONFLUENT:
-          schema = parsedSchemaAdapter.getRawSchema();
-          break;
-        default:
-          throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
-      }
-      attributeList = getExtractor(schemaType,registryName.toUpperCase()).processSchema(schema, schemaRegistryEnum);
+    //TODO change parser
+    switch (schemaRegistryEnum) {
+      case APICURIO:
+        schema = ((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
+        break;
+      case CONFLUENT:
+        schema = parsedSchemaAdapter.getRawSchema();
+        break;
+      default:
+        throw new KLoadGenException("Schema Registry Type not supported " + registryName.toUpperCase());
     }
+    attributeList = getExtractor(schemaType).processSchema(schema, schemaRegistryEnum);
     return Pair.of(schemaType, attributeList);
   }
 }
