@@ -18,6 +18,7 @@ import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.loadgen.impl.JsonSRLoadGenerator;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.gui.GUIMenuSortOrder;
 import org.apache.jmeter.samplers.AbstractSampler;
@@ -118,7 +119,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
   public final AsyncApiFile getAsyncApiFile() {
     try {
       this.asyncApiFileStr = this.getPropertyAsString("asyncapifilestr");
-      if (Objects.nonNull(asyncApiFileStr)) {
+      if (!StringUtils.isEmpty(asyncApiFileStr)) {
         asyncApiFile = mapper.createParser(this.getPropertyAsString("asyncapifilestr")).readValueAs(AsyncApiFile.class);
       }
     } catch (IOException e) {

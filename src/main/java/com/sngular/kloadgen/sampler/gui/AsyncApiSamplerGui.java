@@ -94,6 +94,8 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   public void clearGui() {
     super.clearGui();
     asyncApiFileTextField.setText("");
+    schemaFieldModel.setNumRows(0);
+    brokerFieldModel.setNumRows(0);
     // registryUrl.setText("");
   }
 
