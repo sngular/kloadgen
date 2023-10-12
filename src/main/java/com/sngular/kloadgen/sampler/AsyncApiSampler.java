@@ -117,7 +117,10 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   public final AsyncApiFile getAsyncApiFile() {
     try {
-      asyncApiFile = mapper.createParser(this.getPropertyAsString("asyncapifilestr")).readValueAs(AsyncApiFile.class);
+      this.asyncApiFileStr = this.getPropertyAsString("asyncapifilestr");
+      if (Objects.nonNull(asyncApiFileStr)) {
+        asyncApiFile = mapper.createParser(this.getPropertyAsString("asyncapifilestr")).readValueAs(AsyncApiFile.class);
+      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -126,7 +129,8 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   public final void setAsyncApiFile(final AsyncApiFile asyncApiFile) {
     try {
-      this.setProperty("asyncapifilestr", mapper.writeValueAsString(asyncApiFile));
+      this.asyncApiFileStr = mapper.writeValueAsString(asyncApiFile);
+      this.setProperty("asyncapifilestr", asyncApiFileStr);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
