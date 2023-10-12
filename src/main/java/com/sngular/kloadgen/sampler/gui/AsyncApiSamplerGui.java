@@ -12,26 +12,50 @@
 
 package com.sngular.kloadgen.sampler.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
-import com.sngular.kloadgen.extractor.model.*;
+import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
+import com.sngular.kloadgen.extractor.model.AsyncApiFile;
+import com.sngular.kloadgen.extractor.model.AsyncApiSR;
+import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
+import com.sngular.kloadgen.extractor.model.AsyncApiServer;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.sampler.AsyncApiSampler;
+import com.sngular.kloadgen.sampler.SamplerUtil;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.Collection;
-import java.util.Objects;
+import org.apache.kafka.clients.producer.ProducerConfig;
 
 public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
@@ -58,7 +82,6 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   private AsyncApiFile asyncApiFile;
 
   public AsyncApiSamplerGui() {
-    super();
     init();
   }
 
@@ -82,12 +105,12 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   @Override
   public TestElement createTestElement() {
     final var testElement = new AsyncApiSampler();
-    configureTestElement(testElement);
+    modifyTestElement(testElement);
     return testElement;
   }
 
   @Override
-  public void modifyTestElement(TestElement element) {
+  public void modifyTestElement(final TestElement element) {
     super.configureTestElement(element);
     if (element instanceof AsyncApiSampler asyncApiSampler) {
       if (Objects.nonNull(asyncApiFile)) {
@@ -101,10 +124,11 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
         // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
       }
     }
+    configureTestElement(element);
   }
 
   @Override
-  public void configure(TestElement element) {
+  public void configure(final TestElement element) {
     super.configure(element);
     if (element instanceof AsyncApiSampler) {
       asyncApiFile = ((AsyncApiSampler) element).getAsyncApiFile();
@@ -132,11 +156,36 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     if (Objects.nonNull(asyncApiFile)) {
       asyncApiFile.getApiServerMap().forEach((name, value) -> serverComboBox.addItem(value));
       serverComboBox.setSelectedIndex(0);
-      fillTable(brokerFieldModel, asyncApiExtractor.getBrokerData(asyncApiFile).values());
-      fillTable(schemaRegistryFieldModel, asyncApiExtractor.getSchemaRegistryData(asyncApiFile));
+      fillTable(brokerFieldModel, prepareServer(asyncApiExtractor.getBrokerData(asyncApiFile).get(serverComboBox.getSelectedItem())));
+      final var schemaRegistryList = asyncApiExtractor.getSchemaRegistryData(asyncApiFile);
+      if (!schemaRegistryList.isEmpty()) {
+        fillTable(schemaRegistryFieldModel, prepareSRServer(schemaRegistryList.get(0)));
+      }
       asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
       topicComboBox.setSelectedIndex(0);
     }
+  }
+
+  private Collection<Pair<String, String>> prepareSRServer(final AsyncApiSR schemaRegistryData) {
+    final var srPropoMap = schemaRegistryData.getPropertiesMap();
+    final var propertyList = new ArrayList<Pair<String, String>>();
+    propertyList.add(Pair.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, srPropoMap.get("url")));
+    propertyList.add(Pair.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, srPropoMap.get("type")));
+    SchemaRegistryProperties.DEFAULTS.forEach(jMeterProperty -> propertyList.add(Pair.of(jMeterProperty.getName(), jMeterProperty.getPropertyValue())));
+    return propertyList;
+  }
+
+  private Collection<Pair<String, String>> prepareServer(final AsyncApiServer asyncApiServer) {
+    final var propertylist = new ArrayList<Pair<String, String>>();
+    if (Objects.nonNull(asyncApiServer)) {
+      final var serverProps = asyncApiServer.getPropertiesMap();
+      propertylist.add(Pair.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, serverProps.get("url")));
+      CollectionUtils.select(SamplerUtil
+                                 .getCommonProducerDefaultParameters(),
+                             property -> !property.getName().equalsIgnoreCase(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG))
+          .forEach(jMeterProperty -> propertylist.add(Pair.of(jMeterProperty.getName(), jMeterProperty.getStringValue())));
+    }
+    return propertylist;
   }
 
   private void init() {
@@ -198,7 +247,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     return tabbedPanel;
   }
 
-  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final Collection<T> schemaData) {
+  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final Collection<Pair<String, String>> schemaData) {
     if (Objects.nonNull(schemaData)) {
       final var count = schemaFields.getRowCount();
       for (var i = 0; i < count; i++) {
@@ -220,8 +269,8 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     }
   }
 
-  private <T extends AsyncApiAbstract> Object[] dataToRow(final T data) {
-    return data.getProperties();
+  private Object[] dataToRow(final Pair<String, String> data) {
+    return new Object[] {data.getKey(), data.getValue()};
   }
 
   private JPanel createBrokerPanel() {
@@ -272,7 +321,6 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private void serverChooseActionListener(ActionEvent actionEvent) {
     final JComboBox cb = (JComboBox)actionEvent.getSource();
-    final var selectedSchema = (AsyncApiServer) cb.getSelectedItem();
-    fillTable(brokerFieldModel, selectedSchema.getProperties());
+    fillTable(brokerFieldModel, prepareServer((AsyncApiServer) cb.getSelectedItem()));
   }
 }

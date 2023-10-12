@@ -4,7 +4,7 @@
  *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-package com.sngular.kloadgen.config.schemaregistry;
+package com.sngular.kloadgen.sampler.gui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,9 +14,9 @@ import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 
-class DefaultPropertiesHelper {
+public class SchemaRegistryProperties {
 
-  protected static final List<PropertyMapping> DEFAULTS = new ArrayList<>(Arrays.asList(
+  public static final List<PropertyMapping> DEFAULTS = new ArrayList<>(Arrays.asList(
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG).propertyValue(ProducerKeysHelper.FLAG_NO).build(),
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY).propertyValue(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE).build(),
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY).propertyValue(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_DEFAULT).build(),
@@ -24,7 +24,7 @@ class DefaultPropertiesHelper {
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY).propertyValue(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_DEFAULT)
                      .build()));
 
-  private DefaultPropertiesHelper() {
+  private SchemaRegistryProperties() {
   }
 
 }

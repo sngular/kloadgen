@@ -1,5 +1,13 @@
 package com.sngular.kloadgen.sampler;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sngular.kloadgen.exception.KLoadGenException;
@@ -10,9 +18,8 @@ import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.loadgen.impl.JsonSRLoadGenerator;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.jmeter.config.ConfigTestElement;
+import org.apache.jmeter.gui.GUIMenuSortOrder;
 import org.apache.jmeter.samplers.AbstractSampler;
 import org.apache.jmeter.samplers.Entry;
 import org.apache.jmeter.samplers.SampleResult;
@@ -23,17 +30,8 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-
-@Getter
-@Setter
-public class AsyncApiSampler extends AbstractSampler implements Serializable  {
+@GUIMenuSortOrder(Integer.MAX_VALUE)
+public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(AsyncApiSampler.class);
 
@@ -51,7 +49,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable  {
 
   private transient BaseLoadGenerator generator;
 
-  private transient final ObjectMapper mapper = new ObjectMapper();
+  private final transient ObjectMapper mapper = new ObjectMapper();
 
   public AsyncApiSampler() {
     apiExtractor = new AsyncApiExtractorImpl();
@@ -65,7 +63,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable  {
   }
 
   @Override
-  public SampleResult sample(final Entry entry) {
+  public final SampleResult sample(final Entry entry) {
 
     final var sampleResult = new SampleResult();
     try (final KafkaProducer<Object, Object> producer = new KafkaProducer<>(extractProps(asyncApiServerName))) {
@@ -104,13 +102,53 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable  {
     return properties;
   }
 
-  public String getAsyncApiFileStr() throws JsonProcessingException {
+  public final String getAsyncApiFileStr() throws JsonProcessingException {
     return mapper.writeValueAsString(asyncApiFileStr);
   }
 
-  public void setAsyncApiFileStr(String asyncApiFileStr) throws IOException {
+  public final void setAsyncApiFileStr(String asyncApiFileStr) {
     this.asyncApiFileStr = asyncApiFileStr;
-    this.asyncApiFile = mapper.createParser(asyncApiFileStr).readValueAs(AsyncApiFile.class);
+    try {
+      this.asyncApiFile = mapper.createParser(asyncApiFileStr).readValueAs(AsyncApiFile.class);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public final AsyncApiFile getAsyncApiFile() {
+    try {
+      asyncApiFile = mapper.createParser(this.getPropertyAsString("asyncapifilestr")).readValueAs(AsyncApiFile.class);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return asyncApiFile;
+  }
+
+  public final void setAsyncApiFile(final AsyncApiFile asyncApiFile) {
+    try {
+      this.setProperty("asyncapifilestr", mapper.writeValueAsString(asyncApiFile));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+    this.asyncApiFile = asyncApiFile;
+  }
+
+  public final String getAsyncApiServerName() {
+    return asyncApiServerName;
+  }
+
+  public final void setAsyncApiServerName(final String asyncApiServerName) {
+    this.setProperty("asyncApiServerName", asyncApiServerName);
+    this.asyncApiServerName = asyncApiServerName;
+  }
+
+  public final String getAsyncApiSchemaName() {
+    return asyncApiSchemaName;
+  }
+
+  public final void setAsyncApiSchemaName(final String asyncApiSchemaName) {
+    this.setProperty("asyncapischemaname", asyncApiSchemaName);
+    this.asyncApiSchemaName = asyncApiSchemaName;
   }
 
   private ProducerRecord<Object, Object> getProducerRecord(final EnrichedRecord messageVal, final boolean keyFlag, final boolean valueFlag) {
@@ -128,8 +166,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable  {
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
-    String result = "key: " + producerRecord.key() +
-            ", payload: " + producerRecord.value();
+    final String result = "key: " + producerRecord.key() + ", payload: " + producerRecord.value();
     sampleResult.setSamplerData(result);
   }
 
