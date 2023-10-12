@@ -1,5 +1,17 @@
 package com.sngular.kloadgen.extractor.asyncapi;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -15,11 +27,6 @@ import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
-
 public class AsyncApiExtractorImpl implements ApiExtractor {
 
   private static final Set<String> COMPLEX_TYPES = Set.of("record", "array");
@@ -33,16 +40,24 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
 
   @Override
   public final AsyncApiFile processFile(final File apiFile) {
-    final var builder = AsyncApiFile.builder();
+    AsyncApiFile asyncApiFile = null;
     try {
       final JsonNode openApi = om.readTree(apiFile);
-      builder.apiServerMap(nodeToApServer(ApiTool.getNode(openApi, SERVERS)));
-      builder.apiSchemaList(nodeToSchema(openApi));
+      asyncApiFile = processNode(openApi);
     } catch (final IOException e) {
       throw new KLoadGenException(ERROR_WRONG_ASYNC_API_SCHEMA, e);
     }
 
-    return builder.build();
+    return asyncApiFile;
+  }
+
+  @Override
+  public final AsyncApiFile processNode(final JsonNode apiFile) {
+    return AsyncApiFile.builder()
+                        .asyncApiFileNode(apiFile)
+                        .apiServerMap(nodeToApServer(ApiTool.getNode(apiFile, SERVERS)))
+                        .apiSchemaList(nodeToSchema(apiFile))
+                        .build();
   }
 
   private Map<String, AsyncApiSchema> nodeToSchema(final JsonNode openApi) {

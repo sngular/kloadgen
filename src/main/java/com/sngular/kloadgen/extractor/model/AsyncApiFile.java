@@ -3,6 +3,7 @@ package com.sngular.kloadgen.extractor.model;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.Singular;
 import lombok.Value;
@@ -11,12 +12,14 @@ import lombok.Value;
 @Builder
 public class AsyncApiFile {
 
+  JsonNode asyncApiFileNode;
+
   @Singular("apiServer")
-  Map<String, AsyncApiServer> apiServerMap;
+  transient Map<String, AsyncApiServer> apiServerMap;
 
   @Singular("apiAsyncApiSR")
-  List<AsyncApiSR> apiAsyncApiSRList;
+  transient List<AsyncApiSR> apiAsyncApiSRList;
 
   @Singular("apiSchema")
-  Map<String, AsyncApiSchema> apiSchemaList;
+  transient Map<String, AsyncApiSchema> apiSchemaList;
 }

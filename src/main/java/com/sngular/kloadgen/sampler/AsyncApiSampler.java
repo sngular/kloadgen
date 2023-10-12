@@ -92,7 +92,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return sampleResult;
   }
 
-  private Map<String, Object> extractProps(String asyncApiServerName) {
+  private Map<String, Object> extractProps(final String asyncApiServerName) {
     final var properties = new HashMap<String, Object>();
     final var asyncApiBrokerProps = apiExtractor.getBrokerData(asyncApiFile).get(asyncApiServerName).getPropertiesMap();
     SamplerUtil.getCommonProducerDefaultParameters().forEach(property ->
@@ -118,9 +118,11 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   public final AsyncApiFile getAsyncApiFile() {
     try {
-      this.asyncApiFileStr = this.getPropertyAsString("asyncapifilestr");
-      if (!StringUtils.isEmpty(asyncApiFileStr)) {
-        asyncApiFile = mapper.createParser(this.getPropertyAsString("asyncapifilestr")).readValueAs(AsyncApiFile.class);
+      if (Objects.isNull(asyncApiFile)) {
+        this.asyncApiFileStr = this.getPropertyAsString("asyncapifilestr");
+        if (!StringUtils.isEmpty(asyncApiFileStr)) {
+          asyncApiFile = apiExtractor.processNode(mapper.readTree(this.getPropertyAsString("asyncapifilestr")));
+        }
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -130,7 +132,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   public final void setAsyncApiFile(final AsyncApiFile asyncApiFile) {
     try {
-      this.asyncApiFileStr = mapper.writeValueAsString(asyncApiFile);
+      this.asyncApiFileStr = mapper.writeValueAsString(asyncApiFile.getAsyncApiFileNode());
       this.setProperty("asyncapifilestr", asyncApiFileStr);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
