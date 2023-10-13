@@ -10,8 +10,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
@@ -28,11 +26,8 @@ import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.util.AutoCompletion;
 import com.sngular.kloadgen.util.PropsKeysHelper;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -48,7 +43,6 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
@@ -100,18 +94,18 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
     if (JFileChooser.APPROVE_OPTION == returnValue) {
       final File schemaFile = Objects.requireNonNull(fileChooser.getSelectedFile());
-        try {
-            final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
-            ExtractorRegistry extractor = ExtractorFactory.getExtractor(schemaType);
-            String fileContent = SchemaExtractor.readSchemaFile(schemaFile.getPath());
-            this.parserSchema =  extractor.processSchema(fileContent);
-            List<FieldValueMapping> schemaFieldList = extractor.processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
-            buildTable(schemaFieldList);
-            JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA, fileContent);
-            JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE, schemaType);
-        } catch (final IOException e) {
+      try {
+        final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
+        final ExtractorRegistry extractor = ExtractorFactory.getExtractor(schemaType);
+        final String fileContent = SchemaExtractor.readSchemaFile(schemaFile.getPath());
+        this.parserSchema = extractor.processSchema(fileContent);
+        final List<FieldValueMapping> schemaFieldList = extractor.processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
+        buildTable(schemaFieldList);
+        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA, fileContent);
+        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE, schemaType);
+      } catch (final IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
-                                      JOptionPane.ERROR_MESSAGE);
+                                    JOptionPane.ERROR_MESSAGE);
         log.error(e.getMessage(), e);
       }
     }

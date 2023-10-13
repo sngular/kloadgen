@@ -55,8 +55,4 @@ public  class SchemaExtractor {
     return contentBuilder.toString();
   }
 
-  private static List<FieldValueMapping> processSchema(final ParsedSchema parsedSchema) {
-    return ExtractorFactory.getExtractor(parsedSchema.schemaType()).processSchema(parsedSchema.rawSchema().toString(), SchemaRegistryEnum.CONFLUENT);
-  }
-
 }

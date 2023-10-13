@@ -23,8 +23,7 @@ public class JsonExtractor implements ExtractorRegistry<Object> {
     return schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
   }
 
-  @Override
-  public ParsedSchema processSchema(String fileContent) {
+  public final ParsedSchema processSchema(String fileContent) {
     return new JsonSchema(fileContent);
   }
 

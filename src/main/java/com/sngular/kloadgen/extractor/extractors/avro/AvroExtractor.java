@@ -22,8 +22,7 @@ public class AvroExtractor implements ExtractorRegistry<Object> {
     return schemaRegistryMap.get(registryEnum).processSchema(schema);
   }
 
-  @Override
-  public ParsedSchema processSchema(String fileContent) {
+  public final ParsedSchema processSchema(String fileContent) {
     return new AvroSchema(fileContent);
   }
 

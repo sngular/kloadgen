@@ -389,9 +389,9 @@ public final class SamplerUtil {
         }
       }
     } else {
-      try{
+      try {
         generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-      }catch (final SchemaParseException exc) {
+      } catch (final SchemaParseException exc) {
         generator.setUpGenerator(props.getProperty(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
       }
     }
@@ -473,7 +473,7 @@ public final class SamplerUtil {
 
   private static BaseLoadGenerator getLoadGenerator() {
     final BaseLoadGenerator generator;
-    String schemaType = JMeterContextService.getContext().getProperties().getProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE);
+    final String schemaType = JMeterContextService.getContext().getProperties().getProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE);
     if (Objects.nonNull(schemaType)) {
       if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
         generator = new JsonSRLoadGenerator();

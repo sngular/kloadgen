@@ -38,7 +38,7 @@ public abstract class AbstractAvroFileExtractor {
   }
 
   public List<String> getSchemaNameList(Schema schema) {
-      return new ArrayList<>(extractSchemaNames(schema));
+    return new ArrayList<>(extractSchemaNames(schema));
   }
 
   public void processField(
