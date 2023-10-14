@@ -20,7 +20,9 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -46,6 +48,7 @@ import com.sngular.kloadgen.extractor.model.AsyncApiSR;
 import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
 import com.sngular.kloadgen.extractor.model.AsyncApiServer;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.sampler.AsyncApiSampler;
 import com.sngular.kloadgen.sampler.SamplerUtil;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -119,14 +122,42 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
         asyncApiSampler.setAsyncApiFile(asyncApiFile);
         if (serverComboBox.getSelectedIndex() > -1) {
           asyncApiSampler.setAsyncApiServerName(((AsyncApiServer) serverComboBox.getSelectedItem()).getName());
+          asyncApiSampler.setBrokerConfiguration(mapVectorConf(brokerFieldModel.getDataVector()));
         }
         if (topicComboBox.getSelectedIndex() > -1) {
-          asyncApiSampler.setAsyncApiSchemaName(((AsyncApiSchema) topicComboBox.getSelectedItem()).getTopicName());
+          final var selectedSchema = (AsyncApiSchema) topicComboBox.getSelectedItem();
+          asyncApiSampler.setAsyncApiSchemaName(selectedSchema.getTopicName());
+          asyncApiSampler.setSchemaFieldConfiguration(mapVector(schemaFieldModel.getDataVector()));
         }
         // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
       }
     }
     configureTestElement(element);
+  }
+
+  private List<PropertyMapping> mapVectorConf(final Vector<Vector> dataVector) {
+    final var mapResult = new ArrayList<PropertyMapping>();
+    for (Vector v : dataVector) {
+      mapResult.add(PropertyMapping
+                        .builder()
+                        .propertyName(v.get(0).toString())
+                        .propertyValue(v.get(1).toString())
+                        .build());
+    }
+    return mapResult;
+  }
+
+  private List<FieldValueMapping> mapVector(final Vector<Vector> dataVector) {
+    final var mapResult = new ArrayList<FieldValueMapping>();
+    for (Vector v : dataVector) {
+      mapResult.add(FieldValueMapping
+                        .builder()
+                        .fieldName(v.get(0).toString())
+                        .fieldType(v.get(1).toString())
+                        .fieldValueList(v.get(3).toString())
+                        .build());
+    }
+    return mapResult;
   }
 
   @Override
@@ -178,16 +209,16 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   }
 
   private Collection<Pair<String, String>> prepareServer(final AsyncApiServer asyncApiServer) {
-    final var propertylist = new ArrayList<Pair<String, String>>();
+    final var propertyList = new ArrayList<Pair<String, String>>();
     if (Objects.nonNull(asyncApiServer)) {
       final var serverProps = asyncApiServer.getPropertiesMap();
-      propertylist.add(Pair.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, serverProps.get("url")));
+      propertyList.add(Pair.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, serverProps.get("url")));
       CollectionUtils.select(SamplerUtil
                                  .getCommonProducerDefaultParameters(),
                              property -> !property.getName().equalsIgnoreCase(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG))
-          .forEach(jMeterProperty -> propertylist.add(Pair.of(jMeterProperty.getName(), jMeterProperty.getStringValue())));
+          .forEach(jMeterProperty -> propertyList.add(Pair.of(jMeterProperty.getName(), jMeterProperty.getStringValue())));
     }
-    return propertylist;
+    return propertyList;
   }
 
   private void init() {
@@ -308,7 +339,8 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     topicComboBox.setRenderer(new ApiSchemaRenderer());
     topicComboBox.addActionListener(this::topicComboActionListener);
     schemaTab.add(topicComboBox, BorderLayout.NORTH);
-    schemaTab.add(new JScrollPane(new JTable(schemaFieldModel)), BorderLayout.CENTER);
+    final var schemaTable = new JTable(schemaFieldModel);
+    schemaTab.add(new JScrollPane(schemaTable), BorderLayout.CENTER);
     return schemaTab;
   }
 

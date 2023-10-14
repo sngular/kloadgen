@@ -56,6 +56,12 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
     this.jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, fieldExprMappings);
   }
 
+  @Override
+  public void setUpGenerator(final List<FieldValueMapping> fieldExprMappings) {
+
+    this.jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, fieldExprMappings);
+  }
+
   public EnrichedRecord nextMessage() {
     return EnrichedRecord.builder().schemaMetadata(
         metadata.getLeft().getSchemaMetadataAdapter()

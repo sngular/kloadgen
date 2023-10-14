@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -16,6 +17,8 @@ import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
 import com.sngular.kloadgen.extractor.model.AsyncApiFile;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.loadgen.impl.JsonSRLoadGenerator;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +27,7 @@ import org.apache.jmeter.gui.GUIMenuSortOrder;
 import org.apache.jmeter.samplers.AbstractSampler;
 import org.apache.jmeter.samplers.Entry;
 import org.apache.jmeter.samplers.SampleResult;
+import org.apache.jmeter.testelement.property.ObjectProperty;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -44,10 +48,6 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   private String asyncApiFileStr;
 
-  private String asyncApiServerName;
-
-  private String asyncApiSchemaName;
-
   private transient BaseLoadGenerator generator;
 
   private final transient ObjectMapper mapper = new ObjectMapper();
@@ -67,7 +67,8 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
   public final SampleResult sample(final Entry entry) {
 
     final var sampleResult = new SampleResult();
-    try (final KafkaProducer<Object, Object> producer = new KafkaProducer<>(extractProps(asyncApiServerName))) {
+    try (final KafkaProducer<Object, Object> producer = new KafkaProducer<>(extractProps(getAsyncApiServerName()))) {
+      generator.setUpGenerator(getSchemaFieldConfiguration());
       final var messageVal = generator.nextMessage();
       if (Objects.nonNull(messageVal)) {
         final var producerRecord = getProducerRecord(messageVal, enrichedKeyFlag(), enrichedValueFlag());
@@ -99,7 +100,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
        properties.put(property.getName(), property.getStringValue()));
     properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, asyncApiBrokerProps.get("url"));
     properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "GenericJsonRecordSerializer.class");
-    properties.put(ProducerKeysHelper.KAFKA_TOPIC_CONFIG, asyncApiSchemaName);
+    properties.put(ProducerKeysHelper.KAFKA_TOPIC_CONFIG, getAsyncApiSchemaName());
     return properties;
   }
 
@@ -141,26 +142,40 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
   }
 
   public final String getAsyncApiServerName() {
-    return asyncApiServerName;
+    return this.getPropertyAsString("asyncApiServerName");
   }
 
   public final void setAsyncApiServerName(final String asyncApiServerName) {
     this.setProperty("asyncApiServerName", asyncApiServerName);
-    this.asyncApiServerName = asyncApiServerName;
+  }
+
+  public final void setSchemaFieldConfiguration(final List<FieldValueMapping> asyncApiServerName) {
+    this.setProperty(new ObjectProperty("schemaFieldConfiguration", asyncApiServerName));
+  }
+
+  public final List<FieldValueMapping> getSchemaFieldConfiguration() {
+    return (List<FieldValueMapping>) this.getProperty("schemaFieldConfiguration").getObjectValue();
+  }
+
+  public final void setBrokerConfiguration(final List<PropertyMapping> asyncApiServerName) {
+    this.setProperty(new ObjectProperty("schemaFieldConfiguration", asyncApiServerName));
+  }
+
+  public final List<PropertyMapping> getBrokerConfiguration() {
+    return (List<PropertyMapping>) this.getProperty("schemaFieldConfiguration").getObjectValue();
   }
 
   public final String getAsyncApiSchemaName() {
-    return asyncApiSchemaName;
+    return this.getPropertyAsString("asyncApiServerName");
   }
 
   public final void setAsyncApiSchemaName(final String asyncApiSchemaName) {
     this.setProperty("asyncapischemaname", asyncApiSchemaName);
-    this.asyncApiSchemaName = asyncApiSchemaName;
   }
 
   private ProducerRecord<Object, Object> getProducerRecord(final EnrichedRecord messageVal, final boolean keyFlag, final boolean valueFlag) {
     final ProducerRecord<Object, Object> producerRecord;
-    producerRecord = new ProducerRecord<>(asyncApiSchemaName, getObject(messageVal, valueFlag));
+    producerRecord = new ProducerRecord<>(getAsyncApiSchemaName(), getObject(messageVal, valueFlag));
     return producerRecord;
   }
 
