@@ -20,11 +20,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public final class ExtractorFactory {
-  private static final AvroExtractor Avroextractor = new AvroExtractor();
+  private static final AvroExtractor AVRO_EXTRACTOR = new AvroExtractor();
 
-  private static final JsonExtractor Jsonextractor = new JsonExtractor();
+  private static final JsonExtractor JSON_EXTRACTOR = new JsonExtractor();
 
-  private static final ProtobuffExtractor Protobuffextractor = new ProtobuffExtractor();
+  private static final ProtobuffExtractor PROTOBUF_EXTRACTOR = new ProtobuffExtractor();
 
   private ExtractorFactory() {
   }
@@ -35,12 +35,12 @@ public final class ExtractorFactory {
       final ExtractorRegistry response;
       switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
         case JSON:
-          response = Jsonextractor;
+          response = JSON_EXTRACTOR;
           break;        case AVRO:
-          response = Avroextractor;
+          response = AVRO_EXTRACTOR;
           break;
         case PROTOBUF:
-          response = Protobuffextractor;
+          response = PROTOBUF_EXTRACTOR;
           break;
         default:
           throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
