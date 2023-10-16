@@ -2,7 +2,6 @@ package com.sngular.kloadgen.extractor.extractors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
@@ -21,11 +20,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public final class ExtractorFactory {
-  private static final AvroExtractor avroExtractor = new AvroExtractor();
+  private static final AvroExtractor Avroextractor = new AvroExtractor();
 
-  private static final JsonExtractor jsonExtractor = new JsonExtractor();
+  private static final JsonExtractor Jsonextractor = new JsonExtractor();
 
-  private static final ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
+  private static final ProtobuffExtractor Protobuffextractor = new ProtobuffExtractor();
 
   private ExtractorFactory() {
   }
@@ -36,13 +35,12 @@ public final class ExtractorFactory {
       final ExtractorRegistry response;
       switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
         case JSON:
-          response = jsonExtractor;
-          break;
-        case AVRO:
-          response = avroExtractor;
+          response = Jsonextractor;
+          break;        case AVRO:
+          response = Avroextractor;
           break;
         case PROTOBUF:
-          response = protobuffExtractor;
+          response = Protobuffextractor;
           break;
         default:
           throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));

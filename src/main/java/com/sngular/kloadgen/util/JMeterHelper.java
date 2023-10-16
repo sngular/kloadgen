@@ -8,7 +8,6 @@ package com.sngular.kloadgen.util;
 
 import java.util.Properties;
 
-import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;

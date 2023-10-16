@@ -14,7 +14,6 @@ import com.sngular.kloadgen.randomtool.random.RandomArray;
 import com.sngular.kloadgen.randomtool.random.RandomObject;
 import com.sngular.kloadgen.randomtool.random.RandomSequence;
 import org.apache.commons.lang3.RandomUtils;
-
 import static com.sngular.kloadgen.randomtool.util.ValueUtils.replaceValuesContext;
 
 public class ProtoBufGeneratorTool {

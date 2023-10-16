@@ -207,7 +207,8 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
-    String result = "key: " + producerRecord.key() +
+    final String result = "key: " +
+            producerRecord.key() +
             ", payload: " + producerRecord.value();
     sampleResult.setSamplerData(result);
   }

@@ -28,6 +28,7 @@ import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
