@@ -169,7 +169,7 @@ public class FieldValueMapping extends AbstractTestElement implements AsyncApiAb
   }
 
   public final Object[] getProperties() {
-    return new Object[] {getFieldName(), getFieldType(), getValueLength(), getFieldValuesList()};
+    return new Object[] {getFieldName(), getFieldType(), getValueLength(), getRequired(), getFieldValuesList()};
   }
 
   public static final class FieldValueMappingBuilder {

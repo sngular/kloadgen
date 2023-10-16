@@ -54,8 +54,10 @@ import com.sngular.kloadgen.sampler.SamplerUtil;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jmeter.config.Argument;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -70,7 +72,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private JTextField asyncApiFileTextField;
 
-  private final DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Field Values List"}, 20);
+  private final DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Required", "Field Values List"}, 20);
 
   private final DefaultTableModel brokerFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
 
@@ -119,18 +121,18 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     super.configureTestElement(element);
     if (element instanceof AsyncApiSampler asyncApiSampler) {
       if (Objects.nonNull(asyncApiFile)) {
-        asyncApiSampler.setAsyncApiFile(asyncApiFile);
-        if (serverComboBox.getSelectedIndex() > -1) {
+        asyncApiSampler.setAsyncApiFileNode(asyncApiFile.getAsyncApiFileNode());
+        if (serverComboBox.getItemCount() > 0) {
           asyncApiSampler.setAsyncApiServerName(((AsyncApiServer) serverComboBox.getSelectedItem()).getName());
           asyncApiSampler.setBrokerConfiguration(mapVectorConf(brokerFieldModel.getDataVector()));
         }
-        if (topicComboBox.getSelectedIndex() > -1) {
-          final var selectedSchema = (AsyncApiSchema) topicComboBox.getSelectedItem();
+        final var selectedSchema = (AsyncApiSchema) topicComboBox.getSelectedItem();
+        if (Objects.nonNull(selectedSchema)) {
           asyncApiSampler.setAsyncApiSchemaName(selectedSchema.getTopicName());
           asyncApiSampler.setSchemaFieldConfiguration(mapVector(schemaFieldModel.getDataVector()));
         }
-        // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
       }
+        // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
     }
     configureTestElement(element);
   }
@@ -154,7 +156,9 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
                         .builder()
                         .fieldName(v.get(0).toString())
                         .fieldType(v.get(1).toString())
+                        .valueLength(Integer.parseInt(v.get(2).toString()))
                         .fieldValueList(v.get(3).toString())
+                        .required(true)
                         .build());
     }
     return mapResult;
@@ -164,8 +168,10 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   public void configure(final TestElement element) {
     super.configure(element);
     if (element instanceof AsyncApiSampler) {
-      asyncApiFile = ((AsyncApiSampler) element).getAsyncApiFile();
-      populateData();
+      asyncApiFile = ((AsyncApiSampler) element).getAsyncApiFileNode();
+      if (Objects.nonNull(asyncApiFile)) {
+        populateData((AsyncApiSampler) element);
+      }
     }
   }
 
@@ -185,11 +191,29 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     }
   }
 
+  private void populateData(final AsyncApiSampler element) {
+
+    asyncApiFile.getApiServerMap().forEach((name, value) -> serverComboBox.addItem(value));
+    serverComboBox.setSelectedIndex(0);
+    final Collection<Pair<String, String>> propertyList = new ArrayList<>();
+    element.getBrokerConfiguration()
+           .forEach(propertyMapping ->
+                        propertyList.add(Pair.of(propertyMapping.getPropertyName(), propertyMapping.getPropertyValue())));
+    fillTable(brokerFieldModel, propertyList);
+    /*final var schemaRegistryList = asyncApiExtractor.getSchemaRegistryData(asyncApiFile);
+    if (!schemaRegistryList.isEmpty()) {
+      fillTable(schemaRegistryFieldModel, prepareSRServer(schemaRegistryList.get(0)));
+    }*/
+    asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
+    topicComboBox.setSelectedIndex(0);
+    fillTable(schemaFieldModel, element.getSchemaFieldConfiguration());
+  }
+
   private void populateData() {
     if (Objects.nonNull(asyncApiFile)) {
       asyncApiFile.getApiServerMap().forEach((name, value) -> serverComboBox.addItem(value));
       serverComboBox.setSelectedIndex(0);
-      fillTable(brokerFieldModel, prepareServer(asyncApiExtractor.getBrokerData(asyncApiFile).get(serverComboBox.getSelectedItem())));
+      fillTable(brokerFieldModel, prepareServer((AsyncApiServer) serverComboBox.getSelectedItem()));
       final var schemaRegistryList = asyncApiExtractor.getSchemaRegistryData(asyncApiFile);
       if (!schemaRegistryList.isEmpty()) {
         fillTable(schemaRegistryFieldModel, prepareSRServer(schemaRegistryList.get(0)));
@@ -216,9 +240,14 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
       CollectionUtils.select(SamplerUtil
                                  .getCommonProducerDefaultParameters(),
                              property -> !property.getName().equalsIgnoreCase(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG))
-          .forEach(jMeterProperty -> propertyList.add(Pair.of(jMeterProperty.getName(), jMeterProperty.getStringValue())));
+          .forEach(jMeterProperty -> extractArgument(jMeterProperty, propertyList));
     }
     return propertyList;
+  }
+
+  private static boolean extractArgument(final JMeterProperty jMeterProperty, final ArrayList<Pair<String, String>> propertyList) {
+    final var argument = (Argument) jMeterProperty.getObjectValue();
+    return propertyList.add(Pair.of(argument.getPropertyAsString("Argument.name"), argument.getPropertyAsString("Argument.value")));
   }
 
   private void init() {
@@ -298,6 +327,18 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
       }
       for (var data : schemaData) {
         schemaFields.addRow(((FieldValueMapping) data).getProperties());
+      }
+    }
+  }
+
+  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final List<FieldValueMapping> schemaData) {
+    if (Objects.nonNull(schemaData)) {
+      final var count = schemaFields.getRowCount();
+      for (var i = 0; i < count; i++) {
+        schemaFields.removeRow(0);
+      }
+      for (var data : schemaData) {
+        schemaFields.addRow(data.getProperties());
       }
     }
   }

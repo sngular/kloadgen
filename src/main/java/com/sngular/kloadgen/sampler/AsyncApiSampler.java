@@ -3,6 +3,7 @@ package com.sngular.kloadgen.sampler;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
@@ -20,14 +22,15 @@ import com.sngular.kloadgen.loadgen.impl.JsonSRLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import com.sngular.kloadgen.util.ProducerKeysHelper;
-import org.apache.commons.lang3.StringUtils;
+import com.sngular.kloadgen.serializer.GenericJsonRecordSerializer;
+import com.sngular.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.gui.GUIMenuSortOrder;
 import org.apache.jmeter.samplers.AbstractSampler;
 import org.apache.jmeter.samplers.Entry;
 import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.testelement.property.ObjectProperty;
+import org.apache.jmeter.testelement.property.CollectionProperty;
+import org.apache.jmeter.testelement.property.TestElementProperty;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -42,11 +45,9 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
 
-  private transient AsyncApiFile asyncApiFile;
-
   private transient ApiExtractor apiExtractor;
 
-  private String asyncApiFileStr;
+  private JsonNode asyncApiFileNode;
 
   private transient BaseLoadGenerator generator;
 
@@ -54,12 +55,11 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   public AsyncApiSampler() {
     apiExtractor = new AsyncApiExtractorImpl();
+    generator = new JsonSRLoadGenerator();
   }
 
   @Override
   public final boolean applies(final ConfigTestElement configElement) {
-
-    generator = new JsonSRLoadGenerator();
     return super.applies(configElement);
   }
 
@@ -67,7 +67,8 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
   public final SampleResult sample(final Entry entry) {
 
     final var sampleResult = new SampleResult();
-    try (final KafkaProducer<Object, Object> producer = new KafkaProducer<>(extractProps(getAsyncApiServerName()))) {
+    sampleResult.sampleStart();
+    try (final KafkaProducer<Object, Object> producer = new KafkaProducer<>(extractProps())) {
       generator.setUpGenerator(getSchemaFieldConfiguration());
       final var messageVal = generator.nextMessage();
       if (Objects.nonNull(messageVal)) {
@@ -88,61 +89,39 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
       LOG.error("Failed to send message", e);
       fillSampleResult(sampleResult, e.getMessage() != null ? e.getMessage() : "", false);
     }
-    sampleResult.sampleStart();
 
     return sampleResult;
   }
 
-  private Map<String, Object> extractProps(final String asyncApiServerName) {
+  private Map<String, Object> extractProps() {
     final var properties = new HashMap<String, Object>();
-    final var asyncApiBrokerProps = apiExtractor.getBrokerData(asyncApiFile).get(asyncApiServerName).getPropertiesMap();
-    SamplerUtil.getCommonProducerDefaultParameters().forEach(property ->
-       properties.put(property.getName(), property.getStringValue()));
-    properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, asyncApiBrokerProps.get("url"));
-    properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "GenericJsonRecordSerializer.class");
-    properties.put(ProducerKeysHelper.KAFKA_TOPIC_CONFIG, getAsyncApiSchemaName());
+    getBrokerConfiguration().forEach(property -> properties.put(property.getPropertyName(), property.getPropertyValue()));
+    properties.put(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY, Boolean.FALSE);
+    properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GenericJsonRecordSerializer.class.getCanonicalName());
+    properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, GenericJsonRecordSerializer.class.getCanonicalName());
     return properties;
   }
 
-  public final String getAsyncApiFileStr() throws JsonProcessingException {
-    return mapper.writeValueAsString(asyncApiFileStr);
-  }
-
-  public final void setAsyncApiFileStr(String asyncApiFileStr) {
-    this.asyncApiFileStr = asyncApiFileStr;
+  public final AsyncApiFile getAsyncApiFileNode() {
+    AsyncApiFile asyncApiFile = null;
     try {
-      this.asyncApiFile = mapper.createParser(asyncApiFileStr).readValueAs(AsyncApiFile.class);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public final AsyncApiFile getAsyncApiFile() {
-    try {
-      if (Objects.isNull(asyncApiFile)) {
-        this.asyncApiFileStr = this.getPropertyAsString("asyncapifilestr");
-        if (!StringUtils.isEmpty(asyncApiFileStr)) {
-          asyncApiFile = apiExtractor.processNode(mapper.readTree(this.getPropertyAsString("asyncapifilestr")));
-        }
+      this.asyncApiFileNode = mapper.readTree(this.getPropertyAsString("asyncapifilestr"));
+      if (Objects.nonNull(asyncApiFile)) {
+        asyncApiFile = apiExtractor.processNode(asyncApiFileNode);
       }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new KLoadGenException(e);
     }
     return asyncApiFile;
   }
 
-  public final void setAsyncApiFile(final AsyncApiFile asyncApiFile) {
+  public void setAsyncApiFileNode(final JsonNode asyncApiFileNode) {
+    this.asyncApiFileNode = asyncApiFileNode;
     try {
-      this.asyncApiFileStr = mapper.writeValueAsString(asyncApiFile.getAsyncApiFileNode());
-      this.setProperty("asyncapifilestr", asyncApiFileStr);
+      this.setProperty("asyncapifilestr", mapper.writeValueAsString(asyncApiFileNode));
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new KLoadGenException(e);
     }
-    this.asyncApiFile = asyncApiFile;
-  }
-
-  public final String getAsyncApiServerName() {
-    return this.getPropertyAsString("asyncApiServerName");
   }
 
   public final void setAsyncApiServerName(final String asyncApiServerName) {
@@ -150,19 +129,38 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
   }
 
   public final void setSchemaFieldConfiguration(final List<FieldValueMapping> asyncApiServerName) {
-    this.setProperty(new ObjectProperty("schemaFieldConfiguration", asyncApiServerName));
+    this.setProperty(new CollectionProperty("schemaFieldConfiguration", asyncApiServerName));
   }
 
   public final List<FieldValueMapping> getSchemaFieldConfiguration() {
-    return (List<FieldValueMapping>) this.getProperty("schemaFieldConfiguration").getObjectValue();
+    final List<FieldValueMapping> propertyList = new ArrayList<>();
+    for (TestElementProperty elementProperty : (List<TestElementProperty>) this.getProperty("schemaFieldConfiguration").getObjectValue()) {
+      propertyList.add(FieldValueMapping
+                           .builder()
+                           .fieldName(elementProperty.getElement().getPropertyAsString("fieldName"))
+                           .fieldType(elementProperty.getElement().getPropertyAsString("fieldType"))
+                           .required(elementProperty.getElement().getPropertyAsBoolean("required", false))
+                           .valueLength(elementProperty.getElement().getPropertyAsInt("valueLength", 0))
+                           .fieldValueList(elementProperty.getElement().getPropertyAsString("fieldValueList"))
+                           .build());
+    }
+    return propertyList;
   }
 
   public final void setBrokerConfiguration(final List<PropertyMapping> asyncApiServerName) {
-    this.setProperty(new ObjectProperty("schemaFieldConfiguration", asyncApiServerName));
+    this.setProperty(new CollectionProperty("brokerConfiguration", asyncApiServerName));
   }
 
   public final List<PropertyMapping> getBrokerConfiguration() {
-    return (List<PropertyMapping>) this.getProperty("schemaFieldConfiguration").getObjectValue();
+    final List<PropertyMapping> propertyList = new ArrayList<>();
+    for (TestElementProperty elementProperty : (List<TestElementProperty>) this.getProperty("brokerConfiguration").getObjectValue()) {
+      propertyList.add(PropertyMapping
+          .builder()
+          .propertyName(elementProperty.getElement().getPropertyAsString("propertyName"))
+          .propertyValue(elementProperty.getElement().getPropertyAsString("propertyValue"))
+          .build());
+    }
+    return propertyList;
   }
 
   public final String getAsyncApiSchemaName() {

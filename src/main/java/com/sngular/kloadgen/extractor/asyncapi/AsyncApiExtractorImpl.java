@@ -124,19 +124,21 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
       for (Iterator<Entry<String, JsonNode>> it = ApiTool.getProperties(finalPayload); it.hasNext();) {
         final var property = it.next();
         final var propertyDef = property.getValue();
+        final var propertyName = calculateName(property.getKey(), root);
         if (ApiTool.hasRef(propertyDef)) {
           final var solvedPayload = solveRef(propertyDef, components, antiLoopList, "schemas");
           if (Objects.nonNull(solvedPayload)) {
-            fieldList.addAll(processPayload(solvedPayload, calculateName(property.getKey(), root), components, antiLoopList));
+            fieldList.addAll(processPayload(solvedPayload, propertyName, components, antiLoopList));
           }
         } else if (COMPLEX_TYPES.contains(ApiTool.getType(propertyDef)) || ApiTool.hasAdditionalProperties(propertyDef)) {
-          fieldList.addAll(calculatePayload(propertyDef, calculateName(property.getKey(), root), components, antiLoopList));
+          fieldList.addAll(calculatePayload(propertyDef, propertyName, components, antiLoopList));
         } else {
           fieldList.add(FieldValueMapping
                           .builder()
-                          .fieldName(calculateName(property.getKey(), root))
-                          .fieldType(ApiTool.getType(propertyDef))
+                          .fieldName(propertyName)
+                          .fieldType(getType(propertyDef))
                           .fieldValueList(hasValues(propertyDef))
+                          .required(ApiTool.checkIfRequired(propertyDef, property.getKey()))
                           .constraints(getConstraints(propertyDef))
                           .build());
         }
@@ -147,22 +149,24 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
               .fieldName(calculateName(null, root))
               .fieldType(getType(finalPayload))
               .fieldValueList(hasValues(finalPayload))
+              .required(true)
               .constraints(getConstraints(finalPayload))
               .build());
     }
     return fieldList;
   }
 
-  private String getType(JsonNode finalPayload) {
+  private String getType(final JsonNode finalPayload) {
     String type = ApiTool.getType(finalPayload);
     if (ApiTool.hasFormat(finalPayload)) {
-        type = switch (ApiTool.getFormat(finalPayload)) {
-            case "date-time" -> "datetime";
-            case "int64" -> "long";
-            case "double" -> "double";
-            case "date" -> "date";
-            default -> ApiTool.getType(finalPayload);
-        };
+      type = switch (ApiTool.getFormat(finalPayload)) {
+        case "date-time" -> "datetime";
+        case "int64" -> "long";
+        case "double" -> "double";
+        case "date" -> "date";
+        case "string" -> ApiTool.isEnum(finalPayload) ? "enum" : "string";
+        default -> ApiTool.getType(finalPayload);
+      };
 
     }
     return type;
