@@ -55,6 +55,7 @@ import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.config.Argument;
+import org.apache.jmeter.gui.TestElementMetadata;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
@@ -62,6 +63,7 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
+@TestElementMetadata(labelResource = "async_api_sampler")
 public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());

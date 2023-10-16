@@ -38,7 +38,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@GUIMenuSortOrder(Integer.MAX_VALUE)
+@GUIMenuSortOrder(Integer.MIN_VALUE)
 public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(AsyncApiSampler.class);
