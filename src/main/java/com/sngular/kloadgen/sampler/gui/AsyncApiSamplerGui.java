@@ -111,9 +111,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   @Override
   public TestElement createTestElement() {
-    final var testElement = new AsyncApiSampler();
-    modifyTestElement(testElement);
-    return testElement;
+    return new AsyncApiSampler();
   }
 
   @Override
@@ -157,8 +155,8 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
                         .fieldName(v.get(0).toString())
                         .fieldType(v.get(1).toString())
                         .valueLength(Integer.parseInt(v.get(2).toString()))
-                        .fieldValueList(v.get(3).toString())
-                        .required(true)
+                        .fieldValueList(v.get(4).toString())
+                        .required((Boolean) v.get(3))
                         .build());
     }
     return mapResult;
@@ -193,6 +191,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private void populateData(final AsyncApiSampler element) {
 
+    serverComboBox.removeAllItems();
     asyncApiFile.getApiServerMap().forEach((name, value) -> serverComboBox.addItem(value));
     serverComboBox.setSelectedIndex(0);
     final Collection<Pair<String, String>> propertyList = new ArrayList<>();
@@ -204,6 +203,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     if (!schemaRegistryList.isEmpty()) {
       fillTable(schemaRegistryFieldModel, prepareSRServer(schemaRegistryList.get(0)));
     }*/
+    topicComboBox.removeAllItems();
     asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
     topicComboBox.setSelectedIndex(0);
     fillTable(schemaFieldModel, element.getSchemaFieldConfiguration());
@@ -388,14 +388,18 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   private void topicComboActionListener(final ActionEvent event) {
     final JComboBox cb = (JComboBox)event.getSource();
     final var selectedSchema = (AsyncApiSchema) cb.getSelectedItem();
-    fillTable(schemaFieldModel, selectedSchema.getProperties());
+    if (Objects.nonNull(selectedSchema)) {
+      fillTable(schemaFieldModel, selectedSchema.getProperties());
+    }
   }
 
   private void registryComboActionListener(ActionEvent actionEvent) {
   }
 
   private void serverChooseActionListener(ActionEvent actionEvent) {
-    final JComboBox cb = (JComboBox)actionEvent.getSource();
-    fillTable(brokerFieldModel, prepareServer((AsyncApiServer) cb.getSelectedItem()));
+    final JComboBox serverChoose = (JComboBox)actionEvent.getSource();
+    if (Objects.nonNull(serverChoose)) {
+      fillTable(brokerFieldModel, prepareServer((AsyncApiServer) serverChoose.getSelectedItem()));
+    }
   }
 }

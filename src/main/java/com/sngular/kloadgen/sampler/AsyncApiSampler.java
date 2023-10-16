@@ -45,11 +45,11 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
 
-  private transient ApiExtractor apiExtractor;
+  private final transient ApiExtractor apiExtractor;
 
   private JsonNode asyncApiFileNode;
 
-  private transient BaseLoadGenerator generator;
+  private final transient BaseLoadGenerator generator;
 
   private final transient ObjectMapper mapper = new ObjectMapper();
 
@@ -67,6 +67,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
   public final SampleResult sample(final Entry entry) {
 
     final var sampleResult = new SampleResult();
+    sampleResult.setThreadName("AsyncApi Sampler");
     sampleResult.sampleStart();
     try (final KafkaProducer<Object, Object> producer = new KafkaProducer<>(extractProps())) {
       generator.setUpGenerator(getSchemaFieldConfiguration());
@@ -104,22 +105,24 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   public final AsyncApiFile getAsyncApiFileNode() {
     AsyncApiFile asyncApiFile = null;
-    try {
-      this.asyncApiFileNode = mapper.readTree(this.getPropertyAsString("asyncapifilestr"));
-      if (Objects.nonNull(asyncApiFile)) {
-        asyncApiFile = apiExtractor.processNode(asyncApiFileNode);
+    if (Objects.isNull(asyncApiFileNode)) {
+      try {
+        asyncApiFileNode = mapper.readTree(this.getPropertyAsString("asyncapifilestr"));
+      } catch (final IOException e) {
+        throw new KLoadGenException(e);
       }
-    } catch (IOException e) {
-      throw new KLoadGenException(e);
+    }
+    if (Objects.nonNull(asyncApiFileNode) && !asyncApiFileNode.isMissingNode()) {
+      asyncApiFile = apiExtractor.processNode(asyncApiFileNode);
     }
     return asyncApiFile;
   }
 
-  public void setAsyncApiFileNode(final JsonNode asyncApiFileNode) {
+  public final void setAsyncApiFileNode(final JsonNode asyncApiFileNode) {
     this.asyncApiFileNode = asyncApiFileNode;
     try {
       this.setProperty("asyncapifilestr", mapper.writeValueAsString(asyncApiFileNode));
-    } catch (JsonProcessingException e) {
+    } catch (final JsonProcessingException e) {
       throw new KLoadGenException(e);
     }
   }
@@ -164,7 +167,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
   }
 
   public final String getAsyncApiSchemaName() {
-    return this.getPropertyAsString("asyncApiServerName");
+    return this.getPropertyAsString("asyncapischemaname");
   }
 
   public final void setAsyncApiSchemaName(final String asyncApiSchemaName) {
