@@ -34,11 +34,12 @@ public  class SchemaExtractor {
   }
 
   public static List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
-    return ExtractorFactory.getExtractor(parserSchema.schemaType(), "CONFLUENT").processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
+    return ExtractorFactory.getExtractor(parserSchema.schemaType(), "CONFLUENT").processSchema(parserSchema.rawSchema(), SchemaRegistryEnum.CONFLUENT);
   }
 
   public static List<String> schemaTypesList(final File schemaFile, final String schemaType, String registry) throws IOException {
     return ExtractorFactory.getExtractor(schemaType, registry).getSchemaNameList(readLineByLine(schemaFile.getPath()),
+
             ExtractorFactory.getSchemaRegistry(registry));
   }
 
