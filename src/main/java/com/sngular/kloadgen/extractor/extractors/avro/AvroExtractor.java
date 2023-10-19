@@ -17,7 +17,11 @@ public class AvroExtractor implements ExtractorRegistry<Object> {
           new AvroApicurioExtractor());
 
   public final List<FieldValueMapping> processSchema(final Object schema, SchemaRegistryEnum registryEnum) {
-    return schemaRegistryMap.get(registryEnum).processSchema(schema);
+    try {
+      return schemaRegistryMap.get(registryEnum).processSchema(schema);
+    } catch (ClassCastException exc) {
+      return schemaRegistryMap.get(APICURIO).processSchema(schema);
+    }
   }
 
   public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {
