@@ -42,7 +42,6 @@ import javax.swing.table.DefaultTableModel;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
-import com.sngular.kloadgen.extractor.model.AsyncApiAbstract;
 import com.sngular.kloadgen.extractor.model.AsyncApiFile;
 import com.sngular.kloadgen.extractor.model.AsyncApiSR;
 import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
@@ -55,7 +54,6 @@ import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.config.Argument;
-import org.apache.jmeter.gui.TestElementMetadata;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
@@ -63,7 +61,6 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
-@TestElementMetadata(labelResource = "async_api_sampler")
 public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -185,7 +182,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
         asyncApiFileTextField.setText(apiFile.getAbsolutePath());
         asyncApiFile = asyncApiExtractor.processFile(apiFile);
         populateData();
-      } catch (KLoadGenException ex) {
+      } catch (final KLoadGenException ex) {
         JOptionPane.showMessageDialog(mainPanel, "Error has occurred: " + ex.getMessage(), "Weird Error", JOptionPane.ERROR_MESSAGE);
       }
     }
@@ -230,7 +227,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     final var propertyList = new ArrayList<Pair<String, String>>();
     propertyList.add(Pair.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, srPropoMap.get("url")));
     propertyList.add(Pair.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, srPropoMap.get("type")));
-    SchemaRegistryProperties.DEFAULTS.forEach(jMeterProperty -> propertyList.add(Pair.of(jMeterProperty.getName(), jMeterProperty.getPropertyValue())));
+    SchemaRegistryProperties.DEFAULTS.forEach(jmeterproperty -> propertyList.add(Pair.of(jmeterproperty.getName(), jmeterproperty.getPropertyValue())));
     return propertyList;
   }
 
@@ -242,14 +239,14 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
       CollectionUtils.select(SamplerUtil
                                  .getCommonProducerDefaultParameters(),
                              property -> !property.getName().equalsIgnoreCase(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG))
-          .forEach(jMeterProperty -> extractArgument(jMeterProperty, propertyList));
+          .forEach(jmeterproperty -> extractArgument(jmeterproperty, propertyList));
     }
     return propertyList;
   }
 
-  private static boolean extractArgument(final JMeterProperty jMeterProperty, final ArrayList<Pair<String, String>> propertyList) {
-    final var argument = (Argument) jMeterProperty.getObjectValue();
-    return propertyList.add(Pair.of(argument.getPropertyAsString("Argument.name"), argument.getPropertyAsString("Argument.value")));
+  private static void extractArgument(final JMeterProperty jmeterproperty, final ArrayList<Pair<String, String>> propertyList) {
+    final var argument = (Argument) jmeterproperty.getObjectValue();
+    propertyList.add(Pair.of(argument.getPropertyAsString("Argument.name"), argument.getPropertyAsString("Argument.value")));
   }
 
   private void init() {
@@ -311,7 +308,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     return tabbedPanel;
   }
 
-  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final Collection<Pair<String, String>> schemaData) {
+  private void fillTable(final DefaultTableModel schemaFields, final Collection<Pair<String, String>> schemaData) {
     if (Objects.nonNull(schemaData)) {
       final var count = schemaFields.getRowCount();
       for (var i = 0; i < count; i++) {
@@ -321,7 +318,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     }
   }
 
-  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final Object[] schemaData) {
+  private void fillTable(final DefaultTableModel schemaFields, final Object[] schemaData) {
     if (Objects.nonNull(schemaData)) {
       final var count = schemaFields.getRowCount();
       for (var i = 0; i < count; i++) {
@@ -333,7 +330,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     }
   }
 
-  private <T extends AsyncApiAbstract> void fillTable(final DefaultTableModel schemaFields, final List<FieldValueMapping> schemaData) {
+  private void fillTable(final DefaultTableModel schemaFields, final List<FieldValueMapping> schemaData) {
     if (Objects.nonNull(schemaData)) {
       final var count = schemaFields.getRowCount();
       for (var i = 0; i < count; i++) {
@@ -395,10 +392,10 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     }
   }
 
-  private void registryComboActionListener(ActionEvent actionEvent) {
+  private void registryComboActionListener(final ActionEvent actionEvent) {
   }
 
-  private void serverChooseActionListener(ActionEvent actionEvent) {
+  private void serverChooseActionListener(final ActionEvent actionEvent) {
     final JComboBox serverChoose = (JComboBox)actionEvent.getSource();
     if (Objects.nonNull(serverChoose)) {
       fillTable(brokerFieldModel, prepareServer((AsyncApiServer) serverChoose.getSelectedItem()));

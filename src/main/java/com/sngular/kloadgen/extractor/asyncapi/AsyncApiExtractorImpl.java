@@ -40,7 +40,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
 
   @Override
   public final AsyncApiFile processFile(final File apiFile) {
-    AsyncApiFile asyncApiFile = null;
+    AsyncApiFile asyncApiFile;
     try {
       final JsonNode openApi = om.readTree(apiFile);
       asyncApiFile = processNode(openApi);
@@ -80,7 +80,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
     final var message = ApiTool.findNodeValue(node, "message");
     if (ApiTool.hasNode(message, "bindings")) {
       builder.key(true);
-     // builder.keyType(ApiTool.findValue(message, "key"));
+      // builder.keyType(ApiTool.findValue(message, "key"));
     }
     builder.model(messageToFieldList(message, components, antiLoopList));
     return builder.build();
@@ -138,7 +138,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
                           .fieldName(propertyName)
                           .fieldType(getType(propertyDef))
                           .fieldValueList(hasValues(propertyDef))
-                          .required(ApiTool.checkIfRequired(propertyDef, property.getKey()))
+                          .required(ApiTool.checkIfRequired(finalPayload, property.getKey()))
                           .constraints(getConstraints(propertyDef))
                           .build());
         }
@@ -172,8 +172,8 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
     return type;
   }
 
-  private Map<ConstraintTypeEnum, String> getConstraints(JsonNode finalPayload) {
-    Map<ConstraintTypeEnum, String> constraints = new EnumMap<>(ConstraintTypeEnum.class);
+  private Map<ConstraintTypeEnum, String> getConstraints(final JsonNode finalPayload) {
+    final Map<ConstraintTypeEnum, String> constraints = new EnumMap<>(ConstraintTypeEnum.class);
     if (ApiTool.hasNode(finalPayload, "minLength")) {
       constraints.put(ConstraintTypeEnum.MIN_LENGTH, ApiTool.getNodeAsString(finalPayload, "minLength"));
     }
@@ -199,7 +199,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
     return constraints;
   }
 
-  private String hasValues(JsonNode propertyDef) {
+  private String hasValues(final JsonNode propertyDef) {
     String values = null;
     if (ApiTool.isEnum(propertyDef)) {
       values = String.join(",", ApiTool.getEnumValues(propertyDef));

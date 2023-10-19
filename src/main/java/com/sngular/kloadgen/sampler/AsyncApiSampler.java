@@ -142,9 +142,9 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
                            .builder()
                            .fieldName(elementProperty.getElement().getPropertyAsString("fieldName"))
                            .fieldType(elementProperty.getElement().getPropertyAsString("fieldType"))
-                           .required(elementProperty.getElement().getPropertyAsBoolean("required", false))
+                           .required(elementProperty.getElement().getPropertyAsBoolean("required", true))
                            .valueLength(elementProperty.getElement().getPropertyAsInt("valueLength", 0))
-                           .fieldValueList(elementProperty.getElement().getPropertyAsString("fieldValueList"))
+                           .fieldValueList(elementProperty.getElement().getPropertyAsString("fieldValuesList"))
                            .build());
     }
     return propertyList;
