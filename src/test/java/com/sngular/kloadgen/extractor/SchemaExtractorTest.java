@@ -70,7 +70,7 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList with AVRO")
-  void testFlatPropertiesListWithAVRO() throws IOException, RestClientException {
+  void testFlatPropertiesListWithAVRO() throws IOException {
 
     final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.APICURIO.toString());
@@ -86,7 +86,7 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList with Json")
-  void testFlatPropertiesListWithJson() throws IOException, RestClientException {
+  void testFlatPropertiesListWithJson() throws IOException {
 
     final File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
@@ -102,7 +102,7 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList with Protobuf")
-  void testFlatPropertiesListWithProtobuf() throws RestClientException, IOException {
+  void testFlatPropertiesListWithProtobuf() throws IOException {
 
     final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
@@ -117,7 +117,7 @@ class SchemaExtractorTest {
 
   @Test
   @DisplayName("Test flatPropertiesList throws exception schema type not supported")
-  void testFlatPropertiesListWithException() throws IOException, RestClientException {
+  void testFlatPropertiesListWithException() {
 
     final var parsedSchema = new ParsedSchemaUtil();
     final var baseParsedSchema = new BaseParsedSchema<>(ConfluentParsedSchemaMetadata.parse(parsedSchema));
@@ -130,6 +130,22 @@ class SchemaExtractorTest {
               .isThrownBy(() -> SchemaExtractor.flatPropertiesList("exceptionSubject")
               ).withMessage(String.format("Schema type not supported %s", parsedSchema.schemaType()));
 
+  }
+
+  @Test
+  @DisplayName("Test flatPropertiesList with AVRO and CONFLUENT")
+  void testSchemaTypeIsCorrectWhenAvroConfluent() throws IOException {
+    final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
+    properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
+
+    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
+    final var baseParsedSchema = new BaseParsedSchema<>(ConfluentParsedSchemaMetadata.parse(parsedSchema));
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
+    jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
+
+    final var result = SchemaExtractor.flatPropertiesList("avroSubject");
+
+    Assertions.assertThat(result).isNotNull();
   }
 
 }
