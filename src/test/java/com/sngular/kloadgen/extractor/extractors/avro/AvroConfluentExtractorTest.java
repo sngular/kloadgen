@@ -10,6 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.apache.avro.Schema;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+import org.mockito.ArgumentCaptor;
+
 
 class AvroConfluentExtractorTest {
 
@@ -226,5 +230,18 @@ class AvroConfluentExtractorTest {
                   FieldValueMapping.builder().fieldName("products[].Price.price").fieldType("string").fieldValueList("").valueLength(0).required(true).isAncestorRequired(true)
                                    .build());
   }
+  @Test
+  @DisplayName("Should Extract Schema instead AvroSchema")
+  void testCastException() throws Exception{
+    AvroConfluentExtractor avroce = mock(AvroConfluentExtractor.class);
+    ArgumentCaptor<Schema> argumentCaptor = ArgumentCaptor.forClass(Schema.class);
+    final String testFile = fileHelper.getContent("/avro-files/testCastIssue.avsc");
+    final Schema schema = new Schema.Parser().parse(testFile);
+    avroce.processSchema(schema);
+    verify(avroce).processSchema(argumentCaptor.capture());
+    Schema captureSchema = argumentCaptor.getValue();
+    assertEquals(schema, captureSchema);
+  }
+
 
 }
