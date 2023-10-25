@@ -30,6 +30,12 @@ public final class ExtractorFactory {
   private ExtractorFactory() {
   }
 
+  public static void configExtractorFactory(AvroExtractor avroExtractor, JsonExtractor jsonExtractor, ProtobuffExtractor protobuffExtractor) {
+    ExtractorFactory.avroExtractor = avroExtractor;
+    ExtractorFactory.jsonExtractor = jsonExtractor;
+    ExtractorFactory.protobuffExtractor = protobuffExtractor;
+  }
+
   public static ExtractorRegistry getExtractor(final String schemaType, final String schemaRegistryEnum) {
 
     SchemaRegistryEnum registryEnum = getSchemaRegistry(schemaRegistryEnum);
