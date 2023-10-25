@@ -38,7 +38,6 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.AvroRuntimeException;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -135,10 +134,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   public final void actionPerformed(final ActionEvent event) {
 
     if (subjectNameComboBox.getItemCount() != 0) {
-      final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
+      final String schemaType = (String) schemaTypeComboBox.getSelectedItem();
       final String selectedItem = (String) subjectNameComboBox.getSelectedItem();
       final String selectedSchema = getSelectedSchema(selectedItem);
-      final List<FieldValueMapping> attributeList = Lists.newArrayList();
+      final List<FieldValueMapping> attributeList = SchemaExtractor.flatPropertiesList(selectedSchema).getValue();
 
       if (!attributeList.isEmpty()) {
         try {

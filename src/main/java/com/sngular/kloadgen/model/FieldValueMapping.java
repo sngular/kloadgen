@@ -7,12 +7,13 @@
 package com.sngular.kloadgen.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -108,28 +109,42 @@ public class FieldValueMapping extends AbstractTestElement implements AsyncApiAb
     if (StringUtils.isNotBlank(inputFieldValueList) && !"[]".equalsIgnoreCase(inputFieldValueList)) {
       try {
         inputFieldValueAux = inputFieldValueList;
-        if (inputFieldValueAux.charAt(0) != "[".charAt(0)) {
+
+        if (inputFieldValueAux.charAt(0) != '[') {
           inputFieldValueAux = "[" + inputFieldValueAux;
         }
-        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != "]".charAt(0)) {
+        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) != ']') {
           inputFieldValueAux += "]";
         }
         final JsonNode nodes = OBJECT_MAPPER.readTree(inputFieldValueAux);
         final Iterator<JsonNode> nodeElements = nodes.elements();
         while (nodeElements.hasNext()) {
           result.add(nodeElements.next().toString());
+
         }
       } catch (final JsonProcessingException ex) {
-        inputFieldValueAux = inputFieldValueList;
-        if (inputFieldValueAux.charAt(0) == "[".charAt(0)) {
-          inputFieldValueAux = inputFieldValueAux.substring(1);
+        // Warning: even though IntelliJ say that can be simplified, it can't be simplified!! (test fails)
+
+        if (inputFieldValueList.startsWith("[") && inputFieldValueList.endsWith("]")) {
+          final String pattern = "(?<=\\[?)((([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+:([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|\\[([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+,"
+                                 + "[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+|)*]))|[À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)(?=[]|,]))";
+          final Pattern r = Pattern.compile(pattern);
+          final Matcher matcher = r.matcher(inputFieldValueList.trim());
+          while (matcher.find()) {
+            result.add(matcher.group(0));
+          }
+        } else {
+          final String pattern = "([À-ÿ\\p{Alnum}\\p{Punct}&&[^,\\[\\]]][À-ÿ\\s\\p{Alnum}\\p{Punct}&&[^,\\[\\]]]+)[^,\\s]?+";
+          final Pattern r = Pattern.compile(pattern);
+          final Matcher matcher = r.matcher(inputFieldValueList.trim());
+          while (matcher.find()) {
+            result.add(matcher.group(0));
+          }
         }
-        if (inputFieldValueAux.charAt(inputFieldValueAux.length() - 1) == "]".charAt(0)) {
-          inputFieldValueAux = inputFieldValueAux.substring(0, inputFieldValueAux.length() - 1);
-        }
-        result.addAll(Arrays.asList(inputFieldValueAux.trim().split("\\s*,\\s*", -1)));
+
       }
     }
+
     return result;
   }
 
