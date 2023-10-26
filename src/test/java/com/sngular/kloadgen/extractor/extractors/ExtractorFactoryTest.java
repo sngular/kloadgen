@@ -51,9 +51,9 @@ class ExtractorFactoryTest {
 
     private AvroExtractor avroExtractor = new AvroExtractor();
 
-    private static JsonExtractor jsonExtractor;
+    private static JsonExtractor jsonExtractor = new JsonExtractor();
 
-    private static ProtobuffExtractor protobuffExtractor;
+    private static ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
 
     @Captor
     private ArgumentCaptor<Schema> argumentCaptor = ArgumentCaptor.forClass(Schema.class);
