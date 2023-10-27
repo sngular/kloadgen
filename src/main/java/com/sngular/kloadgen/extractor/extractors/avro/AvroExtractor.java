@@ -11,6 +11,7 @@ import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
+import org.apache.avro.Schema;
 
 public class AvroExtractor implements ExtractorRegistry<Object> {
 
@@ -18,10 +19,13 @@ public class AvroExtractor implements ExtractorRegistry<Object> {
           new AvroApicurioExtractor());
 
   public final List<FieldValueMapping> processSchema(final Object schema, SchemaRegistryEnum registryEnum) {
-    if(schema.getClass().toString().equals("class io.confluent.kafka.schemaregistry.avro.AvroSchema")) {
-      return schemaRegistryMap.get(registryEnum).processSchema(((AvroSchema)schema).rawSchema());
+    Schema rawSchema;
+    if(schema instanceof AvroSchema) {
+      rawSchema = ((AvroSchema)schema).rawSchema();
+    } else {
+      rawSchema = (Schema) schema;
     }
-    return schemaRegistryMap.get(registryEnum).processSchema(schema);
+    return schemaRegistryMap.get(registryEnum).processSchema(rawSchema);
   }
 
   public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {
