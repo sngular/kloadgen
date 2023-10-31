@@ -85,7 +85,8 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  public final BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubjectAndId(final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
+  public final BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubjectAndId(final String subjectName, final BaseSchemaMetadata<?
+      extends SchemaMetadataAdapter> metadata) {
     try {
       final ParsedSchema parsedSchema = this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, metadata.getSchemaMetadataAdapter().getId());
       final ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);

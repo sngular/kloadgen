@@ -11,7 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchemaRegistryManagerFactory {
 
-  static Map<SchemaRegistryEnum, SchemaRegistryAdapter> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new ConfluentSchemaRegistry(), SchemaRegistryEnum.APICURIO, new ApicurioSchemaRegistry());
+  static final Map<SchemaRegistryEnum, SchemaRegistryAdapter> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT,
+      new ConfluentSchemaRegistry(), SchemaRegistryEnum.APICURIO, new ApicurioSchemaRegistry());
 
   public static SchemaRegistryAdapter getSchemaRegistry(final String registry) {
     try {

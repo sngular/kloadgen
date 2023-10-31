@@ -13,14 +13,17 @@ import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 
 public class ProtobuffExtractor implements ExtractorRegistry<Object> {
 
-  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
+  static final Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
       SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
 
   public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
+    List<FieldValueMapping> result = null;
     if (schemaReceived instanceof ProtoFileElement) {
-      return schemaRegistryMap.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived);
+      result = schemaRegistryMap.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived);
+    } else {
+      result = schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
     }
-    return schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
+    return result;
   }
 
   public final ParsedSchema processSchema(final String fileContent) {

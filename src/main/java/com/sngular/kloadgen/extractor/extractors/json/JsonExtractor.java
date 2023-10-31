@@ -13,7 +13,7 @@ import io.confluent.kafka.schemaregistry.json.JsonSchema;
 
 public class JsonExtractor implements ExtractorRegistry<Object> {
 
-  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new JsonDefaultExtractor(),
+  static final Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new JsonDefaultExtractor(),
       SchemaRegistryEnum.APICURIO, new JsonDefaultExtractor());
 
   public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
