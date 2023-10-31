@@ -15,6 +15,7 @@ import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentParsedSchemaMet
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.avro.AvroSchemaProvider;
@@ -24,7 +25,6 @@ import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientExcept
 import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaProvider;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
-import org.apache.jmeter.threads.JMeterContextService;
 
 public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
 
@@ -41,27 +41,23 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
                                 SchemaRegistryConstants.BEARER_AUTH_TOKEN_CONFIG, AbstractKafkaSchemaSerDeConfig.BEARER_AUTH_TOKEN_CONFIG);
   }
 
-  @Override
-  public String getSchemaRegistryUrlKey() {
+  public final String getSchemaRegistryUrlKey() {
     return AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG;
   }
 
-  @Override
-  public void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
-    this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
+  public final void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
+    this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(JMeterHelper.checkPropertyOrVariable(url)), 1000,
                                                                List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);
   }
 
-  @Override
-  public void setSchemaRegistryClient(final Map<String, ?> properties) {
+  public final void setSchemaRegistryClient(final Map<String, ?> properties) {
     final String url = properties.get(this.getSchemaRegistryUrlKey()).toString();
-    this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
+    this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(JMeterHelper.checkPropertyOrVariable(url)), 1000,
                                                                List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);
 
   }
 
-  @Override
-  public Collection<String> getAllSubjects() {
+  public final Collection<String> getAllSubjects() {
     try {
       return new ArrayList<>(this.schemaRegistryClient.getAllSubjects());
     } catch (RestClientException | IOException e) {
@@ -69,8 +65,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  @Override
-  public BaseSchemaMetadata<ConfluentSchemaMetadata> getLatestSchemaMetadata(final String subjectName) {
+  public final BaseSchemaMetadata<ConfluentSchemaMetadata> getLatestSchemaMetadata(final String subjectName) {
     try {
       final SchemaMetadataAdapter schemaMetadataAdapter = ConfluentSchemaMetadata.parse(this.schemaRegistryClient.getLatestSchemaMetadata(subjectName));
       return new BaseSchemaMetadata(schemaMetadataAdapter);
@@ -79,7 +74,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  public BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubject(final String subjectName) {
+  public final BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubject(final String subjectName) {
     try {
       final ConfluentSchemaMetadata schemaMetadata = ConfluentSchemaMetadata.parse(this.schemaRegistryClient.getLatestSchemaMetadata(subjectName));
       final ParsedSchema parsedSchema = this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
@@ -90,7 +85,7 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  public BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubjectAndId(final String subjectName, BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
+  public final BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubjectAndId(final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     try {
       final ParsedSchema parsedSchema = this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, metadata.getSchemaMetadataAdapter().getId());
       final ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);
@@ -100,15 +95,4 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  private String checkPropertyOrVariable(final String textToCheck) {
-    final String result;
-    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
-      result = JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
-    } else if (textToCheck.matches("\\$\\{\\w*}")) {
-      result = JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
-    } else {
-      result = textToCheck;
-    }
-    return result;
-  }
 }

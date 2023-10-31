@@ -11,7 +11,7 @@ public class BaseSchemaMetadata<T extends SchemaMetadataAdapter> {
     this.schemaMetadataAdapter = schemaMetadataAdapter;
   }
 
-  public T getSchemaMetadataAdapter() {
+  public final T getSchemaMetadataAdapter() {
     return schemaMetadataAdapter;
   }
 }

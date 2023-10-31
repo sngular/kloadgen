@@ -13,14 +13,11 @@ import com.google.protobuf.Message;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.schemaregistry.SchemaRegistryConstants;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaParser;
 import io.apicurio.registry.rest.client.RegistryClient;
 import io.apicurio.registry.rest.client.RegistryClientFactory;
@@ -38,30 +35,25 @@ import org.apache.avro.Schema;
 
 public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
 
-  private static final Map<String, String> propertiesMap = Map.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryConstants.SCHEMA_REGISTRY_APICURIO,
-                                                                  SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL_KEY, SerdeConfig.REGISTRY_URL);
-
   private RegistryClient schemaRegistryClient;
 
-  private ApicurioParsedSchemaMetadata apicurioParsedSchemaMetadata;
-
-  public final String getSchemaRegistryUrlKey() {
+  public String getSchemaRegistryUrlKey() {
     return SerdeConfig.REGISTRY_URL;
   }
 
   @Override
-  public final void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
+  public void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
     this.schemaRegistryClient = RegistryClientFactory.create(url);
   }
 
   @Override
-  public final void setSchemaRegistryClient(final Map<String, ?> properties) {
+  public void setSchemaRegistryClient(final Map<String, ?> properties) {
     final String url = Objects.toString(properties.get(this.getSchemaRegistryUrlKey()), "");
     this.schemaRegistryClient = RegistryClientFactory.create(url);
   }
 
   @Override
-  public final Collection<String> getAllSubjects() throws KLoadGenException {
+  public Collection<String> getAllSubjects() throws KLoadGenException {
     final Collection<String> subjects = new ArrayList<>();
     try {
       final List<SearchedArtifact> artifacts = this.schemaRegistryClient.searchArtifacts(null, null, null,
@@ -77,7 +69,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public final BaseSchemaMetadata<ApicurioSchemaMetadata> getLatestSchemaMetadata(final String artifactId) throws KLoadGenException {
+  public BaseSchemaMetadata<ApicurioSchemaMetadata> getLatestSchemaMetadata(final String artifactId) throws KLoadGenException {
     try {
       final SearchedArtifact searchedArtifact = getLastestSearchedArtifact(artifactId);
       final ArtifactMetaData artifactMetaData = this.schemaRegistryClient.getArtifactMetaData(searchedArtifact.getGroupId(), searchedArtifact.getId());
@@ -88,7 +80,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public final BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubject(final String artifactId) {
+  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubject(final String artifactId) {
     final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
     try {
       final SearchedArtifact searchedArtifact = getLastestSearchedArtifact(artifactId);
@@ -124,7 +116,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public final BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubjectAndId(
+  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubjectAndId(
       final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
 

@@ -36,7 +36,8 @@ public final class ExtractorFactory {
       switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
         case JSON:
           response = JSON_EXTRACTOR;
-          break;        case AVRO:
+          break;
+        case AVRO:
           response = AVRO_EXTRACTOR;
           break;
         case PROTOBUF:
@@ -51,7 +52,7 @@ public final class ExtractorFactory {
     }
   }
 
-  public static SchemaRegistryEnum getSchemaRegistry(String schemaRegistryEnum) {
+  public static SchemaRegistryEnum getSchemaRegistry(final String schemaRegistryEnum) {
     if (schemaRegistryEnum != null && EnumUtils.isValidEnum(SchemaRegistryEnum.class, schemaRegistryEnum.toUpperCase())) {
       return SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
     } else {
@@ -67,7 +68,7 @@ public final class ExtractorFactory {
     final String schemaType = parsedSchemaAdapter.getType();
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
-    SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
+    final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
 
     Object schema = null;
     //TODO change parser

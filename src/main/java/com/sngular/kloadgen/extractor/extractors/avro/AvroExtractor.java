@@ -1,8 +1,5 @@
 package com.sngular.kloadgen.extractor.extractors.avro;
 
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.APICURIO;
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.CONFLUENT;
-
 import java.util.List;
 import java.util.Map;
 
@@ -15,10 +12,10 @@ import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 
 public class AvroExtractor implements ExtractorRegistry<Object> {
 
-  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(CONFLUENT, new AvroConfluentExtractor(), APICURIO,
+  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new AvroConfluentExtractor(), SchemaRegistryEnum.APICURIO,
           new AvroApicurioExtractor());
 
-  public final List<FieldValueMapping> processSchema(final Object schema, SchemaRegistryEnum registryEnum) {
+  public final List<FieldValueMapping> processSchema(final Object schema, final SchemaRegistryEnum registryEnum) {
     return schemaRegistryMap.get(registryEnum).processSchema(schema);
   }
 
@@ -26,7 +23,7 @@ public class AvroExtractor implements ExtractorRegistry<Object> {
     return new AvroSchema(fileContent);
   }
 
-  public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {
+  public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
     return schemaRegistryMap.get(registryEnum).getSchemaNameList(schema);
   }
 

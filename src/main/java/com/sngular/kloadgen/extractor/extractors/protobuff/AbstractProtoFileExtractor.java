@@ -40,14 +40,14 @@ public abstract class AbstractProtoFileExtractor {
   protected AbstractProtoFileExtractor() {
   }
 
-  public List<FieldValueMapping>  processSchemaDefault(ProtoFileElement schema){
+  public final List<FieldValueMapping> processSchemaDefault(final ProtoFileElement schema) {
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final HashMap<String, TypeElement> nestedTypes = new HashMap<>();
     schema.getTypes().forEach(field -> processField(field, attributeList, schema.getImports(), true, nestedTypes));
     return attributeList;
   }
 
-  public List<String> getSchemaNameListDefault(String schema){
+  public final List<String> getSchemaNameListDefault(final String schema) {
     final DynamicSchema dynamicSchema;
     try {
       dynamicSchema = DynamicSchema.parseFrom(schema.getBytes(StandardCharsets.UTF_8));

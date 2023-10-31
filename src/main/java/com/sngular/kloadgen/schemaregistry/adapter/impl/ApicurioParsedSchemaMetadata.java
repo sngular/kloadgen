@@ -16,11 +16,12 @@ public class ApicurioParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   private String type;
 
-  public ApicurioParsedSchemaMetadata(ParsedSchema parsedSchema){
+  public ApicurioParsedSchemaMetadata(final ParsedSchema parsedSchema) {
     this.rawSchema = parsedSchema.canonicalString();
     this.type = parsedSchema.schemaType();
     this.schema = parsedSchema.rawSchema();
   }
+
   public static ParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
     return new ApicurioParsedSchemaMetadata(parsedSchema);
   }

@@ -10,7 +10,7 @@ public class BaseParsedSchema<T extends ParsedSchemaAdapter> extends Parser {
     this.parsedSchemaAdapter = parsedSchemaAdapter;
   }
 
-  public T getParsedSchemaAdapter(){
+  public final T getParsedSchemaAdapter() {
     return parsedSchemaAdapter;
   }
 }

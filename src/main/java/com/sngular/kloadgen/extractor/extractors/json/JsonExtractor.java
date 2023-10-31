@@ -1,8 +1,5 @@
 package com.sngular.kloadgen.extractor.extractors.json;
 
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.APICURIO;
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.CONFLUENT;
-
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +13,10 @@ import io.confluent.kafka.schemaregistry.json.JsonSchema;
 
 public class JsonExtractor implements ExtractorRegistry<Object> {
 
-  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(CONFLUENT, new JsonDefaultExtractor(),
-          APICURIO, new JsonDefaultExtractor());
+  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new JsonDefaultExtractor(),
+      SchemaRegistryEnum.APICURIO, new JsonDefaultExtractor());
 
-  public final List<FieldValueMapping> processSchema(final Object schemaReceived, SchemaRegistryEnum registryEnum) {
+  public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
     return schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
   }
 
@@ -27,7 +24,7 @@ public class JsonExtractor implements ExtractorRegistry<Object> {
     return new JsonSchema(fileContent);
   }
 
-  public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {
+  public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
     return schemaRegistryMap.get(registryEnum).getSchemaNameList(schema);
   }
 

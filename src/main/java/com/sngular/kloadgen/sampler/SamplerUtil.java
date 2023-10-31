@@ -356,9 +356,9 @@ public final class SamplerUtil {
     final String valueNameStrategy = jMeterVariables.get(ProducerKeysHelper.VALUE_NAME_STRATEGY);
 
     if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO));
+      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
     } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT));
+      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
     }
 
     generator = getLoadGenerator();
