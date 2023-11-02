@@ -14,10 +14,11 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
 
-import io.apicurio.registry.resolver.strategy.ArtifactReferenceResolverStrategy;
-import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+
+import io.apicurio.registry.resolver.strategy.ArtifactReferenceResolverStrategy;
+import io.confluent.kafka.serializers.subject.strategy.SubjectNameStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;

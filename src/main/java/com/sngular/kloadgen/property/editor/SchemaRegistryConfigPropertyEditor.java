@@ -139,7 +139,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
       //Retrieve TableEditor and set all fields with default values to it
       final var propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
-      Map<String, String> schemaProperties = new HashMap<>();
+      final Map<String, String> schemaProperties = new HashMap<>();
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
           //noinspection unchecked
@@ -150,7 +150,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
       }
       final Map<String, String> originals = new HashMap<>();
 
-      String schemaRegistryName = schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+      final String schemaRegistryName = schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
       JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, schemaRegistryName);
 
       final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
@@ -163,8 +163,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
           JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
 
           originals.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":" +
-                                                                         schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
+          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":"
+                                                                         + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
         }
       }
 

@@ -11,10 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME;
-import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES;
-import static com.sngular.kloadgen.config.schemaregistry.SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL;
-
 import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
@@ -83,7 +79,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
   private Map<String, String> getProperties() {
     final Map<String, String> result = new HashMap<>();
-    final JMeterProperty property = getProperty(SCHEMA_REGISTRY_PROPERTIES);
+    final JMeterProperty property = getProperty(SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES);
     if (Objects.nonNull(property)) {
       result.putAll(
           this.fromTestElementToPropertiesMap((List<TestElementProperty>) property.getObjectValue()));
@@ -94,7 +90,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   }
 
   private String getRegistryName() {
-    String registryName = getPropertyAsString(SCHEMA_REGISTRY_NAME);
+    String registryName = getPropertyAsString(SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME);
     if (StringUtils.isBlank(registryName)) {
       registryName = this.schemaRegistryName;
     }
@@ -102,7 +98,7 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
   }
 
   private String getRegistryUrl() {
-    String registryUrl = getPropertyAsString(SCHEMA_REGISTRY_URL);
+    String registryUrl = getPropertyAsString(SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL);
     if (StringUtils.isBlank(registryUrl)) {
       registryUrl = this.schemaRegistryUrl;
     }
