@@ -6,7 +6,6 @@ import java.util.Set;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
-import com.sngular.kloadgen.extractor.parser.impl.JSONSchemaParser;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -23,8 +22,6 @@ class JsonDefaultTest {
 
   private final Extractor<Schema> jsonDefaultExtractor = new JsonDefaultExtractor();
 
-  public final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
-
   @Test
   @DisplayName("Should extract basic types")
   void testBasic() throws Exception {
@@ -40,8 +37,7 @@ class JsonDefaultTest {
               .containsExactlyInAnyOrder(
                   FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
                   FieldValueMapping.builder().fieldName("lastName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("age").fieldType("number").required(true).isAncestorRequired(false).build()
-              );
+                  FieldValueMapping.builder().fieldName("age").fieldType("number").required(true).isAncestorRequired(false).build());
   }
 
   @Test
@@ -59,8 +55,7 @@ class JsonDefaultTest {
               .containsExactlyInAnyOrder(
                   FieldValueMapping.builder().fieldName("fruits[]").fieldType("string-array").required(true).isAncestorRequired(false).build(),
                   FieldValueMapping.builder().fieldName("vegetables[].veggieName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(true).build(),
-                  FieldValueMapping.builder().fieldName("vegetables[].veggieLike").fieldType("boolean").required(true).isAncestorRequired(true).build()
-              );
+                  FieldValueMapping.builder().fieldName("vegetables[].veggieLike").fieldType("boolean").required(true).isAncestorRequired(true).build());
   }
 
   @Test
@@ -84,10 +79,8 @@ class JsonDefaultTest {
               .hasSize(2)
               .containsExactlyInAnyOrder(
                   FieldValueMapping.builder().fieldName("latitude").fieldType("number").constraints(constraintsLatitude).required(true).isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("longitude").fieldType("number").constraints(constraintsLongitude).required(true).isAncestorRequired(false).build()
-              );
+                  FieldValueMapping.builder().fieldName("longitude").fieldType("number").constraints(constraintsLongitude).required(true).isAncestorRequired(false).build());
   }
-
 
   @Test
   @DisplayName("Should extract optional collections and optional collections inside objects")
@@ -123,8 +116,7 @@ class JsonDefaultTest {
                   FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.dogId").fieldType("number").required(false).isAncestorRequired(true)
                                    .build(),
                   FieldValueMapping.builder().fieldName("objectOfCollectionsOfObject.mapOfObjectsDog[:].vetData.breedName").fieldType("string").constraints(constraints)
-                                   .required(false).isAncestorRequired(true).build()
-              );
+                                   .required(false).isAncestorRequired(true).build());
   }
 
   @Test
@@ -152,8 +144,7 @@ class JsonDefaultTest {
                   FieldValueMapping.builder().fieldName("mapOfMaps[:][:].stringControlObject").fieldType("string").constraints(constraints).required(true).isAncestorRequired(true)
                                    .build(),
                   FieldValueMapping.builder().fieldName("mapOfMaps[:][:].arrayOfArraysOfStrings[][]").fieldType("string-array-array").required(false).isAncestorRequired(true)
-                                   .build()
-              );
+                                   .build());
   }
 
   @Test
@@ -177,8 +168,7 @@ class JsonDefaultTest {
                   FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level2.code").fieldType("string").constraints(constraintsCode).required(false)
                                    .isAncestorRequired(true).build(),
                   FieldValueMapping.builder().fieldName("geopoliticalSubdivisions.level2.freeForm").fieldType("string").constraints(constraintsFreeForm).required(false)
-                                   .isAncestorRequired(true).build()
-              );
+                                   .isAncestorRequired(true).build());
   }
 
   @Test
@@ -196,8 +186,7 @@ class JsonDefaultTest {
               .contains(
                   FieldValueMapping.builder().fieldName("duty.amount.value").fieldType("number").required(false).isAncestorRequired(false).build(),
                   FieldValueMapping.builder().fieldName("duty.amount.currency").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("duty.amount.exponent").fieldType("number").required(false).isAncestorRequired(false).build()
-              );
+                  FieldValueMapping.builder().fieldName("duty.amount.exponent").fieldType("number").required(false).isAncestorRequired(false).build());
   }
 
   @Test
@@ -212,8 +201,7 @@ class JsonDefaultTest {
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(1)
               .satisfiesExactly(
-                  fieldValueMapping -> Set.of("number", "uuid").contains(fieldValueMapping.getFieldType())
-              );
+                  fieldValueMapping -> Set.of("number", "uuid").contains(fieldValueMapping.getFieldType()));
   }
 
   @Test
@@ -241,8 +229,7 @@ class JsonDefaultTest {
                   FieldValueMapping.builder().fieldName("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].stringControl").fieldType("string").constraints(constraints)
                                    .required(false).isAncestorRequired(true).build(),
                   FieldValueMapping.builder().fieldName("mapOfObjectsOfCollections[:].arrayOfMapsOfObject[][:].numberControl").fieldType("number").required(false)
-                                   .isAncestorRequired(true).build()
-              );
+                                   .isAncestorRequired(true).build());
   }
 
   @Test

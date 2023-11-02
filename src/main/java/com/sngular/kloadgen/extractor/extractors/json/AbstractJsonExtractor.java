@@ -19,10 +19,25 @@ import com.sngular.kloadgen.model.json.StringField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractJsonExtractor {
 
   public static final JSONSchemaParser JSON_SCHEMA_PARSER = new JSONSchemaParser();
+
+  protected final JSONSchemaParser getSchemaParser() {
+    return JSON_SCHEMA_PARSER;
+  }
+
+  private static String extractFieldName(final String fieldName) {
+    String fieldNameClean = fieldName;
+    if (fieldName.endsWith("[][]") || fieldName.endsWith("[:][]")) {
+      fieldNameClean = fieldName.substring(0, fieldName.length() - 2);
+    } else if (fieldName.endsWith("[][:]") || fieldName.endsWith("[:][:]")) {
+      fieldNameClean = fieldName.substring(0, fieldName.length() - 3);
+    }
+    return fieldNameClean;
+  }
 
   private List<FieldValueMapping> extractInternalFields(final ObjectField field, final Boolean isAncestorRequired) {
     final List<FieldValueMapping> completeFieldList = new ArrayList<>();
@@ -39,42 +54,32 @@ public abstract class AbstractJsonExtractor {
     };
   }
 
-  private static String extractFieldName(final String fieldName) {
-    String fieldNameClean = fieldName;
-    if (fieldName.endsWith("[][]") || fieldName.endsWith("[:][]")) {
-      fieldNameClean = fieldName.substring(0, fieldName.length() - 2);
-    } else if (fieldName.endsWith("[][:]") || fieldName.endsWith("[:][:]")) {
-      fieldNameClean = fieldName.substring(0, fieldName.length() - 3);
-    }
-    return fieldNameClean;
-  }
-
   public final List<FieldValueMapping> processField(final Field innerField, final Boolean isRootElement, final Boolean isAncestorRequired) {
     final List<FieldValueMapping> completeFieldList = new ArrayList<>();
     if (innerField instanceof ObjectField) {
       processRecordFieldList(innerField.getName(), ".",
-          extractInternalFields((ObjectField) innerField, isAncestorRequired != null ? isAncestorRequired : ((ObjectField) innerField).isFieldRequired()),
-          completeFieldList, checkRequiredElement(isRootElement, isAncestorRequired, ((ObjectField) innerField).isFieldRequired()));
+                             extractInternalFields((ObjectField) innerField, isAncestorRequired != null ? isAncestorRequired : ((ObjectField) innerField).isFieldRequired()),
+                             completeFieldList, checkRequiredElement(isRootElement, isAncestorRequired, ((ObjectField) innerField).isFieldRequired()));
     } else if (innerField instanceof ArrayField) {
       completeFieldList.addAll(extractArrayInternalFields((ArrayField) innerField, isRootElement,
-          checkRequiredElement(isRootElement, isAncestorRequired, ((ArrayField) innerField).isFieldRequired()), ""));
+                                                          checkRequiredElement(isRootElement, isAncestorRequired, ((ArrayField) innerField).isFieldRequired()), ""));
     } else if (innerField instanceof EnumField) {
       completeFieldList.add(FieldValueMapping
-          .builder()
-          .fieldName(innerField.getName())
-          .fieldType(innerField.getType())
-          .valueLength(0)
-          .fieldValueList(String.join(",", ((EnumField) innerField).getEnumValues()))
-          .build());
+                                .builder()
+                                .fieldName(innerField.getName())
+                                .fieldType(innerField.getType())
+                                .valueLength(0)
+                                .fieldValueList(String.join(",", ((EnumField) innerField).getEnumValues()))
+                                .build());
     } else if (innerField instanceof MapField) {
       completeFieldList.addAll(
           extractMapInternalFields((MapField) innerField, isRootElement,
-              checkRequiredElement(isRootElement, isAncestorRequired, ((MapField) innerField).isFieldRequired()), ""));
+                                   checkRequiredElement(isRootElement, isAncestorRequired, ((MapField) innerField).isFieldRequired()), ""));
     } else if (innerField instanceof NumberField) {
       final FieldValueMapping.FieldValueMappingBuilder builder = FieldValueMapping
-          .builder()
-          .fieldName(innerField.getName())
-          .fieldType(innerField.getType());
+                                                                     .builder()
+                                                                     .fieldName(innerField.getName())
+                                                                     .fieldType(innerField.getType());
 
       addConstraint(builder, ConstraintTypeEnum.EXCLUDED_MAXIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getExclusiveMaximum()));
       addConstraint(builder, ConstraintTypeEnum.EXCLUDED_MINIMUM_VALUE, getSafeNumberAsString(((NumberField) innerField).getExclusiveMinimum()));
@@ -115,8 +120,9 @@ public abstract class AbstractJsonExtractor {
     return result;
   }
 
-  private List<FieldValueMapping> extractObjectInternalFields(final ObjectField value, final String innerFieldName, final Boolean isAncestorRequired, final String breadCrumb,
-                                                              final String endValue) {
+  private List<FieldValueMapping> extractObjectInternalFields(
+      final ObjectField value, final String innerFieldName, final Boolean isAncestorRequired, final String breadCrumb,
+      final String endValue) {
     final List<FieldValueMapping> completeFieldList = new ArrayList<>();
     final List<String> requiredInternalFields = value.getRequired();
     for (Field propertiesField : value.getProperties()) {
@@ -151,16 +157,25 @@ public abstract class AbstractJsonExtractor {
         final String name = (StringUtils.isNotEmpty(breadCrumb) ? breadCrumb : innerField.getName() + "[]") + (StringUtils.isNotEmpty(breadCrumb) ? "[]" : breadCrumb);
         completeFieldList.add(
             FieldValueMapping.builder()
-                .fieldName(name)
-                .fieldType(value.getType() + SchemaExtractorUtil.ARRAY_TYPE_POSTFIX + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]"))
-                    ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX :
-                    (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" : breadCrumb))
-                .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
-                .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
-                .build());
+                             .fieldName(name)
+                             .fieldType(calculateFieldType(breadCrumb, value))
+                             .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
+                             .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
+                             .build());
       }
     }
     return completeFieldList;
+  }
+
+  @NotNull
+  private static String calculateFieldType(final String breadCrumb, final Field value) {
+    return value.getType()
+           + SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
+           + ((StringUtils.isNotEmpty(breadCrumb)
+               && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
+                  : (StringUtils.isNotEmpty(breadCrumb)
+                     && breadCrumb.endsWith("[:]")) ? "-map"
+                        : breadCrumb);
   }
 
   private List<FieldValueMapping> extractMapInternalFields(
@@ -181,29 +196,45 @@ public abstract class AbstractJsonExtractor {
       final String name = (StringUtils.isNotEmpty(breadCrumb) ? breadCrumb : innerField.getName() + "[:]") + (StringUtils.isNotEmpty(breadCrumb) ? "[:]" : breadCrumb);
       completeFieldList.add(
           FieldValueMapping.builder()
-              .fieldName(name)
-              .fieldType(value.getType() + "-map" + ((StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[:]")) ? "-map" :
-                  (StringUtils.isNotEmpty(breadCrumb) && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX : breadCrumb))
-              .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
-              .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
-              .build());
+                           .fieldName(name)
+                           .fieldType(getFieldType(breadCrumb, value))
+                           .required(!name.endsWith("][]") && !name.endsWith("][:]") && innerField.isFieldRequired())
+                           .isAncestorRequired(!isRootElement && isAncestorRequired != null && isAncestorRequired)
+                           .build());
     }
     return completeFieldList;
   }
 
-  private void processRecordFieldList(
-      final String fieldName, final String splitter, final List<FieldValueMapping> internalFields,
-      final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired) {
-    internalFields.forEach(internalField -> {
+  @NotNull
+  private static String getFieldType(final String breadCrumb, final Field value) {
+    return value.getType()
+           + "-map"
+           + ((StringUtils.isNotEmpty(breadCrumb)
+               && breadCrumb.endsWith("[:]")) ? "-map"
+                  : (StringUtils.isNotEmpty(breadCrumb)
+                     && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
+                        : breadCrumb);
+  }
+
+  private void processRecordFieldList(final String fieldName, final String splitter, final List<FieldValueMapping> internalFields, final List<FieldValueMapping> completeFieldList,
+      final boolean isAncestorRequired) {
+    internalFields.forEach(internalField -> extracted(fieldName, splitter, completeFieldList, isAncestorRequired, internalField));
+  }
+
+  private static void extracted(final String fieldName, final String splitter, final List<FieldValueMapping> completeFieldList, final boolean isAncestorRequired,
+      final FieldValueMapping internalField) {
+    if (Objects.nonNull(internalField.getFieldName())) {
       internalField.setFieldName(fieldName + splitter + internalField.getFieldName());
-      final String[] splittedName = internalField.getFieldName().split("\\.");
-      String parentName = splittedName[splittedName.length - 2];
-      parentName = parentName.replace("[]", "");
-      if (fieldName.equals(parentName)) {
-        internalField.setAncestorRequired(isAncestorRequired);
-      }
-      completeFieldList.add(internalField);
-    });
+    } else {
+      internalField.setFieldName(fieldName);
+    }
+    final String[] splitName = internalField.getFieldName().split("\\.");
+    String parentName = splitName[splitName.length - 2];
+    parentName = parentName.replace("[]", "");
+    if (fieldName.equals(parentName)) {
+      internalField.setAncestorRequired(isAncestorRequired);
+    }
+    completeFieldList.add(internalField);
   }
 
   private Boolean checkRequiredByType(

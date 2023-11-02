@@ -45,7 +45,7 @@ public class ApicurioSchemaMetadata implements SchemaMetadataAdapter {
   public ApicurioSchemaMetadata(final ArtifactMetaData artifactMetaData) {
     this.id = artifactMetaData.getId();
     this.version = artifactMetaData.getVersion();
-    this.schemaType = artifactMetaData.getType();
+    this.schemaType = artifactMetaData.getType().toString();
     this.name = artifactMetaData.getName();
     this.description = artifactMetaData.getDescription();
     this.createdBy = artifactMetaData.getCreatedBy();
@@ -60,12 +60,14 @@ public class ApicurioSchemaMetadata implements SchemaMetadataAdapter {
     this.contentId = artifactMetaData.getContentId();
   }
 
+  @Override
   public final String getType() {
     return this.schemaType;
   }
 
+  @Override
   public final <T> List<T> getReferences() {
-    return Collections.<T>emptyList();
+    return Collections.emptyList();
   }
 
 }

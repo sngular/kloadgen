@@ -62,8 +62,7 @@ public abstract class AbstractProtoFileExtractor {
       final List<String> imports, final boolean isAncestorRequired,
       final Map<String, TypeElement> nestedTypes) {
     fillNestedTypes(field, nestedTypes);
-    if (field instanceof MessageElement) {
-      final var messageField = (MessageElement) field;
+    if (field instanceof final MessageElement messageField) {
       if (!messageField.getOneOfs().isEmpty()) {
         extractOneOfs((MessageElement) field, completeFieldList, nestedTypes, isAncestorRequired);
       }
@@ -80,9 +79,8 @@ public abstract class AbstractProtoFileExtractor {
     }
   }
 
-  private static void processField(
-      final FieldElement field,
-      final List<FieldValueMapping> completeFieldList, final List<String> imports, final boolean isAncestorRequired, final Map<String, TypeElement> nestedTypes) {
+  private static void processField(final FieldElement field, final List<FieldValueMapping> completeFieldList, final List<String> imports, final boolean isAncestorRequired,
+      final Map<String, TypeElement> nestedTypes) {
     final Field.Label label = checkNullLabel(field);
     final boolean isArray = "repeated".equalsIgnoreCase(Objects.requireNonNull(label.toString()));
     final boolean isOptional = Objects.equals(Objects.requireNonNull(label.toString()), "optional");
@@ -109,8 +107,8 @@ public abstract class AbstractProtoFileExtractor {
     return completeFieldList;
   }
 
-  private static void extractOneOfs(
-      final MessageElement field, final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final boolean isAncestorRequired) {
+  private static void extractOneOfs(final MessageElement field, final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes,
+      final boolean isAncestorRequired) {
     final List<OneOfElement> oneOfs = new ArrayList<>(field.getOneOfs());
     for (OneOfElement oneOfElement : oneOfs) {
       if (!oneOfElement.getFields().isEmpty()) {
@@ -131,8 +129,7 @@ public abstract class AbstractProtoFileExtractor {
     }
   }
 
-  private static FieldValueMapping extractDotTypeWhenNotNestedType(
-      final FieldElement subfield, final boolean isArray, final String dotType, final boolean isRequired,
+  private static FieldValueMapping extractDotTypeWhenNotNestedType(final FieldElement subfield, final boolean isArray, final String dotType, final boolean isRequired,
       final boolean isAncestorRequired) {
     final FieldValueMapping completeFieldList;
     if (isArray) {
@@ -144,9 +141,8 @@ public abstract class AbstractProtoFileExtractor {
     return completeFieldList;
   }
 
-  private static void extractMapType(
-      final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final FieldElement subfield, final List<String> imports,
-      final boolean isRequired, final boolean isAncestorRequired) {
+  private static void extractMapType(final List<FieldValueMapping> completeFieldList, final Map<String, TypeElement> nestedTypes, final FieldElement subfield,
+      final List<String> imports, final boolean isRequired, final boolean isAncestorRequired) {
     final String subFieldType = extractInternalMapFields(subfield);
     final String dotTypeMap = checkDotType(subFieldType, imports);
     if (ProtobufHelper.isValidType(subFieldType)) {
@@ -170,8 +166,8 @@ public abstract class AbstractProtoFileExtractor {
     return mapSplit[1].replace(">", "").trim();
   }
 
-  private static void extractPrimitiveTypes(
-      final List<FieldValueMapping> completeFieldList, final FieldElement subfield, final boolean isArray, final boolean isRequired, final boolean isAncestorRequired) {
+  private static void extractPrimitiveTypes(final List<FieldValueMapping> completeFieldList, final FieldElement subfield, final boolean isArray, final boolean isRequired,
+      final boolean isAncestorRequired) {
     if (isArray) {
       completeFieldList.add(FieldValueMapping.builder().fieldName(subfield.getName() + "[]")
                                              .fieldType(subfield.getType().replace(subfield.getType(), ProtobufHelper.translateType(subfield.getType())) + ARRAY_POSTFIX)

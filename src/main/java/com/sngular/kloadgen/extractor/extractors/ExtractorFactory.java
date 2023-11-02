@@ -24,7 +24,7 @@ public final class ExtractorFactory {
 
   private static final JsonExtractor JSON_EXTRACTOR = new JsonExtractor();
 
-  private static final ProtobuffExtractor PROTOBUF_EXTRACTOR = new ProtobuffExtractor();
+  private static final ProtobuffExtractor PROTOBUFF_EXTRACTOR = new ProtobuffExtractor();
 
   private ExtractorFactory() {
   }
@@ -41,7 +41,7 @@ public final class ExtractorFactory {
           response = AVRO_EXTRACTOR;
           break;
         case PROTOBUF:
-          response = PROTOBUF_EXTRACTOR;
+          response = PROTOBUFF_EXTRACTOR;
           break;
         default:
           throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));

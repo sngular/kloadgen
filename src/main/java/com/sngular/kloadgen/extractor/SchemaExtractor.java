@@ -1,5 +1,6 @@
 package com.sngular.kloadgen.extractor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,20 +12,18 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
+import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class SchemaExtractor {
+@Getter
+public final class SchemaExtractor {
 
   private SchemaRegistryEnum type;
 
   public SchemaExtractor() {
   }
 
-  public final SchemaRegistryEnum getType() {
-    return type;
-  }
-
-  public final void setType(final SchemaRegistryEnum type) {
+  public void setType(final SchemaRegistryEnum type) {
     this.type = type;
   }
 
@@ -36,8 +35,9 @@ public class SchemaExtractor {
     return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
   }
 
-  public static String readSchemaFile(final String filePath) throws IOException {
-    return readLineByLine(filePath);
+  public static List<String> schemaTypesList(final File schemaFile, final String schemaType, final String registry) throws IOException {
+    return ExtractorFactory.getExtractor(schemaType).getSchemaNameList(readLineByLine(schemaFile.getPath()),
+            ExtractorFactory.getSchemaRegistry(registry));
   }
 
   private static String readLineByLine(final String filePath) throws IOException {

@@ -171,7 +171,7 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public Object getRootNode(final String rootNode) {
+  public final Object getRootNode(final String rootNode) {
     return entity.get(rootNode);
   }
 

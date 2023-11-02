@@ -8,7 +8,6 @@ option java_outer_classname = "Protos";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/descriptor.proto";
-import "google/protobuf/compiler/plugin.proto";
 
 message Test {
   repeated PhoneTypes phone_types = 1;

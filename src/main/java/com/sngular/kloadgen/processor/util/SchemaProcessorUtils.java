@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,27 +157,9 @@ public class SchemaProcessorUtils {
       throws Descriptors.DescriptorValidationException, IOException {
 
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
-    final List<String> imports = schema.getImports();
+    final var imports = new ConcurrentLinkedQueue<>(schema.getImports());
     for (final String importedClass : imports) {
-      try (final InputStream resourceStream = SchemaProcessorUtils.class.getClassLoader().getResourceAsStream(importedClass)) {
-        if (null != resourceStream) {
-          final String schemaToString = new String(resourceStream.readAllBytes());
-          final var lines = new ArrayList<>(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
-          if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
-            final var importedSchema = processImported(lines);
-            schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
-            schemaBuilder.addSchema(importedSchema);
-          }
-        } else {
-          final AbstractParsedSchemaAdapter protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
-                                                                                    JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
-          final var importedProtobufSchema = new ProtobufSchema(protoFileElement.getRawSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
-          if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
-            schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
-            schemaBuilder.addSchema(convertDynamicSchema(importedProtobufSchema));
-          }
-        }
-      }
+      processImport(metadata, importedClass, schemaBuilder);
     }
     final MessageElement messageElement = (MessageElement) schema.getTypes().get(0);
 
@@ -190,6 +173,29 @@ public class SchemaProcessorUtils {
     schemaBuilder.addMessageDefinition(buildProtoMessageDefinition(messageElement.getName(), messageElement, globalNestedTypesByLevelAndMessage, deepLevel));
 
     return schemaBuilder.build().getMessageDescriptor(messageElement.getName());
+  }
+
+  private static void processImport(final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata, final String importedClass, final DynamicSchema.Builder schemaBuilder)
+      throws IOException, DescriptorValidationException {
+    try (final InputStream resourceStream = SchemaProcessorUtils.class.getClassLoader().getResourceAsStream(importedClass)) {
+      if (null != resourceStream) {
+        final String schemaToString = new String(resourceStream.readAllBytes());
+        final var lines = new ArrayList<>(CollectionUtils.select(Arrays.asList(schemaToString.split("\\n")), isValid()));
+        if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
+          final var importedSchema = processImported(lines, metadata);
+          schemaBuilder.addDependency(importedSchema.getFileDescriptorSet().getFile(0).getName());
+          schemaBuilder.addSchema(importedSchema);
+        }
+      } else {
+        final AbstractParsedSchemaAdapter protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                                          JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
+        final var importedProtobufSchema = new ProtobufSchema(protoFileElement.getRawSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
+        if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
+          schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
+          schemaBuilder.addSchema(convertDynamicSchema(importedProtobufSchema, metadata));
+        }
+      }
+    }
   }
 
   private static String getSubjectName(final String importedClass, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
@@ -206,15 +212,17 @@ public class SchemaProcessorUtils {
     return Objects.requireNonNullElse(subjectName, importedClass);
   }
 
-  private static DynamicSchema convertDynamicSchema(final ProtobufSchema importSchema) throws DescriptorValidationException {
-    return processImported(Arrays.asList(importSchema.rawSchema().toSchema().split("\\n")));
+  private static DynamicSchema convertDynamicSchema(final ProtobufSchema importSchema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata)
+      throws DescriptorValidationException, IOException {
+    return processImported(Arrays.asList(importSchema.rawSchema().toSchema().split("\\n")), metadata);
   }
 
   private static Predicate<String> isValid() {
     return line -> !line.contains("//") && !line.isEmpty();
   }
 
-  private static DynamicSchema processImported(final List<String> importedLines) throws DescriptorValidationException {
+  private static DynamicSchema processImported(final List<String> importedLines, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata)
+      throws DescriptorValidationException, IOException {
 
     final DynamicSchema.Builder schemaBuilder = DynamicSchema.newBuilder();
 
@@ -234,7 +242,7 @@ public class SchemaProcessorUtils {
 
       }
       if (fileLine.startsWith("import")) {
-        schemaBuilder.addDependency(fileLine.substring(6));
+        processImport(metadata, fileLine.substring(6), schemaBuilder);
       }
     }
 
@@ -382,8 +390,7 @@ public class SchemaProcessorUtils {
       final MessageDefinition.Builder msgDef, final String typeName, final TypeElement typeElement,
       final HashMap<Integer, HashMap<String, HashMap<String, TypeElement>>> globalNestedTypesByLevelAndMessage, final int deepLevel) {
 
-    if (typeElement instanceof EnumElement) {
-      final var enumElement = (EnumElement) typeElement;
+    if (typeElement instanceof final EnumElement enumElement) {
       final EnumDefinition.Builder builder = EnumDefinition.newBuilder(enumElement.getName());
       for (final var constant : enumElement.getConstants()) {
         builder.addValue(constant.getName(), constant.getTag());

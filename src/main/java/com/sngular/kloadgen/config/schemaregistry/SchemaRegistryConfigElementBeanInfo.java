@@ -6,7 +6,6 @@
 
 package com.sngular.kloadgen.config.schemaregistry;
 
-
 import java.beans.PropertyDescriptor;
 
 import com.sngular.kloadgen.model.PropertyMapping;
@@ -23,9 +22,8 @@ public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
 
     super(SchemaRegistryConfigElement.class);
 
-    createPropertyGroup("schema_registry_config",
-        new String[]{SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME, SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL,
-          SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES});
+    createPropertyGroup("schema_registry_config", new String[]{SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME, SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES,
+        SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL});
 
     final PropertyDescriptor schemaRegistryName = property(SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME);
     schemaRegistryName.setPropertyEditorClass(SchemaRegistryNamePropertyEditor.class);

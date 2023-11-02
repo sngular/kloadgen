@@ -27,7 +27,6 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
-import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -87,7 +86,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
   @Override
   public final String getAsText() {
-    return JMeterHelper.checkPropertyOrVariable(this.schemaRegistryUrl.getText());
+    return checkPropertyOrVariable(this.schemaRegistryUrl.getText());
   }
 
   @Override
@@ -146,7 +145,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
           //noinspection unchecked
           schemaProperties.putAll(fromListToPropertiesMap((List<PropertyMapping>) propertyEditor.getValue()));
         } else if (propertyEditor instanceof SchemaRegistryNamePropertyEditor) {
-          schemaProperties.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, JMeterHelper.checkPropertyOrVariable(propertyEditor.getAsText()));
+          schemaProperties.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, checkPropertyOrVariable(propertyEditor.getAsText()));
         }
       }
       final Map<String, String> originals = new HashMap<>();
@@ -156,7 +155,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
       final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
 
-      originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), JMeterHelper.checkPropertyOrVariable(schemaRegistryUrl.getText()));
+      originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), checkPropertyOrVariable(schemaRegistryUrl.getText()));
 
       if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
         JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
@@ -165,15 +164,14 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
           originals.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
           originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":"
-              + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
+                                                                         + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
         }
       }
 
       schemaRegistryManager.setSchemaRegistryClient(getAsText(), originals);
       final var subjects = schemaRegistryManager.getAllSubjects();
 
-      JMeterContextService.getContext().getProperties().setProperty(schemaRegistryManager.getSchemaRegistryUrlKey(),
-          JMeterHelper.checkPropertyOrVariable(schemaRegistryUrl.getText()));
+      JMeterContextService.getContext().getProperties().setProperty(schemaRegistryManager.getSchemaRegistryUrlKey(), checkPropertyOrVariable(schemaRegistryUrl.getText()));
       JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
       if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
         JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG, ProducerKeysHelper.FLAG_YES);
@@ -190,7 +188,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
                               .setProperty(AbstractKafkaSchemaSerDeConfig.BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY));
         }
       }
-      JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + JMeterHelper.checkPropertyOrVariable(schemaRegistryUrl.getText())
+      JOptionPane.showMessageDialog(null, "Successful contacting Schema Registry at : " + checkPropertyOrVariable(schemaRegistryUrl.getText())
                                           + "\n Number of subjects in the Registry : " + subjects.size(), "Successful connection to Schema Registry",
                                     JOptionPane.INFORMATION_MESSAGE);
     } catch (NoSuchFieldException | IllegalAccessException | NullPointerException | KLoadGenException e) {
@@ -203,9 +201,21 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
   private Map<String, String> fromListToPropertiesMap(final List<PropertyMapping> schemaProperties) {
     final Map<String, String> propertiesMap = new HashMap<>();
     for (PropertyMapping property : schemaProperties) {
-      propertiesMap.put(property.getPropertyName(), JMeterHelper.checkPropertyOrVariable(property.getPropertyValue()));
+      propertiesMap.put(property.getPropertyName(), checkPropertyOrVariable(property.getPropertyValue()));
     }
     return propertiesMap;
+  }
+
+  private String checkPropertyOrVariable(final String textToCheck) {
+    final String result;
+    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
+      result = JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
+    } else if (textToCheck.matches("\\$\\{\\w*}")) {
+      result = JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
+    } else {
+      result = textToCheck;
+    }
+    return result;
   }
 
 }

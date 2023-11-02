@@ -9,6 +9,9 @@ package com.sngular.kloadgen.serializer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+import javax.xml.bind.DatatypeConverter;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -38,7 +41,7 @@ public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<
 
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byteArrayOutputStream.write(MAGIC_BYTE);
-        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).put(data.getSchemaMetadata().getId().toString().getBytes()).array());
+        byteArrayOutputStream.write(ByteBuffer.allocate(ID_SIZE).put(Arrays.copyOfRange(data.getSchemaMetadata().getId().toString().getBytes(), 0, ID_SIZE)).array());
         final Descriptor descriptor = ((DynamicMessage) data.getGenericRecord()).getDescriptorForType();
         final ProtobufSchema schema = new ProtobufSchema(descriptor);
         final MessageIndexes indexes = schema.toMessageIndexes(descriptor.getFullName());

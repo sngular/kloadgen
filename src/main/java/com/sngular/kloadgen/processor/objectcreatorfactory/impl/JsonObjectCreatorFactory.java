@@ -122,6 +122,7 @@ public class JsonObjectCreatorFactory implements ObjectCreatorFactory {
     return true;
   }
 
+  @Override
   public final Object getRootNode(final String rootNode) {
     return entity.get(rootNode);
   }

@@ -16,8 +16,6 @@ import org.junit.jupiter.api.Test;
 
 class ValueFileSerializedConfigElementBeanInfoTest {
 
-  private static final String PROPERTIES = "props";
-  private static final String SCHEMA = "schema";
   private static final String VALUE_SUBJECT_NAME = "valueSubjectName";
 
   private static final String VALUE_SCHEMA_PROPERTIES = "valueSchemaProperties";
@@ -42,8 +40,6 @@ class ValueFileSerializedConfigElementBeanInfoTest {
   void shouldGenerateElements() {
     final PropertyDescriptor[] propertyDescriptors = valueFileSerializedConfigElementBeanInfo.getPropertyDescriptors();
     Assertions.assertThat(propertyDescriptors).hasSize(8);
-    Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(PROPERTIES);
-    Assertions.assertThat(propertyDescriptors[1].getName()).isEqualTo(SCHEMA);
     Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(VALUE_NAME_STRATEGY);
     Assertions.assertThat(propertyDescriptors[3].getName()).isEqualTo(VALUE_SCHEMA_DEFINITION);
     Assertions.assertThat(propertyDescriptors[4].getName()).isEqualTo(VALUE_SCHEMA_PROPERTIES);

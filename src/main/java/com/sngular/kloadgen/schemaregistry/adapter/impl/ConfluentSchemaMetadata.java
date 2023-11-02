@@ -32,12 +32,12 @@ public class ConfluentSchemaMetadata implements SchemaMetadataAdapter {
   }
 
   @Override
-  public Integer getGlobalId() {
+  public final Integer getGlobalId() {
     return this.getId();
   }
 
   @Override
-  public String getType() {
+  public final String getType() {
     return this.schemaType;
   }
 }

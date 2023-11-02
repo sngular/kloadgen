@@ -116,7 +116,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubjectAndId(
+  public final BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubjectAndId(
       final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     final ApicurioAbstractParsedSchemaMetadata schema = new ApicurioAbstractParsedSchemaMetadata();
 

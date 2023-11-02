@@ -1,5 +1,6 @@
 package com.sngular.kloadgen.extractor.extractors.protobuff;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,26 +9,20 @@ import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 
 public class ProtobuffExtractor implements ExtractorRegistry<Object> {
 
-  static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
-      SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
+  private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
+                                                                                       SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
 
   public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
-    List<FieldValueMapping> result = null;
+    final var resultSchema = new ArrayList<FieldValueMapping>();
     if (schemaReceived instanceof ProtoFileElement) {
-      result = SCHEMA_REGISTRY_MAP.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived);
+      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived));
     } else {
-      result = SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived);
+      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived));
     }
-    return result;
-  }
-
-  public final ParsedSchema processSchema(final String fileContent) {
-    return new ProtobufSchema(fileContent);
+    return resultSchema;
   }
 
   public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {

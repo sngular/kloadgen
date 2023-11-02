@@ -102,15 +102,15 @@ public final class SamplerUtil {
     final Properties props = new Properties();
 
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-    if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))) {
-      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY));
-    } else if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
-      props.put(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE, context.getJMeterVariables().get(PropsKeysHelper.KEY_TYPE));
-      props.put(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE, context.getJMeterVariables().get(PropsKeysHelper.KEY_VALUE));
-      if (Objects.nonNull(context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
-        props.put(PropsKeysHelper.KEY_SCHEMA_TYPE, context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE));
+    if ("true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))) {
+      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY));
+    } else if ("true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
+      props.put(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_TYPE));
+      props.put(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_VALUE));
+      if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
+        props.put(PropsKeysHelper.KEY_SCHEMA_TYPE, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE));
       }
-      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY));
+      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY, Boolean.FALSE);
     }
@@ -129,15 +129,15 @@ public final class SamplerUtil {
     props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
     props.put(ProducerKeysHelper.SASL_MECHANISM, context.getParameter(ProducerKeysHelper.SASL_MECHANISM));
 
-    final String schemaRegistryNameValue = context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+    final String schemaRegistryNameValue = JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     final String enableSchemaRegistrationValue = context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG);
     if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(schemaRegistryNameValue)) {
       props.put(SerdeConfig.AUTO_REGISTER_ARTIFACT, enableSchemaRegistrationValue);
-      props.put(SchemaResolverConfig.REGISTRY_URL, context.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
+      props.put(SchemaResolverConfig.REGISTRY_URL, JavaSamplerContext.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JavaSamplerContext.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
     } else {
       props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, enableSchemaRegistrationValue);
-      final String schemaRegistryURL = context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL);
+      final String schemaRegistryURL = JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL);
       if (StringUtils.isNotBlank(schemaRegistryURL)) {
         props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, schemaRegistryURL);
       }
@@ -268,14 +268,14 @@ public final class SamplerUtil {
 
     props.put(CommonClientConfigs.CLIENT_ID_CONFIG, context.getParameter(CommonClientConfigs.CLIENT_ID_CONFIG));
 
-    if (Objects.nonNull(context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA))) {
-      props.put(PropsKeysHelper.VALUE_SCHEMA, context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA))) {
+      props.put(PropsKeysHelper.VALUE_SCHEMA, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA));
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA))) {
-      props.put(PropsKeysHelper.KEY_SCHEMA, context.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA))) {
+      props.put(PropsKeysHelper.KEY_SCHEMA, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA));
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
     }
 
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, context.getParameter(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG));
@@ -332,8 +332,7 @@ public final class SamplerUtil {
     props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
 
     props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
-                                ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
+              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG), ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
                                 ""));
 
     props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));

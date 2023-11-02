@@ -11,11 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchemaRegistryManagerFactory {
 
-  static final Map<SchemaRegistryEnum, SchemaRegistryAdapter> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT,
-      new ConfluentSchemaRegistry(), SchemaRegistryEnum.APICURIO, new ApicurioSchemaRegistry());
+  private static final Map<SchemaRegistryEnum, SchemaRegistryAdapter> SCHEMA_REGISTRY_MAP =
+      Map.of(SchemaRegistryEnum.CONFLUENT, new ConfluentSchemaRegistry(), SchemaRegistryEnum.APICURIO, new ApicurioSchemaRegistry());
 
-  private SchemaRegistryManagerFactory() {
-
+  protected SchemaRegistryManagerFactory() {
   }
 
   public static SchemaRegistryAdapter getSchemaRegistry(final String registry) {
