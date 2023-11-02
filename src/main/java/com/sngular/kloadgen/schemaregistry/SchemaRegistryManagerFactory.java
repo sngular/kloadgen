@@ -11,13 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchemaRegistryManagerFactory {
 
-  static final Map<SchemaRegistryEnum, SchemaRegistryAdapter> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT,
+  static final Map<SchemaRegistryEnum, SchemaRegistryAdapter> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT,
       new ConfluentSchemaRegistry(), SchemaRegistryEnum.APICURIO, new ApicurioSchemaRegistry());
 
   public static SchemaRegistryAdapter getSchemaRegistry(final String registry) {
     try {
       final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registry.toUpperCase());
-      return schemaRegistryMap.get(schemaRegistryEnum);
+      return SCHEMA_REGISTRY_MAP.get(schemaRegistryEnum);
     } catch (final IllegalArgumentException e) {
       final String logMsg = "Can not parse the registry " + registry;
       log.error(logMsg, e);

@@ -25,7 +25,6 @@ import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.serializer.ProtobufSerializer;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.Legacy4ByteIdHandler;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
@@ -109,19 +108,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
     }
-  }
-
-  private Properties properties(final JavaSamplerContext context) {
-    final var commonProps = SamplerUtil.setupCommonProperties(context);
-
-    final String artifactResolverStrategy = context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY);
-    if (Objects.nonNull(artifactResolverStrategy)) {
-      commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, artifactResolverStrategy);
-    }
-    if (Objects.nonNull(context.getParameter(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY))) {
-      commonProps.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, artifactResolverStrategy);
-    }
-    return commonProps;
   }
 
   @Override

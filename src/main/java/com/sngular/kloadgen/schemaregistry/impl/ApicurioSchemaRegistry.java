@@ -13,7 +13,7 @@ import com.google.protobuf.Message;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
@@ -80,8 +80,8 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubject(final String artifactId) {
-    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
+  public BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubject(final String artifactId) {
+    final ApicurioAbstractParsedSchemaMetadata schema = new ApicurioAbstractParsedSchemaMetadata();
     try {
       final SearchedArtifact searchedArtifact = getLastestSearchedArtifact(artifactId);
       final InputStream inputStream = this.schemaRegistryClient.getLatestArtifact(searchedArtifact.getGroupId(), searchedArtifact.getId());
@@ -94,7 +94,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  private static void setSchemaBySchemaType(final ApicurioParsedSchemaMetadata schema, final byte[] result, final String searchedArtifactType) {
+  private static void setSchemaBySchemaType(final ApicurioAbstractParsedSchemaMetadata schema, final byte[] result, final String searchedArtifactType) {
 
     switch (SchemaTypeEnum.valueOf(searchedArtifactType)) {
       case AVRO:
@@ -116,9 +116,9 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubjectAndId(
+  public BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubjectAndId(
       final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
-    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
+    final ApicurioAbstractParsedSchemaMetadata schema = new ApicurioAbstractParsedSchemaMetadata();
 
     final SchemaMetadataAdapter schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
     try {

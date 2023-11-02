@@ -11,9 +11,9 @@ import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryConstants;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -74,23 +74,23 @@ public class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  public final BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubject(final String subjectName) {
+  public final BaseParsedSchema<ConfluentAbstractParsedSchemaMetadata> getSchemaBySubject(final String subjectName) {
     try {
       final ConfluentSchemaMetadata schemaMetadata = ConfluentSchemaMetadata.parse(this.schemaRegistryClient.getLatestSchemaMetadata(subjectName));
       final ParsedSchema parsedSchema = this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, schemaMetadata.getId());
-      final ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);
-      return new BaseParsedSchema(parsedSchemaAdapter);
+      final AbstractParsedSchemaAdapter abstractParsedSchemaAdapter = ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema);
+      return new BaseParsedSchema(abstractParsedSchemaAdapter);
     } catch (RestClientException | IOException e) {
       throw new KLoadGenException(e.getMessage());
     }
   }
 
-  public final BaseParsedSchema<ConfluentParsedSchemaMetadata> getSchemaBySubjectAndId(final String subjectName, final BaseSchemaMetadata<?
+  public final BaseParsedSchema<ConfluentAbstractParsedSchemaMetadata> getSchemaBySubjectAndId(final String subjectName, final BaseSchemaMetadata<?
       extends SchemaMetadataAdapter> metadata) {
     try {
       final ParsedSchema parsedSchema = this.schemaRegistryClient.getSchemaBySubjectAndId(subjectName, metadata.getSchemaMetadataAdapter().getId());
-      final ParsedSchemaAdapter parsedSchemaAdapter = ConfluentParsedSchemaMetadata.parse(parsedSchema);
-      return new BaseParsedSchema(parsedSchemaAdapter);
+      final AbstractParsedSchemaAdapter abstractParsedSchemaAdapter = ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema);
+      return new BaseParsedSchema(abstractParsedSchemaAdapter);
     } catch (RestClientException | IOException e) {
       throw new KLoadGenException(e.getMessage());
     }

@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class AbstractJsonExtractor {
 
-  public static final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
+  public static final JSONSchemaParser JSON_SCHEMA_PARSER = new JSONSchemaParser();
 
   private List<FieldValueMapping> extractInternalFields(final ObjectField field, final Boolean isAncestorRequired) {
     final List<FieldValueMapping> completeFieldList = new ArrayList<>();

@@ -2,7 +2,7 @@ package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
 import org.apache.avro.Schema.Parser;
 
-public class BaseParsedSchema<T extends ParsedSchemaAdapter> extends Parser {
+public class BaseParsedSchema<T extends AbstractParsedSchemaAdapter> extends Parser {
 
   private final T parsedSchemaAdapter;
 

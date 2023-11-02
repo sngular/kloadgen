@@ -15,7 +15,7 @@ public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extra
 
   public final List<FieldValueMapping> processSchema(final org.everit.json.schema.Schema schema) {
 
-    final Schema parsed = jsonSchemaParser.parse(schema.toString());
+    final Schema parsed = JSON_SCHEMA_PARSER.parse(schema.toString());
 
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     parsed.getProperties().forEach(field -> attributeList.addAll(processField(field, true, null)));
@@ -31,7 +31,7 @@ public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extra
   }
 
   public final List<String> getSchemaNameList(final String schema) {
-    final Schema parsed = jsonSchemaParser.parse(schema);
+    final Schema parsed = JSON_SCHEMA_PARSER.parse(schema);
     return parsed.getProperties().stream().map(Field::getName).collect(Collectors.toList());
   }
 }

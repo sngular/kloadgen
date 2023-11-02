@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ApicurioParsedSchemaMetadata extends ParsedSchemaAdapter {
+public class ApicurioAbstractParsedSchemaMetadata extends AbstractParsedSchemaAdapter {
 
   private Object schema;
 
@@ -16,13 +16,13 @@ public class ApicurioParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   private String type;
 
-  public ApicurioParsedSchemaMetadata(final ParsedSchema parsedSchema) {
+  public ApicurioAbstractParsedSchemaMetadata(final ParsedSchema parsedSchema) {
     this.rawSchema = parsedSchema.canonicalString();
     this.type = parsedSchema.schemaType();
     this.schema = parsedSchema.rawSchema();
   }
 
-  public static ParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
-    return new ApicurioParsedSchemaMetadata(parsedSchema);
+  public static AbstractParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
+    return new ApicurioAbstractParsedSchemaMetadata(parsedSchema);
   }
 }

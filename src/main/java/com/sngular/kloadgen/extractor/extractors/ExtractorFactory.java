@@ -11,8 +11,8 @@ import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.lang3.EnumUtils;
@@ -64,8 +64,8 @@ public final class ExtractorFactory {
     final Properties properties = JMeterContextService.getContext().getProperties();
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    final ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
-    final String schemaType = parsedSchemaAdapter.getType();
+    final AbstractParsedSchemaAdapter abstractParsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
+    final String schemaType = abstractParsedSchemaAdapter.getType();
 
     List<FieldValueMapping> attributeList = new ArrayList<>();
     final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
@@ -74,10 +74,10 @@ public final class ExtractorFactory {
     //TODO change parser
     switch (schemaRegistryEnum) {
       case APICURIO:
-        schema = ((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
+        schema = ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
         break;
       case CONFLUENT:
-        schema = parsedSchemaAdapter.getRawSchema();
+        schema = abstractParsedSchemaAdapter.getRawSchema();
         break;
       default:
         throw new KLoadGenException("Schema Registry Type not supported " + registryName.toUpperCase());
