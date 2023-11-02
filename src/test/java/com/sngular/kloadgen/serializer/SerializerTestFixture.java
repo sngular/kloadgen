@@ -8,7 +8,10 @@ import java.util.stream.Stream;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
 
-public class SerializerTestFixture {
+public final class SerializerTestFixture {
+
+  private SerializerTestFixture() {
+  }
 
   public static FieldValueMapping createFieldValueMapping(final String name, final String fieldType) {
     return FieldValueMapping.builder().fieldName(name).fieldType(fieldType).valueLength(0).fieldValueList("[]").required(true)
@@ -20,7 +23,7 @@ public class SerializerTestFixture {
                             .isAncestorRequired(true).build();
   }
 
-  static String readSchema(final File file) throws IOException {
+  public static String readSchema(final File file) throws IOException {
     final StringBuilder contentBuilder = new StringBuilder();
 
     try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {

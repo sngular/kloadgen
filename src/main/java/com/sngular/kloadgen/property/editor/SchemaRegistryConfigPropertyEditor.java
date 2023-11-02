@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
@@ -26,10 +31,6 @@ import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.gui.ClearGui;
@@ -138,7 +139,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
       //Retrieve TableEditor and set all fields with default values to it
       final var propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
-      Map<String, String> schemaProperties = new HashMap<>();
+      final Map<String, String> schemaProperties = new HashMap<>();
       for (PropertyEditor propertyEditor : propertyEditors) {
         if (propertyEditor instanceof TableEditor) {
           //noinspection unchecked
@@ -149,7 +150,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
       }
       final Map<String, String> originals = new HashMap<>();
 
-      String schemaRegistryName = schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+      final String schemaRegistryName = schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
       JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, schemaRegistryName);
 
       final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
@@ -162,8 +163,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
           JMeterContextService.getContext().getProperties().setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE);
 
           originals.put(AbstractKafkaSchemaSerDeConfig.BASIC_AUTH_CREDENTIALS_SOURCE, "USER_INFO");
-          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":" +
-                                                                         schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
+          originals.put(AbstractKafkaSchemaSerDeConfig.USER_INFO_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY) + ":"
+                                                                         + schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY));
         }
       }
 

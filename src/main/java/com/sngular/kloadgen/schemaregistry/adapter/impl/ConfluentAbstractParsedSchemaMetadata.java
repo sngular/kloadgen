@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.apache.avro.Schema;
 
 @Getter
-public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
+public final class ConfluentAbstractParsedSchemaMetadata extends AbstractParsedSchemaAdapter {
 
   private String schemaType;
 
@@ -14,40 +14,41 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
 
   private String canonicalString;
 
-  private  Object rawSchema;
+  private Object rawSchema;
 
-  private ConfluentParsedSchemaMetadata(ParsedSchema parsedSchema){
+  private ConfluentAbstractParsedSchemaMetadata(final ParsedSchema parsedSchema) {
     this.schemaType = parsedSchema.schemaType();
     this.name = parsedSchema.name();
     this.canonicalString = parsedSchema.canonicalString();
     this.rawSchema = parsedSchema.rawSchema();
   }
 
-  private ConfluentParsedSchemaMetadata(Schema schema){
+  private ConfluentAbstractParsedSchemaMetadata(final Schema schema) {
     this.schemaType = schema.getType().getName();
     this.name = schema.getName();
   }
 
-  public ConfluentParsedSchemaMetadata(ProtobufSchema schema){
+  public ConfluentAbstractParsedSchemaMetadata(final ProtobufSchema schema) {
     this.schemaType = schema.schemaType();
     this.name = schema.name();
     this.rawSchema = schema.rawSchema();
     this.canonicalString = schema.canonicalString();
   }
 
-  public ConfluentParsedSchemaMetadata() {
+  public ConfluentAbstractParsedSchemaMetadata() {
 
   }
 
-  public static ParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
-    return new ConfluentParsedSchemaMetadata(parsedSchema);
+  public static AbstractParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
+    return new ConfluentAbstractParsedSchemaMetadata(parsedSchema);
   }
 
-  public static ParsedSchemaAdapter parse(final Schema schema) {
-    return new ConfluentParsedSchemaMetadata(schema);
+  public static AbstractParsedSchemaAdapter parse(final Schema schema) {
+    return new ConfluentAbstractParsedSchemaMetadata(schema);
   }
-  public static ParsedSchemaAdapter parse (final ProtobufSchema schema){
-    return new ConfluentParsedSchemaMetadata(schema);
+
+  public static AbstractParsedSchemaAdapter parse(final ProtobufSchema schema) {
+    return new ConfluentAbstractParsedSchemaMetadata(schema);
   }
 
   @Override

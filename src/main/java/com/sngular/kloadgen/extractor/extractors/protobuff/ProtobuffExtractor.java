@@ -1,8 +1,6 @@
 package com.sngular.kloadgen.extractor.extractors.protobuff;
 
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.APICURIO;
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.CONFLUENT;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,18 +12,21 @@ import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 
 public class ProtobuffExtractor implements ExtractorRegistry<Object> {
 
-  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(CONFLUENT, new ProtoBufConfluentExtractor(),
-          APICURIO, new ProtoBufApicurioExtractor());
+  private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
+                                                                                       SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
 
-  public final List<FieldValueMapping> processSchema(final Object schemaReceived, SchemaRegistryEnum registryEnum) {
+  public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
+    final var resultSchema = new ArrayList<FieldValueMapping>();
     if (schemaReceived instanceof ProtoFileElement) {
-      return schemaRegistryMap.get(APICURIO).processSchema(schemaReceived);
+      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived));
+    } else {
+      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived));
     }
-    return schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
+    return resultSchema;
   }
 
-  public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {
-    return schemaRegistryMap.get(registryEnum).getSchemaNameList(schema);
+  public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
+    return SCHEMA_REGISTRY_MAP.get(registryEnum).getSchemaNameList(schema);
   }
 
 }
