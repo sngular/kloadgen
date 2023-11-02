@@ -54,7 +54,7 @@ public class AvroDeserializer implements Deserializer<Object> {
       final var buffer = getByteBuffer(data);
       final var reader = new GenericDatumReader<>(avroSchema);
 
-      final int length = buffer.limit() - 1-4;
+      final int length = buffer.limit() - 5;
       final int start = buffer.position() + buffer.arrayOffset();
 
       try {

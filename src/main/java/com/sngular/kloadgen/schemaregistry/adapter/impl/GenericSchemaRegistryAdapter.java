@@ -1,11 +1,12 @@
 package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
-public interface GenericSchemaRegistryAdapter <T,U> {
-   T getId();
+public interface GenericSchemaRegistryAdapter<T, U> {
 
-   T getVersion();
+  T getId();
 
-   U getSchemaType();
+  T getVersion();
+
+  U getSchemaType();
 
 }
 

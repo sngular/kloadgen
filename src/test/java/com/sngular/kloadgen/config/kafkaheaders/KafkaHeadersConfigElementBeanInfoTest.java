@@ -29,7 +29,7 @@ class KafkaHeadersConfigElementBeanInfoTest {
   @Test
   final void shouldGenerateElements() {
     final PropertyDescriptor[] propertyDescriptors = kafkaHeadersConfigElementBeanInfo.getPropertyDescriptors();
-    Assertions.assertThat(propertyDescriptors).hasSize(1);
+    Assertions.assertThat(propertyDescriptors).hasSize(3);
     Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(KAFKA_HEADERS);
   }
 }

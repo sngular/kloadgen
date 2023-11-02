@@ -12,10 +12,12 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+@Slf4j
 public final class JMeterHelper {
 
   private JMeterHelper() {
