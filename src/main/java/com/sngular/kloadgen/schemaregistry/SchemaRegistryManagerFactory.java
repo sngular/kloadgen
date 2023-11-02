@@ -14,6 +14,10 @@ public class SchemaRegistryManagerFactory {
   static final Map<SchemaRegistryEnum, SchemaRegistryAdapter> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT,
       new ConfluentSchemaRegistry(), SchemaRegistryEnum.APICURIO, new ApicurioSchemaRegistry());
 
+  private SchemaRegistryManagerFactory() {
+
+  }
+
   public static SchemaRegistryAdapter getSchemaRegistry(final String registry) {
     try {
       final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registry.toUpperCase());
