@@ -13,8 +13,6 @@ import java.util.Arrays;
 
 import javax.xml.bind.DatatypeConverter;
 
-import javax.xml.bind.DatatypeConverter;
-
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.DynamicMessage;
 import io.confluent.kafka.schemaregistry.protobuf.MessageIndexes;

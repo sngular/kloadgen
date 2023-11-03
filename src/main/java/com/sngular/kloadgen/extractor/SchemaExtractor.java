@@ -1,6 +1,5 @@
 package com.sngular.kloadgen.extractor;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,9 +34,8 @@ public final class SchemaExtractor {
     return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
   }
 
-  public static List<String> schemaTypesList(final File schemaFile, final String schemaType, final String registry) throws IOException {
-    return ExtractorFactory.getExtractor(schemaType).getSchemaNameList(readLineByLine(schemaFile.getPath()),
-            ExtractorFactory.getSchemaRegistry(registry));
+  public static String readSchemaFile(final String filePath) throws IOException {
+    return readLineByLine(filePath);
   }
 
   private static String readLineByLine(final String filePath) throws IOException {

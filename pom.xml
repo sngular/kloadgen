@@ -192,17 +192,6 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
-      <id>AnxoGomezSngular</id>
-      <name>Anxo Gómez Sánchez</name>
-      <email>anxo.gomez@sngular.com</email>
-      <organization>Sngular</organization>
-      <organizationUrl>https://sngular.github.io/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>Europe/Madrid</timezone>
-    </developer>
-    <developer>
       <id>pedrogarcia</id>
       <name>Pedro Garcia</name>
       <email>pedro.garcia@sngular.com</email>
@@ -221,17 +210,6 @@
       <organizationUrl>https://www.sngular.com</organizationUrl>
       <roles>
         <role>Senior Backend Developer</role>
-      </roles>
-      <timezone>Europe/Madrid</timezone>
-    </developer>
-    <developer>
-      <id>nuriaricorf</id>
-      <name>Nuria Rico Freire</name>
-      <email>nuria.rico@sngular.com</email>
-      <organization>Sngular</organization>
-      <organizationUrl>https://sngular.github.io/</organizationUrl>
-      <roles>
-        <role>Junior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
@@ -301,6 +279,17 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>RobertoSngular</id>
+      <name>Roberto Riveira Veiga</name>
+      <email>roberto.riveira@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://www.sngular.com</organizationUrl>
+      <roles>
+        <role>Trainee Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
 
   <scm>
@@ -321,24 +310,24 @@
   </distributionManagement>
 
   <properties>
-    <assertj-core.version>3.24.2</assertj-core.version>
+    <assertj-core.version>3.22.0</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
     <jsonassert.version>1.5.1</jsonassert.version>
-    <avro.version>1.11.2</avro.version>
+    <avro.version>1.11.0</avro.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <commons-collections4.version>4.4</commons-collections4.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <gson.version>2.8.6</gson.version>
     <guava.version>32.0.0-jre</guava.version>
     <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
-    <jdk.version>17</jdk.version>
+    <jdk.version>11</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
     <jmeter.version>5.6.2</jmeter.version>
     <json-path.version>2.6.0</json-path.version>
     <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
-    <apicurio-registry.version>2.4.3.Final</apicurio-registry.version>
-    <kafka.version>3.5.1</kafka.version>
+    <apicurio-registry.version>2.4.1.Final</apicurio-registry.version>
+    <kafka.version>3.1.0</kafka.version>
     <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
     <mockito-core.version>4.2.0</mockito-core.version>
@@ -350,6 +339,17 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.apache.jmeter</groupId>
+      <artifactId>jorphan</artifactId>
+      <version>${jmeter.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
@@ -364,6 +364,11 @@
           <artifactId>slf4j-api</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>com.eclipsesource.minimal-json</groupId>
@@ -384,12 +389,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.15.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>2.15.2</version>
+      <version>2.13.1</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -467,7 +467,7 @@
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro-protobuf</artifactId>
-      <version>1.11.2</version>
+      <version>1.11.0</version>
     </dependency>
     <dependency>
       <groupId>com.github.os72</groupId>
@@ -479,11 +479,6 @@
       <artifactId>wire-java-generator</artifactId>
       <version>4.0.1</version>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.api.grpc</groupId>
-      <artifactId>proto-google-common-protos</artifactId>
-      <version>2.24.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -514,7 +509,7 @@
     <dependency>
       <groupId>com.github.everit-org.json-schema</groupId>
       <artifactId>org.everit.json.schema</artifactId>
-      <version>1.14.2</version>
+      <version>1.14.0</version>
     </dependency>
     <!-- Options -->
     <dependency>
@@ -701,13 +696,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.6.0</version>
         <configuration>
           <optimize>true</optimize>
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
-          <source>${jdk.version}</source>
-          <target>${jdk.version}</target>
+          <source>16</source>
+          <target>16</target>
         </configuration>
       </plugin>
       <plugin>
@@ -740,7 +735,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>2.22.2</version>
       </plugin>
     </plugins>
   </build>
@@ -760,6 +755,10 @@
           <version>${jmeter.version}</version>
           <scope>provided</scope>
           <exclusions>
+            <exclusion>
+              <groupId>org.apache.jmeter</groupId>
+              <artifactId>jorphan</artifactId>
+            </exclusion>
             <exclusion>
               <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-slf4j-impl</artifactId>
@@ -791,16 +790,13 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version>
+            <version>2.4.2</version>
             <configuration>
               <filters>
                 <filter>
                   <excludes>
                     <exclude>org/apache/jmeter/jmeter.properties</exclude>
                   </excludes>
-                  <includes>
-                    <include>*.proto</include>
-                  </includes>
                 </filter>
               </filters>
               <finalName>${project.artifactId}-${project.version}</finalName>
@@ -829,6 +825,10 @@
           <artifactId>ApacheJMeter_java</artifactId>
           <version>${jmeter.version}</version>
           <exclusions>
+            <exclusion>
+              <groupId>org.apache.jmeter</groupId>
+              <artifactId>jorphan</artifactId>
+            </exclusion>
             <exclusion>
               <groupId>org.apache.logging.log4j</groupId>
               <artifactId>log4j-slf4j-impl</artifactId>
