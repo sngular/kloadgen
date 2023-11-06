@@ -35,6 +35,7 @@ import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
+import org.apache.avro.SchemaParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -359,7 +360,7 @@ public final class SamplerUtil {
       props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
     }
 
-    generator = getLoadGenerator(jMeterVariables);
+    generator = getLoadGenerator();
 
     if (generator.getClass().equals(PlainTextLoadGenerator.class)) {
       final List<FieldValueMapping> list = new ArrayList<>();
@@ -387,7 +388,17 @@ public final class SamplerUtil {
         }
       }
     } else {
-      generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      try {
+        final String schema;
+        if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA).isEmpty()) {
+          schema = props.getProperty(PropsKeysHelper.VALUE_SCHEMA);
+        } else {
+          schema = jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA);
+        }
+        generator.setUpGenerator(schema, (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      } catch (final SchemaParseException exc) {
+        generator.setUpGenerator(props.getProperty(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      }
     }
 
     return generator;
@@ -465,17 +476,17 @@ public final class SamplerUtil {
     return headersSB;
   }
 
-  private static BaseLoadGenerator getLoadGenerator(final JMeterVariables jmeterVariables) {
+  private static BaseLoadGenerator getLoadGenerator() {
     final BaseLoadGenerator generator;
-
-    if (Objects.nonNull(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).toLowerCase())) {
+    final String schemaType = JMeterContextService.getContext().getProperties().getProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE);
+    if (Objects.nonNull(schemaType)) {
+      if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
         generator = new JsonSRLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
+      } else if ("avro".equalsIgnoreCase(schemaType)) {
         generator = new AvroSRLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+      } else if ("Protobuf".equalsIgnoreCase(schemaType)) {
         generator = new ProtobufLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
+      } else if ("NoSchema".equalsIgnoreCase(schemaType)) {
         generator = new PlainTextLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");

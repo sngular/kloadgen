@@ -33,7 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class RandomObject {
 
-  private Random rand = new Random();
+  private final Random rand = new Random();
 
   public boolean isTypeValid(final String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);

@@ -2,7 +2,6 @@ package com.sngular.kloadgen.extractor.extractors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
@@ -53,14 +52,6 @@ public final class ExtractorFactory {
     }
   }
 
-  public static SchemaRegistryEnum getSchemaRegistry(final String schemaRegistryEnum) {
-    if (schemaRegistryEnum != null && EnumUtils.isValidEnum(SchemaRegistryEnum.class, schemaRegistryEnum.toUpperCase())) {
-      return SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
-    } else {
-      throw new KLoadGenException(String.format("Schema Registry type not supported %s", schemaRegistryEnum));
-    }
-  }
-
   public static Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) {
     final Properties properties = JMeterContextService.getContext().getProperties();
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
@@ -72,14 +63,12 @@ public final class ExtractorFactory {
     final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
 
     final Object schema;
-    if (Objects.nonNull(registryName)) {
-      //TODO change parser
-      schema = switch (schemaRegistryEnum) {
-        case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
-        case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
-      };
-      attributeList.addAll(getExtractor(schemaType).processSchema(schema, schemaRegistryEnum));
-    }
+    //TODO change parser
+    schema = switch (schemaRegistryEnum) {
+      case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
+      case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
+    };
+    attributeList.addAll(getExtractor(schemaType).processSchema(schema, schemaRegistryEnum));
     return Pair.of(schemaType, attributeList);
   }
 }

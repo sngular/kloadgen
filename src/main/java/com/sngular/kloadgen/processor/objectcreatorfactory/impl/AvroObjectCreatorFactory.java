@@ -178,8 +178,7 @@ public final class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     return isOptionalField(subSchema);
   }
 
-  @Override
-  public Object getRootNode(final String rootNode) {
+  public final Object getRootNode(final String rootNode) {
     return entity.get(rootNode);
   }
 

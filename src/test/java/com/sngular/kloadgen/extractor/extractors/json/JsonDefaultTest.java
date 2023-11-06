@@ -20,7 +20,7 @@ class JsonDefaultTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final Extractor<Schema> jsonDefaultExtractor = new JsonDefaultExtractor();
+  private final Extractor<String> jsonDefaultExtractor = new JsonDefaultExtractor();
 
   @Test
   @DisplayName("Should extract basic types")
@@ -30,7 +30,7 @@ class JsonDefaultTest {
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -48,7 +48,7 @@ class JsonDefaultTest {
     final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -73,7 +73,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(2)
@@ -91,7 +91,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(12)
@@ -128,7 +128,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -157,7 +157,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .contains(
@@ -180,7 +180,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .contains(
@@ -196,7 +196,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(1)
@@ -213,7 +213,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(8)
@@ -241,7 +241,7 @@ class JsonDefaultTest {
 
     final JSONObject jsonObject = new JSONObject(testFile);
     final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema);
+    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
 
     Assertions.assertThat(fieldValueMappingList).contains(
         FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
@@ -260,7 +260,7 @@ class JsonDefaultTest {
     final Schema schema = SchemaLoader.load(jsonObject);
 
     Assertions.assertThatExceptionOfType(KLoadGenException.class)
-              .isThrownBy(() -> jsonDefaultExtractor.processSchema(schema))
+              .isThrownBy(() -> jsonDefaultExtractor.processSchema(schema.toString()))
               .withMessage("Wrong Json Schema, 3+ consecutive nested collections are not allowed");
   }
 
