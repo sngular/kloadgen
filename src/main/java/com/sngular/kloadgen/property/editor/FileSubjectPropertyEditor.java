@@ -47,7 +47,7 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
-public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
+public class FileSubjectPropertyEditor extends PropertyEditorSupport implements TestBeanPropertyEditor, ClearGui {
 
   public static final String ERROR_FAILED_TO_RETRIEVE_PROPERTIES = "ERROR: Failed to retrieve properties!";
 
@@ -99,7 +99,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
         final ExtractorRegistry extractor = ExtractorFactory.getExtractor(schemaType);
         final String fileContent = SchemaExtractor.readSchemaFile(schemaFile.getPath());
-        this.parserSchema = extractor.processSchema(fileContent);
+        this.parserSchema = (ParsedSchema) extractor.processSchema(fileContent);
         final List<FieldValueMapping> schemaFieldList = extractor.processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
         buildTable(schemaFieldList);
         JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA, fileContent);
@@ -112,67 +112,12 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public final String getSelectedSchema(final String name) {
-    return Objects.equals(parserSchema.name(), name) ? parserSchema.name() : null;
-  }
-
   public final List<FieldValueMapping> getAttributeList(final ParsedSchema selectedSchema) {
     final List<FieldValueMapping> result = new ArrayList<>();
     if (Objects.nonNull(selectedSchema)) {
       result.addAll(SchemaExtractor.flatPropertiesList(selectedSchema));
     }
     return result;
-  }
-
-  @Override
-  public final void actionPerformed(final ActionEvent event) {
-
-    if (parserSchema != null) {
-      final String schemaType = (String) schemaTypeComboBox.getSelectedItem();
-      final String selectedItem = parserSchema.schemaType();
-      final String selectedSchema = getSelectedSchema(selectedItem);
-      final List<FieldValueMapping> attributeList = SchemaExtractor.flatPropertiesList(selectedSchema).getValue();
-
-      if (!attributeList.isEmpty()) {
-        try {
-          //Get current test GUI component
-          final TestBeanGUI testBeanGUI = (TestBeanGUI) GuiPackage.getInstance().getCurrentGui();
-          final Field customizer = TestBeanGUI.class.getDeclaredField(PropsKeysHelper.CUSTOMIZER);
-          customizer.setAccessible(true);
-
-          //From TestBeanGUI retrieve Bean Customizer as it includes all editors like ClassPropertyEditor, TableEditor
-          final GenericTestBeanCustomizer testBeanCustomizer = (GenericTestBeanCustomizer) customizer.get(testBeanGUI);
-          final Field editors = GenericTestBeanCustomizer.class.getDeclaredField(PropsKeysHelper.EDITORS);
-          editors.setAccessible(true);
-
-          //Retrieve TableEditor and set all fields with default values to it
-          final PropertyEditor[] propertyEditors = (PropertyEditor[]) editors.get(testBeanCustomizer);
-          for (PropertyEditor propertyEditor : propertyEditors) {
-            if (propertyEditor instanceof TableEditor) {
-              propertyEditor.setValue(attributeList);
-            } else if (propertyEditor instanceof SchemaConverterPropertyEditor) {
-              propertyEditor.setValue(selectedSchema);
-            } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
-              propertyEditor.setValue(schemaType);
-            }
-          }
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-          JOptionPane
-              .showMessageDialog(panel, "Failed to retrieve schema : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
-                                 JOptionPane.ERROR_MESSAGE);
-          log.error(e.getMessage(), e);
-        } catch (final AvroRuntimeException ex) {
-          JOptionPane
-              .showMessageDialog(panel, "Failed to process schema : " + ex.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
-                                 JOptionPane.ERROR_MESSAGE);
-          log.error(ex.getMessage(), ex);
-        }
-      } else {
-        JOptionPane
-            .showMessageDialog(panel, "No schema has been loaded, we cannot extract properties", ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
-                               JOptionPane.WARNING_MESSAGE);
-      }
-    }
   }
 
   public final void buildTable(final List<FieldValueMapping> attributeList) {

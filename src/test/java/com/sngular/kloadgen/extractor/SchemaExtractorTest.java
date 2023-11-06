@@ -114,12 +114,10 @@ class SchemaExtractorTest {
     Assertions.assertThat(result).isNotNull();
   }
 
-
   @Test
   @DisplayName("Test readSchemaFile with AVRO")
-  void testReadSchemaFile() throws IOException{
+  void testReadSchemaFile() throws IOException {
     final String testFilePath = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc").toPath().toString();
-
 
     final var result = SchemaExtractor.readSchemaFile(testFilePath);
     Assertions.assertThat(result).isNotNull();

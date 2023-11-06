@@ -12,7 +12,7 @@ import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 
 public class AvroExtractor implements ExtractorRegistry<Object> {
 
-  static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new AvroConfluentExtractor(), SchemaRegistryEnum.APICURIO,
+  private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new AvroConfluentExtractor(), SchemaRegistryEnum.APICURIO,
           new AvroApicurioExtractor());
 
   public final List<FieldValueMapping> processSchema(final Object schema, final SchemaRegistryEnum registryEnum) {

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractJsonExtractor {
 
-  public static final JSONSchemaParser JSON_SCHEMA_PARSER = new JSONSchemaParser();
+  private static final JSONSchemaParser JSON_SCHEMA_PARSER = new JSONSchemaParser();
 
   protected final JSONSchemaParser getSchemaParser() {
     return JSON_SCHEMA_PARSER;
