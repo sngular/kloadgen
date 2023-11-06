@@ -7,7 +7,6 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.model.json.Schema;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 
