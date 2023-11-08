@@ -7,9 +7,9 @@ import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.JMeterHelper;
@@ -100,7 +100,7 @@ class ExtractorFactoryTest {
         properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
         final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
-        final var baseParsedSchema = new BaseParsedSchema<>(ConfluentParsedSchemaMetadata.parse(parsedSchema));
+        final var baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
 
         jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
         jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);

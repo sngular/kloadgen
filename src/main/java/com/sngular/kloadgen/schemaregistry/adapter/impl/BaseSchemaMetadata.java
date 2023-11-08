@@ -1,9 +1,11 @@
 package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Builder
-public class BaseSchemaMetadata<T extends SchemaMetadataAdapter> {
+public final class BaseSchemaMetadata<T extends SchemaMetadataAdapter> {
 
   private final T schemaMetadataAdapter;
 
@@ -11,7 +13,4 @@ public class BaseSchemaMetadata<T extends SchemaMetadataAdapter> {
     this.schemaMetadataAdapter = schemaMetadataAdapter;
   }
 
-  public T getSchemaMetadataAdapter() {
-    return schemaMetadataAdapter;
-  }
 }

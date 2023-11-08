@@ -61,13 +61,13 @@ public class ApicurioSchemaMetadata implements SchemaMetadataAdapter {
   }
 
   @Override
-  public String getType() {
+  public final String getType() {
     return this.schemaType;
   }
 
   @Override
-  public <T> List<T> getReferences() {
-    return Collections.<T>emptyList();
+  public final <T> List<T> getReferences() {
+    return Collections.emptyList();
   }
 
 }

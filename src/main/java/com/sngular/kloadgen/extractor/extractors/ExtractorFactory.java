@@ -2,7 +2,6 @@ package com.sngular.kloadgen.extractor.extractors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
@@ -12,8 +11,8 @@ import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.lang3.EnumUtils;
@@ -30,16 +29,13 @@ public final class ExtractorFactory {
   private ExtractorFactory() {
   }
 
-
-  public static void configExtractorFactory(AvroExtractor avroExtractor, JsonExtractor jsonExtractor, ProtobuffExtractor protobuffExtractor) {
+  public static void configExtractorFactory(final AvroExtractor avroExtractor, final JsonExtractor jsonExtractor, final ProtobuffExtractor protobuffExtractor) {
     ExtractorFactory.avroExtractor = avroExtractor;
     ExtractorFactory.jsonExtractor = jsonExtractor;
     ExtractorFactory.protobuffExtractor = protobuffExtractor;
   }
 
-  public static ExtractorRegistry getExtractor(final String schemaType, final String schemaRegistryEnum) {
-
-    SchemaRegistryEnum registryEnum = getSchemaRegistry(schemaRegistryEnum);
+  public static ExtractorRegistry getExtractor(final String schemaType) {
 
     if (schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
       final ExtractorRegistry response;
@@ -62,40 +58,23 @@ public final class ExtractorFactory {
     }
   }
 
-  public static SchemaRegistryEnum getSchemaRegistry(String schemaRegistryEnum) {
-    if (schemaRegistryEnum != null && EnumUtils.isValidEnum(SchemaRegistryEnum.class, schemaRegistryEnum.toUpperCase())) {
-      return SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
-    } else {
-      throw new KLoadGenException(String.format("Schema Registry type not supported %s", schemaRegistryEnum));
-    }
-  }
-
   public static Pair<String, List<FieldValueMapping>> flatPropertiesList(final String subjectName) {
     final Properties properties = JMeterContextService.getContext().getProperties();
     final var schemaParsed = JMeterHelper.getParsedSchema(subjectName, properties);
     final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    String schemaType = null;
-    final ParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
-    schemaType = parsedSchemaAdapter.getType();
+    final AbstractParsedSchemaAdapter abstractParsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
+    final String schemaType = abstractParsedSchemaAdapter.getType();
 
-    List<FieldValueMapping> attributeList = new ArrayList<>();
-    SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
 
-    Object schema = null;
-    if (Objects.nonNull(registryName)) {
-      //TODO change parser
-      switch (schemaRegistryEnum) {
-        case APICURIO:
-          schema = ((ApicurioParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
-          break;
-        case CONFLUENT:
-          schema = parsedSchemaAdapter.getRawSchema();
-          break;
-        default:
-          throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
-      }
-      attributeList = getExtractor(schemaType,registryName.toUpperCase()).processSchema(schema, schemaRegistryEnum);
-    }
+    final Object schema;
+    //TODO change parser
+    schema = switch (schemaRegistryEnum) {
+      case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
+      case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
+    };
+    attributeList.addAll(getExtractor(schemaType).processSchema(schema, schemaRegistryEnum));
     return Pair.of(schemaType, attributeList);
   }
 }

@@ -1,8 +1,11 @@
 package com.sngular.kloadgen.config.schemaregistry;
 
-public interface SchemaRegistryConfigElementValue {
+public final class SchemaRegistryConfigElementValue {
 
-  String SCHEMA_REGISTRY_NAME = "schemaRegistryName";
-  String SCHEMA_REGISTRY_URL = "schemaRegistryUrl";
-  String SCHEMA_REGISTRY_PROPERTIES = "schemaRegistryProperties";
+  public static final String SCHEMA_REGISTRY_NAME = "schemaRegistryName";
+  public static final String SCHEMA_REGISTRY_URL = "schemaRegistryUrl";
+  public static final String SCHEMA_REGISTRY_PROPERTIES = "schemaRegistryProperties";
+
+  private SchemaRegistryConfigElementValue() {
+  }
 }
