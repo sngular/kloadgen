@@ -24,3 +24,4 @@
 # [Additional information](additional-information.md)
   - [Contributing](contributing.md)
   - [Release notes](release-notes.md)
+  - [Debugging](debugging.md)

@@ -7,6 +7,8 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 
 public class AvroExtractor implements ExtractorRegistry<Object> {
 
@@ -15,6 +17,10 @@ public class AvroExtractor implements ExtractorRegistry<Object> {
 
   public final List<FieldValueMapping> processSchema(final Object schema, final SchemaRegistryEnum registryEnum) {
     return schemaRegistryMap.get(registryEnum).processSchema(schema);
+  }
+
+  public final ParsedSchema processSchema(final String fileContent) {
+    return new AvroSchema(fileContent);
   }
 
   public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {

@@ -2,7 +2,6 @@ package com.sngular.kloadgen.extractor.extractors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
@@ -50,14 +49,6 @@ public final class ExtractorFactory {
       return response;
     } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
-    }
-  }
-
-  public static SchemaRegistryEnum getSchemaRegistry(final String schemaRegistryEnum) {
-    if (schemaRegistryEnum != null && EnumUtils.isValidEnum(SchemaRegistryEnum.class, schemaRegistryEnum.toUpperCase())) {
-      return SchemaRegistryEnum.valueOf(schemaRegistryEnum.toUpperCase());
-    } else {
-      throw new KLoadGenException(String.format("Schema Registry type not supported %s", schemaRegistryEnum));
     }
   }
 

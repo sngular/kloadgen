@@ -23,10 +23,10 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractJsonExtractor {
 
-  private final JSONSchemaParser jsonSchemaParser = new JSONSchemaParser();
+  private static final JSONSchemaParser JSON_SCHEMA_PARSER = new JSONSchemaParser();
 
   protected final JSONSchemaParser getSchemaParser() {
-    return jsonSchemaParser;
+    return JSON_SCHEMA_PARSER;
   }
 
   private static String extractFieldName(final String fieldName) {
@@ -90,9 +90,9 @@ public abstract class AbstractJsonExtractor {
       completeFieldList.add(builder.build());
     } else if (innerField instanceof StringField) {
       final FieldValueMapping.FieldValueMappingBuilder builder = FieldValueMapping
-                                                                     .builder()
-                                                                     .fieldName(innerField.getName())
-                                                                     .fieldType(innerField.getType());
+          .builder()
+          .fieldName(innerField.getName())
+          .fieldType(innerField.getType());
 
       addConstraint(builder, ConstraintTypeEnum.REGEX, ((StringField) innerField).getRegex());
       addConstraint(builder, ConstraintTypeEnum.MAXIMUM_VALUE, getSafeNumberAsString(((StringField) innerField).getMaxlength()));
@@ -169,9 +169,9 @@ public abstract class AbstractJsonExtractor {
 
   @NotNull
   private static String calculateFieldType(final String breadCrumb, final Field value) {
-    return value.getType() 
+    return value.getType()
            + SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
-           + ((StringUtils.isNotEmpty(breadCrumb) 
+           + ((StringUtils.isNotEmpty(breadCrumb)
                && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX
                   : (StringUtils.isNotEmpty(breadCrumb)
                      && breadCrumb.endsWith("[:]")) ? "-map"
@@ -207,9 +207,9 @@ public abstract class AbstractJsonExtractor {
 
   @NotNull
   private static String getFieldType(final String breadCrumb, final Field value) {
-    return value.getType() 
-           + "-map" 
-           + ((StringUtils.isNotEmpty(breadCrumb) 
+    return value.getType()
+           + "-map"
+           + ((StringUtils.isNotEmpty(breadCrumb)
                && breadCrumb.endsWith("[:]")) ? "-map"
                   : (StringUtils.isNotEmpty(breadCrumb)
                      && breadCrumb.endsWith("[]")) ? SchemaExtractorUtil.ARRAY_TYPE_POSTFIX

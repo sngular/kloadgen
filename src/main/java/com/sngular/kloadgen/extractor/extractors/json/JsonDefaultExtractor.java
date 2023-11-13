@@ -11,10 +11,10 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.json.Field;
 import com.sngular.kloadgen.model.json.Schema;
 
-public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extractor<org.everit.json.schema.Schema> {
+public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extractor<String> {
 
   @Override
-  public final List<FieldValueMapping> processSchema(final org.everit.json.schema.Schema schema) {
+  public final List<FieldValueMapping> processSchema(final String schema) {
 
     final Schema parsed = getSchemaParser().parse(schema.toString());
 
