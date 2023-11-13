@@ -8,12 +8,7 @@ package com.sngular.kloadgen.sampler;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
@@ -40,13 +35,22 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import com.sngular.kloadgen.property.editor.ReflectionUtils;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 public final class KafkaProducerSampler extends AbstractJavaSamplerClient implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
 
-  private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
+  private static final Set<String> SERIALIZER_SET = new HashSet<>(
+          ReflectionUtils.extractSerializers(
+                  new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClass(Serializer.class)).setScanners(Scanners.SubTypes)),
+                  Serializer.class));
 
   private static final long serialVersionUID = 1L;
 
@@ -72,7 +76,11 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   public void setupTest(final JavaSamplerContext context) {
     props = JMeterContextService.getContext().getProperties();
 
-    generator = SamplerUtil.configureValueGenerator(props);
+    if(props.get(PropsKeysHelper.VALUE_SCHEMA) == null) {
+      generator = SamplerUtil.configureKeyGenerator(props);
+    } else {
+      generator = SamplerUtil.configureValueGenerator(props);
+    }
 
     if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
         || "true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
@@ -104,7 +112,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
       props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
 
-      producer = new KafkaProducer<>(props);
+      producer = new KafkaProducer<>(props, (Serializer) props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG), (Serializer) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
     }
