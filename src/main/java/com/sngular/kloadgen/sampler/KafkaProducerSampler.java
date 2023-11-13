@@ -7,6 +7,7 @@
 package com.sngular.kloadgen.sampler;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -112,9 +113,14 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
       props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
 
-      producer = new KafkaProducer<>(props, (Serializer) props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG), (Serializer) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
+      producer = new KafkaProducer<>(props, (Serializer) Class.forName((String) props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance(),
+              (Serializer) Class.forName((String) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance());
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
+    } catch (ClassNotFoundException e) {
+      getNewLogger().error(e.getMessage(), e);
+    } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
+      throw new RuntimeException(e);
     }
   }
 
