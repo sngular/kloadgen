@@ -15,10 +15,12 @@ import java.util.Objects;
 
 import javax.swing.JPanel;
 
+import com.sngular.kloadgen.util.PropsKeysHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
+import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
 public class SchemaConverterPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
@@ -62,7 +64,8 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public final String getAsText() {
-    return schemaAsString;
+    String schema = JMeterContextService.getContext().getProperties().getProperty(PropsKeysHelper.FILE_SCHEMA);
+    return schema;
   }
 
   @Override

@@ -100,9 +100,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         final String fileContent = SchemaExtractor.readSchemaFile(schemaFile.getPath());
         this.parserSchema = (ParsedSchema) extractor.processSchema(fileContent);
         final List<FieldValueMapping> schemaFieldList = extractor.processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
+        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.FILE_SCHEMA, parserSchema.canonicalString());
+        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.FILE_TYPE, schemaType);
         buildTable(schemaFieldList);
-        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA, fileContent);
-        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE, schemaType);
       } catch (final IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
                                     JOptionPane.ERROR_MESSAGE);
@@ -180,4 +180,16 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     return true;
   }
 
+  @Override
+  public final Object getValue() {
+    return this.parserSchema != null ? this.parserSchema.name() : "";
+  }
+
+//  public final String getType() {
+//    return schemaTypeComboBox.getSelectedItem().toString();
+//  }
+//
+//  public final String getSchema() {
+//    return this.parserSchema != null ? this.parserSchema.canonicalString() : "";
+//  }
 }

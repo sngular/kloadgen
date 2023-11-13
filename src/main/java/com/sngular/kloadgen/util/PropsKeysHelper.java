@@ -60,6 +60,10 @@ public class PropsKeysHelper {
 
   public static final String TIMEOUT_MILLIS = "timeout.millis";
 
+  public static final String FILE_SCHEMA = "file_schema";
+
+  public static final String FILE_TYPE = "file_type";
+
   private PropsKeysHelper() {
   }
 }
