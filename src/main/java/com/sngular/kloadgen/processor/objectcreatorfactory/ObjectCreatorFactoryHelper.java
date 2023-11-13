@@ -20,19 +20,12 @@ public class ObjectCreatorFactoryHelper {
   public static ObjectCreatorFactory getInstance(final SchemaTypeEnum schemaType, final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     final ObjectCreatorFactory objectCreatorFactory;
     try {
-      switch (schemaType) {
-        case JSON:
-          objectCreatorFactory = new JsonObjectCreatorFactory();
-          break;
-        case AVRO:
-          objectCreatorFactory = new AvroObjectCreatorFactory(schema, metadata);
-          break;
-        case PROTOBUF:
-          objectCreatorFactory = new ProtobufObjectCreatorFactory(schema, metadata);
-          break;
-        default:
-          throw new KLoadGenException("Unsupported schema type");
-      }
+      objectCreatorFactory = switch (schemaType) {
+        case JSON -> new JsonObjectCreatorFactory();
+        case AVRO -> new AvroObjectCreatorFactory(schema, metadata);
+        case PROTOBUF -> new ProtobufObjectCreatorFactory(schema, metadata);
+        default -> throw new KLoadGenException("Unsupported schema type");
+      };
     } catch (KLoadGenException | DescriptorValidationException | IOException e) {
       final String logMsg = "Please, make sure that the schema sources fed are correct";
       log.error(logMsg, e);

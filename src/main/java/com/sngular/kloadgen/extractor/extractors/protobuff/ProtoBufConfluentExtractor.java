@@ -9,7 +9,7 @@ import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 public class ProtoBufConfluentExtractor extends AbstractProtoFileExtractor implements Extractor<ProtobufSchema> {
 
   public final List<FieldValueMapping> processSchema(final ProtobufSchema schemaReceived) {
-    return  processSchemaDefault(schemaReceived.rawSchema());
+    return processSchemaDefault(schemaReceived.rawSchema());
   }
 
   public final List<String> getSchemaNameList(final String schema) {

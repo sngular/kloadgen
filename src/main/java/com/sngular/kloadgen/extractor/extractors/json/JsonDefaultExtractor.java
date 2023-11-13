@@ -11,29 +11,29 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.model.json.Field;
 import com.sngular.kloadgen.model.json.Schema;
 
-public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extractor<org.everit.json.schema.Schema> {
+public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extractor<String> {
 
-    @Override
-    public List<FieldValueMapping> processSchema(org.everit.json.schema.Schema schema) {
+  @Override
+  public final List<FieldValueMapping> processSchema(final String schema) {
 
-        Schema parsed =  jsonSchemaParser.parse(schema.toString());
+    final Schema parsed = getSchemaParser().parse(schema.toString());
 
-        final List<FieldValueMapping> attributeList = new ArrayList<>();
-        parsed.getProperties().forEach(field -> attributeList.addAll(processField(field, true, null)));
+    final List<FieldValueMapping> attributeList = new ArrayList<>();
+    parsed.getProperties().forEach(field -> attributeList.addAll(processField(field, true, null)));
 
-        final Set<String> requiredFields = new HashSet<>(parsed.getRequiredFields());
+    final Set<String> requiredFields = new HashSet<>(parsed.getRequiredFields());
 
-        for (FieldValueMapping field : attributeList) {
-            if (!field.getFieldName().contains("[]") && !field.getFieldName().contains("[:]")) {
-                field.setRequired(requiredFields.contains(field.getFieldName()));
-            }
-        }
-        return attributeList;
+    for (FieldValueMapping field : attributeList) {
+      if (!field.getFieldName().contains("[]") && !field.getFieldName().contains("[:]")) {
+        field.setRequired(requiredFields.contains(field.getFieldName()));
+      }
     }
+    return attributeList;
+  }
 
-    @Override
-    public List<String> getSchemaNameList(String schema) {
-        Schema parsed =  jsonSchemaParser.parse(schema);
-        return parsed.getProperties().stream().map(Field::getName).collect(Collectors.toList());
-    }
+  @Override
+  public final List<String> getSchemaNameList(final String schema) {
+    final Schema parsed = getSchemaParser().parse(schema);
+    return parsed.getProperties().stream().map(Field::getName).collect(Collectors.toList());
+  }
 }

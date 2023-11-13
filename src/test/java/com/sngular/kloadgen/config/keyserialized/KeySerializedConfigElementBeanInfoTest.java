@@ -25,6 +25,8 @@ class KeySerializedConfigElementBeanInfoTest {
   private static final String KEY_NAME_STRATEGY = "keyNameStrategy";
 
   private static final String KEY_SERIALIZER_CONFIGURATION = "keySerializerConfiguration";
+  private static final String PROPERTIES = "props";
+  private static final String SCHEMA = "schema";
 
   private KeySerializedConfigElementBeanInfo keySerializedConfigElementBeanInfo;
 
@@ -43,5 +45,7 @@ class KeySerializedConfigElementBeanInfoTest {
     Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(KEY_SCHEMA_TYPE);
     Assertions.assertThat(propertyDescriptors[3].getName()).isEqualTo(KEY_SERIALIZER_CONFIGURATION);
     Assertions.assertThat(propertyDescriptors[4].getName()).isEqualTo(KEY_SUBJECT_NAME);
+    Assertions.assertThat(propertyDescriptors[5].getName()).isEqualTo(PROPERTIES);
+    Assertions.assertThat(propertyDescriptors[6].getName()).isEqualTo(SCHEMA);
   }
 }

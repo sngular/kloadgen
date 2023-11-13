@@ -29,13 +29,13 @@ public class ProtoBufGeneratorTool {
 
   private final Map<String, Object> context = new HashMap<>();
 
-  public final List generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
+  public final List<Object> generateArray(final String fieldName, final String fieldType, final int arraySize, final Integer valueLength, final List<String> fieldValuesList) {
 
     final List<String> parameterList = new ArrayList<>(fieldValuesList);
     parameterList.replaceAll(
         fieldValue -> fieldValue.matches("\\$\\{\\w*}") ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
 
-    final List value = new ArrayList<>(arraySize);
+    final List<Object> value = new ArrayList<>(arraySize);
     if ("seq".equals(fieldType)) {
       if (!fieldValuesList.isEmpty() && (fieldValuesList.size() > 1 || RandomSequence.isTypeNotSupported(fieldType))) {
         value.add(RandomSequence.generateSeq(fieldName, fieldType, parameterList, context));
@@ -45,7 +45,7 @@ public class ProtoBufGeneratorTool {
         }
       }
     } else {
-      value.addAll((ArrayList) RANDOM_ARRAY.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap()));
+      value.addAll((List) RANDOM_ARRAY.generateArray(fieldType, valueLength, parameterList, arraySize, Collections.emptyMap()));
     }
 
     return value;
@@ -60,6 +60,20 @@ public class ProtoBufGeneratorTool {
       value = getArrayEnumOrGenerate(descriptor, fieldType, arraySize, parameterList);
     }
     return value;
+  }
+
+  public final Object generateObject(
+      final FieldDescriptor descriptor, final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
+    Object result = null;
+    if (Objects.nonNull(descriptor.getJavaType())) {
+      result = generateRawObject(fieldType, valueLength, fieldValuesList, constraints);
+    }
+    return result;
+  }
+
+  public final Object generateRawObject(
+      final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
+    return RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
   }
 
   private Object getEnumOrGenerate(final Descriptors.EnumDescriptor descriptor, final String fieldType, final List<String> parameterList) {
@@ -77,20 +91,6 @@ public class ProtoBufGeneratorTool {
       }
     }
     return value;
-  }
-
-  public final Object generateObject(
-      final FieldDescriptor descriptor, final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
-    Object result = null;
-    if (Objects.nonNull(descriptor.getJavaType())) {
-      result = generateRawObject(fieldType, valueLength, fieldValuesList, constraints);
-    }
-    return result;
-  }
-
-  public final Object generateRawObject(
-      final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<ConstraintTypeEnum, String> constraints) {
-    return RANDOM_OBJECT.generateRandom(fieldType, valueLength, fieldValuesList, constraints);
   }
 
   private Object getArrayEnumOrGenerate(final Descriptors.EnumDescriptor descriptor, final String fieldType, final int arraySize, final List<String> parameterList) {

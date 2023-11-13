@@ -1,12 +1,23 @@
 package com.sngular.kloadgen.schemaregistry.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import com.google.protobuf.Message;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.*;
-import io.apicurio.registry.resolver.ParsedSchema;
-import io.apicurio.registry.resolver.ParsedSchemaImpl;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import io.apicurio.registry.resolver.SchemaParser;
 import io.apicurio.registry.rest.client.RegistryClient;
 import io.apicurio.registry.rest.client.RegistryClientFactory;
@@ -24,10 +35,6 @@ import io.apicurio.registry.utils.IoUtil;
 import io.apicurio.registry.utils.protobuf.schema.FileDescriptorUtils;
 import io.apicurio.registry.utils.protobuf.schema.ProtobufSchema;
 import org.apache.avro.Schema;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 
 public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
 
@@ -76,8 +83,8 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubject(final String artifactId) {
-    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
+  public BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubject(final String artifactId) {
+    final ApicurioAbstractParsedSchemaMetadata schema = new ApicurioAbstractParsedSchemaMetadata();
     try {
       final SearchedArtifact searchedArtifact = getLastestSearchedArtifact(artifactId);
       final InputStream inputStream = this.schemaRegistryClient.getLatestArtifact(searchedArtifact.getGroupId(), searchedArtifact.getId());
@@ -92,7 +99,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  private void setSchemaBySchemaType(final ApicurioParsedSchemaMetadata schema, final byte[] result, final String searchedArtifactType, final List<ArtifactReference> artifactReferenceList) {
+  private void setSchemaBySchemaType(final ApicurioAbstractParsedSchemaMetadata schema, final byte[] result, final String searchedArtifactType, final List<ArtifactReference> artifactReferenceList) {
 
     switch (SchemaTypeEnum.valueOf(searchedArtifactType)) {
       case AVRO:
@@ -213,9 +220,9 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public BaseParsedSchema<ApicurioParsedSchemaMetadata> getSchemaBySubjectAndId(
+  public BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubjectAndId(
           final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
-    final ApicurioParsedSchemaMetadata schema = new ApicurioParsedSchemaMetadata();
+    final ApicurioAbstractParsedSchemaMetadata schema = new ApicurioAbstractParsedSchemaMetadata();
 
     final SchemaMetadataAdapter schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
     try {

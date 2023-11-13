@@ -17,7 +17,8 @@ import java.util.Locale;
 class KafkaHeadersConfigElementBeanInfoTest {
 
   private static final String KAFKA_HEADERS = "kafkaHeaders";
-
+  private static final String PROPERTIES = "props";
+  private static final String SCHEMA = "schema";
   private KafkaHeadersConfigElementBeanInfo kafkaHeadersConfigElementBeanInfo;
 
   @BeforeEach
@@ -31,5 +32,7 @@ class KafkaHeadersConfigElementBeanInfoTest {
     final PropertyDescriptor[] propertyDescriptors = kafkaHeadersConfigElementBeanInfo.getPropertyDescriptors();
     Assertions.assertThat(propertyDescriptors).hasSize(3);
     Assertions.assertThat(propertyDescriptors[0].getName()).isEqualTo(KAFKA_HEADERS);
+    Assertions.assertThat(propertyDescriptors[1].getName()).isEqualTo(PROPERTIES);
+    Assertions.assertThat(propertyDescriptors[2].getName()).isEqualTo(SCHEMA);
   }
 }
