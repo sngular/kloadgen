@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,6 +19,8 @@ import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import io.apicurio.registry.resolver.ParsedSchema;
+import io.apicurio.registry.resolver.ParsedSchemaImpl;
 import io.apicurio.registry.resolver.SchemaParser;
 import io.apicurio.registry.rest.client.RegistryClient;
 import io.apicurio.registry.rest.client.RegistryClientFactory;
@@ -36,6 +39,7 @@ import io.apicurio.registry.utils.protobuf.schema.FileDescriptorUtils;
 import io.apicurio.registry.utils.protobuf.schema.ProtobufSchema;
 import org.apache.avro.Schema;
 
+@SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
 
   private RegistryClient schemaRegistryClient;
@@ -99,7 +103,8 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  private void setSchemaBySchemaType(final ApicurioAbstractParsedSchemaMetadata schema, final byte[] result, final String searchedArtifactType, final List<ArtifactReference> artifactReferenceList) {
+  private void setSchemaBySchemaType(final ApicurioAbstractParsedSchemaMetadata schema, final byte[] result, final String searchedArtifactType,
+      final List<ArtifactReference> artifactReferenceList) {
 
     switch (SchemaTypeEnum.valueOf(searchedArtifactType)) {
       case AVRO:
@@ -120,11 +125,11 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
     }
   }
 
-  private Map<String, ParsedSchema<JsonSchema>> solveJsonReferences(List<ArtifactReference> references) {
+  private Map<String, ParsedSchema<JsonSchema>> solveJsonReferences(final List<ArtifactReference> references) {
     final var referencesMap = new HashMap<String, ParsedSchema<JsonSchema>>();
     references.forEach(
             reference -> {
-              var parsedSchema = getJsonParsedSchemaBySubject(reference.getArtifactId());
+              final var parsedSchema = getJsonParsedSchemaBySubject(reference.getArtifactId());
               referencesMap.put(reference.getArtifactId(), parsedSchema);
             }
     );
@@ -137,7 +142,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
     final var referencesMap = new HashMap<String, ParsedSchema<ProtobufSchema>>();
     references.forEach(
             reference -> {
-              var parsedSchema = getProtoBufParsedSchemaBySubject(reference.getArtifactId());
+              final var parsedSchema = getProtoBufParsedSchemaBySubject(reference.getArtifactId());
               referencesMap.put(reference.getArtifactId(), parsedSchema);
             }
     );
@@ -150,7 +155,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
     final var referencesMap = new HashMap<String, ParsedSchema<Schema>>();
     references.forEach(
             reference -> {
-              var parsedSchema = getAvroParsedSchemaBySubject(reference.getArtifactId());
+              final var parsedSchema = getAvroParsedSchemaBySubject(reference.getArtifactId());
               referencesMap.put(reference.getArtifactId(), parsedSchema);
             }
     );
@@ -166,7 +171,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
       final InputStream inputStream = this.schemaRegistryClient.getLatestArtifact(searchedArtifact.getGroupId(), searchedArtifact.getId());
       final ArtifactMetaData artifactMetaData = this.schemaRegistryClient.getArtifactMetaData(searchedArtifact.getGroupId(), searchedArtifact.getId());
       final var solvedParsedSchemas = solveJsonReferences(artifactMetaData.getReferences());
-      var schema = parserJSON.parseSchema(inputStream.readAllBytes(), solvedParsedSchemas);
+      final var schema = parserJSON.parseSchema(inputStream.readAllBytes(), solvedParsedSchemas);
       return new ParsedSchemaImpl<JsonSchema>()
               .setParsedSchema(schema)
               .setSchemaReferences(new ArrayList<>(solvedParsedSchemas.values()))
@@ -187,7 +192,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
       final var solvedParsedSchemas = solveAvroReferences(artifactMetaData.getReferences());
       final var solvedSchemas = new HashSet<Schema>();
       solvedParsedSchemas.forEach((key, parsedSchema) -> solvedSchemas.add(parsedSchema.getParsedSchema()));
-      var schema = parserAvro.parseSchema(inputStream.readAllBytes(), solvedParsedSchemas);
+      final var schema = parserAvro.parseSchema(inputStream.readAllBytes(), solvedParsedSchemas);
       return new ParsedSchemaImpl<Schema>()
               .setParsedSchema(schema)
               .setReferenceName(schema.getFullName())
@@ -207,7 +212,7 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
       final InputStream inputStream = this.schemaRegistryClient.getLatestArtifact(searchedArtifact.getGroupId(), searchedArtifact.getId());
       final ArtifactMetaData artifactMetaData = this.schemaRegistryClient.getArtifactMetaData(searchedArtifact.getGroupId(), searchedArtifact.getId());
       final var solvedParsedSchemas = solveProtoBufReferences(artifactMetaData.getReferences());
-      var schema = protoBuf.parseSchema(inputStream.readAllBytes(), solvedParsedSchemas);
+      final var schema = protoBuf.parseSchema(inputStream.readAllBytes(), solvedParsedSchemas);
       return new ParsedSchemaImpl<ProtobufSchema>()
               .setParsedSchema(schema)
               .setReferenceName(schema.getFileDescriptor().getName())
