@@ -11,6 +11,7 @@ import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.util.JMeterHelper;
@@ -74,7 +75,7 @@ public final class ExtractorFactory {
       case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
       case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
     };
-    attributeList.addAll(getExtractor(schemaType).processSchema(schema, schemaRegistryEnum));
+    attributeList.addAll(getExtractor(schemaType).processSchema(new ParsedSchema(schema), schemaRegistryEnum));
     return Pair.of(schemaType, attributeList);
   }
 }

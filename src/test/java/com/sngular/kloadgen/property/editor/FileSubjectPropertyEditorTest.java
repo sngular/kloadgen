@@ -12,8 +12,7 @@ import java.util.List;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ class FileSubjectPropertyEditorTest {
   @DisplayName("File Subject Property Editor extract AVRO")
   void extractEmbeddedAvroTest() throws IOException {
     final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-    final ParsedSchema schema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
+    final ParsedSchema schema = new ParsedSchema(testFile, "AVRO");
     final List<FieldValueMapping> fieldValueMappingList = editor.getAttributeList(schema);
 
     Assertions.assertThat(fieldValueMappingList)

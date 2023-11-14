@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 

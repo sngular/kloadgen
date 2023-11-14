@@ -45,7 +45,7 @@ public class ProtobufLoadGenerator implements SRLoadGenerator, BaseLoadGenerator
   public final void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final ProtobufSchema protobufSchema = new ProtobufSchema(schema);
     this.protobufSchemaProcessor
-        .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema, new BaseSchemaMetadata<>(
+        .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema.rawSchema(), new BaseSchemaMetadata<>(
                            ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.PROTOBUF.name(), Collections.emptyList(), schema))),
                        fieldExprMappings);
   }

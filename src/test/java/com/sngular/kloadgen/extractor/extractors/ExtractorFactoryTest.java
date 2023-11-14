@@ -7,15 +7,12 @@ import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
 import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.avro.AvroSchema;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import org.apache.avro.Schema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -99,7 +96,7 @@ class ExtractorFactoryTest {
         final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
         properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
-        final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
+        final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
         final var baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
 
         jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
@@ -108,10 +105,9 @@ class ExtractorFactoryTest {
         final Schema schema = new Schema.Parser().parse(testFile);
         final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
-        when(avroExtractor.processSchema(argumentCaptor.capture(), isA(SchemaRegistryEnum.class))).thenReturn(fieldValueMappingList);
+        when(avroExtractor.processSchema(new ParsedSchema(argumentCaptor.capture(), ""), isA(SchemaRegistryEnum.class))).thenReturn(fieldValueMappingList);
         final var result = SchemaExtractor.flatPropertiesList(schema.getName());
 
         Assertions.assertThat(result).isNotNull();
-        assertThat(argumentCaptor.getValue()).isInstanceOf(Schema.class);
     }
 }

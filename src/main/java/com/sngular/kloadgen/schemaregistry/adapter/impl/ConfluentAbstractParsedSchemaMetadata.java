@@ -1,6 +1,6 @@
 package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
-import io.confluent.kafka.schemaregistry.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.Getter;
 import org.apache.avro.Schema;
