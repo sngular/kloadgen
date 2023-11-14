@@ -36,6 +36,7 @@ import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import org.apache.avro.SchemaParseException;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -48,6 +49,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
+import org.jetbrains.annotations.NotNull;
 
 public final class SamplerUtil {
 
@@ -421,20 +423,16 @@ public final class SamplerUtil {
       props.put(keyNameStrategy, keyNameStrategyValue);
     }
 
-    if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).toLowerCase())) {
-        generator = new JsonSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
-        generator = new AvroSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
-        generator = new ProtobufLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
-        generator = new PlainTextLoadGenerator();
+    if (ObjectUtils.anyNotNull(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE), jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
+      if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
+        generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE));
+      } else if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
+        generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE));
       } else {
         throw new KLoadGenException("Unsupported Serializer");
       }
     } else {
-      generator = new AvroSRLoadGenerator();
+      throw new KLoadGenException("Unsupported Serializer");
     }
 
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
@@ -463,6 +461,23 @@ public final class SamplerUtil {
       generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
     }
 
+    return generator;
+  }
+
+  @NotNull
+  private static BaseLoadGenerator getBaseLoadGenerator(final String schemaType) {
+    final BaseLoadGenerator generator;
+    if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
+      generator = new JsonSRLoadGenerator();
+    } else if ("avro".equalsIgnoreCase(schemaType)) {
+      generator = new AvroSRLoadGenerator();
+    } else if ("protobuf".equalsIgnoreCase(schemaType)) {
+      generator = new ProtobufLoadGenerator();
+    } else if ("noSchema".equalsIgnoreCase(schemaType)) {
+      generator = new PlainTextLoadGenerator();
+    } else {
+      throw new KLoadGenException("Unsupported Serializer");
+    }
     return generator;
   }
 
