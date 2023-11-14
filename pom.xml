@@ -295,7 +295,7 @@
       <name>Enrique Gonzalo Legarra</name>
       <email>enrique.gonzalo@sngular.com</email>
       <organization>Sngular</organization>
-      <organizationUrl>https://sngular.githugit b.io/</organizationUrl>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Senior FullStack Developer</role>
       </roles>
@@ -308,7 +308,7 @@
       <organization>Sngular</organization>
       <organizationUrl>https://www.sngular.com</organizationUrl>
       <roles>
-      <role>Trainee Backend Developer</role>
+        <role>Trainee Backend Developer</role>
       </roles>
     </developer>
     <developer>
