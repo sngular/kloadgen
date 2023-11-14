@@ -208,29 +208,29 @@ public final class SamplerUtil {
     return defaultParameters;
   }
 
-  public static void setupConsumerDeserializerProperties(final JavaSamplerContext context, final Properties props) {
-    if (Objects.nonNull(context.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY));
+  public static void setupConsumerDeserializerProperties(final Properties props) {
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, context.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY));
     } else {
       props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
     }
   }
 
-  public static void setupConsumerSchemaRegistryProperties(final JavaSamplerContext context, final Properties props) {
+  public static void setupConsumerSchemaRegistryProperties(final Properties props) {
     final Map<String, String> originals = new HashMap<>();
-    setupSchemaRegistryAuthenticationProperties(context.getJMeterVariables(), originals);
+    setupSchemaRegistryAuthenticationProperties(JavaSamplerContext.getJMeterVariables(), originals);
     props.putAll(originals);
 
-    if (Objects.nonNull(context.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
-      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, context.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
+      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY));
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY))) {
-      props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, context.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY))) {
+      props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY));
     }
   }
 
@@ -257,8 +257,8 @@ public final class SamplerUtil {
     final Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
 
-    setupConsumerDeserializerProperties(context, props);
-    setupConsumerSchemaRegistryProperties(context, props);
+    setupConsumerDeserializerProperties(props);
+    setupConsumerSchemaRegistryProperties(props);
 
     props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
     props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
@@ -362,7 +362,11 @@ public final class SamplerUtil {
       props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
     }
 
-    generator = getLoadGenerator();
+    if (ObjectUtils.isNotEmpty(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
+      generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE));
+    } else {
+      throw new KLoadGenException("Unsupported Serializer");
+    }
 
     if (generator.getClass().equals(PlainTextLoadGenerator.class)) {
       final List<FieldValueMapping> list = new ArrayList<>();
@@ -423,14 +427,8 @@ public final class SamplerUtil {
       props.put(keyNameStrategy, keyNameStrategyValue);
     }
 
-    if (ObjectUtils.anyNotNull(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE), jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
-      if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
-        generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE));
-      } else if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
-        generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE));
-      } else {
-        throw new KLoadGenException("Unsupported Serializer");
-      }
+    if (ObjectUtils.isNotEmpty(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
+      generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE));
     } else {
       throw new KLoadGenException("Unsupported Serializer");
     }
@@ -490,28 +488,5 @@ public final class SamplerUtil {
     }
     return headersSB;
   }
-
-  private static BaseLoadGenerator getLoadGenerator() {
-    final BaseLoadGenerator generator;
-    final String schemaType = JMeterContextService.getContext().getProperties().getProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE);
-    if (Objects.nonNull(schemaType)) {
-      if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
-        generator = new JsonSRLoadGenerator();
-      } else if ("avro".equalsIgnoreCase(schemaType)) {
-        generator = new AvroSRLoadGenerator();
-      } else if ("Protobuf".equalsIgnoreCase(schemaType)) {
-        generator = new ProtobufLoadGenerator();
-      } else if ("NoSchema".equalsIgnoreCase(schemaType)) {
-        generator = new PlainTextLoadGenerator();
-      } else {
-        throw new KLoadGenException("Unsupported Serializer");
-      }
-    } else {
-      generator = new AvroSRLoadGenerator();
-    }
-
-    return generator;
-  }
-
 
 }
