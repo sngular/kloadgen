@@ -19,15 +19,12 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
@@ -37,77 +34,69 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 class ExtractorFactoryTest {
 
-    private AvroExtractor avroExtractor = new AvroExtractor();
+  private static final JsonExtractor jsonExtractor = new JsonExtractor();
 
-    private static JsonExtractor jsonExtractor = new JsonExtractor();
+  private static final ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
 
-    private static ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
+  @Captor
+  private ArgumentCaptor<Schema> argumentCaptor = ArgumentCaptor.forClass(Schema.class);
 
-    @Captor
-    private ArgumentCaptor<Schema> argumentCaptor = ArgumentCaptor.forClass(Schema.class);
+  private final Properties properties = new Properties();
 
-    private final Properties properties = new Properties();
+  private final FileHelper fileHelper = new FileHelper();
 
-    private ExtractorFactory extractorFactory;
+  private final Extractor<Schema> avroConfluentExtractor = new AvroConfluentExtractor();
 
-    private final FileHelper fileHelper = new FileHelper();
+  private MockedStatic<JMeterHelper> jMeterHelperMockedStatic;
 
-    private final Extractor<Schema> avroConfluentExtractor = new AvroConfluentExtractor();
+  private MockedStatic<JMeterContextService> jMeterContextServiceMockedStatic;
 
-    private MockedStatic<JMeterHelper> jMeterHelperMockedStatic;
+  @BeforeEach
+  public void init() {
+    final File file = new File("src/test/resources");
+    final String absolutePath = file.getAbsolutePath();
+    JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
+    final JMeterContext jmcx = JMeterContextService.getContext();
+    jmcx.setVariables(new JMeterVariables());
+    JMeterUtils.setLocale(Locale.ENGLISH);
 
-    private MockedStatic<JMeterContextService> jMeterContextServiceMockedStatic;
+    jMeterHelperMockedStatic = Mockito.mockStatic(JMeterHelper.class);
+    jMeterContextServiceMockedStatic = Mockito.mockStatic(JMeterContextService.class, Answers.RETURNS_DEEP_STUBS);
+    argumentCaptor = ArgumentCaptor.forClass(Schema.class);
+  }
 
-    @BeforeEach
-    public void init() {
-        final File file = new File("src/test/resources");
-        final String absolutePath = file.getAbsolutePath();
-        JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
-        final JMeterContext jmcx = JMeterContextService.getContext();
-        jmcx.setVariables(new JMeterVariables());
-        JMeterUtils.setLocale(Locale.ENGLISH);
+  @AfterEach
+  public void tearDown() {
+    properties.clear();
+    jMeterHelperMockedStatic.close();
+    jMeterContextServiceMockedStatic.close();
+  }
 
-        jMeterHelperMockedStatic = Mockito.mockStatic(JMeterHelper.class);
-        jMeterContextServiceMockedStatic = Mockito.mockStatic(JMeterContextService.class, Answers.RETURNS_DEEP_STUBS);
-        argumentCaptor = ArgumentCaptor.forClass(Schema.class);
-    }
+  @Test
+  void flatPropertiesList() throws IOException {
+    AvroExtractor avroExtractor = Mockito.mock(AvroExtractor.class);
+    ExtractorFactory.configExtractorFactory(avroExtractor, jsonExtractor, protobuffExtractor);
 
-    @AfterEach
-    public void tearDown() {
-        properties.clear();
-        jMeterHelperMockedStatic.close();
-        jMeterContextServiceMockedStatic.close();
-    }
+    final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
+    properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
-    @Test
-    void flatPropertiesList() throws IOException {
-        avroExtractor = Mockito.mock(AvroExtractor.class);
-        ExtractorFactory.configExtractorFactory(avroExtractor, jsonExtractor, protobuffExtractor);
+    final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
+    final var baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
 
-        final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-        properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
+    jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
+    jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
 
-        final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
-        final var baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
+    final Schema schema = new Schema.Parser().parse(testFile);
+    final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
 
-        jMeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
-        jMeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
+    when(avroExtractor.processSchema(new ParsedSchema(argumentCaptor.capture(), ""), isA(SchemaRegistryEnum.class))).thenReturn(fieldValueMappingList);
+    final var result = SchemaExtractor.flatPropertiesList(schema.getName());
 
-        final Schema schema = new Schema.Parser().parse(testFile);
-        final List<FieldValueMapping> fieldValueMappingList = avroConfluentExtractor.processSchema(schema);
-
-        when(avroExtractor.processSchema(new ParsedSchema(argumentCaptor.capture(), ""), isA(SchemaRegistryEnum.class))).thenReturn(fieldValueMappingList);
-        final var result = SchemaExtractor.flatPropertiesList(schema.getName());
-
-        Assertions.assertThat(result).isNotNull();
-    }
+    Assertions.assertThat(result).isNotNull();
+  }
 }
