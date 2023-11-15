@@ -50,9 +50,9 @@ class RandomArrayTest {
   void generateArrayRandomValueZero(final String fieldType, final Integer valueLength, final List<String> fieldValuesList) {
     Assertions.assertThat((List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap()))
               .isNotNull();
-    Object number1 = new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
-    Object number2 = new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
-    List<Object> number3 = (List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
+    final Object number1 = new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
+    final Object number2 = new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
+    final List<Object> number3 = (List<Object>) new RandomArray().generateArray(fieldType, valueLength, fieldValuesList, 1, Collections.emptyMap());
     Assertions.assertThat(number1).isNotNull();
     Assertions.assertThat(number2).isNotNull();
     Assertions.assertThat(number3).isNotNull();

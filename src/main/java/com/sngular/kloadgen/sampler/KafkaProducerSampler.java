@@ -6,6 +6,16 @@
 
 package com.sngular.kloadgen.sampler;
 
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.HeaderMapping;
@@ -15,7 +25,6 @@ import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.serializer.ProtobufSerializer;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.Legacy4ByteIdHandler;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
@@ -32,11 +41,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.StringSerializer;
-
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 public final class KafkaProducerSampler extends AbstractJavaSamplerClient implements Serializable {
 
@@ -66,7 +70,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   @Override
   public void setupTest(final JavaSamplerContext context) {
-    props = properties(context);
+    props = JMeterContextService.getContext().getProperties();
 
     generator = SamplerUtil.configureValueGenerator(props);
 
@@ -94,31 +98,16 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
     try {
 
-      final Properties props2 = new Properties();
-
-      props2.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-      props2.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
-      props2.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
-      props2.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-      props2.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
+      props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
+      props.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
+      props.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
+      props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+      props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
 
       producer = new KafkaProducer<>(props);
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
     }
-  }
-
-  private Properties properties(final JavaSamplerContext context) {
-    final var commonProps = SamplerUtil.setupCommonProperties(context);
-
-    final String artifactResolverStrategy = context.getParameter(ProducerKeysHelper.VALUE_NAME_STRATEGY);
-    if (Objects.nonNull(artifactResolverStrategy)) {
-      commonProps.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, artifactResolverStrategy);
-    }
-    if (Objects.nonNull(context.getParameter(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY))) {
-      commonProps.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, artifactResolverStrategy);
-    }
-    return commonProps;
   }
 
   @Override
@@ -204,8 +193,9 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
-    String result = "key: " + producerRecord.key() +
-            ", payload: " + producerRecord.value();
+    final String result = "key: "
+            + producerRecord.key()
+            + ", payload: " + producerRecord.value();
     sampleResult.setSamplerData(result);
   }
 

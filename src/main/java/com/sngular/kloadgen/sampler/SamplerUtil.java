@@ -35,6 +35,7 @@ import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
+import org.apache.avro.SchemaParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -154,6 +155,10 @@ public final class SamplerUtil {
     return props;
   }
 
+  private static String propertyOrDefault(final String property, final String defaultToken, final String valueToSent) {
+    return defaultToken.equals(property) ? valueToSent : property;
+  }
+
   @SuppressWarnings("checkstyle:ExecutableStatementCount")
   public static Arguments getCommonConsumerDefaultParameters() {
     final Arguments defaultParameters = new Arguments();
@@ -227,6 +232,25 @@ public final class SamplerUtil {
     }
   }
 
+  private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
+    if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+
+      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+      props.put(schemaRegistryManager.getSchemaRegistryUrlKey(), context.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+
+      if (ProducerKeysHelper.FLAG_YES.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
+          props.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
+          props.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, context.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
+        } else {
+          props.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
+          props.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, context.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
+        }
+      }
+    }
+  }
+
   public static Properties setupCommonConsumerProperties(final JavaSamplerContext context) {
     final Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
@@ -250,8 +274,8 @@ public final class SamplerUtil {
     if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA))) {
       props.put(PropsKeysHelper.KEY_SCHEMA, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA));
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
     }
 
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, context.getParameter(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG));
@@ -279,6 +303,51 @@ public final class SamplerUtil {
     return props;
   }
 
+  private static void verifySecurity(final JavaSamplerContext context, final Properties props) {
+    if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(context.getParameter(ProducerKeysHelper.SSL_ENABLED))) {
+
+      props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_KEY_PASSWORD_CONFIG));
+      props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
+      props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
+      props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, context.getParameter(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
+      props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
+    }
+
+    if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(context.getParameter(ProducerKeysHelper.KERBEROS_ENABLED))) {
+      System.setProperty(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG));
+      System.setProperty(ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG));
+      props.put(ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME, context.getParameter(ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME));
+    }
+
+    if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(context.getParameter(ProducerKeysHelper.JAAS_ENABLED))) {
+      if (StringUtils.contains(context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG), File.separatorChar)) {
+        System.setProperty(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG));
+      } else {
+        props.put(SaslConfigs.SASL_JAAS_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG));
+      }
+    }
+
+    props.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
+
+    props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
+
+    props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
+              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG), ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
+                                ""));
+
+    props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
+    props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
+    props.put(SslConfigs.SSL_PROTOCOL_CONFIG, context.getParameter(SslConfigs.SSL_PROTOCOL_CONFIG));
+
+    if (!StringUtils.isBlank(context.getParameter(ProducerConfig.SECURITY_PROVIDERS_CONFIG).trim())) {
+      props.put(ProducerConfig.SECURITY_PROVIDERS_CONFIG, context.getParameter(ProducerConfig.SECURITY_PROVIDERS_CONFIG));
+    }
+
+    if (!StringUtils.isBlank(context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG).trim())) {
+      props.put(SslConfigs.SSL_PROVIDER_CONFIG, context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG));
+    }
+  }
+
   public static BaseLoadGenerator configureValueGenerator(final Properties props) {
     final JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     final BaseLoadGenerator generator;
@@ -286,12 +355,12 @@ public final class SamplerUtil {
     final String valueNameStrategy = jMeterVariables.get(ProducerKeysHelper.VALUE_NAME_STRATEGY);
 
     if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO));
+      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
     } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT));
+      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
     }
 
-    generator = getLoadGenerator(jMeterVariables);
+    generator = getLoadGenerator();
 
     if (generator.getClass().equals(PlainTextLoadGenerator.class)) {
       final List<FieldValueMapping> list = new ArrayList<>();
@@ -319,7 +388,17 @@ public final class SamplerUtil {
         }
       }
     } else {
-      generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      try {
+        final String schema;
+        if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA).isEmpty()) {
+          schema = props.getProperty(PropsKeysHelper.VALUE_SCHEMA);
+        } else {
+          schema = jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA);
+        }
+        generator.setUpGenerator(schema, (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      } catch (final SchemaParseException exc) {
+        generator.setUpGenerator(props.getProperty(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      }
     }
 
     return generator;
@@ -397,86 +476,17 @@ public final class SamplerUtil {
     return headersSB;
   }
 
-  private static void verifySecurity(final JavaSamplerContext context, final Properties props) {
-    if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(context.getParameter(ProducerKeysHelper.SSL_ENABLED))) {
-
-      props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_KEY_PASSWORD_CONFIG));
-      props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG));
-      props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG));
-      props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, context.getParameter(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG));
-      props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, context.getParameter(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG));
-    }
-
-    if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(context.getParameter(ProducerKeysHelper.KERBEROS_ENABLED))) {
-      System.setProperty(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG));
-      System.setProperty(ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_KRB5_CONFIG));
-      props.put(ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME, context.getParameter(ProducerKeysHelper.SASL_KERBEROS_SERVICE_NAME));
-    }
-
-    if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(context.getParameter(ProducerKeysHelper.JAAS_ENABLED))) {
-      if (StringUtils.contains(context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG), File.separatorChar)) {
-        System.setProperty(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG));
-      } else {
-        props.put(SaslConfigs.SASL_JAAS_CONFIG, context.getParameter(ProducerKeysHelper.JAVA_SEC_AUTH_LOGIN_CONFIG));
-      }
-    }
-
-    props.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
-
-    props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
-
-    props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
-                                ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
-                                ""));
-
-    props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
-    props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, context.getParameter(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG));
-    props.put(SslConfigs.SSL_PROTOCOL_CONFIG, context.getParameter(SslConfigs.SSL_PROTOCOL_CONFIG));
-
-    if (!StringUtils.isBlank(context.getParameter(ProducerConfig.SECURITY_PROVIDERS_CONFIG).trim())) {
-      props.put(ProducerConfig.SECURITY_PROVIDERS_CONFIG, context.getParameter(ProducerConfig.SECURITY_PROVIDERS_CONFIG));
-    }
-
-    if (!StringUtils.isBlank(context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG).trim())) {
-      props.put(SslConfigs.SSL_PROVIDER_CONFIG, context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG));
-    }
-  }
-
-  private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
-    if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-
-      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
-      props.put(schemaRegistryManager.getSchemaRegistryUrlKey(), context.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
-
-      if (ProducerKeysHelper.FLAG_YES.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
-          props.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
-          props.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, context.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
-        } else {
-          props.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
-          props.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, context.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
-        }
-      }
-    }
-  }
-
-  private static String propertyOrDefault(final String property, final String defaultToken, final String valueToSent) {
-    return defaultToken.equals(property) ? valueToSent : property;
-  }
-
-  private static BaseLoadGenerator getLoadGenerator(final JMeterVariables jmeterVariables) {
+  private static BaseLoadGenerator getLoadGenerator() {
     final BaseLoadGenerator generator;
-
-    if (Objects.nonNull(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).toLowerCase())) {
+    final String schemaType = JMeterContextService.getContext().getProperties().getProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE);
+    if (Objects.nonNull(schemaType)) {
+      if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
         generator = new JsonSRLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
+      } else if ("avro".equalsIgnoreCase(schemaType)) {
         generator = new AvroSRLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
+      } else if ("Protobuf".equalsIgnoreCase(schemaType)) {
         generator = new ProtobufLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
+      } else if ("NoSchema".equalsIgnoreCase(schemaType)) {
         generator = new PlainTextLoadGenerator();
       } else {
         throw new KLoadGenException("Unsupported Serializer");

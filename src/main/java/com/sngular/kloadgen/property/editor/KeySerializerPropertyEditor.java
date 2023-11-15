@@ -16,6 +16,7 @@ import java.util.Objects;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;

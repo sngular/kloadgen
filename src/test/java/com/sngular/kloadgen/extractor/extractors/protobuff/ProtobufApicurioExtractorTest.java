@@ -25,7 +25,7 @@ class ProtobufApicurioExtractorTest {
 
   private final Extractor<ProtoFileElement> protoBufApicurioExtractor = new ProtoBufApicurioExtractor();
 
-  private Location location = Location.get("","");
+  private final Location location = Location.get("", "");
 
   @BeforeEach
   public void setUp() {

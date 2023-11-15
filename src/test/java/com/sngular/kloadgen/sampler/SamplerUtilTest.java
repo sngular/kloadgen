@@ -101,7 +101,6 @@ class SamplerUtilTest {
     final var generator = SamplerUtil.configureKeyGenerator(props);
     Assertions.assertThat(generator.nextMessage()).isNotNull();
 
-
   }
 
   public JMeterVariables getVariablesJsonSchema() throws IOException {
