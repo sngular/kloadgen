@@ -11,11 +11,11 @@ import com.sngular.kloadgen.parsedschema.ParsedSchema;
 
 public class AvroExtractor implements ExtractorRegistry<ParsedSchema> {
 
-  private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new AvroConfluentExtractor(), SchemaRegistryEnum.APICURIO,
-          new AvroApicurioExtractor());
+  private static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(SchemaRegistryEnum.CONFLUENT, new AvroConfluentExtractor(), SchemaRegistryEnum.APICURIO,
+                                                                       new AvroApicurioExtractor());
 
   public final List<FieldValueMapping> processSchema(final ParsedSchema schema, final SchemaRegistryEnum registryEnum) {
-    return SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schema.rawSchema());
+    return schemaRegistryMap.get(registryEnum).processSchema(schema.rawSchema());
   }
 
   public final ParsedSchema processSchema(final String fileContent) {
@@ -23,7 +23,7 @@ public class AvroExtractor implements ExtractorRegistry<ParsedSchema> {
   }
 
   public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
-    return SCHEMA_REGISTRY_MAP.get(registryEnum).getSchemaNameList(schema);
+    return schemaRegistryMap.get(registryEnum).getSchemaNameList(schema);
   }
 
 }

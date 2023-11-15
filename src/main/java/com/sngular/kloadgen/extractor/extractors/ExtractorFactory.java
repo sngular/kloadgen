@@ -2,6 +2,7 @@ package com.sngular.kloadgen.extractor.extractors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
@@ -39,20 +40,12 @@ public final class ExtractorFactory {
   public static ExtractorRegistry getExtractor(final String schemaType) {
 
     if (schemaType != null && EnumUtils.isValidEnum(SchemaTypeEnum.class, schemaType.toUpperCase())) {
-      final ExtractorRegistry response;
-      switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
-        case JSON:
-          response = jsonExtractor;
-          break;
-        case AVRO:
-          response = avroExtractor;
-          break;
-        case PROTOBUF:
-          response = protobuffExtractor;
-          break;
-        default:
-          throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
-      }
+      final ExtractorRegistry response = switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
+        case JSON -> jsonExtractor;
+        case AVRO -> avroExtractor;
+        case PROTOBUF -> protobuffExtractor;
+        default -> throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
+      };
       return response;
     } else {
       throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
@@ -70,12 +63,14 @@ public final class ExtractorFactory {
     final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
 
     final Object schema;
-    //TODO change parser
-    schema = switch (schemaRegistryEnum) {
-      case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
-      case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
-    };
-    attributeList.addAll(getExtractor(schemaType).processSchema(new ParsedSchema(schema), schemaRegistryEnum));
+    if (Objects.nonNull(registryName)) {
+      //TODO change parser
+      schema = switch (schemaRegistryEnum) {
+        case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
+        case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
+      };
+      attributeList.addAll(getExtractor(schemaType).processSchema(new ParsedSchema(schema), schemaRegistryEnum));
+    }
     return Pair.of(schemaType, attributeList);
   }
 }

@@ -71,6 +71,7 @@ class SamplerUtilTest {
     variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "test");
     variables.put(PropsKeysHelper.KEY_SUBJECT_NAME, "test");
     variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema.rawSchema()));
+    variables.put(PropsKeysHelper.VALUE_SCHEMA_TYPE, "avro");
     variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema.rawSchema()));
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, Arrays.asList(
         FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1]").required(true)
@@ -125,6 +126,7 @@ class SamplerUtilTest {
     variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "protobuf");
     variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "protobufSubject");
     variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema.schema()));
+    variables.put(PropsKeysHelper.VALUE_SCHEMA_TYPE, "protobuf");
     variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema.schema()));
     variables.put(PropsKeysHelper.KEY_SUBJECT_NAME, "protobufSubject");
     variables.putObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES, Arrays.asList(
