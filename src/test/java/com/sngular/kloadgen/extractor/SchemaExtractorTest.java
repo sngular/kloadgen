@@ -13,13 +13,14 @@ import java.util.Properties;
 
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.testutil.FileHelper;
+import com.sngular.kloadgen.testutil.ParsedSchemaUtil;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -105,7 +106,7 @@ class SchemaExtractorTest {
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
     final ParsedSchema parsedSchema = new ParsedSchema(testFile, "PROTOBUF");
-    final BaseParsedSchema baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
+   final BaseParsedSchema baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
     jmeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
     jmeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     final var result = SchemaExtractor.flatPropertiesList("protobufSubject");
@@ -121,7 +122,7 @@ class SchemaExtractorTest {
     Assertions.assertThat(result).isNotNull();
   }
 
-  /*@Test
+  @Test
   @DisplayName("Test flatPropertiesList throws exception schema type not supported")
   void testFlatPropertiesListWithException() {
 
@@ -136,7 +137,7 @@ class SchemaExtractorTest {
               .isThrownBy(() -> SchemaExtractor.flatPropertiesList("exceptionSubject")
               ).withMessage(String.format("Schema type not supported %s", parsedSchema.schemaType()));
 
-  }*/
+  }
 
   @Test
   @DisplayName("Test flatPropertiesList with AVRO and CONFLUENT")

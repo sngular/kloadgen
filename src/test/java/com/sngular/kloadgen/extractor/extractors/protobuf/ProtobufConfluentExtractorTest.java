@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.extractor.extractors.protobuff;
+package com.sngular.kloadgen.extractor.extractors.protobuf;
 
 import java.io.File;
 import java.util.List;
@@ -8,7 +8,6 @@ import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.testutil.FileHelper;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;

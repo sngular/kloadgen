@@ -37,14 +37,12 @@ public final class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
 
   @Override
   public void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
-    log.debug("CREATEION");
     this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
                                                                List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);
   }
 
   @Override
   public void setSchemaRegistryClient(final Map<String, ?> properties) {
-    log.debug("CREATITIN");
     final String url = properties.get(this.getSchemaRegistryUrlKey()).toString();
     this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
                                                                List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);

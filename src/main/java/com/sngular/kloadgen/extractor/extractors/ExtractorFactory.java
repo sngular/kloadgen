@@ -10,7 +10,7 @@ import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.extractors.avro.AvroExtractor;
 import com.sngular.kloadgen.extractor.extractors.json.JsonExtractor;
-import com.sngular.kloadgen.extractor.extractors.protobuff.ProtobuffExtractor;
+import com.sngular.kloadgen.extractor.extractors.protobuf.ProtobufExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
@@ -26,15 +26,15 @@ public final class ExtractorFactory {
 
   private static JsonExtractor jsonExtractor = new JsonExtractor();
 
-  private static ProtobuffExtractor protobuffExtractor = new ProtobuffExtractor();
+  private static ProtobufExtractor protobufExtractor = new ProtobufExtractor();
 
   private ExtractorFactory() {
   }
 
-  public static void configExtractorFactory(final AvroExtractor avroExtractor, final JsonExtractor jsonExtractor, final ProtobuffExtractor protobuffExtractor) {
+  public static void configExtractorFactory(final AvroExtractor avroExtractor, final JsonExtractor jsonExtractor, final ProtobufExtractor protobufExtractor) {
     ExtractorFactory.avroExtractor = avroExtractor;
     ExtractorFactory.jsonExtractor = jsonExtractor;
-    ExtractorFactory.protobuffExtractor = protobuffExtractor;
+    ExtractorFactory.protobufExtractor = protobufExtractor;
   }
 
   public static ExtractorRegistry getExtractor(final String schemaType) {
@@ -43,7 +43,7 @@ public final class ExtractorFactory {
       final ExtractorRegistry response = switch (SchemaTypeEnum.valueOf(schemaType.toUpperCase())) {
         case JSON -> jsonExtractor;
         case AVRO -> avroExtractor;
-        case PROTOBUF -> protobuffExtractor;
+        case PROTOBUF -> protobufExtractor;
         default -> throw new KLoadGenException(String.format("Schema type not supported %s", schemaType));
       };
       return response;

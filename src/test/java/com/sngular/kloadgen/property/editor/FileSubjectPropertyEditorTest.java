@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.util.List;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.testutil.FileHelper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,5 +1,6 @@
 package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
+import com.sngular.kloadgen.parsedschema.IParsedSchema;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public final class ConfluentAbstractParsedSchemaMetadata extends AbstractParsedS
 
   private Object rawSchema;
 
-  private ConfluentAbstractParsedSchemaMetadata(final ParsedSchema parsedSchema) {
+  private ConfluentAbstractParsedSchemaMetadata(final IParsedSchema parsedSchema) {
     this.schemaType = parsedSchema.schemaType();
     this.name = parsedSchema.name();
     this.canonicalString = parsedSchema.canonicalString();
@@ -35,11 +36,7 @@ public final class ConfluentAbstractParsedSchemaMetadata extends AbstractParsedS
     this.canonicalString = schema.canonicalString();
   }
 
-  public ConfluentAbstractParsedSchemaMetadata() {
-
-  }
-
-  public static AbstractParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
+  public static AbstractParsedSchemaAdapter parse(final IParsedSchema parsedSchema) {
     return new ConfluentAbstractParsedSchemaMetadata(parsedSchema);
   }
 

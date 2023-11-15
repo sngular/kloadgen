@@ -14,12 +14,12 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import com.sngular.kloadgen.serializer.SerializerTestFixture;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;

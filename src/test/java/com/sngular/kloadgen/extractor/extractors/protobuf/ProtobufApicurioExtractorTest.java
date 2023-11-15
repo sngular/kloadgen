@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.extractor.extractors.protobuff;
+package com.sngular.kloadgen.extractor.extractors.protobuf;
 
 import java.io.File;
 import java.util.List;
