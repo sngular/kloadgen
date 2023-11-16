@@ -1,7 +1,6 @@
 package com.sngular.kloadgen.schemaregistry.adapter.impl;
 
 import com.sngular.kloadgen.parsedschema.IParsedSchema;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.Getter;
 import org.apache.avro.Schema;
@@ -9,9 +8,9 @@ import org.apache.avro.Schema;
 @Getter
 public final class ConfluentAbstractParsedSchemaMetadata extends AbstractParsedSchemaAdapter {
 
-  private String schemaType;
+  private final String schemaType;
 
-  private String name;
+  private final String name;
 
   private String canonicalString;
 

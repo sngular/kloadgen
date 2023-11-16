@@ -9,7 +9,6 @@ import org.apache.avro.Schema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
