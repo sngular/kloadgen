@@ -12,12 +12,12 @@ import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 
-public class ProtobuffExtractor implements ExtractorRegistry<Object> {
+public class ProtobuffExtractor<T> implements ExtractorRegistry<T> {
 
   private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
                                                                                        SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
 
-  public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
+  public final List<FieldValueMapping> processSchema(final T schemaReceived, final SchemaRegistryEnum registryEnum) {
     final var resultSchema = new ArrayList<FieldValueMapping>();
     if (schemaReceived instanceof ProtoFileElement) {
       resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived));

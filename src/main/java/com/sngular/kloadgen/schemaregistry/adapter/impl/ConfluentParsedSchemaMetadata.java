@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.apache.avro.Schema;
 
 @Getter
-public final class ConfluentAbstractParsedSchemaMetadata extends AbstractParsedSchemaAdapter {
+public final class ConfluentParsedSchemaMetadata extends AbstractParsedSchemaAdapter {
 
   private String schemaType;
 
@@ -16,39 +16,39 @@ public final class ConfluentAbstractParsedSchemaMetadata extends AbstractParsedS
 
   private Object rawSchema;
 
-  private ConfluentAbstractParsedSchemaMetadata(final ParsedSchema parsedSchema) {
+  private ConfluentParsedSchemaMetadata(final ParsedSchema parsedSchema) {
     this.schemaType = parsedSchema.schemaType();
     this.name = parsedSchema.name();
     this.canonicalString = parsedSchema.canonicalString();
     this.rawSchema = parsedSchema.rawSchema();
   }
 
-  private ConfluentAbstractParsedSchemaMetadata(final Schema schema) {
+  private ConfluentParsedSchemaMetadata(final Schema schema) {
     this.schemaType = schema.getType().getName();
     this.name = schema.getName();
   }
 
-  public ConfluentAbstractParsedSchemaMetadata(final ProtobufSchema schema) {
+  public ConfluentParsedSchemaMetadata(final ProtobufSchema schema) {
     this.schemaType = schema.schemaType();
     this.name = schema.name();
     this.rawSchema = schema.rawSchema();
     this.canonicalString = schema.canonicalString();
   }
 
-  public ConfluentAbstractParsedSchemaMetadata() {
+  public ConfluentParsedSchemaMetadata() {
 
   }
 
   public static AbstractParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
-    return new ConfluentAbstractParsedSchemaMetadata(parsedSchema);
+    return new ConfluentParsedSchemaMetadata(parsedSchema);
   }
 
   public static AbstractParsedSchemaAdapter parse(final Schema schema) {
-    return new ConfluentAbstractParsedSchemaMetadata(schema);
+    return new ConfluentParsedSchemaMetadata(schema);
   }
 
   public static AbstractParsedSchemaAdapter parse(final ProtobufSchema schema) {
-    return new ConfluentAbstractParsedSchemaMetadata(schema);
+    return new ConfluentParsedSchemaMetadata(schema);
   }
 
   @Override

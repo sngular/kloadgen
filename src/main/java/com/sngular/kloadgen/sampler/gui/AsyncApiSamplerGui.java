@@ -303,7 +303,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   private JTabbedPane createAsyncApiTabs() {
     final var tabbedPanel = new JTabbedPane();
     tabbedPanel.addTab("Broker", createBrokerPanel());
-   // tabbedPanel.addTab("Registry", createRegistryTab());
+    // tabbedPanel.addTab("Registry", createRegistryTab());
     tabbedPanel.addTab("Schema", createSchemaTab());
     return tabbedPanel;
   }

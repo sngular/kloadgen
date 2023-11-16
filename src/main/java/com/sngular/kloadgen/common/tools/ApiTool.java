@@ -37,6 +37,7 @@ public final class ApiTool {
   public static JsonNode findNodeValue(final JsonNode node, final String valueName) {
     return node.findValue(valueName);
   }
+
   public static String getType(final JsonNode schema) {
     return hasType(schema) ? getNodeAsString(schema, "type") : "";
   }
@@ -198,7 +199,7 @@ public final class ApiTool {
     return hasNode(schema, "additionalProperties");
   }
 
-  public static boolean hasFormat(JsonNode schema) {
+  public static boolean hasFormat(final JsonNode schema) {
     return hasNode(schema, "format");
   }
 

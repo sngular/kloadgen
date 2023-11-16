@@ -18,6 +18,7 @@ import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import com.sngular.kloadgen.serializer.SerializerTestFixture;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.testutil.SchemaParseUtil;
+import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -72,12 +73,14 @@ class SamplerUtilTest {
     variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "test");
     variables.put(PropsKeysHelper.KEY_SUBJECT_NAME, "test");
     variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema));
+    variables.put(PropsKeysHelper.VALUE_SCHEMA_TYPE, "avro");
     variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema));
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, Arrays.asList(
         FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1]").required(true)
                          .isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("topLevelIntArray[3]").fieldType("int-array").valueLength(0).fieldValueList("[2]").required(true).isAncestorRequired(true).build())
     );
+    variables.put(ProducerKeysHelper.KEY_NAME_STRATEGY, "theStrategy");
     return variables;
   }
 
@@ -115,6 +118,7 @@ class SamplerUtilTest {
     variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema));
     variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema));
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, JsonSchemaFixturesConstants.SIMPLE_SCHEMA);
+    variables.put(ProducerKeysHelper.KEY_NAME_STRATEGY, "theStrategy");
     return variables;
   }
 
@@ -126,6 +130,7 @@ class SamplerUtilTest {
     variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "protobuf");
     variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "protobufSubject");
     variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema));
+    variables.put(PropsKeysHelper.VALUE_SCHEMA_TYPE, "protobuf");
     variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema));
     variables.put(PropsKeysHelper.KEY_SUBJECT_NAME, "protobufSubject");
     variables.putObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES, Arrays.asList(
@@ -136,6 +141,7 @@ class SamplerUtilTest {
         SerializerTestFixture.createFieldValueMapping("street", "string"),
         SerializerTestFixture.createFieldValueMapping("number[]", "int-array"),
         SerializerTestFixture.createFieldValueMapping("zipcode", "long")));
+    variables.put(ProducerKeysHelper.KEY_NAME_STRATEGY, "theStrategy");
     return variables;
   }
 

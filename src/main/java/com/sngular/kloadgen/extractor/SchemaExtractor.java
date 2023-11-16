@@ -31,7 +31,7 @@ public final class SchemaExtractor {
   }
 
   public static List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
-    return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
+    return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema.rawSchema(), SchemaRegistryEnum.CONFLUENT);
   }
 
   public static String readSchemaFile(final String filePath) throws IOException {

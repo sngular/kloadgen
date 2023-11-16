@@ -19,7 +19,7 @@ import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
@@ -51,8 +51,8 @@ public final class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     } else if (schema instanceof BaseParsedSchema) {
       final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
       final AbstractParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
-      if (adapterParse instanceof ApicurioAbstractParsedSchemaMetadata) {
-        this.schema = (Schema) ((ApicurioAbstractParsedSchemaMetadata) adapterParse).getSchema();
+      if (adapterParse instanceof ApicurioParsedSchemaMetadata) {
+        this.schema = (Schema) ((ApicurioParsedSchemaMetadata) adapterParse).getSchema();
       } else {
         this.schema = adapterParse.getRawSchema();
       }

@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.7.0</version>
+  <version>5.6.10</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
@@ -358,6 +358,8 @@
     <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
     <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
     <wiremock.version>2.35.1</wiremock.version>
+    <jackson-annotations.version>2.15.2</jackson-annotations.version>
+    <jackson-dataformat-yaml.version>2.15.3</jackson-dataformat-yaml.version>
   </properties>
 
   <dependencies>
@@ -395,18 +397,23 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.15.2</version>
+      <version>${jackson-annotations.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.15.2</version>
+      <version>${jackson-annotations.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>${jackson-dataformat-yaml.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

@@ -6,6 +6,7 @@
 
 package com.sngular.kloadgen.sampler;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   private static final Set<String> SERIALIZER_SET = Set.of(AvroSerializer.class.getName(), ProtobufSerializer.class.getName());
 
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final transient StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
@@ -71,32 +73,32 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   @Override
   public void setupTest(final JavaSamplerContext context) {
     props = JMeterContextService.getContext().getProperties();
-
-    generator = SamplerUtil.configureValueGenerator(props);
-
-    if ("true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
-        || "true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
-      keyMessageFlag = true;
-      if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(PropsKeysHelper.KEY_SUBJECT_NAME))) {
-        keyGenerator = SamplerUtil.configureKeyGenerator(props);
-      } else {
-        msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
-        msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
-                          ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
-      }
-    } else {
-      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
-    }
-
-    if (context.getParameter(ProducerKeysHelper.APICURIO_LEGACY_ID_HANDLER).equals(ProducerKeysHelper.FLAG_YES)) {
-      props.put(SerdeConfig.ID_HANDLER, Legacy4ByteIdHandler.class.getName());
-    }
-    if (context.getParameter(ProducerKeysHelper.APICURIO_ENABLE_HEADERS_ID).equals(ProducerKeysHelper.FLAG_NO)) {
-      props.put(SerdeConfig.ENABLE_HEADERS, "false");
-    }
-
-    topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
     try {
+      generator = SamplerUtil.configureValueGenerator(props);
+
+      if ("true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
+          || "true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
+        keyMessageFlag = true;
+        if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(PropsKeysHelper.KEY_SUBJECT_NAME))) {
+          keyGenerator = SamplerUtil.configureKeyGenerator(props);
+        } else {
+          msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
+          msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
+                            ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+        }
+      } else {
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
+      }
+
+      if (context.getParameter(ProducerKeysHelper.APICURIO_LEGACY_ID_HANDLER).equals(ProducerKeysHelper.FLAG_YES)) {
+        props.put(SerdeConfig.ID_HANDLER, Legacy4ByteIdHandler.class.getName());
+      }
+      if (context.getParameter(ProducerKeysHelper.APICURIO_ENABLE_HEADERS_ID).equals(ProducerKeysHelper.FLAG_NO)) {
+        props.put(SerdeConfig.ENABLE_HEADERS, "false");
+      }
+
+      topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
+
 
       props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
       props.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
