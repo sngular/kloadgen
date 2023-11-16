@@ -50,17 +50,22 @@ public final class ExtractorFactory {
     final String registryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     final AbstractParsedSchemaAdapter abstractParsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
     final String schemaType = abstractParsedSchemaAdapter.getType();
+    final AbstractParsedSchemaAdapter parsedSchemaAdapter = schemaParsed.getParsedSchemaAdapter();
+    final String schemaType = parsedSchemaAdapter.getType();
 
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     final SchemaRegistryEnum schemaRegistryEnum = SchemaRegistryEnum.valueOf(registryName.toUpperCase());
 
     final Object schema;
-    //TODO change parser
-    schema = switch (schemaRegistryEnum) {
-      case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) abstractParsedSchemaAdapter).getSchema();
-      case CONFLUENT -> abstractParsedSchemaAdapter.getRawSchema();
-    };
-    attributeList.addAll(getExtractor(schemaType).processSchema(schema, schemaRegistryEnum));
+    if (Objects.nonNull(registryName)) {
+      //TODO change parser
+      schema = switch (schemaRegistryEnum) {
+        case APICURIO -> ((ApicurioAbstractParsedSchemaMetadata) parsedSchemaAdapter).getSchema();
+        case CONFLUENT -> parsedSchemaAdapter.getRawSchema();
+        default -> throw new KLoadGenException("Schema Registry Type nos supported " + registryName.toUpperCase());
+      };
+      attributeList = getExtractor(schemaType, registryName.toUpperCase()).processSchema(schema, schemaRegistryEnum);
+    }
     return Pair.of(schemaType, attributeList);
   }
 }
