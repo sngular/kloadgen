@@ -16,14 +16,11 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.HeaderMapping;
 import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
-import com.sngular.kloadgen.serializer.AvroSerializer;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import com.sngular.kloadgen.serializer.ProtobufSerializer;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import io.apicurio.registry.serde.Legacy4ByteIdHandler;
 import io.apicurio.registry.serde.SerdeConfig;
-import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
@@ -37,7 +34,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.Serializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import com.sngular.kloadgen.property.editor.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -77,7 +73,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   public void setupTest(final JavaSamplerContext context) {
     props = JMeterContextService.getContext().getProperties();
 
-    if(props.get(PropsKeysHelper.VALUE_SCHEMA) == null) {
+    if(context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA) == null) {
       generator = SamplerUtil.configureKeyGenerator(props);
     } else {
       generator = SamplerUtil.configureValueGenerator(props);
@@ -110,8 +106,8 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
       props.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
       props.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
-      props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-      props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroKafkaSerializer.class.getName());
+      props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
+      props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT);
 
       producer = new KafkaProducer<>(props, (Serializer) Class.forName((String) props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance(),
               (Serializer) Class.forName((String) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance());
@@ -186,7 +182,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     final ProducerRecord<Object, Object> producerRecord;
     if (keyMessageFlag) {
       if (Objects.isNull(keyGenerator)) {
-        final var key = statelessGeneratorTool.generateObject("key", msgKeyType, 0, msgKeyValue).toString();
+        final var key = statelessGeneratorTool.generateObject("key", msgKeyType, 0, msgKeyValue);
         producerRecord = new ProducerRecord<>(topic, key, getObject(messageVal, valueFlag));
       } else {
         final var key = keyGenerator.nextMessage();
