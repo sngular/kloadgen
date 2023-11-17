@@ -15,22 +15,13 @@ servers:
     description: Test MQTT broker
 
 channels:
-  user/signedup:
+  user-signedup:
     publish:
       operationId: onUserSignUp
       message:
         $ref : '#/components/messages/UserSignedUp'
 
 components:
-  messages:
-    UserSignedUp:
-      name: userSignedUp
-      title: User signed up event
-      summary: Inform about a new user registration in the system
-      contentType: application/json
-      payload:
-        $ref: '#/components/schemas/userSignedUpPayload'
-
   schemas:
     userSignedUpPayload:
       type: object
@@ -49,3 +40,8 @@ components:
           type: string
           format: date-time
           description: "foo"
+  messages:
+    UserSignedUp:
+      payload:
+        $ref : '#/components/schemas/userSignedUpPayload'
+

@@ -17,6 +17,7 @@ import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
 import com.sngular.kloadgen.extractor.model.AsyncApiFile;
+import com.sngular.kloadgen.extractor.model.AsyncApiSR;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.loadgen.impl.JsonSRLoadGenerator;
 import com.sngular.kloadgen.model.FieldValueMapping;
@@ -65,7 +66,6 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   @Override
   public final SampleResult sample(final Entry entry) {
-
     final var sampleResult = new SampleResult();
     sampleResult.setThreadName("AsyncApi Sampler");
     sampleResult.sampleStart();
@@ -205,5 +205,9 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   private Object getObject(final EnrichedRecord messageVal, final boolean isKloadSerializer) {
     return isKloadSerializer ? messageVal : messageVal.getGenericRecord();
+  }
+
+  public void setAsyncApiRegistry(AsyncApiSR selectedItem) {
+
   }
 }

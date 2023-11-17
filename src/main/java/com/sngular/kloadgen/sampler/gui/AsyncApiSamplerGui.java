@@ -129,7 +129,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
           asyncApiSampler.setSchemaFieldConfiguration(mapVector(schemaFieldModel.getDataVector()));
         }
       }
-        // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
+         //asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
     }
     configureTestElement(element);
   }
@@ -198,10 +198,13 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
            .forEach(propertyMapping ->
                         propertyList.add(Pair.of(propertyMapping.getPropertyName(), propertyMapping.getPropertyValue())));
     fillTable(brokerFieldModel, propertyList);
-    /*final var schemaRegistryList = asyncApiExtractor.getSchemaRegistryData(asyncApiFile);
+   /* final var schemaRegistryList = asyncApiExtractor.getSchemaRegistryData(asyncApiFile);
     if (!schemaRegistryList.isEmpty()) {
       fillTable(schemaRegistryFieldModel, prepareSRServer(schemaRegistryList.get(0)));
-    }*/
+    }
+    registryComboBox.removeAllItems();
+    asyncApiExtractor.getSchemaRegistryData(asyncApiFile);
+    registryComboBox.setSelectedIndex(0);*/
     topicComboBox.removeAllItems();
     asyncApiExtractor.getSchemaDataMap(asyncApiFile).values().forEach(topicComboBox::addItem);
     topicComboBox.setSelectedIndex(0);
