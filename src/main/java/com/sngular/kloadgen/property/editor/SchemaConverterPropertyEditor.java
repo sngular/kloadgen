@@ -50,7 +50,9 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
   }
 
   @Override
-  public final void clearGui() {}
+  public final void clearGui() {
+    JMeterContextService.getContext().getProperties().remove(PropsKeysHelper.VALUE_SCHEMA);
+  }
 
   @Override
   public final void setDescriptor(final PropertyDescriptor descriptor) {
