@@ -6,7 +6,10 @@
 
 package com.sngular.kloadgen.processor;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
@@ -17,7 +20,6 @@ import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactoryH
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -168,20 +170,21 @@ public class SchemaProcessor {
 
   private ArrayDeque<FieldValueMapping> calculateFieldsToProcess() {
 
-    ArrayDeque<FieldValueMapping> arrayBool;
+    ArrayDeque<FieldValueMapping> fieldToProcess;
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-    List<FieldValueMapping> fieldExprMappingAux;
-    arrayBool =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
-    if (arrayBool.isEmpty()) {
-      fieldExprMappingAux = fieldExprMappings;
-      arrayBool =  new ArrayDeque<>(ListUtils.select(fieldExprMappingAux, this::shouldProcessFieldIfIsNonRequiered));
-    }
-    return arrayBool;
-  }
+    fieldToProcess =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
 
-  /*private ArrayDeque<FieldValueMapping> verifyMandatoryField(ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue, ArrayDeque<FieldValueMapping> arrayBool) {
-    initialFieldExpMappingsQueue.
-  }*/
+    if (fieldToProcess.isEmpty())
+      fieldToProcess =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequiered));
+
+    if(fieldToProcess.isEmpty()) {
+      while (initialFieldExpMappingsQueue.size()>1){
+        initialFieldExpMappingsQueue.removeFirst();
+      }
+      fieldToProcess = new ArrayDeque<>(initialFieldExpMappingsQueue);
+    }
+    return fieldToProcess;
+  }
 
   private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping/*, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue*/){
     boolean shouldProcess = false;

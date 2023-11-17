@@ -7,7 +7,7 @@ import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
 import lombok.Getter;
 
 @Getter
-public class                                                                                                                                                                                                                             ConfluentSchemaMetadata implements SchemaMetadataAdapter {
+public class ConfluentSchemaMetadata implements SchemaMetadataAdapter {
 
   private final Integer id;
 
