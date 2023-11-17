@@ -33,7 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class RandomObject {
 
-  private Random rand = new Random();
+  private final Random rand = new Random();
 
   public boolean isTypeValid(final String type) {
     return ValidTypeConstants.VALID_OBJECT_TYPES.contains(type);
@@ -159,7 +159,7 @@ public final class RandomObject {
       Number maximum;
       if (valueLength == 0) {
         maximum = 1000;
-        int num = rand.nextInt((Integer) maximum);
+        final int num = rand.nextInt((Integer) maximum);
         value = new BigInteger(String.valueOf(num));
       } else {
         maximum = calculateMaximum(valueLength, constraints);

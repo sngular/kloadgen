@@ -1,8 +1,5 @@
 package com.sngular.kloadgen.extractor.extractors.json;
 
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.APICURIO;
-import static com.sngular.kloadgen.common.SchemaRegistryEnum.CONFLUENT;
-
 import java.util.List;
 import java.util.Map;
 
@@ -10,19 +7,25 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
+import io.confluent.kafka.schemaregistry.json.JsonSchema;
 
 
-public class JsonExtractor implements ExtractorRegistry<Object> {
+public class JsonExtractor<T> implements ExtractorRegistry<T> {
 
-  static Map<SchemaRegistryEnum, Extractor> schemaRegistryMap = Map.of(CONFLUENT, new JsonDefaultExtractor(),
-          APICURIO, new JsonDefaultExtractor());
+  private static final Map<SchemaRegistryEnum, Extractor<String>> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new JsonDefaultExtractor(),
+                                                                                       SchemaRegistryEnum.APICURIO, new JsonDefaultExtractor());
 
-  public final List<FieldValueMapping> processSchema(final Object schemaReceived, SchemaRegistryEnum registryEnum) {
-    return schemaRegistryMap.get(registryEnum).processSchema(schemaReceived);
+  public final List<FieldValueMapping> processSchema(final T schemaReceived, final SchemaRegistryEnum registryEnum) {
+    return SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived.toString());
   }
 
-  public final List<String> getSchemaNameList(final String schema, SchemaRegistryEnum registryEnum) {
-    return schemaRegistryMap.get(registryEnum).getSchemaNameList(schema);
+  public final ParsedSchema processSchema(final String fileContent) {
+    return new JsonSchema(fileContent);
+  }
+
+  public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
+    return SCHEMA_REGISTRY_MAP.get(registryEnum).getSchemaNameList(schema);
   }
 
 }

@@ -13,7 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Objects;
 
-import com.sngular.kloadgen.exception.KLoadGenException;
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
@@ -23,6 +22,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
+
+import com.sngular.kloadgen.exception.KLoadGenException;
 
 public class AutoCompletion extends PlainDocument {
 

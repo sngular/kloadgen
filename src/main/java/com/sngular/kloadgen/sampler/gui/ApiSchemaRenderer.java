@@ -1,10 +1,15 @@
 package com.sngular.kloadgen.sampler.gui;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.util.Objects;
+
+import javax.swing.JLabel;
+import javax.swing.JList;
+
 import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Objects;
+
 
 public class ApiSchemaRenderer extends JLabel implements javax.swing.ListCellRenderer<AsyncApiSchema> {
 

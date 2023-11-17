@@ -35,6 +35,8 @@ import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaResolverConfig;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
+import org.apache.avro.SchemaParseException;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
@@ -154,6 +156,10 @@ public final class SamplerUtil {
     return props;
   }
 
+  private static String propertyOrDefault(final String property, final String defaultToken, final String valueToSent) {
+    return defaultToken.equals(property) ? valueToSent : property;
+  }
+
   @SuppressWarnings("checkstyle:ExecutableStatementCount")
   public static Arguments getCommonConsumerDefaultParameters() {
     final Arguments defaultParameters = new Arguments();
@@ -201,7 +207,7 @@ public final class SamplerUtil {
     return defaultParameters;
   }
 
-  public static void setupConsumerDeserializerProperties(final JavaSamplerContext context, final Properties props) {
+  public static void setupConsumerDeserializerProperties(final Properties props) {
     if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY))) {
       props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY));
     } else {
@@ -214,7 +220,7 @@ public final class SamplerUtil {
     }
   }
 
-  public static void setupConsumerSchemaRegistryProperties(final JavaSamplerContext context, final Properties props) {
+  public static void setupConsumerSchemaRegistryProperties(final Properties props) {
     final Map<String, String> originals = new HashMap<>();
     setupSchemaRegistryAuthenticationProperties(JavaSamplerContext.getJMeterVariables(), originals);
     props.putAll(originals);
@@ -227,12 +233,31 @@ public final class SamplerUtil {
     }
   }
 
+  private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
+    if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+
+      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+      props.put(schemaRegistryManager.getSchemaRegistryUrlKey(), context.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+
+      if (ProducerKeysHelper.FLAG_YES.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
+          props.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
+          props.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, context.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
+        } else {
+          props.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
+          props.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, context.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
+        }
+      }
+    }
+  }
+
   public static Properties setupCommonConsumerProperties(final JavaSamplerContext context) {
     final Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
 
-    setupConsumerDeserializerProperties(context, props);
-    setupConsumerSchemaRegistryProperties(context, props);
+    setupConsumerDeserializerProperties(props);
+    setupConsumerSchemaRegistryProperties(props);
 
     props.put(ConsumerConfig.SEND_BUFFER_CONFIG, context.getParameter(ConsumerConfig.SEND_BUFFER_CONFIG));
     props.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ConsumerConfig.RECEIVE_BUFFER_CONFIG));
@@ -250,8 +275,8 @@ public final class SamplerUtil {
     if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA))) {
       props.put(PropsKeysHelper.KEY_SCHEMA, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA));
     }
-    if (Objects.nonNull(context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, context.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL))) {
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL));
     }
 
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, context.getParameter(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG));
@@ -277,124 +302,6 @@ public final class SamplerUtil {
     verifySecurity(context, props);
 
     return props;
-  }
-
-  public static BaseLoadGenerator configureValueGenerator(final Properties props) {
-    final JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
-    final BaseLoadGenerator generator;
-
-    final String valueNameStrategy = jMeterVariables.get(ProducerKeysHelper.VALUE_NAME_STRATEGY);
-
-    if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO));
-    } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, (Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT));
-    }
-
-    generator = getLoadGenerator(jMeterVariables);
-
-    if (generator.getClass().equals(PlainTextLoadGenerator.class)) {
-      final List<FieldValueMapping> list = new ArrayList<>();
-      list.add(FieldValueMapping.builder().fieldName(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES)).build());
-      props.put(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, list);
-    }
-
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-              Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
-
-    if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      final Map<String, String> originals = new HashMap<>();
-      setupSchemaRegistryAuthenticationProperties(jMeterVariables, originals);
-
-      props.putAll(originals);
-
-      try {
-        generator.setUpGenerator(originals, jMeterVariables.get(PropsKeysHelper.VALUE_SUBJECT_NAME),
-                                 (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-      } catch (final KLoadGenException exc) {
-        if (Objects.nonNull(props.get(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
-          generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-        } else {
-          throw exc;
-        }
-      }
-    } else {
-      generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
-    }
-
-    return generator;
-  }
-
-  public static BaseLoadGenerator configureKeyGenerator(final Properties props) {
-    final JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
-    final BaseLoadGenerator generator;
-
-    final String keyNameStrategy = ProducerKeysHelper.KEY_NAME_STRATEGY;
-    final String keyNameStrategyValue = jMeterVariables.get(keyNameStrategy);
-    if (Objects.isNull(keyNameStrategyValue)) {
-      final String schemaRegistryNameValue = jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-      if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(schemaRegistryNameValue)) {
-        props.put(keyNameStrategy, ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
-      } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(schemaRegistryNameValue)) {
-        props.put(keyNameStrategy, ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
-      }
-    } else {
-      props.put(keyNameStrategy, keyNameStrategyValue);
-    }
-
-    if (Objects.nonNull(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).toLowerCase())) {
-        generator = new JsonSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
-        generator = new AvroSRLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
-        generator = new ProtobufLoadGenerator();
-      } else if (jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
-        generator = new PlainTextLoadGenerator();
-      } else {
-        throw new KLoadGenException("Unsupported Serializer");
-      }
-    } else {
-      generator = new AvroSRLoadGenerator();
-    }
-
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-              Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
-
-    if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      final Map<String, String> originals = new HashMap<>();
-      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
-      originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), jMeterVariables.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
-
-      if (ProducerKeysHelper.FLAG_YES.equals(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
-          originals.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
-          originals.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, jMeterVariables.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
-        } else {
-          originals.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
-          originals.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
-        }
-      }
-
-      props.putAll(originals);
-
-      generator.setUpGenerator(originals, jMeterVariables.get(PropsKeysHelper.KEY_SUBJECT_NAME),
-                               (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
-    } else {
-      generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
-    }
-
-    return generator;
-  }
-
-  public static List<String> populateHeaders(final List<HeaderMapping> kafkaHeaders, final ProducerRecord<Object, Object> producerRecord) {
-    final List<String> headersSB = new ArrayList<>();
-    for (final HeaderMapping kafkaHeader : kafkaHeaders) {
-      final String headerValue = STATELESS_GENERATOR_TOOL.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList()).toString();
-      headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
-      producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
-    }
-    return headersSB;
   }
 
   private static void verifySecurity(final JavaSamplerContext context, final Properties props) {
@@ -426,8 +333,7 @@ public final class SamplerUtil {
     props.put(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG, context.getParameter(SslConfigs.SSL_ENABLED_PROTOCOLS_CONFIG));
 
     props.put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG,
-              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG),
-                                ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
+              propertyOrDefault(context.getParameter(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG), ProducerKeysHelper.DEFAULT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM,
                                 ""));
 
     props.put(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG, context.getParameter(SslConfigs.SSL_KEYMANAGER_ALGORITHM_CONFIG));
@@ -443,50 +349,141 @@ public final class SamplerUtil {
     }
   }
 
-  private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
-    if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-
-      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
-      props.put(schemaRegistryManager.getSchemaRegistryUrlKey(), context.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
-
-      if (ProducerKeysHelper.FLAG_YES.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
-          props.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
-          props.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, context.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
-        } else {
-          props.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
-          props.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, context.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
-        }
-      }
-    }
-  }
-
-  private static String propertyOrDefault(final String property, final String defaultToken, final String valueToSent) {
-    return defaultToken.equals(property) ? valueToSent : property;
-  }
-
-  private static BaseLoadGenerator getLoadGenerator(final JMeterVariables jmeterVariables) {
+  public static BaseLoadGenerator configureValueGenerator(final Properties props) {
+    final JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     final BaseLoadGenerator generator;
 
-    if (Objects.nonNull(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
-      if (JSON_TYPE_SET.contains(jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).toLowerCase())) {
-        generator = new JsonSRLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("avro")) {
-        generator = new AvroSRLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("Protobuf")) {
-        generator = new ProtobufLoadGenerator();
-      } else if (jmeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE).equalsIgnoreCase("NoSchema")) {
-        generator = new PlainTextLoadGenerator();
-      } else {
-        throw new KLoadGenException("Unsupported Serializer");
+    final String valueNameStrategy = jMeterVariables.get(ProducerKeysHelper.VALUE_NAME_STRATEGY);
+
+    if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      props.put(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
+    } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, Objects.nonNull(valueNameStrategy) ? valueNameStrategy : ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
+    }
+
+    if (ObjectUtils.isNotEmpty(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE))) {
+      generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_TYPE));
+    } else {
+      throw new KLoadGenException("Unsupported Serializer");
+    }
+
+    if (generator.getClass().equals(PlainTextLoadGenerator.class)) {
+      final List<FieldValueMapping> list = new ArrayList<>();
+      list.add(FieldValueMapping.builder().fieldName(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES)).build());
+      props.put(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, list);
+    }
+
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+              Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
+
+    if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      final Map<String, String> originals = new HashMap<>();
+      setupSchemaRegistryAuthenticationProperties(jMeterVariables, originals);
+
+      props.putAll(originals);
+
+      try {
+        generator.setUpGenerator(originals, jMeterVariables.get(PropsKeysHelper.VALUE_SUBJECT_NAME),
+                                 (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      } catch (final KLoadGenException exc) {
+        if (Objects.nonNull(props.get(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG))) {
+          generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+        } else {
+          throw exc;
+        }
       }
     } else {
-      generator = new AvroSRLoadGenerator();
+      try {
+        final String schema;
+        if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA).isEmpty()) {
+          schema = props.getProperty(PropsKeysHelper.VALUE_SCHEMA);
+        } else {
+          schema = jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA);
+        }
+        generator.setUpGenerator(schema, (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      } catch (final SchemaParseException exc) {
+        generator.setUpGenerator(props.getProperty(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+      }
     }
 
     return generator;
   }
 
+  public static BaseLoadGenerator configureKeyGenerator(final Properties props) {
+    final JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
+    final BaseLoadGenerator generator;
+
+    final String keyNameStrategyValue = jMeterVariables.get(ProducerKeysHelper.KEY_NAME_STRATEGY);
+    if (Objects.nonNull(keyNameStrategyValue)) {
+      final String schemaRegistryNameValue = jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+      if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(schemaRegistryNameValue)) {
+        props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_APICURIO);
+      } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_CONFLUENT.equalsIgnoreCase(schemaRegistryNameValue)) {
+        props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, ProducerKeysHelper.TOPIC_NAME_STRATEGY_CONFLUENT);
+      }
+    } else {
+      props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, keyNameStrategyValue);
+    }
+
+    if (ObjectUtils.isNotEmpty(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
+      generator = getBaseLoadGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA_TYPE));
+    } else {
+      throw new KLoadGenException("Unsupported Serializer");
+    }
+
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+              Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT));
+
+    if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+      final Map<String, String> originals = new HashMap<>();
+      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+      originals.put(schemaRegistryManager.getSchemaRegistryUrlKey(), jMeterVariables.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
+      originals.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+      if (ProducerKeysHelper.FLAG_YES.equals(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
+          originals.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
+          originals.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, jMeterVariables.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
+        } else {
+          originals.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, jMeterVariables.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
+          originals.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, jMeterVariables.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
+        }
+      }
+
+      props.putAll(originals);
+
+      generator.setUpGenerator(originals, jMeterVariables.get(PropsKeysHelper.KEY_SUBJECT_NAME),
+                               (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
+    } else {
+      generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
+    }
+
+    return generator;
+  }
+
+  private static BaseLoadGenerator getBaseLoadGenerator(final String schemaType) {
+    final BaseLoadGenerator generator;
+    if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
+      generator = new JsonSRLoadGenerator();
+    } else if ("avro".equalsIgnoreCase(schemaType)) {
+      generator = new AvroSRLoadGenerator();
+    } else if ("protobuf".equalsIgnoreCase(schemaType)) {
+      generator = new ProtobufLoadGenerator();
+    } else if ("noSchema".equalsIgnoreCase(schemaType)) {
+      generator = new PlainTextLoadGenerator();
+    } else {
+      throw new KLoadGenException("Unsupported Serializer");
+    }
+    return generator;
+  }
+
+  public static List<String> populateHeaders(final List<HeaderMapping> kafkaHeaders, final ProducerRecord<Object, Object> producerRecord) {
+    final List<String> headersSB = new ArrayList<>();
+    for (final HeaderMapping kafkaHeader : kafkaHeaders) {
+      final String headerValue = STATELESS_GENERATOR_TOOL.generateObject(kafkaHeader.getHeaderName(), kafkaHeader.getHeaderValue(), 10, Collections.emptyList()).toString();
+      headersSB.add(kafkaHeader.getHeaderName().concat(":").concat(headerValue));
+      producerRecord.headers().add(kafkaHeader.getHeaderName(), headerValue.getBytes(StandardCharsets.UTF_8));
+    }
+    return headersSB;
+  }
 
 }

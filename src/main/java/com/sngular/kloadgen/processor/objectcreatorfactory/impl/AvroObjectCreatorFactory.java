@@ -18,10 +18,10 @@ import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import io.confluent.kafka.schemaregistry.ParsedSchema;
@@ -31,7 +31,7 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
 
-public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
+public final class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 
   private static final AvroGeneratorTool AVRO_GENERATOR_TOOL = new AvroGeneratorTool();
 
@@ -50,7 +50,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
       this.schema = (Schema) schema;
     } else if (schema instanceof BaseParsedSchema) {
       final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
-      final ParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
+      final AbstractParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
       if (adapterParse instanceof ApicurioParsedSchemaMetadata) {
         this.schema = (Schema) ((ApicurioParsedSchemaMetadata) adapterParse).getSchema();
       } else {
@@ -64,7 +64,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createMap(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
+  public Object createMap(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerMap) {
 
     Map<Object, Object> map = new HashMap<>();
     if (pojo.isLastFilterTypeOfLastElement()) {
@@ -93,7 +93,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createArray(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
+  public Object createArray(final SchemaProcessorPOJO pojo, final Function<SchemaProcessorPOJO, Object> generateFunction, final boolean isInnerArray) {
 
     List<Object> list = new ArrayList<>();
     if (pojo.isLastFilterTypeOfLastElement()) {
@@ -112,7 +112,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object createValueObject(final SchemaProcessorPOJO pojo) {
+  public Object createValueObject(final SchemaProcessorPOJO pojo) {
     final Schema fieldSchema = findSchema(pojo.getCompleteFieldName(), this.schema, new AtomicBoolean(false));
     final String valueType;
     final boolean logicalType = Objects.nonNull(fieldSchema.getLogicalType());
@@ -129,14 +129,14 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final void assignRecord(final SchemaProcessorPOJO pojo) {
+  public void assignRecord(final SchemaProcessorPOJO pojo) {
     final GenericRecord entityObject = entity.get(pojo.getRootFieldName());
     entityObject.put(pojo.getFieldNameSubEntity(), entity.get(pojo.getFieldNameSubEntity()));
     entity.get(pojo.getRootFieldName());
   }
 
   @Override
-  public final void createRecord(final String objectName, final String completeFieldName) {
+  public void createRecord(final String objectName, final String completeFieldName) {
     if ("root".equalsIgnoreCase(objectName)) {
       var aux = this.schema;
       if (Schema.Type.UNION.equals(this.schema.getType())) {
@@ -157,17 +157,17 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   }
 
   @Override
-  public final Object generateRecord() {
+  public Object generateRecord() {
     return EnrichedRecord.builder().schemaMetadata(schemaMetadataAdapter).genericRecord(this.entity.get("root")).build();
   }
 
   @Override
-  public final Object generateSubEntityRecord(final Object objectRecord) {
+  public Object generateSubEntityRecord(final Object objectRecord) {
     return objectRecord;
   }
 
   @Override
-  public final boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
+  public boolean isOptionalFieldAccordingToSchema(final String completeFieldName, final String fieldName, final int level) {
     var subSchema = findSchema(completeFieldName, this.schema, new AtomicBoolean(false));
 
     if (subSchema.getType().equals(Type.MAP)) {
@@ -178,8 +178,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
     return isOptionalField(subSchema);
   }
 
-  @Override
-  public Object getRootNode(final String rootNode) {
+  public final Object getRootNode(final String rootNode) {
     return entity.get(rootNode);
   }
 
@@ -188,7 +187,7 @@ public class AvroObjectCreatorFactory implements ObjectCreatorFactory {
                                                          pojo.getFieldValuesList(), pojo.getFieldSize(), Collections.emptyMap());
   }
 
-  public final Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
+  public Object assignObject(final String targetObjectName, final String fieldName, final Object objectToAssign) {
     final GenericRecord entityObject = entity.get(targetObjectName);
     entityObject.put(fieldName, objectToAssign);
     return entityObject;

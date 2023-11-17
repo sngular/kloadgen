@@ -11,9 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GenericSchemaRegistry<T,U>{
+public class GenericSchemaRegistry<T, U> {
 
   private GenericSchemaRegistryAdapter genericSchemaRegistryAdapter;
+
   private T id;
 
   private T version;

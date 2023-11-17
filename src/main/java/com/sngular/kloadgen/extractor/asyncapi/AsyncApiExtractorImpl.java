@@ -40,7 +40,7 @@ public class AsyncApiExtractorImpl implements ApiExtractor {
 
   @Override
   public final AsyncApiFile processFile(final File apiFile) {
-    AsyncApiFile asyncApiFile;
+    final AsyncApiFile asyncApiFile;
     try {
       final JsonNode openApi = om.readTree(apiFile);
       asyncApiFile = processNode(openApi);

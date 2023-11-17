@@ -248,7 +248,7 @@ public class SchemaProcessor {
     if (otherFieldIsRequired) {
       shouldProcess = false;
     } else {
-      if (listFieldsSharingPath.size() > 0) {
+      if (!listFieldsSharingPath.isEmpty()) {
         makeFieldValueMappingRequiredAndNotNullable(fetchFieldSharingPathToMakeItRequired(listFieldsSharingPath));
         shouldProcess = fieldValueMapping.getRequired();
       } else {

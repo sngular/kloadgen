@@ -8,25 +8,27 @@ package com.sngular.kloadgen.util;
 
 import java.util.Properties;
 
-import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+@Slf4j
 public final class JMeterHelper {
 
   private JMeterHelper() {
   }
 
   public static BaseParsedSchema getParsedSchema(final String subjectName, final Properties properties) {
-    final String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
-    if (schemaRegistryManager == null || StringUtils.isEmpty(schemaRegistryName)) {
-      throw new KLoadGenException("Schema registry name is required");
+    String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
+    if (schemaRegistryName == null || StringUtils.isEmpty(schemaRegistryName)) {
+      schemaRegistryName = SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME_DEFAULT;
     }
+    final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(schemaRegistryName);
+
     return schemaRegistryManager.getSchemaBySubject(subjectName);
 
   }

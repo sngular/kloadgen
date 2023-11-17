@@ -6,7 +6,7 @@ import lombok.Getter;
 import org.apache.avro.Schema;
 
 @Getter
-public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
+public final class ConfluentParsedSchemaMetadata extends AbstractParsedSchemaAdapter {
 
   private String schemaType;
 
@@ -35,25 +35,29 @@ public class ConfluentParsedSchemaMetadata extends ParsedSchemaAdapter {
     this.canonicalString = schema.canonicalString();
   }
 
-  public static ParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
+  public ConfluentParsedSchemaMetadata() {
+
+  }
+
+  public static AbstractParsedSchemaAdapter parse(final ParsedSchema parsedSchema) {
     return new ConfluentParsedSchemaMetadata(parsedSchema);
   }
 
-  public static ParsedSchemaAdapter parse(final Schema schema) {
+  public static AbstractParsedSchemaAdapter parse(final Schema schema) {
     return new ConfluentParsedSchemaMetadata(schema);
   }
 
-  public static ParsedSchemaAdapter parse (final ProtobufSchema schema) {
+  public static AbstractParsedSchemaAdapter parse(final ProtobufSchema schema) {
     return new ConfluentParsedSchemaMetadata(schema);
   }
 
   @Override
-  public final String getType() {
+  public String getType() {
     return this.schemaType;
   }
 
   @Override
-  public final Object getRawSchema() {
+  public Object getRawSchema() {
     return this.rawSchema;
   }
 }

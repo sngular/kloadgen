@@ -11,7 +11,7 @@
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
-    data base on Data specification
+    data based on Data specification
   </description>
   <url>https://sngular.github.io/kloadgen/</url>
 
@@ -20,7 +20,7 @@
       <name>Mozilla Public License 2.0</name>
       <url>https://github.com/sngular/kloadgen/blob/master/LICENSE</url>
       <distribution>repo</distribution>
-      <comments></comments>
+      <comments/>
     </license>
   </licenses>
 
@@ -192,6 +192,17 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
+      <id>AnxoGomezSngular</id>
+      <name>Anxo Gómez Sánchez</name>
+      <email>anxo.gomez@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
       <id>pedrogarcia</id>
       <name>Pedro Garcia</name>
       <email>pedro.garcia@sngular.com</email>
@@ -310,10 +321,10 @@
   </distributionManagement>
 
   <properties>
-    <assertj-core.version>3.22.0</assertj-core.version>
+    <assertj-core.version>3.24.2</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
     <jsonassert.version>1.5.1</jsonassert.version>
-    <avro.version>1.11.0</avro.version>
+    <avro.version>1.11.2</avro.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <commons-collections4.version>4.4</commons-collections4.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -326,7 +337,7 @@
     <json-path.version>2.6.0</json-path.version>
     <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
-    <apicurio-registry.version>2.4.1.Final</apicurio-registry.version>
+    <apicurio-registry.version>2.4.3.Final</apicurio-registry.version>
     <kafka.version>3.5.1</kafka.version>
     <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
@@ -373,7 +384,12 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.13.1</version>
+      <version>2.15.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>2.15.2</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -451,7 +467,7 @@
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro-protobuf</artifactId>
-      <version>1.11.0</version>
+      <version>1.11.2</version>
     </dependency>
     <dependency>
       <groupId>com.github.os72</groupId>
@@ -463,6 +479,16 @@
       <artifactId>wire-java-generator</artifactId>
       <version>4.0.1</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.api.grpc</groupId>
+      <artifactId>proto-google-common-protos</artifactId>
+      <version>2.24.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.24.3</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -649,7 +675,6 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <configLocation>checkstyle.xml</configLocation>
-          <encoding>UTF-8</encoding>
           <consoleOutput>true</consoleOutput>
           <failsOnError>true</failsOnError>
           <linkXRef>false</linkXRef>
@@ -680,7 +705,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.8.1</version>
         <configuration>
           <optimize>true</optimize>
           <showDeprecation>true</showDeprecation>
@@ -725,7 +750,7 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.7</version>
         <configuration>
-          <check></check>
+          <check/>
           <formats>
             <format>xml</format>
           </formats>
@@ -745,7 +770,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
+        <version>3.1.2</version>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -827,13 +852,16 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>2.4.2</version>
+            <version>3.2.4</version>
             <configuration>
               <filters>
                 <filter>
                   <excludes>
                     <exclude>org/apache/jmeter/jmeter.properties</exclude>
                   </excludes>
+                  <includes>
+                    <include>*.proto</include>
+                  </includes>
                 </filter>
               </filters>
               <finalName>${project.artifactId}-${project.version}</finalName>

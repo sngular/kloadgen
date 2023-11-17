@@ -6,8 +6,8 @@ Now that you know what KLoadGen is and that you are familiar with its components
 
 You will need these tools to start using the plugin:
 
-- JDK/JRE 11+
-- JMeter 5.4+
+- JDK/JRE 17+
+- JMeter 5.6.2+
 - Maven
 
 ## Quickstart

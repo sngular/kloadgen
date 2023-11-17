@@ -9,7 +9,7 @@ import javax.swing.JList;
 
 import com.sngular.kloadgen.extractor.model.AsyncApiSR;
 
-public class AsyncApiSRRenderer extends JLabel implements javax.swing.ListCellRenderer<AsyncApiSR> {
+public final class AsyncApiSRRenderer extends JLabel implements javax.swing.ListCellRenderer<AsyncApiSR> {
 
   public AsyncApiSRRenderer() {
     setOpaque(true);
