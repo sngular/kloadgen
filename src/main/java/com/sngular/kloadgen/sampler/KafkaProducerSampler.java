@@ -189,7 +189,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
         producerRecord = new ProducerRecord<>(topic, getObject(key, keyFlag), getObject(messageVal, valueFlag));
       }
     } else {
-      producerRecord = new ProducerRecord<>(topic, getObject(messageVal, valueFlag));
+      producerRecord = new ProducerRecord<>(topic, getObject(messageVal, valueFlag), getObject(messageVal, valueFlag));
     }
     return producerRecord;
   }
