@@ -15,6 +15,7 @@ public class AvroExtractor<T> implements ExtractorRegistry<T> {
   private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new AvroConfluentExtractor(), SchemaRegistryEnum.APICURIO,
                                                                        new AvroApicurioExtractor());
 
+
   public final List<FieldValueMapping> processSchema(final T schema, final SchemaRegistryEnum registryEnum) {
     return SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schema);
   }

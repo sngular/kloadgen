@@ -136,7 +136,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private List<PropertyMapping> mapVectorConf(final Vector<Vector> dataVector) {
     final var mapResult = new ArrayList<PropertyMapping>();
-    for (Vector v : dataVector) {
+    for (final Vector v : dataVector) {
       mapResult.add(PropertyMapping
                         .builder()
                         .propertyName(v.get(0).toString())

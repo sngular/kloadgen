@@ -153,10 +153,6 @@ public class SchemaProcessor {
     }
     return returnObject;
   }
-  /* private void makeNonEmptyFieldValueMappingRequiered(final FieldValueMapping fieldValueMapping){
-    if ()
-  }
- */
 
   private void makeFieldValueMappingRequiredAndNotNullable(final FieldValueMapping fieldValueMapping) {
     makeFieldValueMappingRequired(fieldValueMapping);
@@ -173,7 +169,7 @@ public class SchemaProcessor {
 
     ArrayDeque<FieldValueMapping> fieldToProcess;
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-    fieldToProcess =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
+    fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
 
     if (fieldToProcess.isEmpty()) {
       fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequiered));
@@ -188,12 +184,13 @@ public class SchemaProcessor {
   }
 
   private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping/*, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue*/) {
+
     boolean shouldProcess = false;
     //final String[] fields = fieldValueMapping.getFieldName().split("\\.");
     if (fieldValueMapping.getFieldValuesList().isEmpty()) {
       fieldValueMapping.getFieldValuesList().remove("null");
     } else {
-      shouldProcess=true;
+      shouldProcess = true;
     }
     return shouldProcess;
   }
