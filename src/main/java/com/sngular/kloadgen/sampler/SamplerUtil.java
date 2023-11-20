@@ -33,7 +33,6 @@ import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import io.apicurio.registry.resolver.SchemaResolverConfig;
-import io.apicurio.registry.serde.SerdeConfig;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import org.apache.avro.SchemaParseException;
 import org.apache.commons.lang3.ObjectUtils;
@@ -97,63 +96,6 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ProducerKeysHelper.APICURIO_LEGACY_ID_HANDLER, ProducerKeysHelper.FLAG_NO);
     defaultParameters.addArgument(ProducerKeysHelper.APICURIO_ENABLE_HEADERS_ID, ProducerKeysHelper.FLAG_YES);
     return defaultParameters;
-  }
-
-  public static Properties setupCommonProperties(final JavaSamplerContext context) {
-    final Properties props = new Properties();
-
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-    if ("true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))) {
-      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY));
-    } else if ("true".equals(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
-      props.put(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_TYPE));
-      props.put(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_VALUE));
-      if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE))) {
-        props.put(PropsKeysHelper.KEY_SCHEMA_TYPE, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SCHEMA_TYPE));
-      }
-      props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_SERIALIZER_CLASS_PROPERTY));
-    } else {
-      props.put(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY, Boolean.FALSE);
-    }
-
-    if (Objects.nonNull(context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG))) {
-      props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, context.getParameter(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
-    }
-
-    props.put(ProducerConfig.ACKS_CONFIG, context.getParameter(ProducerConfig.ACKS_CONFIG));
-    props.put(ProducerConfig.SEND_BUFFER_CONFIG, context.getParameter(ProducerConfig.SEND_BUFFER_CONFIG));
-    props.put(ProducerConfig.RECEIVE_BUFFER_CONFIG, context.getParameter(ProducerConfig.RECEIVE_BUFFER_CONFIG));
-    props.put(ProducerConfig.BATCH_SIZE_CONFIG, context.getParameter(ProducerConfig.BATCH_SIZE_CONFIG));
-    props.put(ProducerConfig.LINGER_MS_CONFIG, context.getParameter(ProducerConfig.LINGER_MS_CONFIG));
-    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, context.getParameter(ProducerConfig.BUFFER_MEMORY_CONFIG));
-    props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, context.getParameter(ProducerConfig.COMPRESSION_TYPE_CONFIG));
-    props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, context.getParameter(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG));
-    props.put(ProducerKeysHelper.SASL_MECHANISM, context.getParameter(ProducerKeysHelper.SASL_MECHANISM));
-
-    final String schemaRegistryNameValue = JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
-    final String enableSchemaRegistrationValue = context.getParameter(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG);
-    if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_APICURIO.equalsIgnoreCase(schemaRegistryNameValue)) {
-      props.put(SerdeConfig.AUTO_REGISTER_ARTIFACT, enableSchemaRegistrationValue);
-      props.put(SchemaResolverConfig.REGISTRY_URL, JavaSamplerContext.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, JavaSamplerContext.getJMeterVariables().get(SchemaResolverConfig.REGISTRY_URL));
-    } else {
-      props.put(SchemaRegistryKeyHelper.ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, enableSchemaRegistrationValue);
-      final String schemaRegistryURL = JavaSamplerContext.getJMeterVariables().get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL);
-      if (StringUtils.isNotBlank(schemaRegistryURL)) {
-        props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, schemaRegistryURL);
-      }
-    }
-
-    final Iterator<String> parameters = context.getParameterNamesIterator();
-    parameters.forEachRemaining(parameter -> {
-      if (parameter.startsWith("_")) {
-        props.put(parameter.substring(1), context.getParameter(parameter));
-      }
-    });
-
-    verifySecurity(context, props);
-
-    return props;
   }
 
   private static String propertyOrDefault(final String property, final String defaultToken, final String valueToSent) {
