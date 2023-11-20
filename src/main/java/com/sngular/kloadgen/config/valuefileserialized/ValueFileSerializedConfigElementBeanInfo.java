@@ -42,33 +42,23 @@ public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
     final PropertyDescriptor nameStrategyPropertyProps = property(VALUE_NAME_STRATEGY);
     nameStrategyPropertyProps.setPropertyEditorClass(NameStrategyPropertyEditor.class);
-    nameStrategyPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    nameStrategyPropertyProps.setValue(DEFAULT, "");
-    nameStrategyPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    complete(nameStrategyPropertyProps);
 
     final PropertyDescriptor serializerPropertyProps = property(VALUE_SERIALIZER_PROPERTY);
     serializerPropertyProps.setPropertyEditorClass(ValueSerializerPropertyEditor.class);
-    serializerPropertyProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    serializerPropertyProps.setValue(DEFAULT, "");
-    serializerPropertyProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    complete(serializerPropertyProps);
 
     final PropertyDescriptor subjectNameProps = property(VALUE_SUBJECT_NAME);
     subjectNameProps.setPropertyEditorClass(FileSubjectPropertyEditor.class);
-    subjectNameProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    subjectNameProps.setValue(DEFAULT, "");
-    subjectNameProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    complete(subjectNameProps);
 
     final PropertyDescriptor schemaType = property(VALUE_SCHEMA_TYPE);
     schemaType.setPropertyEditorClass(SchemaTypePropertyEditor.class);
-    schemaType.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    schemaType.setValue(DEFAULT, "");
-    schemaType.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    complete(schemaType);
 
     final PropertyDescriptor avroSchemaProps = property(VALUE_SCHEMA_DEFINITION);
     avroSchemaProps.setPropertyEditorClass(SchemaConverterPropertyEditor.class);
-    avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
-    avroSchemaProps.setValue(DEFAULT, "");
-    avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    complete(avroSchemaProps);
 
     final TypeEditor tableEditor = TypeEditor.TableEditor;
     final PropertyDescriptor tableProperties = property(VALUE_SCHEMA_PROPERTIES, tableEditor);
@@ -78,5 +68,11 @@ public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
                              new String[]{FieldValueMapping.FIELD_NAME, FieldValueMapping.FIELD_TYPE, FieldValueMapping.VALUE_LENGTH, FieldValueMapping.FIELD_VALUES_LIST});
     tableProperties.setValue(DEFAULT, new ArrayList<>());
     tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
+  }
+
+  private void complete(final PropertyDescriptor propertyDescriptor) {
+    propertyDescriptor.setValue(NOT_UNDEFINED, Boolean.TRUE);
+    propertyDescriptor.setValue(DEFAULT, "");
+    propertyDescriptor.setValue(NOT_EXPRESSION, Boolean.FALSE);
   }
 }

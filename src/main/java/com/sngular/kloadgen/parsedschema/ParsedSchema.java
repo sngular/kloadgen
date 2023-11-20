@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
@@ -51,8 +52,7 @@ public class ParsedSchema<T> implements IParsedSchema<T> {
   }
 
   public ParsedSchema(final io.confluent.kafka.schemaregistry.ParsedSchema parsedSchema) throws IOException {
-    this.schema = (T) parsedSchema;
-    this.schemaType = parsedSchema.schemaType();
+    this(parsedSchema.canonicalString(), parsedSchema.schemaType());
   }
 
   public final Object schema() {
@@ -68,7 +68,44 @@ public class ParsedSchema<T> implements IParsedSchema<T> {
   }
 
   public final String canonicalString() {
-    return null;
+    return switch (this.schemaType) {
+      case "AVRO" -> stringAvro(this.schema);
+      case "JSON" -> stringJson(this.schema);
+      case "PROTOBUF" -> stringProto(this.schema);
+      default -> this.schema.toString();
+    };
+  }
+
+  private String stringAvro(final T schema) {
+    final String result;
+    if (schema instanceof AvroSchema) {
+      result = ((AvroSchema) this.schema).canonicalString();
+    } else {
+      result = this.schema.toString();
+    }
+    return result;
+  }
+
+  private String stringJson(final T schema) {
+    final String result;
+    if (schema instanceof JsonSchema) {
+      result = ((JsonSchema) this.schema).canonicalString();
+    } else {
+      result = this.schema.toString();
+    }
+    return result;
+  }
+
+  private String stringProto(final T schema) {
+    final String result;
+    if (schema instanceof ProtobufSchema) {
+      result = ((ProtobufSchema) this.schema).canonicalString();
+    } else if (schema instanceof ProtoFileElement) {
+      result = ((ProtoFileElement) this.schema).toSchema();
+    } else {
+      result = this.schema.toString();
+    }
+    return result;
   }
 
   public final Object rawSchema() {
