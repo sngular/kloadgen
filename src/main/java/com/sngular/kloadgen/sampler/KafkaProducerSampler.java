@@ -82,9 +82,10 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
         if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(PropsKeysHelper.KEY_SUBJECT_NAME))) {
           keyGenerator = SamplerUtil.configureKeyGenerator(props);
         } else {
-          msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
-          msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
-                            ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+          msgKeyType = JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_TYPE);
+          msgKeyValue =
+              Objects.isNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_VALUE))
+                            ? Collections.emptyList() : Collections.singletonList(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_VALUE));
         }
       } else {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
