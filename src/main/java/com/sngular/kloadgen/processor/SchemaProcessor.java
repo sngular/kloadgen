@@ -153,10 +153,7 @@ public class SchemaProcessor {
     }
     return returnObject;
   }
- /* private void makeNonEmptyFieldValueMappingRequiered(final FieldValueMapping fieldValueMapping){
-    if ()
-  }
-*/
+
   private void makeFieldValueMappingRequiredAndNotNullable(final FieldValueMapping fieldValueMapping) {
     makeFieldValueMappingRequired(fieldValueMapping);
     final List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
@@ -172,13 +169,13 @@ public class SchemaProcessor {
 
     ArrayDeque<FieldValueMapping> fieldToProcess;
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-    fieldToProcess =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
+    fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
 
-    if (fieldToProcess.isEmpty())
-      fieldToProcess =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequiered));
-
-    if(fieldToProcess.isEmpty()) {
-      while (initialFieldExpMappingsQueue.size()>1){
+    if (fieldToProcess.isEmpty()) {
+      fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequired));
+    }
+    if (fieldToProcess.isEmpty()) {
+      while (initialFieldExpMappingsQueue.size() > 1) {
         initialFieldExpMappingsQueue.removeFirst();
       }
       fieldToProcess = new ArrayDeque<>(initialFieldExpMappingsQueue);
@@ -186,13 +183,13 @@ public class SchemaProcessor {
     return fieldToProcess;
   }
 
-  private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping/*, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue*/){
+  private boolean shouldProcessFieldIfIsNonRequired(final FieldValueMapping fieldValueMapping/*, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue*/) {
     boolean shouldProcess = false;
     //final String[] fields = fieldValueMapping.getFieldName().split("\\.");
     if (fieldValueMapping.getFieldValuesList().isEmpty()) {
       fieldValueMapping.getFieldValuesList().remove("null");
     } else {
-      shouldProcess=true;
+      shouldProcess = true;
     }
     return shouldProcess;
   }
