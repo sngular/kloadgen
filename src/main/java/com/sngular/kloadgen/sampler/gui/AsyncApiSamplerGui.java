@@ -129,7 +129,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
           asyncApiSampler.setSchemaFieldConfiguration(mapVector(schemaFieldModel.getDataVector()));
         }
       }
-        // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
+      // asyncApiSampler.setAsyncApiRegistry((AsyncApiSR) registryComboBox.getSelectedItem());
     }
     configureTestElement(element);
   }
@@ -385,7 +385,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   }
 
   private void topicComboActionListener(final ActionEvent event) {
-    final JComboBox cb = (JComboBox)event.getSource();
+    final JComboBox cb = (JComboBox) event.getSource();
     final var selectedSchema = (AsyncApiSchema) cb.getSelectedItem();
     if (Objects.nonNull(selectedSchema)) {
       fillTable(schemaFieldModel, selectedSchema.getProperties());
@@ -396,7 +396,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   }
 
   private void serverChooseActionListener(final ActionEvent actionEvent) {
-    final JComboBox serverChoose = (JComboBox)actionEvent.getSource();
+    final JComboBox serverChoose = (JComboBox) actionEvent.getSource();
     if (Objects.nonNull(serverChoose)) {
       fillTable(brokerFieldModel, prepareServer((AsyncApiServer) serverChoose.getSelectedItem()));
     }

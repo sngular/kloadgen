@@ -153,10 +153,11 @@ public class SchemaProcessor {
     }
     return returnObject;
   }
- /* private void makeNonEmptyFieldValueMappingRequiered(final FieldValueMapping fieldValueMapping){
+  /* private void makeNonEmptyFieldValueMappingRequiered(final FieldValueMapping fieldValueMapping){
     if ()
   }
-*/
+ */
+
   private void makeFieldValueMappingRequiredAndNotNullable(final FieldValueMapping fieldValueMapping) {
     makeFieldValueMappingRequired(fieldValueMapping);
     final List<String> temporalFieldValueList = fieldValueMapping.getFieldValuesList();
@@ -174,11 +175,11 @@ public class SchemaProcessor {
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
     fieldToProcess =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
 
-    if (fieldToProcess.isEmpty())
-      fieldToProcess =  new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequiered));
-
-    if(fieldToProcess.isEmpty()) {
-      while (initialFieldExpMappingsQueue.size()>1){
+    if (fieldToProcess.isEmpty()) {
+      fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequiered));
+    }
+    if (fieldToProcess.isEmpty()) {
+      while (initialFieldExpMappingsQueue.size() > 1) {
         initialFieldExpMappingsQueue.removeFirst();
       }
       fieldToProcess = new ArrayDeque<>(initialFieldExpMappingsQueue);
@@ -186,7 +187,7 @@ public class SchemaProcessor {
     return fieldToProcess;
   }
 
-  private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping/*, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue*/){
+  private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping/*, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue*/) {
     boolean shouldProcess = false;
     //final String[] fields = fieldValueMapping.getFieldName().split("\\.");
     if (fieldValueMapping.getFieldValuesList().isEmpty()) {
