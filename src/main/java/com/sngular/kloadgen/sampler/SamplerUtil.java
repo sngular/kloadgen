@@ -395,7 +395,7 @@ public final class SamplerUtil {
     } else {
       try {
         final String schema;
-        if (jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA).isEmpty()) {
+        if (ObjectUtils.isEmpty(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA))) {
           schema = props.getProperty(PropsKeysHelper.VALUE_SCHEMA);
         } else {
           schema = jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA);
