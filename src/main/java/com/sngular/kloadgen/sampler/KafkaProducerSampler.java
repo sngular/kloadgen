@@ -34,20 +34,10 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.Serializer;
-import com.sngular.kloadgen.property.editor.ReflectionUtils;
-import org.reflections.Reflections;
-import org.reflections.scanners.Scanners;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 public final class KafkaProducerSampler extends AbstractJavaSamplerClient implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
-
-  private static final Set<String> SERIALIZER_SET = new HashSet<>(
-          ReflectionUtils.extractSerializers(
-                  new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClass(Serializer.class)).setScanners(Scanners.SubTypes)),
-                  Serializer.class));
 
   private static final long serialVersionUID = 1L;
 
@@ -195,11 +185,11 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private Boolean enrichedKeyFlag() {
-    return SERIALIZER_SET.contains(props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toString());
+    return keyMessageFlag;
   }
 
   private Boolean enrichedValueFlag() {
-    return SERIALIZER_SET.contains(props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG).toString());
+    return !keyMessageFlag;
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
