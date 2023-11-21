@@ -16,8 +16,10 @@ import java.util.concurrent.ExecutionException;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.model.HeaderMapping;
+import com.sngular.kloadgen.property.editor.ReflectionUtils;
 import com.sngular.kloadgen.randomtool.generator.StatelessGeneratorTool;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
+import com.sngular.kloadgen.serializer.EnrichedRecordSerializer;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import io.apicurio.registry.serde.Legacy4ByteIdHandler;
@@ -35,11 +37,25 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.Serializer;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 public final class KafkaProducerSampler extends AbstractJavaSamplerClient implements Serializable {
 
   private static final String TEMPLATE = "Topic: %s, partition: %s, offset: %s";
 
+  private static final Set<String> SERIALIZER_SET = new HashSet<>(
+          ReflectionUtils.extractSerializers(
+                  new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClass(Serializer.class)).setScanners(Scanners.SubTypes)),
+                  Serializer.class));
+
+  private static final Set<String> VALUE_SERIALIZER_SET = new HashSet<>(ReflectionUtils.extractSerializers(
+          new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClass(Serializer.class)).setScanners(Scanners.SubTypes)),
+          EnrichedRecordSerializer.class));
+
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private final transient StatelessGeneratorTool statelessGeneratorTool = new StatelessGeneratorTool();
@@ -59,6 +75,8 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   private transient BaseLoadGenerator keyGenerator;
 
   private transient Properties props;
+
+  private Serializer valueSerializer;
 
   @Override
   public void setupTest(final JavaSamplerContext context) {
@@ -100,8 +118,9 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
       props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT);
 
+      valueSerializer = (Serializer) Class.forName((String) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance();
       producer = new KafkaProducer<>(props, (Serializer) Class.forName((String) props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance(),
-              (Serializer) Class.forName((String) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance());
+              valueSerializer);
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
     } catch (ClassNotFoundException e) {
@@ -186,11 +205,11 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   }
 
   private Boolean enrichedKeyFlag() {
-    return keyMessageFlag;
+    return SERIALIZER_SET.contains(props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toString());
   }
 
   private Boolean enrichedValueFlag() {
-    return !keyMessageFlag;
+    return VALUE_SERIALIZER_SET.contains(props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG).toString());
   }
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {

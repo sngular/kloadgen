@@ -21,7 +21,7 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
-public class AvroSerializer<T extends EnrichedRecord> implements Serializer<T> {
+public class AvroSerializer<T extends EnrichedRecord> implements EnrichedRecordSerializer<T> {
 
   private static final byte MAGIC_BYTE = 0x0;
 

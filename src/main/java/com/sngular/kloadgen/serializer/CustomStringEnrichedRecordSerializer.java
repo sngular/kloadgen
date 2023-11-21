@@ -5,7 +5,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Map;
 
-public class CustomStringEnrichedRecordSerializer implements Serializer<EnrichedRecord> {
+public class CustomStringEnrichedRecordSerializer<T extends EnrichedRecord> implements EnrichedRecordSerializer<T> {
   StringSerializer stringSerializer;
 
   public CustomStringEnrichedRecordSerializer() {
