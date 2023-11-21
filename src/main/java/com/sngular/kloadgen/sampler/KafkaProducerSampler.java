@@ -6,6 +6,7 @@
 
 package com.sngular.kloadgen.sampler;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
