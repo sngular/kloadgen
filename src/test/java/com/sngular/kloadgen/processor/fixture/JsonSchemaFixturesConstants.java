@@ -66,7 +66,7 @@ public class JsonSchemaFixturesConstants {
                   .constraints(Collections.emptyMap())
                   .build()
   ));
-  public static final String SIMPLE_SCHEMA_NONREQUIRED_EXPECTED =  "{\"firstName\": \"Graciela\",\"age\":21}";
+  public static final String SIMPLE_SCHEMA_NONREQUIRED_EXPECTED =  "{\"firstName\":\"Graciela\",\"age\":21.0}";
 
   public static final List<FieldValueMapping> SIMPLE_SCHEMA_MAP = new ArrayList<>(Arrays.asList(
       FieldValueMapping.builder()
