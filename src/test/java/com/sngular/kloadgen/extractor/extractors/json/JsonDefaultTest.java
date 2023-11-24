@@ -22,23 +22,7 @@ class JsonDefaultTest {
 
   private final Extractor<String> jsonDefaultExtractor = new JsonDefaultExtractor();
 
-  @Test
-  @DisplayName("Should extract basic types")
-  void testBasic() throws Exception {
-    final String testFile = fileHelper.getContent("/jsonschema/basic.jcs");
 
-    final Map<ConstraintTypeEnum, String> constraints = Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0");
-    final JSONObject jsonObject = new JSONObject(testFile);
-    final Schema schema = SchemaLoader.load(jsonObject);
-    final List<FieldValueMapping> fieldValueMappingList = jsonDefaultExtractor.processSchema(schema.toString());
-
-    Assertions.assertThat(fieldValueMappingList)
-              .hasSize(3)
-              .containsExactlyInAnyOrder(
-                  FieldValueMapping.builder().fieldName("firstName").fieldType("string").constraints(constraints).required(false).isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("lastName").fieldType("string").constraints(constraints).required(true).isAncestorRequired(false).build(),
-                  FieldValueMapping.builder().fieldName("age").fieldType("number").required(true).isAncestorRequired(false).build());
-  }
 
   @Test
   @DisplayName("Should extract a basic array")

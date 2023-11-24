@@ -53,7 +53,7 @@ class RandomMapTest {
     );
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "test for {0}")
   @MethodSource("parametersForGenerateMapRandomValueFromList")
   void generateMapRandomValueFromList(
       final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<String, Object> expected, final Integer size) {

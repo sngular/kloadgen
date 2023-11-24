@@ -9,12 +9,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
+import com.sngular.kloadgen.testutil.FileHelper;
+import com.sngular.kloadgen.testutil.SchemaParseUtil;
+import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,6 +34,10 @@ public class JsonSchemaProcessorTest {
 
   private static Stream<Object> parametersForTestBasicStructure() {
     return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED_EXPECTED));
+  }
+
+  private static Stream<Object> parametersForTestOptionalFieldNonEmpty(){
+    return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED_EXPECTED));
   }
 
   @BeforeEach
@@ -115,6 +123,19 @@ public class JsonSchemaProcessorTest {
     Assertions.assertThat(message.toString()).containsPattern("^\\{\"flowers\":\\{(\"\\w+\":\\{\"name\":\\[(\"Edelweiss\",?)+],?)+.*");
     Assertions.assertThat(message.toString()).containsPattern(
         ".*\\\"bush\":\\{\"\\w+\":\\{\"maxHeight\":(\\[(\\{(\"\\w+\":\\d+,?)+},?)+],?)*\"leafs\":(\\[\\{(\"\\w+\":\\[(\"oval\",?)+],?)+}+],+)*.*$");
+  }
+
+  @ParameterizedTest
+  @DisplayName("Should process non-required fields if it is not empty")
+  @MethodSource("parametersForTestOptionalFieldNonEmpty")
+  final void testOptionalFieldNonEmpty(final List<FieldValueMapping> schemaAsJson, final String expected){
+
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON,null,null,schemaAsJson);
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+
+    JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
   }
 
 }

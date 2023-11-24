@@ -171,23 +171,24 @@ public class SchemaProcessor {
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
     fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
 
+
     if (fieldToProcess.isEmpty()) {
       fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequiered));
-    }
-    if (fieldToProcess.isEmpty()) {
-      while (initialFieldExpMappingsQueue.size() > 1) {
-        initialFieldExpMappingsQueue.removeFirst();
+      if (fieldToProcess.isEmpty()) {
+        while (initialFieldExpMappingsQueue.size() > 1) {
+          initialFieldExpMappingsQueue.removeFirst();
+        }
+        fieldToProcess = initialFieldExpMappingsQueue;
       }
-      fieldToProcess = new ArrayDeque<>(initialFieldExpMappingsQueue);
     }
+
     return fieldToProcess;
   }
 
-  private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping/*, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue*/) {
+  private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping) {
 
     boolean shouldProcess = false;
-    //final String[] fields = fieldValueMapping.getFieldName().split("\\.");
-    if (fieldValueMapping.getFieldValuesList().isEmpty()) {
+    if (fieldValueMapping.getFieldValuesList().isEmpty() || fieldValueMapping.getFieldValuesList().contains("null")) {
       fieldValueMapping.getFieldValuesList().remove("null");
     } else {
       shouldProcess = true;
