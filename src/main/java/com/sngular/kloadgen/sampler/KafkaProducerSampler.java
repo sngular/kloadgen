@@ -10,7 +10,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
@@ -82,7 +88,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   public void setupTest(final JavaSamplerContext context) {
     props = JMeterContextService.getContext().getProperties();
 
-    if(context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA) == null) {
+    if (context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA) == null) {
       generator = SamplerUtil.configureKeyGenerator(props);
     } else {
       generator = SamplerUtil.configureValueGenerator(props);
@@ -123,7 +129,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
               valueSerializer);
     } catch (final KafkaException ex) {
       getNewLogger().error(ex.getMessage(), ex);
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       getNewLogger().error(e.getMessage(), e);
     } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
       throw new RuntimeException(e);

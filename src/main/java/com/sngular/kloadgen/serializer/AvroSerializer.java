@@ -18,7 +18,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
-import org.apache.kafka.common.serialization.Serializer;
 
 @Slf4j
 public class AvroSerializer<T extends EnrichedRecord> implements EnrichedRecordSerializer<T> {
