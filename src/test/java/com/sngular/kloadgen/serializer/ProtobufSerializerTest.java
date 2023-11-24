@@ -9,12 +9,11 @@ import java.util.stream.Stream.Builder;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -47,30 +46,30 @@ class ProtobufSerializerTest {
   private static Stream<Arguments> getSchemaToTest() {
     final Builder<Arguments> builder = Stream.builder();
 
-    final File testCompleteProtoFile = ProtobuffSerializerTestFixture.TEST_COMPLETE_PROTO.getFirst();
-    builder.add(Arguments.arguments(Named.of(testCompleteProtoFile.getName(), testCompleteProtoFile), ProtobuffSerializerTestFixture.TEST_COMPLETE_PROTO.getSecond()));
-    final File testComplexFile = ProtobuffSerializerTestFixture.TEST_COMPLEX.getFirst();
-    builder.add(Arguments.arguments(Named.of(testComplexFile.getName(), testComplexFile), ProtobuffSerializerTestFixture.TEST_COMPLEX.getSecond()));
-    final File testDateTimeFile = ProtobuffSerializerTestFixture.TEST_DATE_TIME.getFirst();
-    builder.add(Arguments.arguments(Named.of(testDateTimeFile.getName(), testDateTimeFile), ProtobuffSerializerTestFixture.TEST_DATE_TIME.getSecond()));
-    final File testDeveFile = ProtobuffSerializerTestFixture.TEST_DEVE.getFirst();
-    builder.add(Arguments.arguments(Named.of(testDeveFile.getName(), testDeveFile), ProtobuffSerializerTestFixture.TEST_DEVE.getSecond()));
-    final File testEasyFile = ProtobuffSerializerTestFixture.TEST_EASY.getFirst();
-    builder.add(Arguments.arguments(Named.of(testEasyFile.getName(), testEasyFile), ProtobuffSerializerTestFixture.TEST_EASY.getSecond()));
-    final File testEmbeddedTypeFile = ProtobuffSerializerTestFixture.TEST_EMBEDDED_TYPE.getFirst();
-    builder.add(Arguments.arguments(Named.of(testEmbeddedTypeFile.getName(), testEmbeddedTypeFile), ProtobuffSerializerTestFixture.TEST_EMBEDDED_TYPE.getSecond()));
-    final File testEnumFile = ProtobuffSerializerTestFixture.TEST_ENUM.getFirst();
-    builder.add(Arguments.arguments(Named.of(testEnumFile.getName(), testEnumFile), ProtobuffSerializerTestFixture.TEST_ENUM.getSecond()));
-    final File testGoogleTypesFile = ProtobuffSerializerTestFixture.TEST_GOOGLE_TYPES.getFirst();
-    builder.add(Arguments.arguments(Named.of(testGoogleTypesFile.getName(), testGoogleTypesFile), ProtobuffSerializerTestFixture.TEST_GOOGLE_TYPES.getSecond()));
-    final File testIssue311File = ProtobuffSerializerTestFixture.TEST_ISSUE_311.getFirst();
-    builder.add(Arguments.arguments(Named.of(testIssue311File.getName(), testIssue311File), ProtobuffSerializerTestFixture.TEST_ISSUE_311.getSecond()));
-    final File testMapFile = ProtobuffSerializerTestFixture.TEST_MAP.getFirst();
-    builder.add(Arguments.arguments(Named.of(testMapFile.getName(), testMapFile), ProtobuffSerializerTestFixture.TEST_MAP.getSecond()));
-    final File testOneOfFile = ProtobuffSerializerTestFixture.TEST_ONE_OF.getFirst();
-    builder.add(Arguments.arguments(Named.of(testOneOfFile.getName(), testOneOfFile), ProtobuffSerializerTestFixture.TEST_ONE_OF.getSecond()));
-    final File testProvidedFile = ProtobuffSerializerTestFixture.TEST_PROVIDED.getFirst();
-    builder.add(Arguments.arguments(Named.of(testProvidedFile.getName(), testProvidedFile), ProtobuffSerializerTestFixture.TEST_PROVIDED.getSecond()));
+    final File testCompleteProtoFile = ProtobufSerializerTestFixture.TEST_COMPLETE_PROTO.getFirst();
+    builder.add(Arguments.arguments(Named.of(testCompleteProtoFile.getName(), testCompleteProtoFile), ProtobufSerializerTestFixture.TEST_COMPLETE_PROTO.getSecond()));
+    final File testComplexFile = ProtobufSerializerTestFixture.TEST_COMPLEX.getFirst();
+    builder.add(Arguments.arguments(Named.of(testComplexFile.getName(), testComplexFile), ProtobufSerializerTestFixture.TEST_COMPLEX.getSecond()));
+    final File testDateTimeFile = ProtobufSerializerTestFixture.TEST_DATE_TIME.getFirst();
+    builder.add(Arguments.arguments(Named.of(testDateTimeFile.getName(), testDateTimeFile), ProtobufSerializerTestFixture.TEST_DATE_TIME.getSecond()));
+    final File testDeveFile = ProtobufSerializerTestFixture.TEST_DEVE.getFirst();
+    builder.add(Arguments.arguments(Named.of(testDeveFile.getName(), testDeveFile), ProtobufSerializerTestFixture.TEST_DEVE.getSecond()));
+    final File testEasyFile = ProtobufSerializerTestFixture.TEST_EASY.getFirst();
+    builder.add(Arguments.arguments(Named.of(testEasyFile.getName(), testEasyFile), ProtobufSerializerTestFixture.TEST_EASY.getSecond()));
+    final File testEmbeddedTypeFile = ProtobufSerializerTestFixture.TEST_EMBEDDED_TYPE.getFirst();
+    builder.add(Arguments.arguments(Named.of(testEmbeddedTypeFile.getName(), testEmbeddedTypeFile), ProtobufSerializerTestFixture.TEST_EMBEDDED_TYPE.getSecond()));
+    final File testEnumFile = ProtobufSerializerTestFixture.TEST_ENUM.getFirst();
+    builder.add(Arguments.arguments(Named.of(testEnumFile.getName(), testEnumFile), ProtobufSerializerTestFixture.TEST_ENUM.getSecond()));
+    final File testGoogleTypesFile = ProtobufSerializerTestFixture.TEST_GOOGLE_TYPES.getFirst();
+    builder.add(Arguments.arguments(Named.of(testGoogleTypesFile.getName(), testGoogleTypesFile), ProtobufSerializerTestFixture.TEST_GOOGLE_TYPES.getSecond()));
+    final File testIssue311File = ProtobufSerializerTestFixture.TEST_ISSUE_311.getFirst();
+    builder.add(Arguments.arguments(Named.of(testIssue311File.getName(), testIssue311File), ProtobufSerializerTestFixture.TEST_ISSUE_311.getSecond()));
+    final File testMapFile = ProtobufSerializerTestFixture.TEST_MAP.getFirst();
+    builder.add(Arguments.arguments(Named.of(testMapFile.getName(), testMapFile), ProtobufSerializerTestFixture.TEST_MAP.getSecond()));
+    final File testOneOfFile = ProtobufSerializerTestFixture.TEST_ONE_OF.getFirst();
+    builder.add(Arguments.arguments(Named.of(testOneOfFile.getName(), testOneOfFile), ProtobufSerializerTestFixture.TEST_ONE_OF.getSecond()));
+    final File testProvidedFile = ProtobufSerializerTestFixture.TEST_PROVIDED.getFirst();
+    builder.add(Arguments.arguments(Named.of(testProvidedFile.getName(), testProvidedFile), ProtobufSerializerTestFixture.TEST_PROVIDED.getSecond()));
 
     return builder.build();
   }
@@ -78,12 +77,12 @@ class ProtobufSerializerTest {
   @ParameterizedTest
   @MethodSource("getSchemaToTest")
   void serialize(final File schemaFile, final List<FieldValueMapping> fieldValueMappings) throws IOException {
-    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(schemaFile, "Protobuf");
+    final ParsedSchema parsedSchema = new ParsedSchema(schemaFile, "PROTOBUF");
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     final BaseSchemaMetadata confluentBaseSchemaMetadata =
         new BaseSchemaMetadata<>(
             ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1, "")));
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema.rawSchema(), confluentBaseSchemaMetadata, fieldValueMappings);
 
     final var generatedRecord = protobufSchemaProcessor.next();
 

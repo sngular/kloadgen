@@ -15,6 +15,7 @@
   <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*ProcessorTest\.java" />
   <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*Standalone\.java" />
   <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*AvroSerializersUtil\.java" />
+  <suppress checks="ClassDataAbstractionCoupling" files="[/\\].*ExtractorFactoryTest\.java" />
   <suppress checks="ExecutableStatementCount" files="[/\\].*Standalone\.java" />
   <suppress checks="AnonInnerLength" files="[/\\].*AutoCompletion\.java" />
   <suppress checks="Indentation" files="[/\\].*ExtractorTest\.java" />

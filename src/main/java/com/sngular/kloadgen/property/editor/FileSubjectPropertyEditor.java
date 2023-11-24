@@ -32,8 +32,8 @@ import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.AvroRuntimeException;
 import org.apache.jmeter.gui.ClearGui;
@@ -43,6 +43,7 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.util.JMeterUtils;
+
 
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements TestBeanPropertyEditor, ClearGui {

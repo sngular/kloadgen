@@ -152,7 +152,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     final var kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
     if (Objects.nonNull(messageVal)) {
-
       try {
         final var producerRecord = getProducerRecord(messageVal, enrichedKeyFlag(), enrichedValueFlag());
         final var headersSB = new ArrayList<>(SamplerUtil.populateHeaders(kafkaHeaders, producerRecord));
@@ -215,8 +214,18 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
     final String result = "key: "
             + producerRecord.key()
-            + ", payload: " + producerRecord.value();
+            + ", payload: " + stringValue(producerRecord.value());
     sampleResult.setSamplerData(result);
+  }
+
+  private String stringValue(final Object value) {
+    final String result;
+    if (value instanceof EnrichedRecord) {
+      result = ((EnrichedRecord) value).getGenericRecord().toString();
+    } else {
+      result = value.toString();
+    }
+    return result;
   }
 
   private void fillSampleResult(final SampleResult sampleResult, final String respondeData, final boolean successful) {
