@@ -21,13 +21,12 @@ import java.util.stream.Stream;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.fixture.AvroSchemaFixturesConstants;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
@@ -81,7 +80,7 @@ class AvroSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("topLevelIntArray[3]").fieldType("int-array").valueLength(0).fieldValueList("[2]").required(true).isAncestorRequired(true).build());
 
     final File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
+    final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
     final SchemaProcessor avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final GenericRecord entity = setUpEntityForAvroTestWithSubEntitySimpleArray(parsedSchema);
@@ -131,7 +130,7 @@ class AvroSchemaProcessorTest {
             .build());
 
     final var testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-    final var parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
+    final var parsedSchema = new ParsedSchema(testFile, "AVRO");
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var entity = setUpEntityForAvroTestWithSubEntityArray(parsedSchema);
@@ -175,7 +174,7 @@ class AvroSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("timestamp").fieldType("long").valueLength(0).fieldValueList("5").required(true).isAncestorRequired(true).build()
     );
     final var testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-    final var parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
+    final var parsedSchema = new ParsedSchema(testFile, "AVRO");
     final var avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var message = (EnrichedRecord) avroSchemaProcessor.next();
@@ -553,7 +552,7 @@ class AvroSchemaProcessorTest {
             .build()
     );
     final File testFile = fileHelper.getFile("/avro-files/optionalEnum.avsc");
-    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "AVRO");
+    final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
     final SchemaProcessor avroSchemaProcessor = new SchemaProcessor();
     avroSchemaProcessor.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final EnrichedRecord message = (EnrichedRecord) avroSchemaProcessor.next();

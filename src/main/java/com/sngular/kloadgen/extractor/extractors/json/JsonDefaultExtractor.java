@@ -16,7 +16,7 @@ public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extra
   @Override
   public final List<FieldValueMapping> processSchema(final String schema) {
 
-    final Schema parsed = getSchemaParser().parse(schema.toString());
+    final Schema parsed = getSchemaParser().parse(schema);
 
     final List<FieldValueMapping> attributeList = new ArrayList<>();
     parsed.getProperties().forEach(field -> attributeList.addAll(processField(field, true, null)));
