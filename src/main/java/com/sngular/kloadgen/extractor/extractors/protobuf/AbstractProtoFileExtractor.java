@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.extractor.extractors.protobuff;
+package com.sngular.kloadgen.extractor.extractors.protobuf;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
