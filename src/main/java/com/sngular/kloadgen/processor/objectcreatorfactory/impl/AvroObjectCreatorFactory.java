@@ -14,6 +14,7 @@ import java.util.function.Function;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
@@ -24,7 +25,6 @@ import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
