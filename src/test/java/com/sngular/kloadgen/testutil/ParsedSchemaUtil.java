@@ -1,11 +1,8 @@
 package com.sngular.kloadgen.testutil;
 
-import java.util.List;
+import com.sngular.kloadgen.parsedschema.IParsedSchema;
 
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.client.rest.entities.SchemaReference;
-
-public final class ParsedSchemaUtil implements ParsedSchema {
+public final class ParsedSchemaUtil implements IParsedSchema {
 
   @Override
   public String schemaType() {
@@ -19,16 +16,6 @@ public final class ParsedSchemaUtil implements ParsedSchema {
 
   @Override
   public String canonicalString() {
-    return null;
-  }
-
-  @Override
-  public List<SchemaReference> references() {
-    return null;
-  }
-
-  @Override
-  public List<String> isBackwardCompatible(final ParsedSchema parsedSchema) {
     return null;
   }
 

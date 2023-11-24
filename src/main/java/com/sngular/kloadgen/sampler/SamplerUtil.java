@@ -398,7 +398,7 @@ public final class SamplerUtil {
         final String schema = StringUtils.defaultIfEmpty(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), props.getProperty(PropsKeysHelper.VALUE_SCHEMA));
         generator.setUpGenerator(schema, (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
       } catch (final SchemaParseException exc) {
-        generator.setUpGenerator(props.getProperty(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
+        generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
       }
     }
 

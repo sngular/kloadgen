@@ -20,6 +20,7 @@ import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.DynamicMessage.Builder;
 import com.google.protobuf.Message;
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
@@ -30,7 +31,6 @@ import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {

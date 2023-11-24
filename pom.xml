@@ -310,6 +310,27 @@
       <roles>
         <role>Trainee Backend Developer</role>
       </roles>
+    </developer>
+    <developer>
+      <id>GraciMndzSNG</id>
+      <name>Graciela Méndez Olmos</name>
+      <email>graciela.mendez@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>pablorodriguez-sngular</id>
+      <name>Pablo Rodríguez Pérez</name>
+      <email>pablo.rodriguezp@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Backend Developer</role>
+      </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
   </developers>

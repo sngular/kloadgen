@@ -10,12 +10,11 @@ import javax.xml.bind.DatatypeConverter;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +80,7 @@ class AvroDeserializerTest {
 
     avroDeserializer.configure(Map.of(PropsKeysHelper.VALUE_SCHEMA, schemaStr), false);
 
-    final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(schemaFile, "AVRO");
+    final ParsedSchema parsedSchema = new ParsedSchema(schemaFile, "AVRO");
     AVRO_SCHEMA_PROCESSOR.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var generatedRecord = AVRO_SCHEMA_PROCESSOR.next();
 

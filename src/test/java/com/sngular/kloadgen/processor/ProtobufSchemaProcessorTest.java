@@ -14,13 +14,13 @@ import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.collections.MapUtils;
 import org.apache.jmeter.threads.JMeterContext;
@@ -62,7 +62,7 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("phones.phoneType").fieldType("enum").fieldValueList("[MOBILE, HOME, WORK]").required(true).isAncestorRequired(true).build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
 
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -96,7 +96,7 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("occurrence_id").fieldType("StringValue").fieldValueList("Isabel").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("load_number").fieldType("Int32Value").required(true).isAncestorRequired(true).build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -121,10 +121,10 @@ class ProtobufSchemaProcessorTest {
   @DisplayName("Be able to process enum in the schema")
   void testProtoBufEnumSchemaProcessor() throws IOException {
     final File testFile = fileHelper.getFile("/proto-files/enumTest.proto");
-    final List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(SchemaParseUtil.getParsedSchema(testFile, "PROTOBUF"));
+    final List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(new ParsedSchema(testFile, "PROTOBUF"));
     fieldValueMappingList.get(0).setFieldValuesList("HOME, WORK");
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -160,9 +160,9 @@ class ProtobufSchemaProcessorTest {
   @DisplayName("Be able to process easy schema")
   void testProtoBufEasyTestProcessor() throws IOException {
     final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
-    final List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(SchemaParseUtil.getParsedSchema(testFile, "PROTOBUF"));
+    final List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(new ParsedSchema(testFile, "PROTOBUF"));
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -191,9 +191,9 @@ class ProtobufSchemaProcessorTest {
   void testProtoBufOneOfProcessor() throws IOException {
     final File testFile = fileHelper.getFile("/proto-files/oneOfTest.proto");
 
-    final List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(SchemaParseUtil.getParsedSchema(testFile, "PROTOBUF"));
+    final List<FieldValueMapping> fieldValueMappingList = schemaExtractor.flatPropertiesList(new ParsedSchema(testFile, "PROTOBUF"));
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -230,7 +230,7 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("addressesNoDot[:].number").fieldType("int").fieldValueList("6").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("addressesNoDot[:].zipcode").fieldType("int").fieldValueList("15011").required(true).isAncestorRequired(true).build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -295,7 +295,7 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("response").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("presents[:].options[]").fieldType("string-array").required(true).isAncestorRequired(true).build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -364,7 +364,7 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("report_by_name").fieldType("string").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("create_user_id").fieldType("string").required(true).isAncestorRequired(true).build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, SchemaParseUtil.getParsedSchema(testFile,
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile,
             SchemaTypeEnum.PROTOBUF.name()), confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
@@ -472,7 +472,7 @@ class ProtobufSchemaProcessorTest {
 
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF,
-                                          SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()), confluentBaseSchemaMetadata, fieldValueMappingList);
+                                          new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()), confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     final List<String> assertKeys = new ArrayList<>();
@@ -504,7 +504,7 @@ class ProtobufSchemaProcessorTest {
         FieldValueMapping.builder().fieldName("customer_account.billing_party.address.address_line_two").fieldType("string").required(true).isAncestorRequired(true).build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF,
-                                          SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()), confluentBaseSchemaMetadata, fieldValueMappingList);
+                                          new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()), confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     final List<String> assertKeys = new ArrayList<>();
@@ -538,7 +538,7 @@ class ProtobufSchemaProcessorTest {
                          .build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF,
-                                          SchemaParseUtil.getParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()), confluentBaseSchemaMetadata, fieldValueMappingList);
+                                          new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()), confluentBaseSchemaMetadata, fieldValueMappingList);
     final EnrichedRecord message = (EnrichedRecord) protobufSchemaProcessor.next();
     final DynamicMessage genericRecord = (DynamicMessage) message.getGenericRecord();
     final Map<Descriptors.FieldDescriptor, Object> map = genericRecord.getAllFields();
