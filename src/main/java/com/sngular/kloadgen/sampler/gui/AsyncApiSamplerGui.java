@@ -61,6 +61,7 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
+@SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -80,8 +81,6 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   private JComboBox<AsyncApiServer> serverComboBox;
 
   private JComboBox<AsyncApiSchema> topicComboBox;
-
-  private JComboBox<AsyncApiSR> registryComboBox;
 
   private AsyncApiFile asyncApiFile;
 
@@ -362,10 +361,10 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     final JPanel registryUrlPanel = new JPanel();
     registryUrlPanel.setLayout(new BorderLayout(0, 0));
     registryUrlPanel.add(new JLabeledTextField("Schema Registry URL"));
-    registryComboBox = new JComboBox<>();
+    final JComboBox<AsyncApiSR> registryComboBox = new JComboBox<>();
     registryComboBox.setRenderer(new AsyncApiSRRenderer());
     registryComboBox.addActionListener(this::registryComboActionListener);
-    registryUrlPanel.add(this.registryComboBox, BorderLayout.NORTH);
+    registryUrlPanel.add(registryComboBox, BorderLayout.NORTH);
     registryUrlPanel.add(new JScrollPane(new JTable(schemaRegistryFieldModel)), BorderLayout.CENTER);
     return registryUrlPanel;
   }

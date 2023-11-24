@@ -33,7 +33,7 @@ public class JsonSchemaProcessorTest {
     return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED_EXPECTED));
   }
 
-  private static Stream<Object> parametersForTestOptionalFieldNonEmpty(){
+  private static Stream<Object> parametersForTestOptionalFieldNonEmpty() {
     return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED_EXPECTED));
   }
 
@@ -125,11 +125,11 @@ public class JsonSchemaProcessorTest {
   @ParameterizedTest
   @DisplayName("Should process non-required fields if it is not empty")
   @MethodSource("parametersForTestOptionalFieldNonEmpty")
-  final void testOptionalFieldNonEmpty(final List<FieldValueMapping> schemaAsJson, final String expected){
+  final void testOptionalFieldNonEmpty(final List<FieldValueMapping> schemaAsJson, final String expected) {
 
     final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
 
-    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON,null,null,schemaAsJson);
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
     final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).isEqualTo(expected);

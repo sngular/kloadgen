@@ -10,17 +10,17 @@ import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
 
-public class ProtobuffExtractor<T> implements ExtractorRegistry<T> {
+public class ProtobufExtractor<T extends ParsedSchema> implements ExtractorRegistry<T> {
 
   private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
                                                                                        SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
 
-  public final List<FieldValueMapping> processSchema(final ParsedSchema schemaReceived, final SchemaRegistryEnum registryEnum) {
+  public final List<FieldValueMapping> processSchema(final T schemaReceived, final SchemaRegistryEnum registryEnum) {
     return new ArrayList<FieldValueMapping>(SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived));
   }
 
-  public final ParsedSchema processSchema(final String fileContent) {
-    return new ParsedSchema(fileContent, "PROTOBUF");
+  public final T processSchema(final String fileContent) {
+    return (T) new ParsedSchema(fileContent, "PROTOBUF");
   }
 
   public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
