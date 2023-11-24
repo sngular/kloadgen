@@ -82,8 +82,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   private transient Properties props;
 
-  private Serializer valueSerializer;
-
   @Override
   public void setupTest(final JavaSamplerContext context) {
     props = JMeterContextService.getContext().getProperties();
@@ -124,7 +122,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
       props.putIfAbsent(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
       props.putIfAbsent(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT);
 
-      valueSerializer = (Serializer) Class.forName((String) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance();
+      Serializer valueSerializer = (Serializer) Class.forName((String) props.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance();
       producer = new KafkaProducer<>(props, (Serializer) Class.forName((String) props.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG)).getConstructor().newInstance(),
               valueSerializer);
     } catch (final KafkaException ex) {
@@ -132,7 +130,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     } catch (final ClassNotFoundException e) {
       getNewLogger().error(e.getMessage(), e);
     } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
-      throw new RuntimeException(e);
+      throw new KLoadGenException(e);
     }
   }
 
