@@ -73,7 +73,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
       generator.setUpGenerator(getSchemaFieldConfiguration());
       final var messageVal = generator.nextMessage();
       if (Objects.nonNull(messageVal)) {
-        final var producerRecord = getProducerRecord(messageVal, enrichedKeyFlag(), enrichedValueFlag());
+        final var producerRecord = getProducerRecord(messageVal, enrichedValueFlag());
         fillSamplerResult(producerRecord, sampleResult);
         final var result = producer.send(producerRecord, (metadata, e) -> {
           if (e != null) {
@@ -174,7 +174,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     this.setProperty("asyncapischemaname", asyncApiSchemaName);
   }
 
-  private ProducerRecord<Object, Object> getProducerRecord(final EnrichedRecord messageVal, final boolean keyFlag, final boolean valueFlag) {
+  private ProducerRecord<Object, Object> getProducerRecord(final EnrichedRecord messageVal, final boolean valueFlag) {
     final ProducerRecord<Object, Object> producerRecord;
     producerRecord = new ProducerRecord<>(getAsyncApiSchemaName(), getObject(messageVal, valueFlag));
     return producerRecord;

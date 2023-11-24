@@ -9,9 +9,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
-import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -135,7 +132,8 @@ public class JsonSchemaProcessorTest {
     jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON,null,null,schemaAsJson);
     final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
-    JSONAssert.assertEquals(message.toString(), expected, JSONCompareMode.STRICT);
+    Assertions.assertThat(message.toString()).isEqualTo(expected);
+
   }
 
 }
