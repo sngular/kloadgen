@@ -180,10 +180,6 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return producerRecord;
   }
 
-  private Boolean enrichedKeyFlag() {
-    return false;
-  }
-
   private Boolean enrichedValueFlag() {
     return false;
   }
