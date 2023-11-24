@@ -268,36 +268,35 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     final JPanel fileChoosingPanel = new JPanel();
     fileChoosingPanel.setLayout(new GridBagLayout());
     fileChoosingPanel.setName("AsyncApi File");
-    var gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.weighty = 0.03;
-    gridBagConstraints.fill = GridBagConstraints.BOTH;
+    gridEstablish(0, 0, 0.03, GridBagConstraints.BOTH, -1);
     asyncApiFileTextField = new JTextField();
     asyncApiFileTextField.setPreferredSize(new Dimension(249, 30));
     asyncApiFileTextField.setText("");
-    gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = GridBagConstraints.WEST;
-    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-    fileChoosingPanel.add(asyncApiFileTextField, gridBagConstraints);
+    fileChoosingPanel.add(asyncApiFileTextField, gridEstablish(1, 0, -1, GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST));
     final JButton fileButton = new JButton();
     fileButton.setText("Open File");
     fileButton.addActionListener(this::actionFileChooser);
-    gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 2;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-    fileChoosingPanel.add(fileButton, gridBagConstraints);
+    fileChoosingPanel.add(fileButton, gridEstablish(2, 0, -1, GridBagConstraints.HORIZONTAL, -1));
     final JLabel label1 = new JLabel();
     label1.setText("AsyncApi File");
-    gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 0;
-    gridBagConstraints.anchor = GridBagConstraints.WEST;
-    fileChoosingPanel.add(label1, gridBagConstraints);
+    fileChoosingPanel.add(label1, gridEstablish(0, 0, -1, -1, GridBagConstraints.WEST));
     return fileChoosingPanel;
+  }
+
+  private GridBagConstraints gridEstablish(final int x, final int y, final double w, final int fill, final int anchor) {
+    final var gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = x;
+    gridBagConstraints.gridy = y;
+    if (w != -1) {
+      gridBagConstraints.weighty = w;
+    }
+    if (fill != -1) {
+      gridBagConstraints.fill = fill;
+    }
+    if (anchor != -1) {
+      gridBagConstraints.anchor = anchor;
+    }
+    return gridBagConstraints;
   }
 
   private JTabbedPane createAsyncApiTabs() {
