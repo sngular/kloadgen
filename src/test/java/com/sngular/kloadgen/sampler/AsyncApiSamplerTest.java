@@ -1,7 +1,11 @@
 package com.sngular.kloadgen.sampler;
 
 import com.sngular.kloadgen.extractor.ApiExtractor;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import com.sngular.kloadgen.testutil.FileHelper;
+import com.sngular.kloadgen.util.ProducerKeysHelper;
+import com.sngular.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -52,11 +56,11 @@ class AsyncApiSamplerTest {
 
     }*/
 
-/*
+
     public JMeterVariables getVariablesJsonSchema() throws IOException {
 
         final File testFile = fileHelper.getFile("/asyncapi/event-api.yml");
-        final ParsedSchema parsedSchema = SchemaParseUtil.getParsedSchema(testFile, "JSON");
+        final ParsedSchema parsedSchema = new ParsedSchema(testFile, "JSON");
 
         final var variables = new JMeterVariables();
         variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "JSON");
@@ -67,7 +71,7 @@ class AsyncApiSamplerTest {
         variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED);
         variables.put(ProducerKeysHelper.KEY_NAME_STRATEGY, "theStrategy");
         return variables;
-    }*/
+    }
 
 
 
