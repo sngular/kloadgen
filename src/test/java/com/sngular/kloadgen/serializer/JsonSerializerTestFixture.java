@@ -2,6 +2,7 @@ package com.sngular.kloadgen.serializer;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
@@ -229,7 +230,7 @@ final class JsonSerializerTestFixture {
 
   static final Pair<File, List<FieldValueMapping>> TEST_MULTIPLE_TYPE_SINGLE = new Pair<>(
       new FileHelper().getFile("/jsonschema/multiple-type-single.jcs"),
-      Arrays.asList(
+      Collections.singletonList(
           SerializerTestFixture.createFieldValueMapping("id", "number"))
   );
 

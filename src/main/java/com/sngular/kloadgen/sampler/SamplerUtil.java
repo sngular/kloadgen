@@ -98,10 +98,6 @@ public final class SamplerUtil {
     return defaultParameters;
   }
 
-  private static String propertyOrDefault(final String property, final String defaultToken, final String valueToSent) {
-    return defaultToken.equals(property) ? valueToSent : property;
-  }
-
   @SuppressWarnings("checkstyle:ExecutableStatementCount")
   public static Arguments getCommonConsumerDefaultParameters() {
     final Arguments defaultParameters = new Arguments();
@@ -147,51 +143,6 @@ public final class SamplerUtil {
     defaultParameters.addArgument(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, "1000");
 
     return defaultParameters;
-  }
-
-  public static void setupConsumerDeserializerProperties(final Properties props) {
-    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY));
-    } else {
-      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-    }
-    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY))) {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY));
-    } else {
-      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-    }
-  }
-
-  public static void setupConsumerSchemaRegistryProperties(final Properties props) {
-    final Map<String, String> originals = new HashMap<>();
-    setupSchemaRegistryAuthenticationProperties(JavaSamplerContext.getJMeterVariables(), originals);
-    props.putAll(originals);
-
-    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
-      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY));
-    }
-    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY))) {
-      props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY));
-    }
-  }
-
-  private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
-    if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-
-      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
-      props.put(schemaRegistryManager.getSchemaRegistryUrlKey(), context.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
-      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
-
-      if (ProducerKeysHelper.FLAG_YES.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
-        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
-          props.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
-          props.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, context.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
-        } else {
-          props.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
-          props.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, context.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
-        }
-      }
-    }
   }
 
   public static Properties setupCommonConsumerProperties(final JavaSamplerContext context) {
@@ -246,6 +197,32 @@ public final class SamplerUtil {
     return props;
   }
 
+  public static void setupConsumerDeserializerProperties(final Properties props) {
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.KEY_DESERIALIZER_CLASS_PROPERTY));
+    } else {
+      props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+    }
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY))) {
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JavaSamplerContext.getJMeterVariables().get(PropsKeysHelper.VALUE_DESERIALIZER_CLASS_PROPERTY));
+    } else {
+      props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+    }
+  }
+
+  public static void setupConsumerSchemaRegistryProperties(final Properties props) {
+    final Map<String, String> originals = new HashMap<>();
+    setupSchemaRegistryAuthenticationProperties(JavaSamplerContext.getJMeterVariables(), originals);
+    props.putAll(originals);
+
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
+      props.put(ProducerKeysHelper.VALUE_NAME_STRATEGY, JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY));
+    }
+    if (Objects.nonNull(JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY))) {
+      props.put(ProducerKeysHelper.KEY_NAME_STRATEGY, JavaSamplerContext.getJMeterVariables().get(ProducerKeysHelper.KEY_NAME_STRATEGY));
+    }
+  }
+
   private static void verifySecurity(final JavaSamplerContext context, final Properties props) {
     if (ProducerKeysHelper.FLAG_YES.equalsIgnoreCase(context.getParameter(ProducerKeysHelper.SSL_ENABLED))) {
 
@@ -289,6 +266,29 @@ public final class SamplerUtil {
     if (!StringUtils.isBlank(context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG).trim())) {
       props.put(SslConfigs.SSL_PROVIDER_CONFIG, context.getParameter(SslConfigs.SSL_PROVIDER_CONFIG));
     }
+  }
+
+  private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
+    if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
+
+      final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+      props.put(schemaRegistryManager.getSchemaRegistryUrlKey(), context.get(schemaRegistryManager.getSchemaRegistryUrlKey()));
+      props.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
+
+      if (ProducerKeysHelper.FLAG_YES.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG))) {
+        if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equals(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
+          props.put(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE));
+          props.put(SchemaRegistryClientConfig.USER_INFO_CONFIG, context.get(SchemaRegistryClientConfig.USER_INFO_CONFIG));
+        } else {
+          props.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, context.get(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE));
+          props.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, context.get(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG));
+        }
+      }
+    }
+  }
+
+  private static String propertyOrDefault(final String property, final String defaultToken, final String valueToSent) {
+    return defaultToken.equals(property) ? valueToSent : property;
   }
 
   public static BaseLoadGenerator configureValueGenerator(final Properties props) {
@@ -351,6 +351,22 @@ public final class SamplerUtil {
     return generator;
   }
 
+  private static BaseLoadGenerator getBaseLoadGenerator(final String schemaType) {
+    final BaseLoadGenerator generator;
+    if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
+      generator = new JsonSRLoadGenerator();
+    } else if ("avro".equalsIgnoreCase(schemaType)) {
+      generator = new AvroSRLoadGenerator();
+    } else if ("protobuf".equalsIgnoreCase(schemaType)) {
+      generator = new ProtobufLoadGenerator();
+    } else if ("noSchema".equalsIgnoreCase(schemaType)) {
+      generator = new PlainTextLoadGenerator();
+    } else {
+      throw new KLoadGenException("Unsupported Serializer");
+    }
+    return generator;
+  }
+
   public static BaseLoadGenerator configureKeyGenerator(final Properties props) {
     final JMeterVariables jMeterVariables = JMeterContextService.getContext().getVariables();
     final BaseLoadGenerator generator;
@@ -399,22 +415,6 @@ public final class SamplerUtil {
       generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.KEY_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES));
     }
 
-    return generator;
-  }
-
-  private static BaseLoadGenerator getBaseLoadGenerator(final String schemaType) {
-    final BaseLoadGenerator generator;
-    if (JSON_TYPE_SET.contains(schemaType.toLowerCase())) {
-      generator = new JsonSRLoadGenerator();
-    } else if ("avro".equalsIgnoreCase(schemaType)) {
-      generator = new AvroSRLoadGenerator();
-    } else if ("protobuf".equalsIgnoreCase(schemaType)) {
-      generator = new ProtobufLoadGenerator();
-    } else if ("noSchema".equalsIgnoreCase(schemaType)) {
-      generator = new PlainTextLoadGenerator();
-    } else {
-      throw new KLoadGenException("Unsupported Serializer");
-    }
     return generator;
   }
 

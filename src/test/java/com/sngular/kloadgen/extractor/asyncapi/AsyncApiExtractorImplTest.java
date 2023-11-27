@@ -1,5 +1,9 @@
 package com.sngular.kloadgen.extractor.asyncapi;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -13,10 +17,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Locale;
 
 class AsyncApiExtractorImplTest {
 
@@ -36,7 +36,7 @@ class AsyncApiExtractorImplTest {
 
   @Test
   @DisplayName("Should extract asyncapi file")
-  void testExtractFile() throws IOException {
+  void testExtractFile() {
     final File testFile = fileHelper.getFile("/asyncapi/event-api.yml");
     final AsyncApiFile asapfle = new AsyncApiExtractorImpl().processFile(testFile);
 

@@ -19,15 +19,33 @@ class FieldValueMappingTest {
   @BeforeAll
   static void setUpTest() {
     fieldValueMapping = FieldValueMapping
-        .builder()
-        .fieldName("value")
-        .fieldType("String")
-        .valueLength(30)
-        .fieldValueList(
-            "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]},"
-            + "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}")
-        .constraint(ConstraintTypeEnum.MAXIMUM_VALUE, "5")
-        .build();
+                            .builder()
+                            .fieldName("value")
+                            .fieldType("String")
+                            .valueLength(30)
+                            .fieldValueList(
+                                """
+                                {"client_code":"ABC",
+                                 "market_codes":["popfa","popfa"],
+                                 "permissions":[
+                                    {"app_code":"TEAA",
+                                     "resource_codes":[
+                                        {"code":"",
+                                         "action":""}]
+                                    }]
+                                },
+                                {"client_code":"ABC",
+                                 "market_codes":["popfa","popfa"],
+                                 "permissions":[
+                                            {"app_code":"TEAA",
+                                             "resource_codes":[
+                                                  {"code":"",
+                                                   "action":""}
+                                                   ]
+                                             }]
+                                 }""")
+                            .constraint(ConstraintTypeEnum.MAXIMUM_VALUE, "5")
+                            .build();
   }
 
   @Test
@@ -50,17 +68,23 @@ class FieldValueMappingTest {
     Assertions.assertThat(fieldValueMapping.getFieldValuesList())
               .hasSize(2)
               .containsExactlyElementsOf(List.of(
-            "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}",
-            "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"\",\"action\":\"\"}]}]}"));
+                  """
+                   {"client_code":"ABC","market_codes":["popfa","popfa"],"permissions":[{"app_code":"TEAA","resource_codes":[{"code":"","action":""}]}]}""",
+                  """
+                      {"client_code":"ABC","market_codes":["popfa","popfa"],"permissions":[{"app_code":"TEAA","resource_codes":[{"code":"","action":""}]}]}"""));
   }
 
   @Test
   void getFieldValuesListSingleJson() {
     fieldValueMapping.setFieldValuesList(
-        "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"jj\",\"action\":\"kk\"}]}]}");
+        """
+          {"client_code":"ABC",
+           "market_codes":["popfa","popfa"],
+           "permissions":[{"app_code":"TEAA","resource_codes":[{"code":"jj","action":"kk"}]}]}""");
     Assertions.assertThat(fieldValueMapping.getFieldValuesList())
               .hasSize(1)
               .containsExactlyElementsOf(List.of(
-            "{\"client_code\":\"ABC\",\"market_codes\":[\"popfa\",\"popfa\"],\"permissions\":[{\"app_code\":\"TEAA\",\"resource_codes\":[{\"code\":\"jj\",\"action\":\"kk\"}]}]}"));
+                  """
+                        {"client_code":"ABC","market_codes":["popfa","popfa"],"permissions":[{"app_code":"TEAA","resource_codes":[{"code":"jj","action":"kk"}]}]}"""));
   }
 }

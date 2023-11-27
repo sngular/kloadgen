@@ -20,13 +20,11 @@ import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.DynamicMessage.Builder;
 import com.google.protobuf.Message;
 import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AbstractParsedSchema;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.ProtoBufGeneratorTool;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
@@ -44,15 +42,10 @@ public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
   private final Map<String, DynamicMessage.Builder> entity = new HashMap<>();
 
   public ProtobufObjectCreatorFactory(final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) throws DescriptorValidationException, IOException {
-    if (schema instanceof ParsedSchema) {
-      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((ParsedSchema) schema).rawSchema(), metadata);
+    if (schema instanceof AbstractParsedSchema) {
+      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) ((AbstractParsedSchema) schema).getRawSchema(), metadata);
     } else if (schema instanceof ProtoFileElement) {
       this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schema, metadata);
-    } else if (schema instanceof BaseParsedSchema) {
-      final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
-      final AbstractParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
-      final Object schemaParsed = adapterParse.getRawSchema();
-      this.schema = SchemaProcessorUtils.buildProtoDescriptor((ProtoFileElement) schemaParsed, metadata);
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }

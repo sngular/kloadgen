@@ -1,12 +1,22 @@
 package com.sngular.kloadgen.serializer;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
+
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.ProtobufParsedSchema;
 import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import com.squareup.wire.schema.Location;
+import com.squareup.wire.schema.internal.parser.ProtoParser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -19,29 +29,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Stream;
-import java.util.stream.Stream.Builder;
-
 @Slf4j
 class ProtobufSerializerTest {
 
-  private ProtobufSerializer protobufSerializer;
+  private final FileHelper fileHelper = new FileHelper();
 
-  @BeforeEach
-  void setUp() {
-    protobufSerializer = new ProtobufSerializer();
-    final File file = new File("src/test/resources");
-    final String absolutePath = file.getAbsolutePath();
-    JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
-    final JMeterContext jmcx = JMeterContextService.getContext();
-    jmcx.setVariables(new JMeterVariables());
-    JMeterUtils.setLocale(Locale.ENGLISH);
-    JMeterContextService.getContext().getProperties().put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, "CONFLUENT");
-  }
+  private ProtobufSerializer<EnrichedRecord> protobufSerializer;
 
   private static Stream<Arguments> getSchemaToTest() {
     final Builder<Arguments> builder = Stream.builder();
@@ -74,15 +67,29 @@ class ProtobufSerializerTest {
     return builder.build();
   }
 
+  @BeforeEach
+  void setUp() {
+    protobufSerializer = new ProtobufSerializer();
+    final File file = new File("src/test/resources");
+    final String absolutePath = file.getAbsolutePath();
+    JMeterUtils.loadJMeterProperties(absolutePath + "/kloadgen.properties");
+    final JMeterContext jmcx = JMeterContextService.getContext();
+    jmcx.setVariables(new JMeterVariables());
+    JMeterUtils.setLocale(Locale.ENGLISH);
+    JMeterContextService.getContext().getProperties().put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, "CONFLUENT");
+  }
+
   @ParameterizedTest
   @MethodSource("getSchemaToTest")
   void serialize(final File schemaFile, final List<FieldValueMapping> fieldValueMappings) throws IOException {
-    final ParsedSchema parsedSchema = new ParsedSchema(schemaFile, "PROTOBUF");
+    final String testFile = FileHelper.readFile(schemaFile);
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
+
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
-    final BaseSchemaMetadata confluentBaseSchemaMetadata =
+    final var confluentBaseSchemaMetadata =
         new BaseSchemaMetadata<>(
             ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1, "")));
-    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, parsedSchema.rawSchema(), confluentBaseSchemaMetadata, fieldValueMappings);
+    protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, schema.getRawSchema(), confluentBaseSchemaMetadata, fieldValueMappings);
 
     final var generatedRecord = protobufSchemaProcessor.next();
 

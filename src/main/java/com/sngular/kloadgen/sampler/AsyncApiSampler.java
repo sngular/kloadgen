@@ -47,11 +47,11 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   private final transient ApiExtractor apiExtractor;
 
-  private JsonNode asyncApiFileNode;
-
   private final transient BaseLoadGenerator generator;
 
   private final transient ObjectMapper mapper = new ObjectMapper();
+
+  private JsonNode asyncApiFileNode;
 
   public AsyncApiSampler() {
     apiExtractor = new AsyncApiExtractorImpl();
@@ -103,38 +103,6 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return properties;
   }
 
-  public final AsyncApiFile getAsyncApiFileNode() {
-    AsyncApiFile asyncApiFile = null;
-    if (Objects.isNull(asyncApiFileNode)) {
-      try {
-        asyncApiFileNode = mapper.readTree(this.getPropertyAsString("asyncapifilestr"));
-      } catch (final IOException e) {
-        throw new KLoadGenException(e);
-      }
-    }
-    if (Objects.nonNull(asyncApiFileNode) && !asyncApiFileNode.isMissingNode()) {
-      asyncApiFile = apiExtractor.processNode(asyncApiFileNode);
-    }
-    return asyncApiFile;
-  }
-
-  public final void setAsyncApiFileNode(final JsonNode asyncApiFileNode) {
-    this.asyncApiFileNode = asyncApiFileNode;
-    try {
-      this.setProperty("asyncapifilestr", mapper.writeValueAsString(asyncApiFileNode));
-    } catch (final JsonProcessingException e) {
-      throw new KLoadGenException(e);
-    }
-  }
-
-  public final void setAsyncApiServerName(final String asyncApiServerName) {
-    this.setProperty("asyncApiServerName", asyncApiServerName);
-  }
-
-  public final void setSchemaFieldConfiguration(final List<FieldValueMapping> asyncApiServerName) {
-    this.setProperty(new CollectionProperty("schemaFieldConfiguration", asyncApiServerName));
-  }
-
   public final List<FieldValueMapping> getSchemaFieldConfiguration() {
     final List<FieldValueMapping> propertyList = new ArrayList<>();
     for (TestElementProperty elementProperty : (List<TestElementProperty>) this.getProperty("schemaFieldConfiguration").getObjectValue()) {
@@ -150,28 +118,8 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return propertyList;
   }
 
-  public final void setBrokerConfiguration(final List<PropertyMapping> asyncApiServerName) {
-    this.setProperty(new CollectionProperty("brokerConfiguration", asyncApiServerName));
-  }
-
-  public final List<PropertyMapping> getBrokerConfiguration() {
-    final List<PropertyMapping> propertyList = new ArrayList<>();
-    for (TestElementProperty elementProperty : (List<TestElementProperty>) this.getProperty("brokerConfiguration").getObjectValue()) {
-      propertyList.add(PropertyMapping
-          .builder()
-          .propertyName(elementProperty.getElement().getPropertyAsString("propertyName"))
-          .propertyValue(elementProperty.getElement().getPropertyAsString("propertyValue"))
-          .build());
-    }
-    return propertyList;
-  }
-
-  public final String getAsyncApiSchemaName() {
-    return this.getPropertyAsString("asyncapischemaname");
-  }
-
-  public final void setAsyncApiSchemaName(final String asyncApiSchemaName) {
-    this.setProperty("asyncapischemaname", asyncApiSchemaName);
+  public final void setSchemaFieldConfiguration(final List<FieldValueMapping> asyncApiServerName) {
+    this.setProperty(new CollectionProperty("schemaFieldConfiguration", asyncApiServerName));
   }
 
   private ProducerRecord<Object, Object> getProducerRecord(final EnrichedRecord messageVal, final boolean valueFlag) {
@@ -199,7 +147,59 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return String.format(TEMPLATE, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
   }
 
+  public final List<PropertyMapping> getBrokerConfiguration() {
+    final List<PropertyMapping> propertyList = new ArrayList<>();
+    for (TestElementProperty elementProperty : (List<TestElementProperty>) this.getProperty("brokerConfiguration").getObjectValue()) {
+      propertyList.add(PropertyMapping
+                           .builder()
+                           .propertyName(elementProperty.getElement().getPropertyAsString("propertyName"))
+                           .propertyValue(elementProperty.getElement().getPropertyAsString("propertyValue"))
+                           .build());
+    }
+    return propertyList;
+  }
+
+  public final void setBrokerConfiguration(final List<PropertyMapping> asyncApiServerName) {
+    this.setProperty(new CollectionProperty("brokerConfiguration", asyncApiServerName));
+  }
+
+  public final String getAsyncApiSchemaName() {
+    return this.getPropertyAsString("asyncapischemaname");
+  }
+
+  public final void setAsyncApiSchemaName(final String asyncApiSchemaName) {
+    this.setProperty("asyncapischemaname", asyncApiSchemaName);
+  }
+
   private Object getObject(final EnrichedRecord messageVal, final boolean isKloadSerializer) {
     return isKloadSerializer ? messageVal : messageVal.getGenericRecord();
+  }
+
+  public final AsyncApiFile getAsyncApiFileNode() {
+    AsyncApiFile asyncApiFile = null;
+    if (Objects.isNull(asyncApiFileNode)) {
+      try {
+        asyncApiFileNode = mapper.readTree(this.getPropertyAsString("asyncapifilestr"));
+      } catch (final IOException e) {
+        throw new KLoadGenException(e);
+      }
+    }
+    if (Objects.nonNull(asyncApiFileNode) && !asyncApiFileNode.isMissingNode()) {
+      asyncApiFile = apiExtractor.processNode(asyncApiFileNode);
+    }
+    return asyncApiFile;
+  }
+
+  public final void setAsyncApiFileNode(final JsonNode asyncApiFileNode) {
+    this.asyncApiFileNode = asyncApiFileNode;
+    try {
+      this.setProperty("asyncapifilestr", mapper.writeValueAsString(asyncApiFileNode));
+    } catch (final JsonProcessingException e) {
+      throw new KLoadGenException(e);
+    }
+  }
+
+  public final void setAsyncApiServerName(final String asyncApiServerName) {
+    this.setProperty("asyncApiServerName", asyncApiServerName);
   }
 }

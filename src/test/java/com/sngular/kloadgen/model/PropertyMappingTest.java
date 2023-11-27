@@ -5,15 +5,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class PropertyMappingTest {
+
   private static PropertyMapping propertyMapping;
 
   @BeforeAll
   static void setUpTest() {
     propertyMapping = PropertyMapping
-                        .builder()
-                        .propertyName("value")
-                        .propertyValue("String")
-                        .build();
+                          .builder()
+                          .propertyName("value")
+                          .propertyValue("String")
+                          .build();
   }
 
   @Test

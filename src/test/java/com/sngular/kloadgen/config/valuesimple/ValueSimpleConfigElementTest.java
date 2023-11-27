@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-
 class ValueSimpleConfigElementTest {
 
   private JMeterContext jmcx;
@@ -53,6 +52,6 @@ class ValueSimpleConfigElementTest {
               .containsExactlyInAnyOrder(new SimpleEntry<>("message.value", "data"),
                                          new SimpleEntry<>("message.type", "String"),
                                          new SimpleEntry<>("value.schema.type", "NoSchema"),
-                                   new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"));
+                                         new SimpleEntry<>("value.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"));
   }
 }

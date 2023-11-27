@@ -1,5 +1,7 @@
 package com.sngular.kloadgen.extractor.extractors.avro;
 
+import java.util.List;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -10,16 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import java.util.List;
-
-
 class AvroConfluentExtractorTest {
-
 
   private final FileHelper fileHelper = new FileHelper();
 
   private final Extractor<Schema> avroConfluentExtractor = new AvroConfluentExtractor();
-
 
   @Test
   @DisplayName("Should extract Embedded Record")

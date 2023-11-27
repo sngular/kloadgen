@@ -50,9 +50,9 @@ class KeySimpleConfigElementTest {
     Assertions.assertThat(variables.entrySet())
               .hasSize(4)
               .containsExactlyInAnyOrder(new SimpleEntry<>("key.type", "string"),
-                                   new SimpleEntry<>("key.value", ""),
-                                   new SimpleEntry<>("key.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
-                                   new SimpleEntry<>("simple.keyed.message", true));
+                                         new SimpleEntry<>("key.value", ""),
+                                         new SimpleEntry<>("key.serializer.class.property", "org.apache.kafka.common.serialization.StringSerializer"),
+                                         new SimpleEntry<>("simple.keyed.message", true));
 
   }
 }

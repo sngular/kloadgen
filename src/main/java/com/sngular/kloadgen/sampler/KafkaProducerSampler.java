@@ -99,7 +99,6 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
       topic = context.getParameter(ProducerKeysHelper.KAFKA_TOPIC_CONFIG);
 
-
       props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, context.getParameter(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
       props.put(ProducerConfig.CLIENT_ID_CONFIG, context.getParameter(ProducerConfig.CLIENT_ID_CONFIG));
       props.putIfAbsent(ProducerConfig.ACKS_CONFIG, "all");
@@ -195,19 +194,9 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   private void fillSamplerResult(final ProducerRecord<Object, Object> producerRecord, final SampleResult sampleResult) {
     final String result = "key: "
-            + producerRecord.key()
-            + ", payload: " + stringValue(producerRecord.value());
+                          + producerRecord.key()
+                          + ", payload: " + stringValue(producerRecord.value());
     sampleResult.setSamplerData(result);
-  }
-
-  private String stringValue(final Object value) {
-    final String result;
-    if (value instanceof EnrichedRecord) {
-      result = ((EnrichedRecord) value).getGenericRecord().toString();
-    } else {
-      result = value.toString();
-    }
-    return result;
   }
 
   private void fillSampleResult(final SampleResult sampleResult, final String respondeData, final boolean successful) {
@@ -222,6 +211,16 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
 
   private Object getObject(final EnrichedRecord messageVal, final boolean isKloadSerializer) {
     return isKloadSerializer ? messageVal : messageVal.getGenericRecord();
+  }
+
+  private String stringValue(final Object value) {
+    final String result;
+    if (value instanceof EnrichedRecord) {
+      result = ((EnrichedRecord) value).getGenericRecord().toString();
+    } else {
+      result = value.toString();
+    }
+    return result;
   }
 }
 

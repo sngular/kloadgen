@@ -26,17 +26,28 @@ class RandomIteratorTest {
 
   private static Stream<Arguments> parametersForGenerateIteratorValueForField() {
     return Stream.of(
-            Arguments.of("name", "int", Collections.emptyList(), new HashMap<>(), null),
-            Arguments.of("name", "float", Collections.singletonList("1"), new HashMap<>(), 1f),
-            Arguments.of("name", "long", Collections.singletonList("2"), new HashMap<>(), 2L),
-            Arguments.of("name", "bytes_decimal", Collections.singletonList("1"), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("1")),
-            Arguments.of("name15", "bytes_decimal", Collections.emptyList(), new HashMap<>(Maps.of("name15", new BigDecimal("15"))), null));
+        Arguments.of("name", "int", Collections.emptyList(), new HashMap<>(), null),
+        Arguments.of("name", "float", Collections.singletonList("1"), new HashMap<>(), 1f),
+        Arguments.of("name", "long", Collections.singletonList("2"), new HashMap<>(), 2L),
+        Arguments.of("name", "bytes_decimal", Collections.singletonList("1"), new HashMap<>(Maps.of("name", new BigDecimal("15"))), new BigDecimal("1")),
+        Arguments.of("name15", "bytes_decimal", Collections.emptyList(), new HashMap<>(Maps.of("name15", new BigDecimal("15"))), null));
+  }
+
+  private static Stream<Arguments> parametersForGenerateValueWithList() {
+    return Stream.of(
+        Arguments.of(10,
+                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10"),
+                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10")),
+        Arguments.of(12,
+                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10"),
+                     List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "1", "2")));
   }
 
   @ParameterizedTest
   @DisplayName("Testing Generate an Iterator With an empty list or a list with one value")
   @MethodSource("parametersForGenerateIteratorValueForField")
-  void testGenerateIteratorValueForField(final String fieldName, final String fieldType, final List<String> fieldValuesList, final Map<String, Object> context,
+  void testGenerateIteratorValueForField(
+      final String fieldName, final String fieldType, final List<String> fieldValuesList, final Map<String, Object> context,
       final Object expectedStored) {
     Assertions.assertThat(RandomIterator.generateIt(fieldName, fieldType, fieldValuesList, context)).isEqualTo(expectedStored);
     if (Objects.isNull(expectedStored)) {
@@ -44,16 +55,6 @@ class RandomIteratorTest {
     } else {
       Assertions.assertThat(context).containsEntry(fieldName, expectedStored);
     }
-  }
-
-  private static Stream<Arguments> parametersForGenerateValueWithList() {
-    return Stream.of(
-            Arguments.of(10,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10")),
-            Arguments.of(12,
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10"),
-                    List.of("1", "2", "3", "5", "6", "7", "7", "9", "9", "9", "10", "1", "2")));
   }
 
   @ParameterizedTest

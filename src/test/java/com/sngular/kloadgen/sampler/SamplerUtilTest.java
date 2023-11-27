@@ -6,8 +6,14 @@
 
 package com.sngular.kloadgen.sampler;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.stream.Stream;
+
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import com.sngular.kloadgen.serializer.SerializerTestFixture;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -22,13 +28,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.stream.Stream;
 
 class SamplerUtilTest {
 
@@ -65,15 +64,14 @@ class SamplerUtilTest {
   }
 
   public JMeterVariables getVariablesAvro() throws IOException {
-    final File testFile = fileHelper.getFile("/avro-files/avros-example-with-sub-entity-array-test.avsc");
-    final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
+    final var testFile = fileHelper.getContent("/avro-files/avros-example-with-sub-entity-array-test.avsc");
     final var variables = new JMeterVariables();
     variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "avro");
     variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "test");
     variables.put(PropsKeysHelper.KEY_SUBJECT_NAME, "test");
-    variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema.rawSchema()));
+    variables.put(PropsKeysHelper.VALUE_SCHEMA, testFile);
     variables.put(PropsKeysHelper.VALUE_SCHEMA_TYPE, "avro");
-    variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema.rawSchema()));
+    variables.put(PropsKeysHelper.KEY_SCHEMA, testFile);
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, Arrays.asList(
         FieldValueMapping.builder().fieldName("subEntity.anotherLevel.subEntityIntArray[2]").fieldType("int-array").valueLength(0).fieldValueList("[1]").required(true)
                          .isAncestorRequired(true).build(),
@@ -107,15 +105,14 @@ class SamplerUtilTest {
 
   public JMeterVariables getVariablesJsonSchema() throws IOException {
 
-    final File testFile = fileHelper.getFile("/jsonschema/basic.jcs");
-    final ParsedSchema parsedSchema = new ParsedSchema(testFile, "JSON");
+    final var testFile = fileHelper.getContent("/jsonschema/basic.jcs");
 
     final var variables = new JMeterVariables();
     variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "JSON");
     variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "jsonSubject");
     variables.put(PropsKeysHelper.KEY_SUBJECT_NAME, "jsonSubject");
-    variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema.rawSchema()));
-    variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema.rawSchema()));
+    variables.put(PropsKeysHelper.VALUE_SCHEMA, testFile);
+    variables.put(PropsKeysHelper.KEY_SCHEMA, testFile);
     variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, JsonSchemaFixturesConstants.SIMPLE_SCHEMA);
     variables.put(ProducerKeysHelper.KEY_NAME_STRATEGY, "theStrategy");
     return variables;
@@ -123,14 +120,13 @@ class SamplerUtilTest {
 
   public JMeterVariables getVariablesProtobuf() throws IOException {
 
-    final File testFile = fileHelper.getFile("/proto-files/easyTest.proto");
-    final ParsedSchema parsedSchema = new ParsedSchema(testFile, "PROTOBUF");
+    final var testFile = fileHelper.getContent("/proto-files/easyTest.proto");
     final var variables = new JMeterVariables();
     variables.put(PropsKeysHelper.KEY_SCHEMA_TYPE, "protobuf");
     variables.put(PropsKeysHelper.VALUE_SUBJECT_NAME, "protobufSubject");
-    variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(parsedSchema.schema()));
+    variables.put(PropsKeysHelper.VALUE_SCHEMA, String.valueOf(testFile));
     variables.put(PropsKeysHelper.VALUE_SCHEMA_TYPE, "protobuf");
-    variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(parsedSchema.schema()));
+    variables.put(PropsKeysHelper.KEY_SCHEMA, String.valueOf(testFile));
     variables.put(PropsKeysHelper.KEY_SUBJECT_NAME, "protobufSubject");
     variables.putObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES, Arrays.asList(
         SerializerTestFixture.createFieldValueMapping("street", "string"),

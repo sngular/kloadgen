@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AbstractParsedSchema;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -30,7 +30,7 @@ public final class SchemaExtractor {
     return ExtractorFactory.flatPropertiesList(subjectName);
   }
 
-  public static List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
+  public static List<FieldValueMapping> flatPropertiesList(final AbstractParsedSchema<?> parserSchema) {
     return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
   }
 

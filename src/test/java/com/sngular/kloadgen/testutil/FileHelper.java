@@ -7,13 +7,19 @@
 package com.sngular.kloadgen.testutil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 
 public final class FileHelper {
+
+  public static String readFile(final File fileToRead) throws IOException {
+    return IOUtils.toString(new FileInputStream(fileToRead), Charset.defaultCharset());
+  }
 
   public File getFile(final String fileName) {
     final URL url = this.getClass().getResource(fileName);

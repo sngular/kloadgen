@@ -22,8 +22,6 @@ class JsonDefaultTest {
 
   private final Extractor<String> jsonDefaultExtractor = new JsonDefaultExtractor();
 
-
-
   @Test
   @DisplayName("Should extract a basic array")
   void testBasicArray() throws Exception {

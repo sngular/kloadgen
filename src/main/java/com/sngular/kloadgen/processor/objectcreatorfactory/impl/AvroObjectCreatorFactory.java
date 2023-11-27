@@ -14,14 +14,11 @@ import java.util.function.Function;
 
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AvroParsedSchema;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
@@ -44,18 +41,10 @@ public final class AvroObjectCreatorFactory implements ObjectCreatorFactory {
   private final Map<String, GenericRecord> entity = new HashMap<>();
 
   public AvroObjectCreatorFactory(final Object schema, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
-    if (schema instanceof ParsedSchema) {
-      this.schema = (Schema) ((ParsedSchema) schema).rawSchema();
+    if (schema instanceof AvroParsedSchema) {
+      this.schema = ((AvroParsedSchema) schema).getRawSchema();
     } else if (schema instanceof Schema) {
       this.schema = (Schema) schema;
-    } else if (schema instanceof BaseParsedSchema) {
-      final BaseParsedSchema schemaParse = (BaseParsedSchema) schema;
-      final AbstractParsedSchemaAdapter adapterParse = schemaParse.getParsedSchemaAdapter();
-      if (adapterParse instanceof ApicurioParsedSchemaMetadata) {
-        this.schema = (Schema) ((ApicurioParsedSchemaMetadata) adapterParse).getSchema();
-      } else {
-        this.schema = adapterParse.getRawSchema();
-      }
     } else {
       throw new KLoadGenException("Unsupported schema type");
     }

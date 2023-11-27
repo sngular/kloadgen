@@ -11,10 +11,10 @@ public class HeaderMappingTest {
   @BeforeAll
   static void setUpTest() {
     headerMapping = HeaderMapping
-      .builder()
-      .headerName("value")
-      .headerValue("String")
-      .build();
+                        .builder()
+                        .headerName("value")
+                        .headerValue("String")
+                        .build();
   }
 
   @Test

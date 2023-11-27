@@ -19,8 +19,11 @@ import org.junit.jupiter.api.Test;
 class KafkaHeadersConfigElementBeanInfoTest {
 
   private static final String KAFKA_HEADERS = "kafkaHeaders";
+
   private static final String PROPERTIES = "props";
+
   private static final String SCHEMA = "schema";
+
   private KafkaHeadersConfigElementBeanInfo kafkaHeadersConfigElementBeanInfo;
 
   @BeforeEach

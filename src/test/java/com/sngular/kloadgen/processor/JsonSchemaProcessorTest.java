@@ -1,5 +1,10 @@
 package com.sngular.kloadgen.processor;
 
+import java.io.File;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
@@ -17,11 +22,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-
-import java.io.File;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Stream;
 
 public class JsonSchemaProcessorTest {
 
@@ -68,7 +68,7 @@ public class JsonSchemaProcessorTest {
     final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).contains("lastName\":\"García")
-                                  .contains("itemTipo\":{").contains("itemType\":{");
+              .contains("itemTipo\":{").contains("itemType\":{");
   }
 
   @Test
@@ -92,11 +92,11 @@ public class JsonSchemaProcessorTest {
     final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
-                                  .contains("\"birds\":[[{\"nameBird\":")
-                                  .contains("\"animals\":{").contains("nameAnimal\":");
+              .contains("\"birds\":[[{\"nameBird\":")
+              .contains("\"animals\":{").contains("nameAnimal\":");
 
   }
-  
+
   @ParameterizedTest
   @MethodSource("parametersForTestBasicStructure")
   final void testBasicStructure(final List<FieldValueMapping> schemaAsJson, final String expected) {

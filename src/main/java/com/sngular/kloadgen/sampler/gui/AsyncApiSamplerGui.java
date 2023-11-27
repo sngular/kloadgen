@@ -24,18 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
-import com.sngular.kloadgen.exception.KLoadGenException;
-import com.sngular.kloadgen.extractor.ApiExtractor;
-import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
-import com.sngular.kloadgen.extractor.model.AsyncApiFile;
-import com.sngular.kloadgen.extractor.model.AsyncApiSR;
-import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
-import com.sngular.kloadgen.extractor.model.AsyncApiServer;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.model.PropertyMapping;
-import com.sngular.kloadgen.sampler.AsyncApiSampler;
-import com.sngular.kloadgen.sampler.SamplerUtil;
-import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -50,6 +38,19 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.DefaultTableModel;
+
+import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.extractor.ApiExtractor;
+import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
+import com.sngular.kloadgen.extractor.model.AsyncApiFile;
+import com.sngular.kloadgen.extractor.model.AsyncApiSR;
+import com.sngular.kloadgen.extractor.model.AsyncApiSchema;
+import com.sngular.kloadgen.extractor.model.AsyncApiServer;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.model.PropertyMapping;
+import com.sngular.kloadgen.sampler.AsyncApiSampler;
+import com.sngular.kloadgen.sampler.SamplerUtil;
+import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.config.Argument;
@@ -67,15 +68,15 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private final ApiExtractor asyncApiExtractor = new AsyncApiExtractorImpl();
 
+  private final DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Required", "Field Values List"}, 20);
+
+  private final DefaultTableModel brokerFieldModel = new DefaultTableModel(new String[]{"Property name", "Property Value"}, 20);
+
+  private final DefaultTableModel schemaRegistryFieldModel = new DefaultTableModel(new String[]{"Property name", "Property Value"}, 20);
+
   private JPanel mainPanel;
 
   private JTextField asyncApiFileTextField;
-
-  private final DefaultTableModel schemaFieldModel = new DefaultTableModel(new String[]{"Field Name", "Field Type", "Field Length", "Required", "Field Values List"}, 20);
-
-  private final DefaultTableModel brokerFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
-
-  private final DefaultTableModel schemaRegistryFieldModel = new DefaultTableModel(new String[] {"Property name", "Property Value"}, 20);
 
   private JComboBox<AsyncApiServer> serverComboBox;
 
@@ -87,18 +88,9 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     init();
   }
 
-  @Override
-  public String getStaticLabel() {
-    return "AsyncApi Sampler";
-  }
-
-  @Override
-  public void clearGui() {
-    super.clearGui();
-    asyncApiFileTextField.setText("");
-    schemaFieldModel.setNumRows(0);
-    brokerFieldModel.setNumRows(0);
-    // registryUrl.setText("");
+  private static void extractArgument(final JMeterProperty jmeterproperty, final ArrayList<Pair<String, String>> propertyList) {
+    final var argument = (Argument) jmeterproperty.getObjectValue();
+    propertyList.add(Pair.of(argument.getPropertyAsString("Argument.name"), argument.getPropertyAsString("Argument.value")));
   }
 
   @Override
@@ -170,20 +162,18 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     }
   }
 
-  private void actionFileChooser(final ActionEvent event) {
+  @Override
+  public void clearGui() {
+    super.clearGui();
+    asyncApiFileTextField.setText("");
+    schemaFieldModel.setNumRows(0);
+    brokerFieldModel.setNumRows(0);
+    // registryUrl.setText("");
+  }
 
-    final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
-
-    if (JFileChooser.APPROVE_OPTION == returnValue) {
-      try {
-        final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
-        asyncApiFileTextField.setText(apiFile.getAbsolutePath());
-        asyncApiFile = asyncApiExtractor.processFile(apiFile);
-        populateData();
-      } catch (final KLoadGenException ex) {
-        JOptionPane.showMessageDialog(mainPanel, "Error has occurred: " + ex.getMessage(), "Weird Error", JOptionPane.ERROR_MESSAGE);
-      }
-    }
+  @Override
+  public String getStaticLabel() {
+    return "AsyncApi Sampler";
   }
 
   private void populateData(final AsyncApiSampler element) {
@@ -220,6 +210,60 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     }
   }
 
+  private void fillTable(final DefaultTableModel schemaFields, final Collection<Pair<String, String>> schemaData) {
+    if (Objects.nonNull(schemaData)) {
+      final var count = schemaFields.getRowCount();
+      for (var i = 0; i < count; i++) {
+        schemaFields.removeRow(0);
+      }
+      schemaData.forEach(data -> schemaFields.addRow(dataToRow(data)));
+    }
+  }
+
+  private void fillTable(final DefaultTableModel schemaFields, final List<FieldValueMapping> schemaData) {
+    if (Objects.nonNull(schemaData)) {
+      final var count = schemaFields.getRowCount();
+      for (var i = 0; i < count; i++) {
+        schemaFields.removeRow(0);
+      }
+      for (var data : schemaData) {
+        schemaFields.addRow(data.getProperties());
+      }
+    }
+  }
+
+  private void fillTable(final DefaultTableModel schemaFields, final Object[] schemaData) {
+    if (Objects.nonNull(schemaData)) {
+      final var count = schemaFields.getRowCount();
+      for (var i = 0; i < count; i++) {
+        schemaFields.removeRow(0);
+      }
+      for (var data : schemaData) {
+        schemaFields.addRow(((FieldValueMapping) data).getProperties());
+      }
+    }
+  }
+
+  private Object[] dataToRow(final Pair<String, String> data) {
+    return new Object[]{data.getKey(), data.getValue()};
+  }
+
+  private void actionFileChooser(final ActionEvent event) {
+
+    final int returnValue = fileChooser.showDialog(mainPanel, JMeterUtils.getResString("file_visualizer_open"));
+
+    if (JFileChooser.APPROVE_OPTION == returnValue) {
+      try {
+        final File apiFile = Objects.requireNonNull(fileChooser.getSelectedFile());
+        asyncApiFileTextField.setText(apiFile.getAbsolutePath());
+        asyncApiFile = asyncApiExtractor.processFile(apiFile);
+        populateData();
+      } catch (final KLoadGenException ex) {
+        JOptionPane.showMessageDialog(mainPanel, "Error has occurred: " + ex.getMessage(), "Weird Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
+  }
+
   private Collection<Pair<String, String>> prepareSRServer(final AsyncApiSR schemaRegistryData) {
     final var srPropoMap = schemaRegistryData.getPropertiesMap();
     final var propertyList = new ArrayList<Pair<String, String>>();
@@ -237,14 +281,9 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
       CollectionUtils.select(SamplerUtil
                                  .getCommonProducerDefaultParameters(),
                              property -> !property.getName().equalsIgnoreCase(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG))
-          .forEach(jmeterproperty -> extractArgument(jmeterproperty, propertyList));
+                     .forEach(jmeterproperty -> extractArgument(jmeterproperty, propertyList));
     }
     return propertyList;
-  }
-
-  private static void extractArgument(final JMeterProperty jmeterproperty, final ArrayList<Pair<String, String>> propertyList) {
-    final var argument = (Argument) jmeterproperty.getObjectValue();
-    propertyList.add(Pair.of(argument.getPropertyAsString("Argument.name"), argument.getPropertyAsString("Argument.value")));
   }
 
   private void init() {
@@ -255,7 +294,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     mainPanel.putClientProperty("html.disable", Boolean.FALSE);
     mainPanel.setBorder(
         BorderFactory
-          .createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+            .createTitledBorder(BorderFactory.createLoweredBevelBorder(), "AsyncApi Module", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
 
     mainPanel.add(createAsyncApiFileSelectPanel(), BorderLayout.NORTH);
     mainPanel.add(createAsyncApiTabs(), BorderLayout.CENTER);
@@ -305,44 +344,6 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     return tabbedPanel;
   }
 
-  private void fillTable(final DefaultTableModel schemaFields, final Collection<Pair<String, String>> schemaData) {
-    if (Objects.nonNull(schemaData)) {
-      final var count = schemaFields.getRowCount();
-      for (var i = 0; i < count; i++) {
-        schemaFields.removeRow(0);
-      }
-      schemaData.forEach(data -> schemaFields.addRow(dataToRow(data)));
-    }
-  }
-
-  private void fillTable(final DefaultTableModel schemaFields, final Object[] schemaData) {
-    if (Objects.nonNull(schemaData)) {
-      final var count = schemaFields.getRowCount();
-      for (var i = 0; i < count; i++) {
-        schemaFields.removeRow(0);
-      }
-      for (var data : schemaData) {
-        schemaFields.addRow(((FieldValueMapping) data).getProperties());
-      }
-    }
-  }
-
-  private void fillTable(final DefaultTableModel schemaFields, final List<FieldValueMapping> schemaData) {
-    if (Objects.nonNull(schemaData)) {
-      final var count = schemaFields.getRowCount();
-      for (var i = 0; i < count; i++) {
-        schemaFields.removeRow(0);
-      }
-      for (var data : schemaData) {
-        schemaFields.addRow(data.getProperties());
-      }
-    }
-  }
-
-  private Object[] dataToRow(final Pair<String, String> data) {
-    return new Object[] {data.getKey(), data.getValue()};
-  }
-
   private JPanel createBrokerPanel() {
     final JPanel brokerPanel = new JPanel();
     brokerPanel.setLayout(new BorderLayout(0, 0));
@@ -355,7 +356,6 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     return brokerPanel;
   }
 
-
   private JPanel createRegistryTab() {
     final JPanel registryUrlPanel = new JPanel();
     registryUrlPanel.setLayout(new BorderLayout(0, 0));
@@ -366,6 +366,9 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     registryUrlPanel.add(registryComboBox, BorderLayout.NORTH);
     registryUrlPanel.add(new JScrollPane(new JTable(schemaRegistryFieldModel)), BorderLayout.CENTER);
     return registryUrlPanel;
+  }
+
+  private void registryComboActionListener(final ActionEvent actionEvent) {
   }
 
   private JPanel createSchemaTab() {
@@ -387,9 +390,6 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     if (Objects.nonNull(selectedSchema)) {
       fillTable(schemaFieldModel, selectedSchema.getProperties());
     }
-  }
-
-  private void registryComboActionListener(final ActionEvent actionEvent) {
   }
 
   private void serverChooseActionListener(final ActionEvent actionEvent) {

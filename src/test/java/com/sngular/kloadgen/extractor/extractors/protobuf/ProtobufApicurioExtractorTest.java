@@ -1,5 +1,9 @@
 package com.sngular.kloadgen.extractor.extractors.protobuf;
 
+import java.io.File;
+import java.util.List;
+import java.util.Locale;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -14,10 +18,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.util.List;
-import java.util.Locale;
 
 class ProtobufApicurioExtractorTest {
 
@@ -37,7 +37,6 @@ class ProtobufApicurioExtractorTest {
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
-
   @Test
   @DisplayName("Test Extractor with simple proto file")
   void testFlatProperties() throws Exception {
@@ -53,7 +52,6 @@ class ProtobufApicurioExtractorTest {
                   FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(true).build()
               );
   }
-
 
   @Test
   @DisplayName("Test Extractor with data structure map and array")

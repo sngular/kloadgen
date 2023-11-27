@@ -1,12 +1,12 @@
 package com.sngular.kloadgen.serializer;
 
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.testutil.FileHelper;
-import org.apache.commons.math3.util.Pair;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.testutil.FileHelper;
+import org.apache.commons.math3.util.Pair;
 
 public class ProtobufSerializerTestFixture {
 

@@ -82,7 +82,7 @@ class SerialisedSubjectPropertyEditorTest {
   void iterationStart() {
 
     final var valueSerializedConfigElement = new ValueSerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
-                                                                        AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
+                                                                              AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     final var variables = JMeterContextService.getContext().getVariables();
     valueSerializedConfigElement.iterationStart(null);
 

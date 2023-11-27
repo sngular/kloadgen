@@ -11,61 +11,64 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 
 public class JsonSchemaFixturesConstants {
 
-  public static final List<FieldValueMapping> SIMPLE_SCHEMA = new ArrayList<FieldValueMapping>(Arrays.asList(
-          FieldValueMapping.builder()
-                  .fieldName("firstName")
-                  .fieldType("string")
-                  .valueLength(0)
-                  .fieldValueList("null")
-                  .required(false)
-                  .isAncestorRequired(false)
-                  .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
-                  .build(),
-          FieldValueMapping.builder()
-                  .fieldName("lastName")
-                  .fieldType("string")
-                  .valueLength(0)
-                  .fieldValueList("García")
-                  .required(true)
-                  .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
-                  .build(),
-          FieldValueMapping.builder()
-                  .fieldName("age")
-                  .fieldType("number")
-                  .valueLength(0)
-                  .fieldValueList("null")
-                  .required(false)
-                  .constraints(Collections.emptyMap())
-                  .build()
+  public static final List<FieldValueMapping> SIMPLE_SCHEMA = new ArrayList<>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("firstName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("null")
+                       .required(false)
+                       .isAncestorRequired(false)
+                       .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("lastName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("García")
+                       .required(true)
+                       .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("age")
+                       .fieldType("number")
+                       .valueLength(0)
+                       .fieldValueList("null")
+                       .required(false)
+                       .constraints(Collections.emptyMap())
+                       .build()
   ));
+
   public static final String SIMPLE_SCHEMA_EXPECTED = "{\"lastName\":\"García\"}";
-  public static final List<FieldValueMapping> SIMPLE_SCHEMA_NONREQUIRED = new ArrayList<FieldValueMapping>(Arrays.asList(
-          FieldValueMapping.builder()
-                  .fieldName("firstName")
-                  .fieldType("string")
-                  .valueLength(0)
-                  .fieldValueList("Graciela")
-                  .required(false)
-                  .isAncestorRequired(false)
-                  .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
-                  .build(),
-          FieldValueMapping.builder()
-                  .fieldName("lastName")
-                  .fieldType("string")
-                  .valueLength(0)
-                  .fieldValueList("null")
-                  .required(false)
-                  .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
-                  .build(),
-          FieldValueMapping.builder()
-                  .fieldName("age")
-                  .fieldType("number")
-                  .valueLength(0)
-                  .fieldValueList("21")
-                  .required(false)
-                  .constraints(Collections.emptyMap())
-                  .build()
+
+  public static final List<FieldValueMapping> SIMPLE_SCHEMA_NONREQUIRED = new ArrayList<>(Arrays.asList(
+      FieldValueMapping.builder()
+                       .fieldName("firstName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("Graciela")
+                       .required(false)
+                       .isAncestorRequired(false)
+                       .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("lastName")
+                       .fieldType("string")
+                       .valueLength(0)
+                       .fieldValueList("null")
+                       .required(false)
+                       .constraints(Map.of(ConstraintTypeEnum.MINIMUM_VALUE, "0", ConstraintTypeEnum.MAXIMUM_VALUE, "0"))
+                       .build(),
+      FieldValueMapping.builder()
+                       .fieldName("age")
+                       .fieldType("number")
+                       .valueLength(0)
+                       .fieldValueList("21")
+                       .required(false)
+                       .constraints(Collections.emptyMap())
+                       .build()
   ));
+
   public static final String SIMPLE_SCHEMA_NONREQUIRED_EXPECTED = "{\"firstName\":\"Graciela\",\"age\":21.0}";
 
   public static final List<FieldValueMapping> SIMPLE_SCHEMA_MAP = new ArrayList<>(Arrays.asList(
@@ -190,7 +193,7 @@ public class JsonSchemaFixturesConstants {
                        .build()
   ));
 
-  public static final List<FieldValueMapping> SIMPLE_SCHEMA_REQUIRED = new ArrayList<FieldValueMapping>(Arrays.asList(
+  public static final List<FieldValueMapping> SIMPLE_SCHEMA_REQUIRED = new ArrayList<>(Arrays.asList(
       FieldValueMapping.builder()
                        .fieldName("firstName")
                        .fieldType("string")
