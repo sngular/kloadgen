@@ -85,7 +85,8 @@ public final class RandomObject {
         break;
       case ValidTypeConstants.BYTES:
         try {
-          value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
+          value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap())
+                  .byteValueExact();
         } catch (final ArithmeticException exception) {
           value = Byte.MAX_VALUE;
         }
@@ -149,7 +150,8 @@ public final class RandomObject {
     return value;
   }
 
-  private BigInteger getIntegerValueOrRandom(final Integer valueLength, final List<String> fieldValueList, final Map<ConstraintTypeEnum, String> constraints) {
+  private BigInteger getIntegerValueOrRandom(final Integer valueLength, final List<String> fieldValueList,
+                                             final Map<ConstraintTypeEnum, String> constraints) {
     final BigInteger value;
 
     if (!fieldValueList.isEmpty()) {
@@ -176,7 +178,8 @@ public final class RandomObject {
     return value;
   }
 
-  private BigDecimal getDecimalValueOrRandom(final Integer valueLength, final List<String> fieldValueList, final Map<ConstraintTypeEnum, String> constraints) {
+  private BigDecimal getDecimalValueOrRandom(final Integer valueLength, final List<String> fieldValueList,
+                                             final Map<ConstraintTypeEnum, String> constraints) {
     final BigDecimal value;
 
     if (!fieldValueList.isEmpty()) {
@@ -421,8 +424,10 @@ public final class RandomObject {
 
   private static LocalDateTime getRandomLocalDateTime(final List<String> fieldValueList) {
     final LocalDateTime value;
-    final long minDay = LocalDateTime.of(1900, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
-    final long maxDay = LocalDateTime.of(2100, 1, 1, 0, 0).toEpochSecond(ZoneOffset.UTC);
+    final long minDay = LocalDateTime.of(1900, 1, 1, 0, 0)
+            .toEpochSecond(ZoneOffset.UTC);
+    final long maxDay = LocalDateTime.of(2100, 1, 1, 0, 0)
+            .toEpochSecond(ZoneOffset.UTC);
     final long randomSeconds = minDay + RandomUtils.nextLong(0, maxDay - minDay);
 
     if (fieldValueList.isEmpty()) {

@@ -1,10 +1,10 @@
 package com.sngular.kloadgen.extractor.extractors.protobuf;
 
+import java.util.List;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-
-import java.util.List;
 
 public class ProtoBufApicurioExtractor extends AbstractProtoFileExtractor implements Extractor<ProtoFileElement> {
 

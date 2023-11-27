@@ -1,10 +1,10 @@
 package com.sngular.kloadgen.extractor.extractors.avro;
 
+import java.util.List;
+
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import org.apache.avro.Schema;
-
-import java.util.List;
 
 public class AvroConfluentExtractor extends AbstractAvroFileExtractor implements Extractor<Schema> {
 

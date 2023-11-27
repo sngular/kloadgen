@@ -1,15 +1,15 @@
 package com.sngular.kloadgen.extractor.extractors.json;
 
-import com.sngular.kloadgen.extractor.extractors.Extractor;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.model.json.Field;
-import com.sngular.kloadgen.model.json.Schema;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.sngular.kloadgen.extractor.extractors.Extractor;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.model.json.Field;
+import com.sngular.kloadgen.model.json.Schema;
 
 public class JsonDefaultExtractor extends AbstractJsonExtractor implements Extractor<String> {
 

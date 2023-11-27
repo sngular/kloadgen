@@ -1,5 +1,11 @@
 package com.sngular.kloadgen.extractor.extractors;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.extractors.avro.AvroConfluentExtractor;
@@ -9,7 +15,7 @@ import com.sngular.kloadgen.extractor.extractors.protobuf.ProtobufExtractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentAbstractParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.util.JMeterHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
@@ -22,13 +28,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
@@ -75,7 +80,7 @@ class ExtractorFactoryTest {
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
     final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
-    final var baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
+    final var baseParsedSchema = new BaseParsedSchema<>(ConfluentParsedSchemaMetadata.parse(parsedSchema));
 
     jmeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     jmeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);

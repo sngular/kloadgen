@@ -12,6 +12,18 @@
 
 package com.sngular.kloadgen.sampler.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Vector;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
@@ -24,6 +36,20 @@ import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.sampler.AsyncApiSampler;
 import com.sngular.kloadgen.sampler.SamplerUtil;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.config.Argument;
@@ -33,16 +59,6 @@ import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
 import org.apache.kafka.clients.producer.ProducerConfig;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.List;
-import java.util.*;
 
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public final class AsyncApiSamplerGui extends AbstractSamplerGui {

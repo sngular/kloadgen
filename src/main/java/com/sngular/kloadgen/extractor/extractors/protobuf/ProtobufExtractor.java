@@ -1,14 +1,14 @@
 package com.sngular.kloadgen.extractor.extractors.protobuf;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class ProtobufExtractor<T extends ParsedSchema> implements ExtractorRegistry<T> {
 
@@ -19,7 +19,7 @@ public class ProtobufExtractor<T extends ParsedSchema> implements ExtractorRegis
     return new ArrayList<FieldValueMapping>(SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived));
   }
 
-  public final T processSchema(final String fileContent) {
+  public final ParsedSchema processSchema(final String fileContent) {
     return (T) new ParsedSchema(fileContent, "PROTOBUF");
   }
 

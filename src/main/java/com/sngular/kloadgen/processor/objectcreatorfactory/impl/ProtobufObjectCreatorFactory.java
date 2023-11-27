@@ -1,5 +1,16 @@
 package com.sngular.kloadgen.processor.objectcreatorfactory.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
@@ -21,11 +32,6 @@ import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 public class ProtobufObjectCreatorFactory implements ObjectCreatorFactory {
 

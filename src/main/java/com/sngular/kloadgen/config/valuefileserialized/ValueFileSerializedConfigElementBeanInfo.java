@@ -6,14 +6,18 @@
 
 package com.sngular.kloadgen.config.valuefileserialized;
 
+import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
+
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.property.editor.*;
+import com.sngular.kloadgen.property.editor.FileSubjectPropertyEditor;
+import com.sngular.kloadgen.property.editor.NameStrategyPropertyEditor;
+import com.sngular.kloadgen.property.editor.SchemaConverterPropertyEditor;
+import com.sngular.kloadgen.property.editor.SchemaTypePropertyEditor;
+import com.sngular.kloadgen.property.editor.ValueSerializerPropertyEditor;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
-
-import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
 
 public class ValueFileSerializedConfigElementBeanInfo extends BeanInfoSupport {
 

@@ -6,6 +6,11 @@
 
 package com.sngular.kloadgen.extractor;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.Properties;
+
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
@@ -30,11 +35,6 @@ import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Locale;
-import java.util.Properties;
 
 @ExtendWith(MockitoExtension.class)
 class SchemaExtractorTest {
@@ -146,7 +146,7 @@ class SchemaExtractorTest {
     properties.setProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, SchemaRegistryEnum.CONFLUENT.toString());
 
     final ParsedSchema parsedSchema = new ParsedSchema(testFile, "AVRO");
-    final var baseParsedSchema = new BaseParsedSchema<>(ConfluentAbstractParsedSchemaMetadata.parse(parsedSchema));
+    final var baseParsedSchema = new BaseParsedSchema<>(ConfluentParsedSchemaMetadata.parse(parsedSchema));
     jmeterHelperMockedStatic.when(() -> JMeterHelper.getParsedSchema(Mockito.anyString(), Mockito.any(Properties.class))).thenReturn(baseParsedSchema);
     jmeterContextServiceMockedStatic.when(() -> JMeterContextService.getContext().getProperties()).thenReturn(properties);
 

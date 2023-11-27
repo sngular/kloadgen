@@ -1,15 +1,15 @@
 package com.sngular.kloadgen.parsedschema;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import io.confluent.kafka.schemaregistry.avro.AvroSchema;
 import io.confluent.kafka.schemaregistry.json.JsonSchema;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import org.apache.avro.Schema;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 public class ParsedSchema<T> implements IParsedSchema<T> {
 

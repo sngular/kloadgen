@@ -1,18 +1,18 @@
 package com.sngular.kloadgen.extractor;
 
-import com.sngular.kloadgen.common.SchemaRegistryEnum;
-import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
-import lombok.Getter;
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
+
+import com.sngular.kloadgen.common.SchemaRegistryEnum;
+import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Getter
 public final class SchemaExtractor {
@@ -31,7 +31,7 @@ public final class SchemaExtractor {
   }
 
   public static List<FieldValueMapping> flatPropertiesList(final ParsedSchema parserSchema) {
-    return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema.rawSchema(), SchemaRegistryEnum.CONFLUENT);
+    return ExtractorFactory.getExtractor(parserSchema.schemaType()).processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
   }
 
   public static String readSchemaFile(final String filePath) throws IOException {

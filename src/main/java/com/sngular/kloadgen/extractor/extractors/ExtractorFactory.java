@@ -1,5 +1,10 @@
 package com.sngular.kloadgen.extractor.extractors;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+
 import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
@@ -15,11 +20,6 @@ import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jmeter.threads.JMeterContextService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
 
 public final class ExtractorFactory {
   private static AvroExtractor avroExtractor = new AvroExtractor();

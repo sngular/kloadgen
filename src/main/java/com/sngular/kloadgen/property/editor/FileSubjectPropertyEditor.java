@@ -6,27 +6,8 @@
 
 package com.sngular.kloadgen.property.editor;
 
-import com.sngular.kloadgen.common.SchemaRegistryEnum;
-import com.sngular.kloadgen.common.SchemaTypeEnum;
-import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
-import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
-import com.sngular.kloadgen.util.PropsKeysHelper;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.AvroRuntimeException;
-import org.apache.jmeter.gui.ClearGui;
-import org.apache.jmeter.gui.GuiPackage;
-import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
-import org.apache.jmeter.testbeans.gui.TableEditor;
-import org.apache.jmeter.testbeans.gui.TestBeanGUI;
-import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.apache.jmeter.util.JMeterUtils;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
@@ -37,6 +18,30 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.sngular.kloadgen.common.SchemaRegistryEnum;
+import com.sngular.kloadgen.common.SchemaTypeEnum;
+import com.sngular.kloadgen.extractor.SchemaExtractor;
+import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
+import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.util.PropsKeysHelper;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileSystemView;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.AvroRuntimeException;
+import org.apache.jmeter.gui.ClearGui;
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
+import org.apache.jmeter.testbeans.gui.TableEditor;
+import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
+import org.apache.jmeter.util.JMeterUtils;
 
 
 @Slf4j

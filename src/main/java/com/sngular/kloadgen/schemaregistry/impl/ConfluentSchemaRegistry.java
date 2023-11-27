@@ -1,9 +1,20 @@
 package com.sngular.kloadgen.schemaregistry.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.*;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentParsedSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import io.confluent.kafka.schemaregistry.avro.AvroSchemaProvider;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
@@ -13,12 +24,6 @@ import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaProvider;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.threads.JMeterContextService;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 public final class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
