@@ -1,30 +1,19 @@
 package com.sngular.kloadgen.sampler;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sngular.kloadgen.extractor.ApiExtractor;
-import com.sngular.kloadgen.extractor.model.AsyncApiFile;
-import com.sngular.kloadgen.processor.fixture.JsonSchemaFixturesConstants;
 import com.sngular.kloadgen.testutil.FileHelper;
-import com.sngular.kloadgen.testutil.SchemaParseUtil;
-import com.sngular.kloadgen.util.ProducerKeysHelper;
-import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class AsyncApiSamplerTest {
     private final FileHelper fileHelper = new FileHelper();
@@ -63,7 +52,7 @@ class AsyncApiSamplerTest {
 
     }*/
 
-
+/*
     public JMeterVariables getVariablesJsonSchema() throws IOException {
 
         final File testFile = fileHelper.getFile("/asyncapi/event-api.yml");
@@ -78,7 +67,7 @@ class AsyncApiSamplerTest {
         variables.putObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED);
         variables.put(ProducerKeysHelper.KEY_NAME_STRATEGY, "theStrategy");
         return variables;
-    }
+    }*/
 
 
 
