@@ -6,8 +6,27 @@
 
 package com.sngular.kloadgen.property.editor;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import com.sngular.kloadgen.common.SchemaRegistryEnum;
+import com.sngular.kloadgen.common.SchemaTypeEnum;
+import com.sngular.kloadgen.extractor.SchemaExtractor;
+import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
+import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
+import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.util.PropsKeysHelper;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.AvroRuntimeException;
+import org.apache.jmeter.gui.ClearGui;
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
+import org.apache.jmeter.testbeans.gui.TableEditor;
+import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
+import org.apache.jmeter.util.JMeterUtils;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
@@ -19,31 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.filechooser.FileSystemView;
-
-import com.sngular.kloadgen.common.SchemaRegistryEnum;
-import com.sngular.kloadgen.common.SchemaTypeEnum;
-import com.sngular.kloadgen.extractor.SchemaExtractor;
-import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
-import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
-import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.util.PropsKeysHelper;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.AvroRuntimeException;
-import org.apache.jmeter.gui.ClearGui;
-import org.apache.jmeter.gui.GuiPackage;
-import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
-import org.apache.jmeter.testbeans.gui.TableEditor;
-import org.apache.jmeter.testbeans.gui.TestBeanGUI;
-import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
-import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.util.JMeterUtils;
 
 @Slf4j
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements TestBeanPropertyEditor, ClearGui {
@@ -55,8 +49,6 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   private final JPanel panel = new JPanel();
 
   private final JButton openFileDialogButton = new JButton(JMeterUtils.getResString("file_visualizer_open"));
-
-  private ParsedSchema parserSchema;
 
   private JComboBox<String> schemaTypeComboBox;
 
@@ -98,11 +90,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
         final ExtractorRegistry extractor = ExtractorFactory.getExtractor(schemaType);
         final String fileContent = SchemaExtractor.readSchemaFile(schemaFile.getPath());
-        this.parserSchema = (ParsedSchema) extractor.processSchema(fileContent);
+        final ParsedSchema parserSchema = (ParsedSchema) extractor.processSchema(fileContent);
         final List<FieldValueMapping> schemaFieldList = extractor.processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
-        buildTable(schemaFieldList);
-        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA, fileContent);
-        JMeterContextService.getContext().getProperties().setProperty(PropsKeysHelper.VALUE_SCHEMA_TYPE, schemaType);
+        buildTable(schemaFieldList, fileContent, schemaType);
       } catch (final IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), ERROR_FAILED_TO_RETRIEVE_PROPERTIES,
                                     JOptionPane.ERROR_MESSAGE);
@@ -119,7 +109,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     return result;
   }
 
-  public final void buildTable(final List<FieldValueMapping> attributeList) {
+  public final void buildTable(final List<FieldValueMapping> attributeList, final String fileContent, final String schemaType) {
 
     if (!attributeList.isEmpty()) {
       try {
@@ -138,6 +128,10 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         for (PropertyEditor propertyEditor : propertyEditors) {
           if (propertyEditor instanceof TableEditor) {
             propertyEditor.setValue(attributeList);
+          } else if (propertyEditor instanceof SchemaConverterPropertyEditor) {
+            propertyEditor.setValue(fileContent);
+          } else if (propertyEditor instanceof SchemaTypePropertyEditor) {
+            propertyEditor.setValue(schemaType);
           }
         }
       } catch (NoSuchFieldException | IllegalAccessException e) {

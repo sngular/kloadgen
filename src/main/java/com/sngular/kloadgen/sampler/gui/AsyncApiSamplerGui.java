@@ -12,33 +12,6 @@
 
 package com.sngular.kloadgen.sampler.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.table.DefaultTableModel;
-
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.extractor.ApiExtractor;
 import com.sngular.kloadgen.extractor.asyncapi.AsyncApiExtractorImpl;
@@ -61,6 +34,17 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.gui.JLabeledTextField;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.List;
+import java.util.*;
+
+@SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public final class AsyncApiSamplerGui extends AbstractSamplerGui {
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
@@ -80,8 +64,6 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
   private JComboBox<AsyncApiServer> serverComboBox;
 
   private JComboBox<AsyncApiSchema> topicComboBox;
-
-  private JComboBox<AsyncApiSR> registryComboBox;
 
   private AsyncApiFile asyncApiFile;
 
@@ -362,10 +344,10 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     final JPanel registryUrlPanel = new JPanel();
     registryUrlPanel.setLayout(new BorderLayout(0, 0));
     registryUrlPanel.add(new JLabeledTextField("Schema Registry URL"));
-    registryComboBox = new JComboBox<>();
+    final JComboBox<AsyncApiSR> registryComboBox = new JComboBox<>();
     registryComboBox.setRenderer(new AsyncApiSRRenderer());
     registryComboBox.addActionListener(this::registryComboActionListener);
-    registryUrlPanel.add(this.registryComboBox, BorderLayout.NORTH);
+    registryUrlPanel.add(registryComboBox, BorderLayout.NORTH);
     registryUrlPanel.add(new JScrollPane(new JTable(schemaRegistryFieldModel)), BorderLayout.CENTER);
     return registryUrlPanel;
   }

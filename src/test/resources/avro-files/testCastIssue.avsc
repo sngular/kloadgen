@@ -1,0 +1,28 @@
+{
+"type":"record",
+"name":"TopicName",
+"fields": [
+    {"name":"messageId",
+    "type":"string"
+    },
+    {"name":"messageTime",
+    "type":"long"
+    },
+    {"name":"data",
+    "type":{
+        "type":"array",
+        "items":{
+            "type":"record",
+            "name":"DataItems",
+            "fields": [{
+                "name":"numericFieldValueList",
+                "type":"int"
+                },
+                {
+                "name":"stringFieldValueList",
+                "type":"string"
+                }
+            ]
+        }
+    }}]
+}

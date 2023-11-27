@@ -1,35 +1,23 @@
 package com.sngular.kloadgen.processor.objectcreatorfactory.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.model.ConstraintTypeEnum;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.processor.model.SchemaProcessorPOJO;
 import com.sngular.kloadgen.processor.objectcreatorfactory.ObjectCreatorFactory;
 import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.randomtool.generator.AvroGeneratorTool;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioParsedSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
+import com.sngular.kloadgen.schemaregistry.adapter.impl.*;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.collections4.IteratorUtils;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 public final class AvroObjectCreatorFactory implements ObjectCreatorFactory {
 

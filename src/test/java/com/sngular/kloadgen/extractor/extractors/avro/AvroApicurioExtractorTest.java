@@ -1,7 +1,5 @@
 package com.sngular.kloadgen.extractor.extractors.avro;
 
-import java.util.List;
-
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
@@ -9,6 +7,8 @@ import org.apache.avro.Schema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 class AvroApicurioExtractorTest {
 
@@ -42,7 +42,6 @@ class AvroApicurioExtractorTest {
   void testOptionalEnum() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
-    //final ParsedSchema parsedSchema = avroConfluentExtractor.getSchemaNameList(testFile);
 
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);

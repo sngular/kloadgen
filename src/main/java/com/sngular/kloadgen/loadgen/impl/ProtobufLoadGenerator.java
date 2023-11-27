@@ -1,10 +1,5 @@
 package com.sngular.kloadgen.loadgen.impl;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
@@ -17,6 +12,11 @@ import io.confluent.kafka.schemaregistry.client.SchemaMetadata;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
 import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class ProtobufLoadGenerator implements SRLoadGenerator, BaseLoadGenerator {
@@ -45,7 +45,7 @@ public class ProtobufLoadGenerator implements SRLoadGenerator, BaseLoadGenerator
   public final void setUpGenerator(final String schema, final List<FieldValueMapping> fieldExprMappings) {
     final ProtobufSchema protobufSchema = new ProtobufSchema(schema);
     this.protobufSchemaProcessor
-        .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema, new BaseSchemaMetadata<>(
+        .processSchema(SchemaTypeEnum.PROTOBUF, protobufSchema.rawSchema(), new BaseSchemaMetadata<>(
                            ConfluentSchemaMetadata.parse(new SchemaMetadata(1, 1, SchemaTypeEnum.PROTOBUF.name(), Collections.emptyList(), schema))),
                        fieldExprMappings);
   }

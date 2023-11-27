@@ -1,10 +1,5 @@
 package com.sngular.kloadgen.processor;
 
-import java.io.File;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Stream;
-
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
@@ -23,6 +18,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
+import java.io.File;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
+
 public class JsonSchemaProcessorTest {
 
   private static Stream<Object> parametersForTestNullOnOptionalField() {
@@ -33,7 +33,7 @@ public class JsonSchemaProcessorTest {
     return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED_EXPECTED));
   }
 
-  private static Stream<Object> parametersForTestOptionalFieldNonEmpty(){
+  private static Stream<Object> parametersForTestOptionalFieldNonEmpty() {
     return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED_EXPECTED));
   }
 
@@ -125,11 +125,11 @@ public class JsonSchemaProcessorTest {
   @ParameterizedTest
   @DisplayName("Should process non-required fields if it is not empty")
   @MethodSource("parametersForTestOptionalFieldNonEmpty")
-  final void testOptionalFieldNonEmpty(final List<FieldValueMapping> schemaAsJson, final String expected){
+  final void testOptionalFieldNonEmpty(final List<FieldValueMapping> schemaAsJson, final String expected) {
 
     final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
 
-    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON,null,null,schemaAsJson);
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
     final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).isEqualTo(expected);

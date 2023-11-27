@@ -1,14 +1,14 @@
 package com.sngular.kloadgen.serializer;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
 import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.testutil.FileHelper;
 import org.apache.commons.math3.util.Pair;
 
-public class ProtobuffSerializerTestFixture {
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+
+public class ProtobufSerializerTestFixture {
 
   static final Pair<File, List<FieldValueMapping>> TEST_COMPLETE_PROTO = new Pair<>(
       new FileHelper().getFile("/proto-files/completeProto.proto"),
@@ -227,6 +227,6 @@ public class ProtobuffSerializerTestFixture {
           SerializerTestFixture.createFieldValueMapping("create_user_id", "string"))
   );
 
-  protected ProtobuffSerializerTestFixture() {
+  protected ProtobufSerializerTestFixture() {
   }
 }
