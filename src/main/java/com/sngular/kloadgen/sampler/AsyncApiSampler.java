@@ -69,7 +69,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     final var sampleResult = new SampleResult();
     sampleResult.setThreadName("AsyncApi Sampler");
     sampleResult.sampleStart();
-    try (final KafkaProducer<Object, Object> producer = new KafkaProducer<>(extractProps())) {
+    try (final KafkaProducer<Object, Object> producer = getKafkaProducer()) {
       generator.setUpGenerator(getSchemaFieldConfiguration());
       final var messageVal = generator.nextMessage();
       if (Objects.nonNull(messageVal)) {
@@ -94,13 +94,8 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return sampleResult;
   }
 
-  private Map<String, Object> extractProps() {
-    final var properties = new HashMap<String, Object>();
-    getBrokerConfiguration().forEach(property -> properties.put(property.getPropertyName(), property.getPropertyValue()));
-    properties.put(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY, Boolean.FALSE);
-    properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GenericJsonRecordSerializer.class.getCanonicalName());
-    properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, GenericJsonRecordSerializer.class.getCanonicalName());
-    return properties;
+  public KafkaProducer getKafkaProducer() {
+    return new KafkaProducer<>(extractProps());
   }
 
   public final List<FieldValueMapping> getSchemaFieldConfiguration() {
@@ -147,6 +142,27 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return String.format(TEMPLATE, recordMetadata.topic(), recordMetadata.partition(), recordMetadata.offset());
   }
 
+  private Map<String, Object> extractProps() {
+    final var properties = new HashMap<String, Object>();
+    getBrokerConfiguration().forEach(property -> properties.put(property.getPropertyName(), property.getPropertyValue()));
+    properties.put(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY, Boolean.FALSE);
+    properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GenericJsonRecordSerializer.class.getCanonicalName());
+    properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, GenericJsonRecordSerializer.class.getCanonicalName());
+    return properties;
+  }
+
+  public final String getAsyncApiSchemaName() {
+    return this.getPropertyAsString("asyncapischemaname");
+  }
+
+  public final void setAsyncApiSchemaName(final String asyncApiSchemaName) {
+    this.setProperty("asyncapischemaname", asyncApiSchemaName);
+  }
+
+  private Object getObject(final EnrichedRecord messageVal, final boolean isKloadSerializer) {
+    return isKloadSerializer ? messageVal : messageVal.getGenericRecord();
+  }
+
   public final List<PropertyMapping> getBrokerConfiguration() {
     final List<PropertyMapping> propertyList = new ArrayList<>();
     for (TestElementProperty elementProperty : (List<TestElementProperty>) this.getProperty("brokerConfiguration").getObjectValue()) {
@@ -161,18 +177,6 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
 
   public final void setBrokerConfiguration(final List<PropertyMapping> asyncApiServerName) {
     this.setProperty(new CollectionProperty("brokerConfiguration", asyncApiServerName));
-  }
-
-  public final String getAsyncApiSchemaName() {
-    return this.getPropertyAsString("asyncapischemaname");
-  }
-
-  public final void setAsyncApiSchemaName(final String asyncApiSchemaName) {
-    this.setProperty("asyncapischemaname", asyncApiSchemaName);
-  }
-
-  private Object getObject(final EnrichedRecord messageVal, final boolean isKloadSerializer) {
-    return isKloadSerializer ? messageVal : messageVal.getGenericRecord();
   }
 
   public final AsyncApiFile getAsyncApiFileNode() {

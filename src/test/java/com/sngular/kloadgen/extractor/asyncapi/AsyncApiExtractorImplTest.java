@@ -40,10 +40,11 @@ class AsyncApiExtractorImplTest {
     final File testFile = fileHelper.getFile("/asyncapi/event-api.yml");
     final AsyncApiFile asapfle = new AsyncApiExtractorImpl().processFile(testFile);
 
-    org.junit.jupiter.api.Assertions.assertNotNull(asapfle);
-    org.junit.jupiter.api.Assertions.assertEquals("{user_signedup=user_signedup}", asapfle.getApiSchemaList().toString());
-    org.junit.jupiter.api.Assertions.assertEquals("{production=AsyncApiServer(name=production, url=mqtt://test.mosquitto.org, protocol=mqtt, description=Test MQTT broker)}",
-                                                  asapfle.getApiServerMap().toString());
+    Assertions.assertThat(asapfle).isNotNull();
+    Assertions.assertThat(asapfle.getApiSchemaList().toString()).isEqualTo("{user_signedup=user_signedup}");
+    Assertions.assertThat(asapfle.getApiServerMap().toString()).isEqualTo("{production=AsyncApiServer(name=production," +
+                                                                          " url=mqtt://test.mosquitto.org, protocol=mqtt," +
+                                                                          " description=Test MQTT broker)}");
   }
 
   @Test
