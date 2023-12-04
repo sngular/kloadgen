@@ -23,7 +23,8 @@ public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
     super(SchemaRegistryConfigElement.class);
 
     createPropertyGroup("schema_registry_config", new String[] {SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME,
-      SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL, SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES});
+                                                                SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_URL,
+                                                                SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_PROPERTIES});
 
     final PropertyDescriptor schemaRegistryName = property(SchemaRegistryConfigElementValue.SCHEMA_REGISTRY_NAME);
     schemaRegistryName.setPropertyEditorClass(SchemaRegistryNamePropertyEditor.class);
