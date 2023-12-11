@@ -15,6 +15,14 @@ A list of the properties explained here:
 * `schema.registry.username` Username
 * `schema.registry.password` Password
 * `schema.registry.bearer`	Token for SASL/OAUTHBEARER
+* `schema.registry.keystore.location` The absolute path of the keystore file for the schema registry
+* `schema.registry.keystore.password` The password that protects the keystore file for the schema registry
+* `schema.registry.truststore.location` The absolute path of the truststore file for the schema registry
+* `schema.registry.truststore.password` The password that protects the truststore file for the schema registry
+* `ssl.keystore.location` The absolute path of the keystore file for the connection against the schema registry
+* `ssl.keystore.password` The password that protects the keystore file for the connection against the schema registry
+* `ssl.truststore.location` The absolute path of the truststore file for the connection against the schema registry
+* `ssl.truststore.password` The password that protects the truststore file for the connection against the schema registry
 
 ## Some Recommendations
 
