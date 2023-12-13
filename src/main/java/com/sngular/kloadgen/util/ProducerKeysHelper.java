@@ -8,7 +8,6 @@ package com.sngular.kloadgen.util;
 
 import com.sngular.kloadgen.serializer.AvroSerializer;
 import com.sngular.kloadgen.serializer.GenericAvroRecordSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 public final class ProducerKeysHelper {
 
