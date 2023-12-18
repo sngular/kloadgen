@@ -6,8 +6,8 @@
 
 package com.sngular.kloadgen.util;
 
+import com.sngular.kloadgen.serializer.AvroSerializer;
 import com.sngular.kloadgen.serializer.GenericAvroRecordSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 public final class ProducerKeysHelper {
 
@@ -19,7 +19,7 @@ public final class ProducerKeysHelper {
 
   public static final String KAFKA_TOPIC_CONFIG_DEFAULT = "<Topic>";
 
-  public static final String KEY_SERIALIZER_CLASS_CONFIG_DEFAULT = StringSerializer.class.getName();
+  public static final String KEY_SERIALIZER_CLASS_CONFIG_DEFAULT = AvroSerializer.class.getName();
 
   public static final String VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT = GenericAvroRecordSerializer.class.getName();
 

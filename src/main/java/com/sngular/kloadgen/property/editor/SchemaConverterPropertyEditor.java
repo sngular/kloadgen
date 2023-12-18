@@ -48,7 +48,8 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
   }
 
   @Override
-  public final void clearGui() {}
+  public final void clearGui() {
+  }
 
   @Override
   public final void setDescriptor(final PropertyDescriptor descriptor) {

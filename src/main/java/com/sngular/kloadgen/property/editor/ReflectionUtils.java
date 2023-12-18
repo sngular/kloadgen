@@ -17,12 +17,12 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
 import org.reflections.Reflections;
 
-final class ReflectionUtils {
+public final class ReflectionUtils {
 
   private ReflectionUtils() {
   }
 
-  static void extractSerializers(final JComboBox<String> serializerComboBox, final Reflections reflections, final Class reflectedClass) {
+  public static List<String> extractSerializers(final Reflections reflections, final Class reflectedClass) {
     final Set<Class<? extends Serializer>> subTypes = reflections.getSubTypesOf(reflectedClass);
     final List<String> classList = new ArrayList<>();
 
@@ -31,7 +31,11 @@ final class ReflectionUtils {
     }
 
     classList.sort(Comparator.naturalOrder());
-    for (String serializer : classList) {
+    return classList;
+  }
+
+  static void extractSerializers(final JComboBox<String> serializerComboBox, final Reflections reflections, final Class reflectedClass) {
+    for (String serializer : extractSerializers(reflections, reflectedClass)) {
       serializerComboBox.addItem(serializer);
     }
     serializerComboBox.setSelectedItem(0);
