@@ -20,7 +20,7 @@
       <name>Mozilla Public License 2.0</name>
       <url>https://github.com/sngular/kloadgen/blob/master/LICENSE</url>
       <distribution>repo</distribution>
-      <comments></comments>
+      <comments/>
     </license>
   </licenses>
 
@@ -225,17 +225,6 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
-      <id>nuriaricorf</id>
-      <name>Nuria Rico Freire</name>
-      <email>nuria.rico@sngular.com</email>
-      <organization>Sngular</organization>
-      <organizationUrl>https://sngular.github.io/</organizationUrl>
-      <roles>
-        <role>Junior Developer</role>
-      </roles>
-      <timezone>Europe/Madrid</timezone>
-    </developer>
-    <developer>
       <id>rabad-sng</id>
       <name>Raúl Abad</name>
       <email>raul.abad@sngular.com</email>
@@ -243,6 +232,17 @@
       <organizationUrl>https://www.sngular.com</organizationUrl>
       <roles>
         <role>Senior Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>nuriaricorf</id>
+      <name>Nuria Rico Freire</name>
+      <email>nuria.rico@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
@@ -697,7 +697,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.3.0</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
@@ -732,7 +732,7 @@
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
         <artifactId>sortpom-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <goals>
@@ -745,7 +745,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.9.0</version>
         <configuration>
           <optimize>true</optimize>
           <showDeprecation>true</showDeprecation>
@@ -764,7 +764,7 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.7</version>
         <configuration>
-          <check></check>
+          <check/>
           <formats>
             <format>xml</format>
           </formats>
@@ -835,7 +835,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.0</version>
             <configuration>
               <filters>
                 <filter>
