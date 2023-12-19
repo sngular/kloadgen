@@ -301,6 +301,17 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>RobertoSngular</id>
+      <name>Roberto Riveira Veiga</name>
+      <email>roberto.riveira@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
 
   <scm>
@@ -658,7 +669,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.3.0</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
@@ -692,7 +703,7 @@
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
         <artifactId>sortpom-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <goals>
@@ -705,7 +716,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.9.0</version>
         <configuration>
           <optimize>true</optimize>
           <showDeprecation>true</showDeprecation>
@@ -717,7 +728,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -730,7 +741,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.3.2</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -775,7 +786,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
+        <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -786,7 +797,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -852,7 +863,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.0</version>
             <configuration>
               <filters>
                 <filter>

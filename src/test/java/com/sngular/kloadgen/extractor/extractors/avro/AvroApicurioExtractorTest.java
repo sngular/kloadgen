@@ -42,7 +42,6 @@ class AvroApicurioExtractorTest {
   void testOptionalEnum() throws Exception {
 
     final String testFile = fileHelper.getContent("/avro-files/optionalEnum.avsc");
-    //final ParsedSchema parsedSchema = avroConfluentExtractor.getSchemaNameList(testFile);
 
     final Schema schema = new Schema.Parser().parse(testFile);
     final List<FieldValueMapping> fieldValueMappingList = avroApicurioExtractor.processSchema(schema);

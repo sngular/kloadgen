@@ -1,4 +1,4 @@
-package com.sngular.kloadgen.extractor.extractors.protobuff;
+package com.sngular.kloadgen.extractor.extractors.protobuf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,27 +8,19 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.squareup.wire.schema.internal.parser.ProtoFileElement;
-import io.confluent.kafka.schemaregistry.ParsedSchema;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchema;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 
-public class ProtobuffExtractor implements ExtractorRegistry<Object> {
+public class ProtobufExtractor implements ExtractorRegistry<ParsedSchema> {
 
   private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new ProtoBufConfluentExtractor(),
                                                                                        SchemaRegistryEnum.APICURIO, new ProtoBufApicurioExtractor());
 
-  public final List<FieldValueMapping> processSchema(final Object schemaReceived, final SchemaRegistryEnum registryEnum) {
-    final var resultSchema = new ArrayList<FieldValueMapping>();
-    if (schemaReceived instanceof ProtoFileElement) {
-      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(SchemaRegistryEnum.APICURIO).processSchema(schemaReceived));
-    } else {
-      resultSchema.addAll(SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived));
-    }
-    return resultSchema;
+  public final List<FieldValueMapping> processSchema(final ParsedSchema schemaReceived, final SchemaRegistryEnum registryEnum) {
+    return new ArrayList<FieldValueMapping>(SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived));
   }
 
   public final ParsedSchema processSchema(final String fileContent) {
-    return new ProtobufSchema(fileContent);
+    return new ParsedSchema(fileContent, "PROTOBUF");
   }
 
   public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {
