@@ -40,6 +40,8 @@ public final class SchemaRegistryKeyHelper {
 
   public static final String SCHEMA_REGISTRY_AUTH_BEARER_TYPE = "BEARER";
 
+  public static final String SCHEMA_REGISTRY_AUTH_SSL_TYPE = "SSL";
+
   public static final String SCHEMA_REGISTRY_AUTH_BEARER_DEFAULT = "<bearer>";
 
   public static final String SCHEMA_REGISTRY_SUBJECTS = "schema.registry.subjects";
@@ -49,6 +51,22 @@ public final class SchemaRegistryKeyHelper {
   public static final String SCHEMA_REGISTRY_AUTH_FLAG = "schema.registry.auth.enabled";
 
   public static final String ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG = "auto.register.schemas";
+
+  public static final String SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION_KEY = "schema.registry.ssl.keystore.location";
+
+  public static final String SCHEMA_REGISTRY_SSL_KEYSTORE_PASSWORD_KEY = "schema.registry.ssl.keystore.password";
+
+  public static final String SCHEMA_REGISTRY_SSL_TRUSTSTORE_LOCATION_KEY = "schema.registry.ssl.truststore.location";
+
+  public static final String SCHEMA_REGISTRY_SSL_TRUSTSTORE_PASSWORD_KEY = "schema.registry.ssl.truststore.password";
+
+  public static final String SSL_KEYSTORE_LOCATION_KEY = "ssl.keystore.location";
+
+  public static final String SSL_KEYSTORE_PASSWORD_KEY = "ssl.keystore.password";
+
+  public static final String SSL_TRUSTSTORE_LOCATION_KEY = "ssl.truststore.location";
+
+  public static final String SSL_TRUSTSTORE_PASSWORD_KEY = "ssl.truststore.password";
 
   private SchemaRegistryKeyHelper() {
   }
