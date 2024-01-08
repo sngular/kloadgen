@@ -73,6 +73,9 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
         jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_TYPE);
         jMeterVariables.put(SchemaRegistryClientConfig.BEARER_AUTH_CREDENTIALS_SOURCE, "STATIC_TOKEN");
         jMeterVariables.put(SchemaRegistryClientConfig.BEARER_AUTH_TOKEN_CONFIG, schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY));
+      } else if (SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_SSL_TYPE.equalsIgnoreCase(schemaProperties.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY))) {
+        jMeterVariables.put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_KEY, SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_SSL_TYPE);
+
       }
     }
   }

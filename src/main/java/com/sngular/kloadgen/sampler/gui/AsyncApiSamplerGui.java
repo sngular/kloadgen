@@ -269,7 +269,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
     final var propertyList = new ArrayList<Pair<String, String>>();
     propertyList.add(Pair.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_URL, srPropoMap.get("url")));
     propertyList.add(Pair.of(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME, srPropoMap.get("type")));
-    SchemaRegistryProperties.DEFAULTS.forEach(jmeterproperty -> propertyList.add(Pair.of(jmeterproperty.getName(), jmeterproperty.getPropertyValue())));
+    DefaultPropertiesHelper.DEFAULTS.forEach(jmeterproperty -> propertyList.add(Pair.of(jmeterproperty.getName(), jmeterproperty.getPropertyValue())));
     return propertyList;
   }
 
@@ -279,7 +279,7 @@ public final class AsyncApiSamplerGui extends AbstractSamplerGui {
       final var serverProps = asyncApiServer.getPropertiesMap();
       propertyList.add(Pair.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, serverProps.get("url")));
       CollectionUtils.select(SamplerUtil
-                                 .getCommonProducerDefaultParameters(),
+                                 .getCommonDefaultParameters(),
                              property -> !property.getName().equalsIgnoreCase(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG))
                      .forEach(jmeterproperty -> extractArgument(jmeterproperty, propertyList));
     }

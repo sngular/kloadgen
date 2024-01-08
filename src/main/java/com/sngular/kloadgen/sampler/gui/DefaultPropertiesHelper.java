@@ -14,7 +14,7 @@ import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.util.ProducerKeysHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 
-public class SchemaRegistryProperties {
+public class DefaultPropertiesHelper {
 
   public static final List<PropertyMapping> DEFAULTS = new ArrayList<>(Arrays.asList(
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG).propertyValue(ProducerKeysHelper.FLAG_NO).build(),
@@ -22,9 +22,18 @@ public class SchemaRegistryProperties {
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_KEY).propertyValue(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_USERNAME_DEFAULT).build(),
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY).propertyValue(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_DEFAULT).build(),
       PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY).propertyValue(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_DEFAULT)
-                     .build()));
+                     .build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION_KEY).propertyValue("").build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SSL_KEYSTORE_PASSWORD_KEY).propertyValue("").build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SSL_TRUSTSTORE_LOCATION_KEY).propertyValue("").build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_SSL_TRUSTSTORE_PASSWORD_KEY).propertyValue("").build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SSL_KEYSTORE_LOCATION_KEY).propertyValue("").build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SSL_KEYSTORE_PASSWORD_KEY).propertyValue("").build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SSL_TRUSTSTORE_LOCATION_KEY).propertyValue("").build(),
+      PropertyMapping.builder().propertyName(SchemaRegistryKeyHelper.SSL_TRUSTSTORE_PASSWORD_KEY).propertyValue("").build()
+  ));
 
-  private SchemaRegistryProperties() {
+  private DefaultPropertiesHelper() {
   }
 
 }

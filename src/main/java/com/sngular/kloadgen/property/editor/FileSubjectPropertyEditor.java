@@ -178,5 +178,4 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   public final boolean supportsCustomEditor() {
     return true;
   }
-
 }
