@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.6.10</version>
+  <version>5.6.14</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
@@ -306,6 +306,27 @@
       <name>Roberto Riveira Veiga</name>
       <email>roberto.riveira@sngular.com</email>
       <organization>Sngular</organization>
+      <organizationUrl>https://www.sngular.com</organizationUrl>
+      <roles>
+        <role>Trainee Backend Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>GraciMndzSNG</id>
+      <name>Graciela Méndez Olmos</name>
+      <email>graciela.mendez@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>pablorodriguez-sngular</id>
+      <name>Pablo Rodríguez Pérez</name>
+      <email>pablo.rodriguezp@sngular.com</email>
+      <organization>Sngular</organization>
       <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Backend Developer</role>
@@ -335,7 +356,7 @@
     <assertj-core.version>3.24.2</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
     <jsonassert.version>1.5.1</jsonassert.version>
-    <avro.version>1.11.2</avro.version>
+    <avro.version>1.11.3</avro.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <commons-collections4.version>4.4</commons-collections4.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -669,7 +690,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.1.2</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
@@ -686,6 +707,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <configLocation>checkstyle.xml</configLocation>
+          <encoding>UTF-8</encoding>
           <consoleOutput>true</consoleOutput>
           <failsOnError>true</failsOnError>
           <linkXRef>false</linkXRef>
@@ -703,7 +725,7 @@
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
         <artifactId>sortpom-maven-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <goals>
@@ -724,32 +746,6 @@
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.3.0</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.4.0</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.eluder.coveralls</groupId>

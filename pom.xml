@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.6.12</version>
+  <version>5.6.14</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
@@ -20,7 +20,7 @@
       <name>Mozilla Public License 2.0</name>
       <url>https://github.com/sngular/kloadgen/blob/master/LICENSE</url>
       <distribution>repo</distribution>
-      <comments></comments>
+      <comments/>
     </license>
   </licenses>
 
@@ -515,12 +515,12 @@
     <dependency>
       <groupId>com.google.api.grpc</groupId>
       <artifactId>proto-google-common-protos</artifactId>
-      <version>2.24.0</version>
+      <version>2.30.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>3.24.3</version>
+      <version>3.25.1</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -738,7 +738,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.9.0</version>
         <configuration>
           <optimize>true</optimize>
           <showDeprecation>true</showDeprecation>
@@ -757,7 +757,7 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.7</version>
         <configuration>
-          <check></check>
+          <check/>
           <formats>
             <format>xml</format>
           </formats>
@@ -828,7 +828,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.0</version>
             <configuration>
               <filters>
                 <filter>
