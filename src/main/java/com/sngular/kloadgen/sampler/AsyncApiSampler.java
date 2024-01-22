@@ -94,6 +94,7 @@ public class AsyncApiSampler extends AbstractSampler implements Serializable {
     return sampleResult;
   }
 
+  @SuppressWarnings("checkstyle:DesignForExtension")
   public KafkaProducer getKafkaProducer() {
     return new KafkaProducer<>(extractProps());
   }
