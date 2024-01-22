@@ -42,9 +42,9 @@ class AsyncApiExtractorImplTest {
 
     Assertions.assertThat(asapfle).isNotNull();
     Assertions.assertThat(asapfle.getApiSchemaList().toString()).isEqualTo("{user_signedup=user_signedup}");
-    Assertions.assertThat(asapfle.getApiServerMap().toString()).isEqualTo("{production=AsyncApiServer(name=production," +
-                                                                          " url=mqtt://test.mosquitto.org, protocol=mqtt," +
-                                                                          " description=Test MQTT broker)}");
+    Assertions.assertThat(asapfle.getApiServerMap().toString()).isEqualTo("{production=AsyncApiServer(name=production,"
+                                                                          + " url=mqtt://test.mosquitto.org, protocol=mqtt,"
+                                                                          + " description=Test MQTT broker)}");
   }
 
   @Test

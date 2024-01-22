@@ -98,15 +98,15 @@ class AsyncApiSamplerTest {
 
   public static List<PropertyMapping> getMappings() {
 
-    List<PropertyMapping> mappings = new ArrayList<>();
-    JsonNode serversNode = asyncApiFileNode.getAsyncApiFileNode().path("servers");
+    final List<PropertyMapping> mappings = new ArrayList<>();
+    final JsonNode serversNode = asyncApiFileNode.getAsyncApiFileNode().path("servers");
     if (serversNode != null) {
-      Iterator<JsonNode> serverNodes = serversNode.elements();
+      final Iterator<JsonNode> serverNodes = serversNode.elements();
       while (serverNodes.hasNext()) {
-        JsonNode serverNode = serverNodes.next();
-        String serverUrl = serverNode.get("url").asText();
-        String serverProtocol = serverNode.get("protocol").asText();
-        String serverDescription = serverNode.get("description").asText();
+        final JsonNode serverNode = serverNodes.next();
+        final String serverUrl = serverNode.get("url").asText();
+        final String serverProtocol = serverNode.get("protocol").asText();
+        final String serverDescription = serverNode.get("description").asText();
 
         mappings.add(new PropertyMapping("url", serverUrl));
         mappings.add(new PropertyMapping("protocol", serverProtocol));
@@ -120,15 +120,15 @@ class AsyncApiSamplerTest {
 
     int i = 0;
     String field = null;
-    List<FieldValueMapping> fieldValueMappings = new ArrayList<>();
-    JsonNode valueFields = asyncApiFileNode.getAsyncApiFileNode().path("components")
+    final List<FieldValueMapping> fieldValueMappings = new ArrayList<>();
+    final JsonNode valueFields = asyncApiFileNode.getAsyncApiFileNode().path("components")
                                            .path("schemas")
                                            .path("userSignedUpPayload")
                                            .path("properties");
     if (valueFields != null) {
-      Iterator<JsonNode> fieldValuesNodes = valueFields.elements();
+      final Iterator<JsonNode> fieldValuesNodes = valueFields.elements();
       while (fieldValuesNodes.hasNext()) {
-        JsonNode fieldValuesNode = fieldValuesNodes.next();
+        final JsonNode fieldValuesNode = fieldValuesNodes.next();
         String type = fieldValuesNode.get("type").toString().replaceAll("\"", "");
         type = type.replaceAll("'", "");
         String value = fieldValuesNode.get("description").toString().replaceAll("\"", "");
