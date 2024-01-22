@@ -6,10 +6,13 @@ import java.util.Locale;
 
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
+import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.testutil.FileHelper;
 import com.squareup.wire.schema.Location;
 import com.squareup.wire.schema.internal.parser.ProtoFileElement;
 import com.squareup.wire.schema.internal.parser.ProtoParser;
+import io.apicurio.registry.utils.protobuf.schema.FileDescriptorUtils;
+import io.apicurio.registry.utils.protobuf.schema.ProtobufSchema;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -23,7 +26,7 @@ class ProtobufApicurioExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final Extractor<ProtoFileElement> protoBufApicurioExtractor = new ProtoBufApicurioExtractor();
+  private final Extractor<ParsedSchema> protoBufApicurioExtractor = new ProtoBufApicurioExtractor();
 
   private final Location location = Location.get("", "");
 
@@ -42,8 +45,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with simple proto file")
   void testFlatProperties() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/easyTest.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
 
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -59,8 +63,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with data structure map and array")
   void testEmbeddedTypes() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/embeddedTypeTest.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(2)
               .containsExactlyInAnyOrder(
@@ -74,8 +79,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with data structure enums and collections")
   void testEnumType() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/enumTest.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
               .containsExactlyInAnyOrder(
@@ -92,8 +98,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with data structure Any of")
   void testOneOfsType() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/oneOfTest.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(4)
               .contains(
@@ -112,8 +119,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with complex structure")
   void testComplexProto() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/complexTest.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(13)
               .containsExactlyInAnyOrder(
@@ -137,8 +145,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with real proto")
   void testProvided() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/providedTest.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(32)
               .containsExactlyInAnyOrder(
@@ -181,8 +190,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with data structure maps")
   void testMap() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/mapTest.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(7)
               .containsExactlyInAnyOrder(
@@ -200,8 +210,9 @@ class ProtobufApicurioExtractorTest {
   @DisplayName("Test Extractor with multi types")
   void completeTest() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/completeProto.proto");
-    final ProtoFileElement schema = ProtoParser.Companion.parse(location, testFile);
-    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(schema);
+    final ProtoFileElement protoFileElement = ProtoParser.Companion.parse(location, testFile);
+    final ProtobufSchema schema = new ProtobufSchema(FileDescriptorUtils.protoFileToFileDescriptor(protoFileElement), protoFileElement);
+    final List<FieldValueMapping> fieldValueMappingList = protoBufApicurioExtractor.processSchema(new ParsedSchema(schema));
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(11)
               .containsExactlyInAnyOrder(
