@@ -222,8 +222,7 @@ public final class SamplerUtil {
   }
 
   public static void setupConsumerSchemaRegistryProperties(final Properties props, final JavaSamplerContext context) {
-    final Map<String, String> originals = new HashMap<>();
-    setupSchemaRegistryAuthenticationProperties(context.getJMeterVariables(), originals);
+    final Map<String, String> originals = setupSchemaRegistryAuthenticationProperties(context.getJMeterVariables());
     props.putAll(originals);
 
     if (Objects.nonNull(context.getJMeterVariables().get(ProducerKeysHelper.VALUE_NAME_STRATEGY))) {
@@ -234,7 +233,8 @@ public final class SamplerUtil {
     }
   }
 
-  private static void setupSchemaRegistryAuthenticationProperties(final JMeterVariables context, final Map<String, String> props) {
+  static Map<String, String> setupSchemaRegistryAuthenticationProperties(final JMeterVariables context) {
+    final Map<String, String> props = new HashMap<>();
     if (Objects.nonNull(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
 
       final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry(context.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME));
@@ -251,6 +251,7 @@ public final class SamplerUtil {
         }
       }
     }
+    return props;
   }
 
   public static Properties setupCommonConsumerProperties(final JavaSamplerContext context) {
@@ -378,8 +379,7 @@ public final class SamplerUtil {
               Objects.requireNonNullElse(jMeterVariables.get(PropsKeysHelper.VALUE_SERIALIZER_CLASS_PROPERTY), ProducerKeysHelper.VALUE_SERIALIZER_CLASS_CONFIG_DEFAULT));
 
     if (Objects.nonNull(jMeterVariables.get(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME))) {
-      final Map<String, String> originals = new HashMap<>();
-      setupSchemaRegistryAuthenticationProperties(jMeterVariables, originals);
+      final Map<String, String> originals = setupSchemaRegistryAuthenticationProperties(jMeterVariables);
 
       props.putAll(originals);
 

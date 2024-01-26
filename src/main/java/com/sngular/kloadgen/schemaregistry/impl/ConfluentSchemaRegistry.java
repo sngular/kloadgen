@@ -3,27 +3,23 @@ package com.sngular.kloadgen.schemaregistry.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
+import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.parsedschema.ParsedSchema;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryFactory;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
-import io.confluent.kafka.schemaregistry.avro.AvroSchemaProvider;
-import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.rest.exceptions.RestClientException;
-import io.confluent.kafka.schemaregistry.json.JsonSchemaProvider;
-import io.confluent.kafka.schemaregistry.protobuf.ProtobufSchemaProvider;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.jmeter.threads.JMeterContextService;
 
 @Slf4j
 public final class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
@@ -37,15 +33,13 @@ public final class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
 
   @Override
   public void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
-    this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
-                                                               List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);
+    this.schemaRegistryClient = (SchemaRegistryClient) SchemaRegistryFactory.getSchemaRegistryClient(SchemaRegistryEnum.CONFLUENT, url, properties);
   }
 
   @Override
   public void setSchemaRegistryClient(final Map<String, ?> properties) {
     final String url = properties.get(this.getSchemaRegistryUrlKey()).toString();
-    this.schemaRegistryClient = new CachedSchemaRegistryClient(List.of(checkPropertyOrVariable(url)), 1000,
-                                                               List.of(new AvroSchemaProvider(), new JsonSchemaProvider(), new ProtobufSchemaProvider()), properties);
+    this.schemaRegistryClient = (SchemaRegistryClient) SchemaRegistryFactory.getSchemaRegistryClient(SchemaRegistryEnum.CONFLUENT, url, properties);
 
   }
 
@@ -88,17 +82,5 @@ public final class ConfluentSchemaRegistry implements SchemaRegistryAdapter {
     } catch (RestClientException | IOException e) {
       throw new KLoadGenException(e.getMessage());
     }
-  }
-
-  private String checkPropertyOrVariable(final String textToCheck) {
-    final String result;
-    if (textToCheck.matches("\\$\\{__P\\(.*\\)}")) {
-      result = JMeterContextService.getContext().getProperties().getProperty(textToCheck.substring(6, textToCheck.length() - 2));
-    } else if (textToCheck.matches("\\$\\{\\w*}")) {
-      result = JMeterContextService.getContext().getVariables().get(textToCheck.substring(2, textToCheck.length() - 1));
-    } else {
-      result = textToCheck;
-    }
-    return result;
   }
 }
