@@ -69,11 +69,7 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   public void setupTest(final JavaSamplerContext context) {
     props = JMeterContextService.getContext().getProperties();
 
-    if (context.getJMeterVariables().get(PropsKeysHelper.VALUE_SCHEMA) == null) {
-      generator = SamplerUtil.configureKeyGenerator(props);
-    } else {
-      generator = SamplerUtil.configureValueGenerator(props);
-    }
+    generator = SamplerUtil.configureValueGenerator(props);
 
     if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
         || "true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
