@@ -42,111 +42,67 @@ public final class RandomObject {
   public Object generateRandom(
       final String fieldType, final Integer valueLength, final List<String> fieldValueList,
       final Map<ConstraintTypeEnum, String> constraints) {
-    Object value;
-    switch (fieldType.toLowerCase()) {
-      case ValidTypeConstants.STRING:
-        value = getStringValueOrRandom(valueLength, fieldValueList, constraints);
-        break;
-      case ValidTypeConstants.INT:
+    final String fixFieldType = StringUtils.defaultString(fieldType, "string");
+    return switch (fixFieldType.toLowerCase()) {
+      case ValidTypeConstants.STRING -> getStringValueOrRandom(valueLength, fieldValueList, constraints);
+      case ValidTypeConstants.INT -> {
         try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).intValueExact();
+          yield getIntegerValueOrRandom(valueLength, fieldValueList, constraints).intValueExact();
         } catch (final ArithmeticException exception) {
-          value = Integer.MAX_VALUE;
+          yield Integer.MAX_VALUE;
         }
-        break;
-      case ValidTypeConstants.LONG:
+      }
+      case ValidTypeConstants.LONG -> {
         try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).longValueExact();
+          yield getIntegerValueOrRandom(valueLength, fieldValueList, constraints).longValueExact();
         } catch (final ArithmeticException exception) {
-          value = Long.MAX_VALUE;
+          yield Long.MAX_VALUE;
         }
-        break;
-      case ValidTypeConstants.SHORT:
+      }
+      case ValidTypeConstants.SHORT -> {
         try {
-          value = getIntegerValueOrRandom(valueLength, fieldValueList, constraints).shortValueExact();
+          yield getIntegerValueOrRandom(valueLength, fieldValueList, constraints).shortValueExact();
         } catch (final ArithmeticException exception) {
-          value = Short.MAX_VALUE;
+          yield Short.MAX_VALUE;
         }
-        break;
-      case ValidTypeConstants.DOUBLE:
+      }
+      case ValidTypeConstants.DOUBLE -> {
         try {
-          value = getDecimalValueOrRandom(valueLength, fieldValueList, constraints).doubleValue();
+          yield getDecimalValueOrRandom(valueLength, fieldValueList, constraints).doubleValue();
         } catch (final ArithmeticException exception) {
-          value = Double.MAX_VALUE;
+          yield Double.MAX_VALUE;
         }
-        break;
-      case ValidTypeConstants.NUMBER:
-      case ValidTypeConstants.FLOAT:
+      }
+      case ValidTypeConstants.NUMBER, ValidTypeConstants.FLOAT -> {
         try {
-          value = getDecimalValueOrRandom(valueLength, fieldValueList, constraints).floatValue();
+          yield getDecimalValueOrRandom(valueLength, fieldValueList, constraints).floatValue();
         } catch (final ArithmeticException exception) {
-          value = Float.MAX_VALUE;
+          yield Float.MAX_VALUE;
         }
-        break;
-      case ValidTypeConstants.BYTES:
+      }
+      case ValidTypeConstants.BYTES -> {
         try {
-          value = getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
+          yield getIntegerValueOrRandom(valueLength, Collections.emptyList(), Collections.emptyMap()).byteValueExact();
         } catch (final ArithmeticException exception) {
-          value = Byte.MAX_VALUE;
+          yield Byte.MAX_VALUE;
         }
-        break;
-      case ValidTypeConstants.TIMESTAMP:
-      case ValidTypeConstants.LONG_TIMESTAMP:
-      case ValidTypeConstants.STRING_TIMESTAMP:
-        value = getTimestampValueOrRandom(fieldType, fieldValueList);
-        break;
-      case ValidTypeConstants.BOOLEAN:
-        value = getBooleanValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.ENUM:
-        value = getEnumValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.INT_DATE:
-        value = getDateValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.INT_TIME_MILLIS:
-        value = getTimeMillisValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_TIME_MICROS:
-        value = getTimeMicrosValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_TIMESTAMP_MILLIS:
-        value = getTimestampMillisValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_TIMESTAMP_MICROS:
-        value = getTimestampMicrosValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS:
-        value = getLocalTimestampMillisValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS:
-        value = getLocalTimestampMicrosValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.UUID:
-      case ValidTypeConstants.STRING_UUID:
-        value = getUUIDValueOrRandom(fieldValueList);
-        break;
-      case ValidTypeConstants.BYTES_DECIMAL:
-      case ValidTypeConstants.FIXED_DECIMAL:
-        value = getDecimalValueOrRandom(fieldValueList, constraints);
-        break;
-      case ValidTypeConstants.INT_YEAR:
-      case ValidTypeConstants.INT_MONTH:
-      case ValidTypeConstants.INT_DAY:
-        value = getDateValueOrRandom(fieldType, fieldValueList);
-        break;
-      case ValidTypeConstants.INT_HOURS:
-      case ValidTypeConstants.INT_MINUTES:
-      case ValidTypeConstants.INT_SECONDS:
-      case ValidTypeConstants.INT_NANOS:
-        value = getTimeOfDayValueOrRandom(fieldType, fieldValueList);
-        break;
-      default:
-        value = fieldType;
-        break;
-    }
-
-    return value;
+      }
+      case ValidTypeConstants.TIMESTAMP, ValidTypeConstants.LONG_TIMESTAMP, ValidTypeConstants.STRING_TIMESTAMP -> getTimestampValueOrRandom(fieldType, fieldValueList);
+      case ValidTypeConstants.BOOLEAN -> getBooleanValueOrRandom(fieldValueList);
+      case ValidTypeConstants.ENUM -> getEnumValueOrRandom(fieldValueList);
+      case ValidTypeConstants.INT_DATE -> getDateValueOrRandom(fieldValueList);
+      case ValidTypeConstants.INT_TIME_MILLIS -> getTimeMillisValueOrRandom(fieldValueList);
+      case ValidTypeConstants.LONG_TIME_MICROS -> getTimeMicrosValueOrRandom(fieldValueList);
+      case ValidTypeConstants.LONG_TIMESTAMP_MILLIS -> getTimestampMillisValueOrRandom(fieldValueList);
+      case ValidTypeConstants.LONG_TIMESTAMP_MICROS -> getTimestampMicrosValueOrRandom(fieldValueList);
+      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MILLIS -> getLocalTimestampMillisValueOrRandom(fieldValueList);
+      case ValidTypeConstants.LONG_LOCAL_TIMESTAMP_MICROS -> getLocalTimestampMicrosValueOrRandom(fieldValueList);
+      case ValidTypeConstants.UUID, ValidTypeConstants.STRING_UUID -> getUUIDValueOrRandom(fieldValueList);
+      case ValidTypeConstants.BYTES_DECIMAL, ValidTypeConstants.FIXED_DECIMAL -> getDecimalValueOrRandom(fieldValueList, constraints);
+      case ValidTypeConstants.INT_YEAR, ValidTypeConstants.INT_MONTH, ValidTypeConstants.INT_DAY -> getDateValueOrRandom(fieldType, fieldValueList);
+      case ValidTypeConstants.INT_HOURS, ValidTypeConstants.INT_MINUTES, ValidTypeConstants.INT_SECONDS, ValidTypeConstants.INT_NANOS -> getTimeOfDayValueOrRandom(fieldType, fieldValueList);
+      default -> fieldType;
+    };
   }
 
   private BigInteger getIntegerValueOrRandom(final Integer valueLength, final List<String> fieldValueList, final Map<ConstraintTypeEnum, String> constraints) {

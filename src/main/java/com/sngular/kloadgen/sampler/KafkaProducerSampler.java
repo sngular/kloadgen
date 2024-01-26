@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
@@ -33,12 +32,14 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.serialization.Serializer;
+import org.jetbrains.annotations.NotNull;
 
 public final class KafkaProducerSampler extends AbstractJavaSamplerClient implements Serializable {
 
@@ -68,18 +69,17 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
   @Override
   public void setupTest(final JavaSamplerContext context) {
     props = JMeterContextService.getContext().getProperties();
-
+    final var vars = JMeterContextService.getContext().getVariables();
     generator = SamplerUtil.configureValueGenerator(props);
 
-    if ("true".equals(context.getJMeterVariables().get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
-        || "true".equals(context.getJMeterVariables().get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
+    if ("true".equals(vars.get(PropsKeysHelper.SCHEMA_KEYED_MESSAGE_KEY))
+        || "true".equals(vars.get(PropsKeysHelper.SIMPLE_KEYED_MESSAGE_KEY))) {
       keyMessageFlag = true;
-      if (!Objects.isNull(JMeterContextService.getContext().getVariables().get(PropsKeysHelper.KEY_SUBJECT_NAME))) {
+      if (!Objects.isNull(vars.get(PropsKeysHelper.KEY_SUBJECT_NAME))) {
         keyGenerator = SamplerUtil.configureKeyGenerator(props);
       } else {
-        msgKeyType = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE);
-        msgKeyValue = PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
-                          ? Collections.emptyList() : Collections.singletonList(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+        msgKeyType = getMsgKeyType(props, vars);
+        msgKeyValue = getMsgKeyValue(props, vars);
       }
     } else {
       props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ProducerKeysHelper.KEY_SERIALIZER_CLASS_CONFIG_DEFAULT);
@@ -108,6 +108,28 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException e) {
       throw new KLoadGenException(e);
     }
+  }
+
+  private String getMsgKeyType(final Properties props, final JMeterVariables vars) {
+    String result = props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_TYPE, null);
+    if (Objects.isNull(result)) {
+      result = vars.get(PropsKeysHelper.KEY_VALUE);
+    }
+    return result;
+  }
+
+  @NotNull
+  private List<String> getMsgKeyValue(final Properties props, final JMeterVariables vars) {
+    
+    final List<String> result = new ArrayList<>();
+    
+    if (PropsKeysHelper.MSG_KEY_VALUE.equalsIgnoreCase(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))
+           || Objects.isNull(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE))) {
+      result.add(props.getProperty(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+    } else if (Objects.nonNull(vars.get(PropsKeysHelper.KEY_VALUE))) {
+      result.add(vars.get(PropsKeysHelper.MESSAGE_KEY_KEY_VALUE));
+    }
+    return result;
   }
 
   @Override
