@@ -147,12 +147,12 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     };
   }
 
-  private Object createInstance(final Class<?> aClass, final SchemaRegistryEnum schemaRegistryEnum, final String url, final Map<String, ?> properties)
+  private Object createInstance(final Class<?> classToGenerate, final SchemaRegistryEnum schemaRegistryEnum, final String url, final Map<String, ?> properties)
       throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
     return switch (schemaRegistryEnum) {
-      case APICURIO -> aClass.getConstructor(RegistryClient.class)
+      case APICURIO -> classToGenerate.getConstructor(RegistryClient.class)
                              .newInstance(SchemaRegistryFactory.getSchemaRegistryClient(SchemaRegistryEnum.APICURIO, url, properties));
-      case CONFLUENT -> aClass.getConstructor(SchemaRegistryClient.class, Map.class)
+      case CONFLUENT -> classToGenerate.getConstructor(SchemaRegistryClient.class, Map.class)
                               .newInstance(SchemaRegistryFactory.getSchemaRegistryClient(SchemaRegistryEnum.CONFLUENT, url, properties), properties);
     };
   }
@@ -205,6 +205,9 @@ public final class KafkaProducerSampler extends AbstractJavaSamplerClient implem
     final var sampleResult = new SampleResult();
     sampleResult.sampleStart();
     final var jMeterContext = JMeterContextService.getContext();
+    if (Objects.isNull(generator)) {
+      throw new KLoadGenException("Error initializing Generator");
+    }
     final var messageVal = generator.nextMessage();
     final var kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
 
