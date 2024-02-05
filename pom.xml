@@ -366,7 +366,7 @@
     <jdk.version>17</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
     <jmeter.version>5.6.2</jmeter.version>
-    <json-path.version>2.6.0</json-path.version>
+    <json-path.version>2.9.0</json-path.version>
     <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
     <apicurio-registry.version>2.4.3.Final</apicurio-registry.version>
