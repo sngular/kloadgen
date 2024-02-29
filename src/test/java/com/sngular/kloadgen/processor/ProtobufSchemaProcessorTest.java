@@ -94,7 +94,9 @@ class ProtobufSchemaProcessorTest {
     final List<FieldValueMapping> fieldValueMappingList = List.of(
         FieldValueMapping.builder().fieldName("id").fieldType("Int32Value").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("occurrence_id").fieldType("StringValue").fieldValueList("Isabel").required(true).isAncestorRequired(true).build(),
-        FieldValueMapping.builder().fieldName("load_number").fieldType("Int32Value").required(true).isAncestorRequired(true).build());
+        FieldValueMapping.builder().fieldName("load_number").fieldType("Int32Value").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("date").fieldType("DateValue").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("timeofday").fieldType("TimeOfDateValue").required(true).isAncestorRequired(true).build());
     final SchemaProcessor protobufSchemaProcessor = new SchemaProcessor();
     protobufSchemaProcessor.processSchema(SchemaTypeEnum.PROTOBUF, new ParsedSchema(testFile, SchemaTypeEnum.PROTOBUF.name()),
             confluentBaseSchemaMetadata, fieldValueMappingList);
@@ -112,9 +114,11 @@ class ProtobufSchemaProcessorTest {
     Assertions.assertThat(message).isNotNull().isInstanceOf(EnrichedRecord.class);
     Assertions.assertThat(message.getGenericRecord()).isNotNull();
     Assertions.assertThat(secondValue).isEqualTo("Isabel");
-    Assertions.assertThat(assertKeys).hasSize(3).containsExactlyInAnyOrder("abc.Incident.id",
+    Assertions.assertThat(assertKeys).hasSize(5).containsExactlyInAnyOrder("abc.Incident.id",
                                                                            "abc.Incident.occurrence_id",
-                                                                           "abc.Incident.load_number");
+                                                                           "abc.Incident.load_number",
+                                                                           "abc.Incident.date",
+                                                                           "abc.Incident.timeofday");
   }
 
   @Test
