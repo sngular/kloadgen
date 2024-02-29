@@ -11,6 +11,7 @@ import java.beans.PropertyDescriptor;
 import com.sngular.kloadgen.model.PropertyMapping;
 import com.sngular.kloadgen.property.editor.SchemaRegistryConfigPropertyEditor;
 import com.sngular.kloadgen.property.editor.SchemaRegistryNamePropertyEditor;
+import com.sngular.kloadgen.sampler.gui.DefaultPropertiesHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;

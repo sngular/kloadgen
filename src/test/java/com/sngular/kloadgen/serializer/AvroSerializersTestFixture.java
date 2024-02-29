@@ -2,6 +2,7 @@ package com.sngular.kloadgen.serializer;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
@@ -13,8 +14,8 @@ import org.apache.kafka.common.serialization.Serializer;
 public final class AvroSerializersTestFixture {
 
   static final List<Serializer<GenericRecord>> SERIALIZER_LIST = List.of(
-    new GenericAvroRecordSerializer<>(),
-    new GenericAvroRecordBinarySerializer<>()
+      new GenericAvroRecordSerializer<>(),
+      new GenericAvroRecordBinarySerializer<>()
   );
 
   static final Pair<File, List<FieldValueMapping>> TEST_SUBENTITY_ARRAY = new Pair<>(
@@ -45,7 +46,7 @@ public final class AvroSerializersTestFixture {
 
   static final Pair<File, List<FieldValueMapping>> TEST_OPTIONAL_ENUM = new Pair<>(
       new FileHelper().getFile("/avro-files/optionalEnum.avsc"),
-      Arrays.asList(SerializerTestFixture.createFieldValueMapping("aggregateAttribute.fruitList.fruits[].fruitType", "enum"))
+      Collections.singletonList(SerializerTestFixture.createFieldValueMapping("aggregateAttribute.fruitList.fruits[].fruitType", "enum"))
   );
 
   static final Pair<File, List<FieldValueMapping>> TEST_FILE_ISSUE = new Pair<>(

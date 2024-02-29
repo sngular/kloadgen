@@ -37,7 +37,6 @@ class ProtobufApicurioExtractorTest {
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
-
   @Test
   @DisplayName("Test Extractor with simple proto file")
   void testFlatProperties() throws Exception {
@@ -53,7 +52,6 @@ class ProtobufApicurioExtractorTest {
                   FieldValueMapping.builder().fieldName("zipcode").fieldType("long").required(true).isAncestorRequired(true).build()
               );
   }
-
 
   @Test
   @DisplayName("Test Extractor with data structure map and array")

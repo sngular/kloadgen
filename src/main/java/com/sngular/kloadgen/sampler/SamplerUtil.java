@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.loadgen.BaseLoadGenerator;
 import com.sngular.kloadgen.loadgen.impl.AvroSRLoadGenerator;
@@ -49,7 +51,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.jetbrains.annotations.NotNull;
 
 public final class SamplerUtil {
 
@@ -395,6 +396,13 @@ public final class SamplerUtil {
       }
     } else {
       try {
+        final String schema;
+        if (ObjectUtils.isEmpty(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA))) {
+          schema = props.getProperty(PropsKeysHelper.VALUE_SCHEMA);
+        } else {
+          schema = jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA);
+        }
+        generator.setUpGenerator(schema, (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
         generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));
       } catch (final SchemaParseException exc) {
         generator.setUpGenerator(jMeterVariables.get(PropsKeysHelper.VALUE_SCHEMA), (List<FieldValueMapping>) jMeterVariables.getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES));

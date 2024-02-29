@@ -47,7 +47,7 @@ class KeySerializedConfigElementTest {
     JMeterContextService.getContext().getProperties().put(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
     final var keySerializedConfigElement = new KeySerializedConfigElement("avroSubject", Collections.emptyList(), "AVRO",
-                                                                    AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
+                                                                          AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     keySerializedConfigElement.iterationStart(null);
     Assertions.assertThat(JMeterContextService.getContext().getVariables().getObject(PropsKeysHelper.KEY_SUBJECT_NAME)).isNotNull();
     Assertions.assertThat(JMeterContextService.getContext().getVariables().getObject(PropsKeysHelper.KEY_SCHEMA_PROPERTIES)).isNotNull();

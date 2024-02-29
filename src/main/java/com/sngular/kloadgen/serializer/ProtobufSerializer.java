@@ -22,6 +22,7 @@ import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
+
 @Slf4j
 public class ProtobufSerializer<T extends EnrichedRecord> implements Serializer<T> {
 

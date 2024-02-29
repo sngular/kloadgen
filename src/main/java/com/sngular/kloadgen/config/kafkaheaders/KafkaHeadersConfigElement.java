@@ -32,7 +32,7 @@ public class KafkaHeadersConfigElement extends ConfigTestElement implements Test
   private List<FieldValueMapping> kafkaHeaders;
 
   @Override
-  public final void iterationStart(final LoopIterationEvent iterEvent) {
+  public final void iterationStart(final LoopIterationEvent iteEvent) {
 
     final JMeterContext context = getThreadContext();
 

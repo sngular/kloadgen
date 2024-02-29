@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.avro.Schema;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.jmeter.threads.JMeterContextService;
 
 public class ValueUtils {
@@ -25,11 +26,13 @@ public class ValueUtils {
   }
 
   public static List<String> replaceValuesContext(final List<String> fieldValuesList) {
-    final List<String> parameterList = new ArrayList<>(fieldValuesList);
-
-    parameterList.replaceAll(fieldValue ->
-                                 fieldValue.matches("\\$\\{\\w*}")
-                                     ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
+    final List<String> parameterList = new ArrayList<>();
+    if (CollectionUtils.isNotEmpty(fieldValuesList)) {
+      parameterList.addAll(fieldValuesList);
+      parameterList.replaceAll(fieldValue ->
+                                   fieldValue.matches("\\$\\{\\w*}")
+                                       ? JMeterContextService.getContext().getVariables().get(fieldValue.substring(2, fieldValue.length() - 1)) : fieldValue);
+    }
     return parameterList;
   }
 

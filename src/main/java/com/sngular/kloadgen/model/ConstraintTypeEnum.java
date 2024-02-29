@@ -15,5 +15,5 @@ public enum ConstraintTypeEnum {
   REGEX,
   FORMAT,
   PRECISION,
-  SCALE
+    MIN_LENGTH, MAX_LENGTH, SCALE
 }

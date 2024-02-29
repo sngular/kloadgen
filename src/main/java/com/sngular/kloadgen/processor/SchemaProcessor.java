@@ -21,6 +21,7 @@ import com.sngular.kloadgen.processor.util.SchemaProcessorUtils;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 public class SchemaProcessor {
@@ -165,9 +166,34 @@ public class SchemaProcessor {
   }
 
   private ArrayDeque<FieldValueMapping> calculateFieldsToProcess() {
+
+    ArrayDeque<FieldValueMapping> fieldToProcess;
     final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue = new ArrayDeque<>(fieldExprMappings);
-    return initialFieldExpMappingsQueue.stream().filter(fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue))
-                                       .collect(Collectors.toCollection(ArrayDeque::new));
+    fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, fieldValueMapping -> shouldProcessField(fieldValueMapping, initialFieldExpMappingsQueue)));
+
+
+    if (fieldToProcess.isEmpty()) {
+      fieldToProcess = new ArrayDeque<>(ListUtils.select(fieldExprMappings, this::shouldProcessFieldIfIsNonRequiered));
+      if (fieldToProcess.isEmpty()) {
+        while (initialFieldExpMappingsQueue.size() > 1) {
+          initialFieldExpMappingsQueue.removeFirst();
+        }
+        fieldToProcess = initialFieldExpMappingsQueue;
+      }
+    }
+
+    return fieldToProcess;
+  }
+
+  private boolean shouldProcessFieldIfIsNonRequiered(final FieldValueMapping fieldValueMapping) {
+
+    boolean shouldProcess = false;
+    if (fieldValueMapping.getFieldValuesList().isEmpty() || fieldValueMapping.getFieldValuesList().contains("null")) {
+      fieldValueMapping.getFieldValuesList().remove("null");
+    } else {
+      shouldProcess = true;
+    }
+    return shouldProcess;
   }
 
   private boolean shouldProcessField(final FieldValueMapping fieldValueMapping, final ArrayDeque<FieldValueMapping> initialFieldExpMappingsQueue) {

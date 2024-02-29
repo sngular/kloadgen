@@ -7,20 +7,21 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AbstractParsedSchema;
+import com.sngular.kloadgen.parsedschema.JsonParsedSchema;
 
+public class JsonExtractor implements ExtractorRegistry<JsonParsedSchema> {
 
-public class JsonExtractor implements ExtractorRegistry<ParsedSchema> {
-
-  private static final Map<SchemaRegistryEnum, Extractor> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new JsonDefaultExtractor(),
+  private static final Map<SchemaRegistryEnum, Extractor<String>> SCHEMA_REGISTRY_MAP = Map.of(SchemaRegistryEnum.CONFLUENT, new JsonDefaultExtractor(),
                                                                                        SchemaRegistryEnum.APICURIO, new JsonDefaultExtractor());
 
-  public final List<FieldValueMapping> processSchema(final ParsedSchema schemaReceived, final SchemaRegistryEnum registryEnum) {
-    return SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived.rawSchema().toString());
+  public final List<FieldValueMapping> processSchema(final AbstractParsedSchema<?> schemaReceived, final SchemaRegistryEnum registryEnum) {
+    return SCHEMA_REGISTRY_MAP.get(registryEnum).processSchema(schemaReceived.getRawSchema().toString());
   }
 
-  public final ParsedSchema processSchema(final String fileContent) {
-    return new ParsedSchema(fileContent, "JSON");
+
+  public final JsonParsedSchema processSchema(final String fileContent) {
+    return new JsonParsedSchema(null, fileContent);
   }
 
   public final List<String> getSchemaNameList(final String schema, final SchemaRegistryEnum registryEnum) {

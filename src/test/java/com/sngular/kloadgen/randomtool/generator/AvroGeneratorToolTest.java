@@ -38,10 +38,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 class AvroGeneratorToolTest {
 
   private static final LocalDateTime FIXED_TIMESTAMP = LocalDateTime.of(2019, 12, 6, 10, 15, 30);
+
   private static final LocalDate FIXED_DATE = LocalDate.of(2019, 12, 6);
+
   private static final LocalTime FIXED_TIME = LocalTime.of(10, 15, 30);
+
   private static final String TIMESTAMP_STRING = "2019-12-06T10:15:30";
+
   private static final String DATE_STRING = "2019-12-06";
+
   private static final String TIME_STRING = "10:15:30";
 
   private static Stream<Arguments> parametersForGenerateRandomValueForField() {
@@ -109,62 +114,12 @@ class AvroGeneratorToolTest {
     );
   }
 
-  @ParameterizedTest
-  @DisplayName("Testing Random Value for Field")
-  @MethodSource("parametersForGenerateRandomValueForField")
-  void testGenerateRandomValueForField(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field, final Object expected) {
-    final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType(fieldType)
-                                                           .valueLength(valueLength)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
-    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
-  }
-
-  @ParameterizedTest
-  @DisplayName("Testing Random Value for Field with Logical Types")
-  @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
-  void testGenerateRandomValueForFieldLogicalTypes(final String fieldType, final Integer valueLength, final List<String> fieldValuesList,
-      final Field field, final Object expected,
-      final Map<ConstraintTypeEnum, String> constraints) {
-    final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType(fieldType)
-                                                           .valueLength(valueLength)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
-    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, constraints)).isEqualTo(expected);
-  }
-
   private static Stream<Arguments> parametersForGenerateRandomValue() {
     return Stream.of(
         Arguments.of("int", 5, Collections.emptyList(), new Field("name", SchemaBuilder.builder().intType())),
         Arguments.of("long", 6, Collections.emptyList(), new Field("name", SchemaBuilder.builder().longType())),
         Arguments.of("float", 5, Collections.emptyList(), new Field("name", SchemaBuilder.builder().floatType())),
         Arguments.of("double", 6, Collections.emptyList(), new Field("name", SchemaBuilder.builder().doubleType())));
-  }
-
-  @Disabled("Test failure sometimes")
-  @ParameterizedTest
-  @DisplayName("Testing Generate a Random Value")
-  @MethodSource("parametersForGenerateRandomValue")
-  void testGenerateRandomValue(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field) {
-    final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType(fieldType)
-                                                           .valueLength(valueLength)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
-    final Object number = new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap());
-    Assertions.assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
-    Assertions.assertThat(String.valueOf(number)).hasSize(valueLength);
   }
 
   private static Stream<Arguments> parametersForGenerateFieldValuesListIterator() {
@@ -183,45 +138,10 @@ class AvroGeneratorToolTest {
                      List.of("first", "second", "third", "first", "second")));
   }
 
-  @ParameterizedTest
-  @DisplayName("Testing generate an iterator of a list of values")
-  @MethodSource("parametersForGenerateFieldValuesListIterator")
-  void testGenerateFieldValuesListSequence(final int size, final List<String> fieldValuesList, final String fieldType, final List<Object> expected) {
-    final var intList = new ArrayList<>();
-    final Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
-    final Field field = new Field("name", schema);
-    final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType("it")
-                                                           .valueLength(0)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .build();
-    final var avroGeneratorTool = new AvroGeneratorTool();
-    for (int i = 0; i <= size; i++) {
-      intList.add(avroGeneratorTool.generateObject(field.schema(), fieldValueMapping, Collections.emptyMap()));
-    }
-    Assertions.assertThat(intList).containsExactlyElementsOf(expected);
-  }
-
   private static Stream<Arguments> parametersForGenerateRandomValueForEnums() {
     return Stream.of(
         Arguments.of("enum", 1, Collections.singletonList("RED"),
                      new Field("name", SchemaBuilder.builder().enumeration("ENUM1").symbols("RED", "BLUE", "GREEN")), "RED"));
-  }
-
-  @ParameterizedTest
-  @DisplayName("Testing Generate a Random Value for Enums")
-  @MethodSource("parametersForGenerateRandomValueForEnums")
-  void testGenerateRandomValueForEnums(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field, final Object expected) {
-    final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType(fieldType)
-                                                           .valueLength(valueLength)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
-    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).hasFieldOrPropertyWithValue("symbol", expected);
   }
 
   private static Stream<Arguments> parametersForGenerateSequenceValueForField() {
@@ -232,22 +152,6 @@ class AvroGeneratorToolTest {
         Arguments.of("it", 1, Collections.singletonList("0"), new Field("name", SchemaBuilder.builder().stringType()), "0"),
         Arguments.of("it", 1, Collections.singletonList("1"), new Field("name", SchemaBuilder.builder().intType()), 1),
         Arguments.of("it", 1, Collections.singletonList("2"), new Field("name", SchemaBuilder.builder().intType()), 2));
-  }
-
-  @ParameterizedTest
-  @DisplayName("Testing Generate a Random Value for Field")
-  @MethodSource("parametersForGenerateSequenceValueForField")
-  void testGenerateSequenceValueForField(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field,
-      final Object expectedTyped) {
-    final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType(fieldType)
-                                                           .valueLength(valueLength)
-                                                           .fieldValueList(String.join(",", fieldValuesList))
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
-    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
   }
 
   private static Stream<Arguments> parametersForShouldRecoverVariableFromContext() {
@@ -302,6 +206,109 @@ class AvroGeneratorToolTest {
   }
 
   @ParameterizedTest
+  @DisplayName("Testing Random Value for Field")
+  @MethodSource("parametersForGenerateRandomValueForField")
+  void testGenerateRandomValueForField(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field, final Object expected) {
+    final var fieldValueMapping = FieldValueMapping.builder()
+                                                   .fieldName(field.name())
+                                                   .fieldType(fieldType)
+                                                   .valueLength(valueLength)
+                                                   .fieldValueList(String.join(",", fieldValuesList))
+                                                   .required(true)
+                                                   .isAncestorRequired(true)
+                                                   .build();
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
+  }
+
+  @ParameterizedTest
+  @DisplayName("Testing Random Value for Field with Logical Types")
+  @MethodSource("parametersForGenerateRandomValueForFieldLogicalTypes")
+  void testGenerateRandomValueForFieldLogicalTypes(
+      final String fieldType, final Integer valueLength, final List<String> fieldValuesList,
+      final Field field, final Object expected,
+      final Map<ConstraintTypeEnum, String> constraints) {
+    final var fieldValueMapping = FieldValueMapping.builder()
+                                                   .fieldName(field.name())
+                                                   .fieldType(fieldType)
+                                                   .valueLength(valueLength)
+                                                   .fieldValueList(String.join(",", fieldValuesList))
+                                                   .required(true)
+                                                   .isAncestorRequired(true)
+                                                   .build();
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, constraints)).isEqualTo(expected);
+  }
+
+  @Disabled("Test failure sometimes")
+  @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value")
+  @MethodSource("parametersForGenerateRandomValue")
+  void testGenerateRandomValue(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field) {
+    final var fieldValueMapping = FieldValueMapping.builder()
+                                                   .fieldName(field.name())
+                                                   .fieldType(fieldType)
+                                                   .valueLength(valueLength)
+                                                   .fieldValueList(String.join(",", fieldValuesList))
+                                                   .required(true)
+                                                   .isAncestorRequired(true)
+                                                   .build();
+    final Object number = new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap());
+    Assertions.assertThat(number).isInstanceOfAny(Long.class, Integer.class, Double.class, Float.class);
+    Assertions.assertThat(String.valueOf(number)).hasSize(valueLength);
+  }
+
+  @ParameterizedTest
+  @DisplayName("Testing generate an iterator of a list of values")
+  @MethodSource("parametersForGenerateFieldValuesListIterator")
+  void testGenerateFieldValuesListSequence(final int size, final List<String> fieldValuesList, final String fieldType, final List<Object> expected) {
+    final var intList = new ArrayList<>();
+    final Schema schema = fieldType.equals(ValidTypeConstants.INT) ? SchemaBuilder.builder().intType() : SchemaBuilder.builder().stringType();
+    final Field field = new Field("name", schema);
+    final var fieldValueMapping = FieldValueMapping.builder()
+                                                   .fieldName(field.name())
+                                                   .fieldType("it")
+                                                   .valueLength(0)
+                                                   .fieldValueList(String.join(",", fieldValuesList))
+                                                   .build();
+    final var avroGeneratorTool = new AvroGeneratorTool();
+    for (int i = 0; i <= size; i++) {
+      intList.add(avroGeneratorTool.generateObject(field.schema(), fieldValueMapping, Collections.emptyMap()));
+    }
+    Assertions.assertThat(intList).containsExactlyElementsOf(expected);
+  }
+
+  @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value for Enums")
+  @MethodSource("parametersForGenerateRandomValueForEnums")
+  void testGenerateRandomValueForEnums(final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field, final Object expected) {
+    final var fieldValueMapping = FieldValueMapping.builder()
+                                                   .fieldName(field.name())
+                                                   .fieldType(fieldType)
+                                                   .valueLength(valueLength)
+                                                   .fieldValueList(String.join(",", fieldValuesList))
+                                                   .required(true)
+                                                   .isAncestorRequired(true)
+                                                   .build();
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).hasFieldOrPropertyWithValue("symbol", expected);
+  }
+
+  @ParameterizedTest
+  @DisplayName("Testing Generate a Random Value for Field")
+  @MethodSource("parametersForGenerateSequenceValueForField")
+  void testGenerateSequenceValueForField(
+      final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Field field,
+      final Object expectedTyped) {
+    final var fieldValueMapping = FieldValueMapping.builder()
+                                                   .fieldName(field.name())
+                                                   .fieldType(fieldType)
+                                                   .valueLength(valueLength)
+                                                   .fieldValueList(String.join(",", fieldValuesList))
+                                                   .required(true)
+                                                   .isAncestorRequired(true)
+                                                   .build();
+    Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expectedTyped);
+  }
+
+  @ParameterizedTest
   @DisplayName("Testing Recover Variable from Context")
   @MethodSource("parametersForShouldRecoverVariableFromContext")
   void shouldRecoverVariableFromContext(final String fieldType, final Integer valueLength, final String value, final Field field, final Object expected) {
@@ -309,32 +316,33 @@ class AvroGeneratorToolTest {
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
     final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType(fieldType)
-                                                           .valueLength(valueLength)
-                                                           .fieldValueList("${VARIABLE}")
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
+                                                   .fieldName(field.name())
+                                                   .fieldType(fieldType)
+                                                   .valueLength(valueLength)
+                                                   .fieldValueList("${VARIABLE}")
+                                                   .required(true)
+                                                   .isAncestorRequired(true)
+                                                   .build();
     Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, Collections.emptyMap())).isEqualTo(expected);
   }
 
   @ParameterizedTest
   @DisplayName("Testing Recover Variable from Context Logical Types")
   @MethodSource("parametersForShouldRecoverVariableFromContextLogicalTypes")
-  void shouldRecoverVariableFromContext(final String fieldType, final Integer valueLength, final String value, final Field field,
+  void shouldRecoverVariableFromContext(
+      final String fieldType, final Integer valueLength, final String value, final Field field,
       final Object expected, final Map<ConstraintTypeEnum, String> constraints) {
     final var variables = new JMeterVariables();
     variables.put("VARIABLE", value);
     JMeterContextService.getContext().setVariables(variables);
     final var fieldValueMapping = FieldValueMapping.builder()
-                                                           .fieldName(field.name())
-                                                           .fieldType(fieldType)
-                                                           .valueLength(valueLength)
-                                                           .fieldValueList("${VARIABLE}")
-                                                           .required(true)
-                                                           .isAncestorRequired(true)
-                                                           .build();
+                                                   .fieldName(field.name())
+                                                   .fieldType(fieldType)
+                                                   .valueLength(valueLength)
+                                                   .fieldValueList("${VARIABLE}")
+                                                   .required(true)
+                                                   .isAncestorRequired(true)
+                                                   .build();
     Assertions.assertThat(new AvroGeneratorTool().generateObject(field.schema(), fieldValueMapping, constraints)).isEqualTo(expected);
   }
 }

@@ -21,7 +21,6 @@ import com.sngular.kloadgen.model.FieldValueMapping;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
 import com.sngular.kloadgen.serializer.EnrichedRecord;
-import com.sngular.kloadgen.testutil.FileHelper;
 import com.sngular.kloadgen.util.SchemaRegistryKeyHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -34,8 +33,6 @@ import org.junit.jupiter.api.Test;
 @WireMockTest
 class AvroSRLoadGeneratorTest {
 
-  private final FileHelper fileHelper = new FileHelper();
-
   @BeforeEach
   public void setUp(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
     final File file = new File("src/test/resources");
@@ -47,7 +44,7 @@ class AvroSRLoadGeneratorTest {
   }
 
   @Test
-  void testAvroLoadGeneratorApicurio(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException, IOException {
+  void testAvroLoadGeneratorApicurio(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
     final List<FieldValueMapping> fieldValueMappingList = Arrays.asList(
         FieldValueMapping.builder().fieldName("Name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
         FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
@@ -67,11 +64,11 @@ class AvroSRLoadGeneratorTest {
   }
 
   @Test
-  void testAvroLoadGeneratorConfluent(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException, IOException {
+  void testAvroLoadGeneratorConfluent(final WireMockRuntimeInfo wmRuntimeInfo) throws KLoadGenException {
 
     final List<FieldValueMapping> fieldValueMappingList = Arrays.asList(
-            FieldValueMapping.builder().fieldName("Name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
-            FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
+        FieldValueMapping.builder().fieldName("Name").fieldType("string").valueLength(0).fieldValueList("Jose").required(true).isAncestorRequired(true).build(),
+        FieldValueMapping.builder().fieldName("Age").fieldType("int").valueLength(0).fieldValueList("43").required(true).isAncestorRequired(true).build());
 
     final Map<String, String> originals = new HashMap<>();
     final SchemaRegistryAdapter schemaRegistryManager = SchemaRegistryManagerFactory.getSchemaRegistry("confluent");

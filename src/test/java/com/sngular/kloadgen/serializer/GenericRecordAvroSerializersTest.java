@@ -7,10 +7,11 @@ import java.util.stream.Stream.Builder;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AvroParsedSchema;
 import com.sngular.kloadgen.processor.SchemaProcessor;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ConfluentSchemaMetadata;
+import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.common.serialization.Serializer;
 import org.assertj.core.api.Assertions;
@@ -67,12 +68,12 @@ public class GenericRecordAvroSerializersTest {
   @MethodSource("getSerializerAndSchemaToTest")
   void genericAvroRecordSerializerTest(final Serializer<GenericRecord> serializer, final File schemaFile, final List<FieldValueMapping> fieldValueMappings) throws Exception {
     final var schemaStr = SerializerTestFixture.readSchema(schemaFile);
-    final BaseSchemaMetadata confluentBaseSchemaMetadata =
+    final BaseSchemaMetadata<ConfluentSchemaMetadata> confluentBaseSchemaMetadata =
         new BaseSchemaMetadata<>(
             ConfluentSchemaMetadata.parse(new io.confluent.kafka.schemaregistry.client.SchemaMetadata(1, 1,
                                                                                                       schemaStr)));
 
-    final ParsedSchema parsedSchema = new ParsedSchema(schemaFile, "AVRO");
+    final var parsedSchema = new AvroParsedSchema("AVRO", new Schema.Parser().parse(schemaFile));
     AVRO_SCHEMA_PROCESSOR.processSchema(SchemaTypeEnum.AVRO, parsedSchema, confluentBaseSchemaMetadata, fieldValueMappings);
     final var generatedRecord = AVRO_SCHEMA_PROCESSOR.next();
 

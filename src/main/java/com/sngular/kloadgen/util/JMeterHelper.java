@@ -8,9 +8,9 @@ package com.sngular.kloadgen.util;
 
 import java.util.Properties;
 
+import com.sngular.kloadgen.parsedschema.AbstractParsedSchema;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryManagerFactory;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -22,7 +22,7 @@ public final class JMeterHelper {
   private JMeterHelper() {
   }
 
-  public static BaseParsedSchema getParsedSchema(final String subjectName, final Properties properties) {
+  public static AbstractParsedSchema<?> getParsedSchema(final String subjectName, final Properties properties) {
     String schemaRegistryName = properties.getProperty(SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME);
     if (schemaRegistryName == null || StringUtils.isEmpty(schemaRegistryName)) {
       schemaRegistryName = SchemaRegistryKeyHelper.SCHEMA_REGISTRY_NAME_DEFAULT;

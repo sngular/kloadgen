@@ -25,7 +25,9 @@ class KeySerializedConfigElementBeanInfoTest {
   private static final String KEY_NAME_STRATEGY = "keyNameStrategy";
 
   private static final String KEY_SERIALIZER_CONFIGURATION = "keySerializerConfiguration";
+
   private static final String PROPERTIES = "props";
+
   private static final String SCHEMA = "schema";
 
   private KeySerializedConfigElementBeanInfo keySerializedConfigElementBeanInfo;

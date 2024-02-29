@@ -1,3 +1,9 @@
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  * License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 package com.sngular.kloadgen.processor;
 
 import java.io.File;
@@ -15,6 +21,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,6 +37,10 @@ public class JsonSchemaProcessorTest {
 
   private static Stream<Object> parametersForTestBasicStructure() {
     return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_REQUIRED_EXPECTED));
+  }
+
+  private static Stream<Object> parametersForTestOptionalFieldNonEmpty() {
+    return Stream.of(Arguments.of(JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED, JsonSchemaFixturesConstants.SIMPLE_SCHEMA_NONREQUIRED_EXPECTED));
   }
 
   @BeforeEach
@@ -63,7 +74,7 @@ public class JsonSchemaProcessorTest {
     final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).contains("lastName\":\"García")
-                                  .contains("itemTipo\":{").contains("itemType\":{");
+              .contains("itemTipo\":{").contains("itemType\":{");
   }
 
   @Test
@@ -87,11 +98,11 @@ public class JsonSchemaProcessorTest {
     final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
 
     Assertions.assertThat(message.toString()).contains("{\"fruits\":{\"tropical\":[]},\"vegetables\":{\"trees\":{}}")
-                                  .contains("\"birds\":[[{\"nameBird\":")
-                                  .contains("\"animals\":{").contains("nameAnimal\":");
+              .contains("\"birds\":[[{\"nameBird\":")
+              .contains("\"animals\":{").contains("nameAnimal\":");
 
   }
-  
+
   @ParameterizedTest
   @MethodSource("parametersForTestBasicStructure")
   final void testBasicStructure(final List<FieldValueMapping> schemaAsJson, final String expected) {
@@ -115,6 +126,20 @@ public class JsonSchemaProcessorTest {
     Assertions.assertThat(message.toString()).containsPattern("^\\{\"flowers\":\\{(\"\\w+\":\\{\"name\":\\[(\"Edelweiss\",?)+],?)+.*");
     Assertions.assertThat(message.toString()).containsPattern(
         ".*\\\"bush\":\\{\"\\w+\":\\{\"maxHeight\":(\\[(\\{(\"\\w+\":\\d+,?)+},?)+],?)*\"leafs\":(\\[\\{(\"\\w+\":\\[(\"oval\",?)+],?)+}+],+)*.*$");
+  }
+
+  @ParameterizedTest
+  @DisplayName("Should process non-required fields if it is not empty")
+  @MethodSource("parametersForTestOptionalFieldNonEmpty")
+  final void testOptionalFieldNonEmpty(final List<FieldValueMapping> schemaAsJson, final String expected) {
+
+    final SchemaProcessor jsonSchemaProcessor = new SchemaProcessor();
+
+    jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, schemaAsJson);
+    final ObjectNode message = (ObjectNode) jsonSchemaProcessor.next();
+
+    Assertions.assertThat(message.toString()).isEqualTo(expected);
+
   }
 
 }

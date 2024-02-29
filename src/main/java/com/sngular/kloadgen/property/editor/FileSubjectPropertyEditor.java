@@ -30,9 +30,8 @@ import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.extractor.SchemaExtractor;
 import com.sngular.kloadgen.extractor.extractors.ExtractorFactory;
-import com.sngular.kloadgen.extractor.extractors.ExtractorRegistry;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AbstractParsedSchema;
 import com.sngular.kloadgen.util.PropsKeysHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.AvroRuntimeException;
@@ -94,9 +93,9 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
       final File schemaFile = Objects.requireNonNull(fileChooser.getSelectedFile());
       try {
         final String schemaType = schemaTypeComboBox.getSelectedItem().toString();
-        final ExtractorRegistry extractor = ExtractorFactory.getExtractor(schemaType);
+        final var extractor = ExtractorFactory.getExtractor(schemaType);
         final String fileContent = SchemaExtractor.readSchemaFile(schemaFile.getPath());
-        final ParsedSchema parserSchema = (ParsedSchema) extractor.processSchema(fileContent);
+        final var parserSchema = extractor.processSchema(fileContent);
         final List<FieldValueMapping> schemaFieldList = extractor.processSchema(parserSchema, SchemaRegistryEnum.CONFLUENT);
         buildTable(schemaFieldList, fileContent, schemaType);
       } catch (final IOException e) {
@@ -107,7 +106,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     }
   }
 
-  public final List<FieldValueMapping> getAttributeList(final ParsedSchema selectedSchema) {
+  public final List<FieldValueMapping> getAttributeList(final AbstractParsedSchema selectedSchema) {
     final List<FieldValueMapping> result = new ArrayList<>();
     if (Objects.nonNull(selectedSchema)) {
       result.addAll(SchemaExtractor.flatPropertiesList(selectedSchema));

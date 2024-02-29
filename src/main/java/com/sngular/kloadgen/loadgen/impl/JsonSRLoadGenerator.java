@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
@@ -56,10 +57,23 @@ public final class JsonSRLoadGenerator implements SRLoadGenerator, BaseLoadGener
     this.jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, fieldExprMappings);
   }
 
+  @Override
+  public void setUpGenerator(final List<FieldValueMapping> fieldExprMappings) {
+
+    this.jsonSchemaProcessor.processSchema(SchemaTypeEnum.JSON, null, null, fieldExprMappings);
+  }
+
   public EnrichedRecord nextMessage() {
-    return EnrichedRecord.builder().schemaMetadata(
-        metadata.getLeft().getSchemaMetadataAdapter()
-    ).genericRecord(jsonSchemaProcessor.next()).build();
+    final EnrichedRecord.EnrichedRecordBuilder builder = EnrichedRecord.builder();
+
+    if (Objects.nonNull(metadata)) {
+      builder.schemaMetadata(
+          metadata.getLeft().getSchemaMetadataAdapter()
+      );
+    }
+    builder.genericRecord(jsonSchemaProcessor.next()).build();
+
+    return builder.build();
   }
 
 }

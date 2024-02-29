@@ -6,8 +6,12 @@ import java.util.Locale;
 
 import com.sngular.kloadgen.extractor.extractors.Extractor;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AbstractParsedSchema;
+import com.sngular.kloadgen.parsedschema.ProtobufParsedSchema;
 import com.sngular.kloadgen.testutil.FileHelper;
+import com.squareup.wire.schema.Location;
+import com.squareup.wire.schema.internal.parser.ProtoFileElement;
+import com.squareup.wire.schema.internal.parser.ProtoParser;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -21,7 +25,7 @@ class ProtobufConfluentExtractorTest {
 
   private final FileHelper fileHelper = new FileHelper();
 
-  private final Extractor<ParsedSchema> protoBufConfluentExtractor = new ProtoBufConfluentExtractor();
+  private final Extractor<AbstractParsedSchema<ProtoFileElement>> protoBufConfluentExtractor = new ProtoBufConfluentExtractor();
 
   @BeforeEach
   public void setUp() {
@@ -33,12 +37,11 @@ class ProtobufConfluentExtractorTest {
     JMeterUtils.setLocale(Locale.ENGLISH);
   }
 
-  
   @Test
   @DisplayName("Test Extractor with simple proto file")
   void testFlatProperties() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/easyTest.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -53,7 +56,7 @@ class ProtobufConfluentExtractorTest {
   @DisplayName("Test Extractor with data structure map and array")
   void testEmbeddedTypes() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/embeddedTypeTest.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(2)
@@ -68,7 +71,7 @@ class ProtobufConfluentExtractorTest {
   @DisplayName("Test Extractor with data structure enums and collections")
   void testEnumType() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/enumTest.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(3)
@@ -86,7 +89,7 @@ class ProtobufConfluentExtractorTest {
   @DisplayName("Test Extractor with data structure Any of")
   void testOneOfsType() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/oneOfTest.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(4)
@@ -106,7 +109,7 @@ class ProtobufConfluentExtractorTest {
   @DisplayName("Test Extractor with complex structure")
   void testComplexProto() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/complexTest.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(13)
@@ -131,7 +134,7 @@ class ProtobufConfluentExtractorTest {
   @DisplayName("Test Extractor with real proto")
   void testProvided() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/providedTest.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(32)
@@ -175,7 +178,7 @@ class ProtobufConfluentExtractorTest {
   @DisplayName("Test Extractor with data structure maps")
   void testMap() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/mapTest.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(7)
@@ -194,7 +197,7 @@ class ProtobufConfluentExtractorTest {
   @DisplayName("Test Extractor with multi types")
   void completeTest() throws Exception {
     final String testFile = fileHelper.getContent("/proto-files/completeProto.proto");
-    final ParsedSchema schema = new ParsedSchema(testFile, "PROTOBUF");
+    final var schema = new ProtobufParsedSchema("PROTOBUF", new ProtoParser(Location.get("/"), testFile.toCharArray()).readProtoFile());
     final List<FieldValueMapping> fieldValueMappingList = protoBufConfluentExtractor.processSchema(schema);
     Assertions.assertThat(fieldValueMappingList)
               .hasSize(11)

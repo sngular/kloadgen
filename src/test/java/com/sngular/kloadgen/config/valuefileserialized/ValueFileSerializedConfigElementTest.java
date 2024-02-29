@@ -41,7 +41,7 @@ class ValueFileSerializedConfigElementTest {
           + ".topic.value\"}";
 
     final var valueFileSerializedConfigElement = new ValueFileSerializedConfigElement("avroSubject", Collections.emptyList(), definitionSchema, "AVRO",
-                                             AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
+                                                                                      AvroSerializer.class.getSimpleName(), TopicNameStrategy.class.getSimpleName());
     valueFileSerializedConfigElement.iterationStart(null);
     Assertions.assertThat(JMeterContextService.getContext().getVariables().getObject(PropsKeysHelper.VALUE_SUBJECT_NAME)).isNotNull();
     Assertions.assertThat(JMeterContextService.getContext().getVariables().getObject(PropsKeysHelper.VALUE_SCHEMA_PROPERTIES)).isNotNull();

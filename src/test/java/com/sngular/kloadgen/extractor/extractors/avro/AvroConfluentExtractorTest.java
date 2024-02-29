@@ -12,14 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-
 class AvroConfluentExtractorTest {
-
 
   private final FileHelper fileHelper = new FileHelper();
 
   private final Extractor<Schema> avroConfluentExtractor = new AvroConfluentExtractor();
-
 
   @Test
   @DisplayName("Should extract Embedded Record")

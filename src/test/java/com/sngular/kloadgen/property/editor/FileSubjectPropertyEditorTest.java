@@ -11,8 +11,9 @@ import java.io.IOException;
 import java.util.List;
 
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.parsedschema.ParsedSchema;
+import com.sngular.kloadgen.parsedschema.AvroParsedSchema;
 import com.sngular.kloadgen.testutil.FileHelper;
+import org.apache.avro.Schema;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class FileSubjectPropertyEditorTest {
   @DisplayName("File Subject Property Editor extract AVRO")
   void extractEmbeddedAvroTest() throws IOException {
     final File testFile = fileHelper.getFile("/avro-files/embedded-avros-example-test.avsc");
-    final ParsedSchema schema = new ParsedSchema(testFile, "AVRO");
+    final var schema = new AvroParsedSchema("AVRO", new Schema.Parser().parse(testFile));
     final List<FieldValueMapping> fieldValueMappingList = editor.getAttributeList(schema);
 
     Assertions.assertThat(fieldValueMappingList)

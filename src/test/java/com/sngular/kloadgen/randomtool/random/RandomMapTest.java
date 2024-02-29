@@ -29,7 +29,7 @@ class RandomMapTest {
         Arguments.of("short-map", 1, Collections.singletonList("testString:1"), Maps.of("testString", (short) 1), 1),
         Arguments.of("double-map", 1, Collections.singletonList("testString:1.0"), Maps.of("testString", 1.0), 1),
         Arguments.of("uuid-map", 1, Collections.singletonList("testString:0177f035-e51c-4a46-8b82-5b157371c2a5"),
-            Maps.of("testString", UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")), 1
+                     Maps.of("testString", UUID.fromString("0177f035-e51c-4a46-8b82-5b157371c2a5")), 1
         )
     );
   }
@@ -38,7 +38,7 @@ class RandomMapTest {
 
     //The name of this type is due to: SchemaProcessorUtils.getOneDimensionValueType (this remove the last -map)
     return Stream.of(Arguments.of("string-array", 5, List.of("key1:[value1,value2,value3]", "key2:[valueB1,valueB2]"),
-                         Map.of("key1", List.of("value1", "value2", "value3"), "key2", List.of("valueB1", "valueB2")), 1)
+                                  Map.of("key1", List.of("value1", "value2", "value3"), "key2", List.of("valueB1", "valueB2")), 1)
     );
   }
 
@@ -53,11 +53,11 @@ class RandomMapTest {
     );
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "test for {0}")
   @MethodSource("parametersForGenerateMapRandomValueFromList")
   void generateMapRandomValueFromList(
       final String fieldType, final Integer valueLength, final List<String> fieldValuesList, final Map<String, Object> expected, final Integer size) {
-    final Entry<String, Object>[] expectedMap = expected.entrySet().toArray(new Entry[1]);
+    final Entry[] expectedMap = expected.entrySet().toArray(new Entry[1]);
     final Map<String, Object> result =
         (Map<String, Object>) new RandomMap().generateMap(fieldType, valueLength, fieldValuesList, size, Collections.emptyMap());
     Assertions.assertThat(result).containsExactly(expectedMap);

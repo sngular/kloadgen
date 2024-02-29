@@ -12,10 +12,12 @@ import java.util.Objects;
 import com.google.protobuf.Message;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
+import com.sngular.kloadgen.parsedschema.AbstractParsedSchema;
+import com.sngular.kloadgen.parsedschema.AvroParsedSchema;
+import com.sngular.kloadgen.parsedschema.JsonParsedSchema;
+import com.sngular.kloadgen.parsedschema.ProtobufParsedSchema;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import io.apicurio.registry.resolver.SchemaParser;
@@ -80,56 +82,46 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
   }
 
   @Override
-  public BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubject(final String artifactId) {
-    final ApicurioAbstractParsedSchemaMetadata schema = new ApicurioAbstractParsedSchemaMetadata();
+  public AbstractParsedSchema<?> getSchemaBySubject(final String artifactId) {
     try {
       final SearchedArtifact searchedArtifact = getLastestSearchedArtifact(artifactId);
       final InputStream inputStream = this.schemaRegistryClient.getLatestArtifact(searchedArtifact.getGroupId(), searchedArtifact.getId());
-      final String searchedArtifactType = searchedArtifact.getType();
-      setSchemaBySchemaType(schema, inputStream.readAllBytes(), searchedArtifactType);
-      schema.setType(searchedArtifactType);
-      return new BaseParsedSchema<>(schema);
+      return extractSchema(inputStream.readAllBytes(), searchedArtifact);
     } catch (final IOException e) {
       throw new KLoadGenException(e);
     }
   }
 
-  private static void setSchemaBySchemaType(final ApicurioAbstractParsedSchemaMetadata schema, final byte[] result, final String searchedArtifactType) {
-
-    switch (SchemaTypeEnum.valueOf(searchedArtifactType)) {
-      case AVRO:
-        final SchemaParser<Schema, Object> parserAvro = new AvroSchemaParser<>(null);
-        schema.setSchema(parserAvro.parseSchema(result, new HashMap<>()));
-        break;
-      case PROTOBUF:
-        final SchemaParser<ProtobufSchema, Message> parserProtobuf = new ProtobufSchemaParser<>();
-        schema.setSchema(parserProtobuf.parseSchema(result, new HashMap<>()));
-        break;
-      case JSON:
-        final SchemaParser<JsonSchema, Object> parserJson = new JsonSchemaParser<>();
-        schema.setSchema(parserJson.parseSchema(result, new HashMap<>()));
-        break;
-      default:
-        throw new KLoadGenException(String.format("Schema type not supported %s", searchedArtifactType));
-
-    }
-  }
-
   @Override
-  public final BaseParsedSchema<ApicurioAbstractParsedSchemaMetadata> getSchemaBySubjectAndId(
-      final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
-    final ApicurioAbstractParsedSchemaMetadata schema = new ApicurioAbstractParsedSchemaMetadata();
-
+  public AbstractParsedSchema<?> getSchemaBySubjectAndId(final String subjectName, final BaseSchemaMetadata<? extends SchemaMetadataAdapter> metadata) {
     final SchemaMetadataAdapter schemaMetadataAdapter = metadata.getSchemaMetadataAdapter();
     try {
       final InputStream inputStream = this.schemaRegistryClient.getContentByGlobalId(schemaMetadataAdapter.getGlobalId());
-
-      final String searchedArtifactType = schemaMetadataAdapter.getType();
-      setSchemaBySchemaType(schema, inputStream.readAllBytes(), searchedArtifactType);
+      return extractSchema(inputStream.readAllBytes(), subjectName, schemaMetadataAdapter.getType());
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
-    return new BaseParsedSchema<>(schema);
+  }
+
+  private AbstractParsedSchema<?> extractSchema(final byte[] schema, final SearchedArtifact searchedArtifact) {
+    return extractSchema(schema, searchedArtifact.getName(), searchedArtifact.getType());
+  }
+
+  private AbstractParsedSchema<?> extractSchema(final byte[] schemaInputStream, final String schemaName, final String schemaType) {
+    return switch (SchemaTypeEnum.valueOf(schemaType)) {
+      case AVRO -> {
+        final SchemaParser<Schema, Object> parserAvro = new AvroSchemaParser<>(null);
+        yield new AvroParsedSchema(schemaName, parserAvro.parseSchema(schemaInputStream, new HashMap<>()));
+      }
+      case PROTOBUF -> {
+        final SchemaParser<ProtobufSchema, Message> parserProtobuf = new ProtobufSchemaParser<>();
+        yield new ProtobufParsedSchema(schemaName, parserProtobuf.parseSchema(schemaInputStream, new HashMap<>()).getProtoFileElement());
+      }
+      case JSON -> {
+        final SchemaParser<JsonSchema, Object> parserJson = new JsonSchemaParser<>();
+        yield new JsonParsedSchema(schemaName, parserJson.parseSchema(schemaInputStream, new HashMap<>()).toString());
+      }
+    };
   }
 
   private SearchedArtifact getLastestSearchedArtifact(final String artifactId) {

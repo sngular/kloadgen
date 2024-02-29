@@ -26,7 +26,6 @@ import com.github.os72.protobuf.dynamic.MessageDefinition.Builder;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.sngular.kloadgen.model.FieldValueMapping;
-import com.sngular.kloadgen.schemaregistry.adapter.impl.AbstractParsedSchemaAdapter;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import com.sngular.kloadgen.util.JMeterHelper;
@@ -187,9 +186,10 @@ public class SchemaProcessorUtils {
           schemaBuilder.addSchema(importedSchema);
         }
       } else {
-        final AbstractParsedSchemaAdapter protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
-                                                                                          JMeterContextService.getContext().getProperties()).getParsedSchemaAdapter();
-        final var importedProtobufSchema = new ProtobufSchema(protoFileElement.getRawSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
+        final var protoFileElement = JMeterHelper.getParsedSchema(getSubjectName(importedClass, metadata),
+                                                                                          JMeterContextService.getContext().getProperties());
+        final var importedProtobufSchema = new ProtobufSchema(
+            (ProtoFileElement) protoFileElement.getSchema(), metadata.getSchemaMetadataAdapter().getReferences(), new HashMap<>());
         if (!ProtobufHelper.NOT_ACCEPTED_IMPORTS.contains(importedClass)) {
           schemaBuilder.addDependency(importedProtobufSchema.toDescriptor().getFullName());
           schemaBuilder.addSchema(convertDynamicSchema(importedProtobufSchema, metadata));

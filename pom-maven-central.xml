@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.6.10</version>
+  <version>5.7.0</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
@@ -225,17 +225,6 @@
       <timezone>Europe/Madrid</timezone>
     </developer>
     <developer>
-      <id>nuriaricorf</id>
-      <name>Nuria Rico Freire</name>
-      <email>nuria.rico@sngular.com</email>
-      <organization>Sngular</organization>
-      <organizationUrl>https://sngular.github.io/</organizationUrl>
-      <roles>
-        <role>Junior Developer</role>
-      </roles>
-      <timezone>Europe/Madrid</timezone>
-    </developer>
-    <developer>
       <id>rabad-sng</id>
       <name>Raúl Abad</name>
       <email>raul.abad@sngular.com</email>
@@ -243,6 +232,17 @@
       <organizationUrl>https://www.sngular.com</organizationUrl>
       <roles>
         <role>Senior Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>nuriaricorf</id>
+      <name>Nuria Rico Freire</name>
+      <email>nuria.rico@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Junior Developer</role>
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
@@ -306,6 +306,27 @@
       <name>Roberto Riveira Veiga</name>
       <email>roberto.riveira@sngular.com</email>
       <organization>Sngular</organization>
+      <organizationUrl>https://www.sngular.com</organizationUrl>
+      <roles>
+        <role>Trainee Backend Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>GraciMndzSNG</id>
+      <name>Graciela Méndez Olmos</name>
+      <email>graciela.mendez@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io/</organizationUrl>
+      <roles>
+        <role>Backend Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>pablorodriguez-sngular</id>
+      <name>Pablo Rodríguez Pérez</name>
+      <email>pablo.rodriguezp@sngular.com</email>
+      <organization>Sngular</organization>
       <organizationUrl>https://sngular.github.io/</organizationUrl>
       <roles>
         <role>Backend Developer</role>
@@ -335,7 +356,7 @@
     <assertj-core.version>3.24.2</assertj-core.version>
     <assertj-json.version>1.2.0</assertj-json.version>
     <jsonassert.version>1.5.1</jsonassert.version>
-    <avro.version>1.11.2</avro.version>
+    <avro.version>1.11.3</avro.version>
     <commons-beanutils.version>1.9.4</commons-beanutils.version>
     <commons-collections4.version>4.4</commons-collections4.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -358,6 +379,8 @@
     <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
     <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
     <wiremock.version>2.35.1</wiremock.version>
+    <jackson-annotations.version>2.15.2</jackson-annotations.version>
+    <jackson-dataformat-yaml.version>2.15.3</jackson-dataformat-yaml.version>
   </properties>
 
   <dependencies>
@@ -395,18 +418,23 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.15.2</version>
+      <version>${jackson-annotations.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.15.2</version>
+      <version>${jackson-annotations.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>${jackson-dataformat-yaml.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -686,6 +714,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <configLocation>checkstyle.xml</configLocation>
+          <encoding>UTF-8</encoding>
           <consoleOutput>true</consoleOutput>
           <failsOnError>true</failsOnError>
           <linkXRef>false</linkXRef>

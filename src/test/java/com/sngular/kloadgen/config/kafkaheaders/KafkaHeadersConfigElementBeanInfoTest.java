@@ -9,16 +9,21 @@ package com.sngular.kloadgen.config.kafkaheaders;
 import java.beans.PropertyDescriptor;
 import java.util.Locale;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jmeter.util.JMeterUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@Slf4j
 class KafkaHeadersConfigElementBeanInfoTest {
 
   private static final String KAFKA_HEADERS = "kafkaHeaders";
+
   private static final String PROPERTIES = "props";
+
   private static final String SCHEMA = "schema";
+
   private KafkaHeadersConfigElementBeanInfo kafkaHeadersConfigElementBeanInfo;
 
   @BeforeEach

@@ -18,5 +18,9 @@ public interface BaseLoadGenerator {
 
   void setUpGenerator(String schema, List<FieldValueMapping> fieldExprMappings);
 
+  default void setUpGenerator(List<FieldValueMapping> fieldExprMappings) {
+    this.setUpGenerator(null, fieldExprMappings);
+  }
+
   EnrichedRecord nextMessage();
 }
