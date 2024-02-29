@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.google.protobuf.Message;
+import com.sngular.kloadgen.common.SchemaRegistryEnum;
 import com.sngular.kloadgen.common.SchemaTypeEnum;
 import com.sngular.kloadgen.exception.KLoadGenException;
 import com.sngular.kloadgen.schemaregistry.SchemaRegistryAdapter;
+import com.sngular.kloadgen.schemaregistry.SchemaRegistryFactory;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioAbstractParsedSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.ApicurioSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseParsedSchema;
@@ -20,7 +22,6 @@ import com.sngular.kloadgen.schemaregistry.adapter.impl.BaseSchemaMetadata;
 import com.sngular.kloadgen.schemaregistry.adapter.impl.SchemaMetadataAdapter;
 import io.apicurio.registry.resolver.SchemaParser;
 import io.apicurio.registry.rest.client.RegistryClient;
-import io.apicurio.registry.rest.client.RegistryClientFactory;
 import io.apicurio.registry.rest.client.exception.RestClientException;
 import io.apicurio.registry.rest.v2.beans.ArtifactMetaData;
 import io.apicurio.registry.rest.v2.beans.SearchedArtifact;
@@ -43,13 +44,13 @@ public final class ApicurioSchemaRegistry implements SchemaRegistryAdapter {
 
   @Override
   public void setSchemaRegistryClient(final String url, final Map<String, ?> properties) {
-    this.schemaRegistryClient = RegistryClientFactory.create(url);
+    this.schemaRegistryClient = (RegistryClient) SchemaRegistryFactory.getSchemaRegistryClient(SchemaRegistryEnum.APICURIO, url, properties);
   }
 
   @Override
   public void setSchemaRegistryClient(final Map<String, ?> properties) {
     final String url = Objects.toString(properties.get(this.getSchemaRegistryUrlKey()), "");
-    this.schemaRegistryClient = RegistryClientFactory.create(url);
+    this.schemaRegistryClient = (RegistryClient) SchemaRegistryFactory.getSchemaRegistryClient(SchemaRegistryEnum.APICURIO, url, properties);
   }
 
   @Override

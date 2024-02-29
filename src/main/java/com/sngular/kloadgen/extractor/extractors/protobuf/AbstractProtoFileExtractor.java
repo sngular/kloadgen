@@ -118,7 +118,8 @@ public abstract class AbstractProtoFileExtractor {
                                                  .isAncestorRequired(isAncestorRequired).build());
         } else if (nestedTypes.containsKey(subField.getType())) {
           final MessageElement clonedField = new MessageElement(field.getLocation(), field.getName(), field.getDocumentation(), field.getNestedTypes(), field.getOptions(),
-                                                                field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(), field.getExtensions(), field.getGroups());
+                                                                field.getReserveds(), oneOfElement.getFields(), Collections.emptyList(), field.getExtensions(), field.getGroups(),
+                                                                field.getExtendDeclarations());
           processField(clonedField, completeFieldList, Collections.emptyList(), isAncestorRequired, nestedTypes);
         } else {
           completeFieldList.add(

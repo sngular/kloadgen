@@ -45,7 +45,7 @@ public class ParsedSchema<T> implements IParsedSchema<T> {
     this.schema = schema;
     this.schemaType = switch (this.schema.getClass().getSimpleName()) {
       case "Schema", "AvroSchema", "UnionSchema", "RecordSchema" -> "AVRO";
-      case "ProtoBuf", "ProtoFileElement" -> "PROTOBUF";
+      case "ProtoBuf", "ProtobufSchema", "ProtoFileElement" -> "PROTOBUF";
       case "JsonSchema", "ObjectSchema" -> "JSON";
       default -> throw new KLoadGenException(String.format("Need to specify schemaType for %s", this.schema.getClass().getSimpleName()));
     };

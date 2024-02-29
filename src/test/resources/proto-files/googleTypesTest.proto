@@ -14,5 +14,7 @@ message Incident {
     .google.protobuf.Int32Value id = 1;
     .google.protobuf.StringValue occurrence_id = 2;
     .google.protobuf.StringValue load_number = 3;
-    
+    .google.type.Date date = 4;
+    .google.type.TimeOfDay timeofday = 5;
+
 }
