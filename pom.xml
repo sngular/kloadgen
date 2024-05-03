@@ -7,7 +7,7 @@
 
   <artifactId>kloadgen</artifactId>
 
-  <version>5.6.12</version>
+  <version>5.6.13</version>
 
   <name>KLoadGen</name>
   <description>Load Generation Jmeter plugin for Kafka Cluster. Supporting AVRO, JSON Schema and Protobuf schema types. Generate Artificial
@@ -20,7 +20,7 @@
       <name>Mozilla Public License 2.0</name>
       <url>https://github.com/sngular/kloadgen/blob/master/LICENSE</url>
       <distribution>repo</distribution>
-      <comments></comments>
+      <comments/>
     </license>
   </licenses>
 
@@ -333,6 +333,28 @@
       </roles>
       <timezone>Europe/Madrid</timezone>
     </developer>
+    <developer>
+      <id>JanDuinRod</id>
+      <name>Jan Duinkerken Rodríguez</name>
+      <email>jan.duinkerken@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io</organizationUrl>
+      <roles>
+        <role>Fullstack Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
+    <developer>
+      <id>davidgayoso</id>
+      <name>David Gayoso Salvado</name>
+      <email>david.gayoso@sngular.com</email>
+      <organization>Sngular</organization>
+      <organizationUrl>https://sngular.github.io</organizationUrl>
+      <roles>
+        <role>Fullstack Developer</role>
+      </roles>
+      <timezone>Europe/Madrid</timezone>
+    </developer>
   </developers>
 
   <scm>
@@ -365,20 +387,21 @@
     <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
     <jdk.version>17</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.6.2</jmeter.version>
+    <jmeter.version>5.6.3</jmeter.version>
     <json-path.version>2.9.0</json-path.version>
-    <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
-    <kafka-schema-registry-client.version>7.1.1</kafka-schema-registry-client.version>
-    <apicurio-registry.version>2.4.3.Final</apicurio-registry.version>
-    <kafka.version>3.5.1</kafka.version>
+    <junit-jupiter-api.version>5.10.1</junit-jupiter-api.version>
+    <kafka-schema-registry-client.version>7.5.1</kafka-schema-registry-client.version>
+    <apicurio-registry.version>2.5.8.Final</apicurio-registry.version>
+    <kafka.version>3.6.1</kafka.version>
     <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
     <mockito-core.version>4.2.0</mockito-core.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <rest-assured.version>4.5.0</rest-assured.version>
-    <slf4j-api.version>2.0.0-alpha1</slf4j-api.version>
+    <slf4j-api.version>2.0.11</slf4j-api.version>
     <wiremock-junit5.version>1.3.1</wiremock-junit5.version>
     <wiremock.version>2.35.1</wiremock.version>
+    <jackson-core.version>2.15.2</jackson-core.version>
   </properties>
 
   <dependencies>
@@ -406,22 +429,21 @@
       <groupId>org.apache.avro</groupId>
       <artifactId>avro</artifactId>
       <version>${avro.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-        </exclusion>
-      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.24.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.15.2</version>
+      <version>${jackson-core.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.15.2</version>
+      <version>${jackson-core.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -433,16 +455,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>${commons-lang3.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.confluent</groupId>
-      <artifactId>kafka-schema-registry-client</artifactId>
-      <version>${kafka-schema-registry-client.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.confluent</groupId>
-      <artifactId>kafka-avro-serializer</artifactId>
-      <version>${kafka-schema-registry-client.version}</version>
     </dependency>
     <dependency>
       <groupId>io.confluent</groupId>
@@ -477,6 +489,16 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib-common</artifactId>
+      <version>1.8.20</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib</artifactId>
+      <version>1.8.20</version>
+    </dependency>
+    <dependency>
       <groupId>io.apicurio</groupId>
       <artifactId>apicurio-registry-serdes-avro-serde</artifactId>
       <version>${apicurio-registry.version}</version>
@@ -499,7 +521,7 @@
     <dependency>
       <groupId>org.apache.avro</groupId>
       <artifactId>avro-protobuf</artifactId>
-      <version>1.11.2</version>
+      <version>1.11.3</version>
     </dependency>
     <dependency>
       <groupId>com.github.os72</groupId>
@@ -509,18 +531,18 @@
     <dependency>
       <groupId>com.squareup.wire</groupId>
       <artifactId>wire-java-generator</artifactId>
-      <version>4.0.1</version>
+      <version>4.9.0</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.google.api.grpc</groupId>
       <artifactId>proto-google-common-protos</artifactId>
-      <version>2.24.0</version>
+      <version>2.30.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>3.24.3</version>
+      <version>3.25.1</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -541,7 +563,7 @@
     <dependency>
       <groupId>com.github.curious-odd-man</groupId>
       <artifactId>rgxgen</artifactId>
-      <version>1.3</version>
+      <version>1.4</version>
     </dependency>
     <dependency>
       <groupId>org.reflections</groupId>
@@ -557,7 +579,7 @@
     <dependency>
       <groupId>com.github.charithe</groupId>
       <artifactId>kafka-junit</artifactId>
-      <version>4.2.0</version>
+      <version>4.2.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -690,7 +712,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.0</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
@@ -725,7 +747,7 @@
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
         <artifactId>sortpom-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <goals>
@@ -738,7 +760,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.10.0</version>
         <configuration>
           <optimize>true</optimize>
           <showDeprecation>true</showDeprecation>
@@ -757,7 +779,7 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.7</version>
         <configuration>
-          <check></check>
+          <check/>
           <formats>
             <format>xml</format>
           </formats>
@@ -777,7 +799,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.2.2</version>
       </plugin>
     </plugins>
   </build>
@@ -828,7 +850,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.0</version>
             <configuration>
               <filters>
                 <filter>
