@@ -392,7 +392,7 @@
     <junit-jupiter-api.version>5.10.1</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>7.5.1</kafka-schema-registry-client.version>
     <apicurio-registry.version>2.5.8.Final</apicurio-registry.version>
-    <kafka.version>3.6.1</kafka.version>
+    <kafka.version>5.3.0-ccs</kafka.version>
     <lombok.version>1.18.22</lombok.version>
     <minimal-json.version>0.9.5</minimal-json.version>
     <mockito-core.version>4.2.0</mockito-core.version>
